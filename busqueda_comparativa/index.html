@@ -1,0 +1,1229 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Macroled — Catálogo de productos (prototipo)</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --brand:#00bdff;
+    --brand-dark:#0090c7;
+    --ink:#141821;
+    --ink-soft:#5b6472;
+    --line:#e6e9ee;
+    --bg-card:#efefef;
+    --bg-page:#f5f5f5;
+    --radius:12px;
+    --radius-sm:8px;
+    --dark-blue--700:#00152B;
+    --dark-blue-600:#012a4a;
+    --colortext:#5D5C5C;
+    --btn-blue:#0077a8;
+    --btn-blue-dark:#005f87;
+    --shadow-sm:0 1px 2px rgba(20,24,33,.05);
+    --shadow-md:0 12px 28px rgba(20,24,33,.10);
+    --focus-ring:0 0 0 3px rgba(0,189,255,.35);
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:'Noto Sans',sans-serif;
+    color:var(--ink);
+    background:var(--bg-page);
+    -webkit-font-smoothing:antialiased;
+  }
+  a{color:inherit;text-decoration:none;}
+
+  header.topbar{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:18px 40px;border-bottom:1px solid var(--line);
+    flex-wrap:wrap;gap:16px;
+  }
+  .logo{font-weight:800;font-size:22px;letter-spacing:.5px;color:var(--brand);}
+  nav.mainnav{display:flex;gap:28px;font-size:14px;font-weight:600;color:var(--ink);}
+  .topbar-right{display:flex;align-items:center;gap:16px;}
+  .search-box{
+    display:flex;align-items:center;gap:8px;border:1px solid var(--line);
+    border-radius:10px;padding:8px 14px;min-width:220px;color:var(--ink-soft);font-size:13px;
+  }
+
+  .crumb{
+    padding:16px 40px 0;font-size:13px;color:var(--ink-soft);
+    max-width:1400px;margin:0 auto;box-sizing:border-box;
+  }
+  .crumb b{color:var(--ink);}
+  .crumb a{cursor:pointer;}
+  .crumb a:hover{text-decoration:underline;color:var(--dark-blue--700);}
+  .crumb .crumb-active{color:var(--brand-dark);font-weight:700;}
+
+  .layout{display:flex;gap:50px;padding:24px 40px 60px;align-items:flex-start;
+   max-width: 1400px;
+      margin:auto;}
+  aside.filters{
+    width:300px;flex:none;
+    position:sticky;
+    top:24px;
+    max-height:calc(100vh - 48px);
+    overflow-y:auto;
+  }
+  main.results{flex:1;min-width:0;}
+
+  .facet-group{border-bottom:1px solid var(--line);padding:20px 0;}
+  .facet-group:first-child{padding-top:2px;}
+  .facet-title{
+    display:flex;align-items:center;justify-content:space-between;cursor:pointer;
+    font-weight:600;font-size:14px;
+    color:var(--dark-blue--700);transition:opacity .12s;
+  }
+  .facet-title:hover{opacity:.72;}
+  .facet-title .chev{transition:transform .15s;}
+  .facet-group.collapsed .facet-title .chev{transform:rotate(180deg);}
+  .ft-label{display:flex;align-items:center;gap:9px;}
+  .ft-label svg{flex:none;color:var(--dark-blue--700);}
+  .facet-title .chev{color:var(--ink-soft);font-size:12px;}
+  .facet-body{margin-top:16px;display:flex;flex-direction:column;gap:14px;}
+  .facet-group.collapsed .facet-body{display:none;}
+  .facet-row{display:flex;align-items:center;gap:10px;font-size:14px;cursor:pointer;user-select:none;
+  color:var(--colortext);border-radius:6px;margin:0 -6px;padding:2px 6px;transition:background .12s,color .12s;}
+  .facet-row:hover{background:rgb(227,242,253);color:rgb(0,110,165);}
+  .facet-row:hover .cb-wrap .box{border-color:rgb(0,110,165);}
+  .cb-wrap{position:relative;width:18px;height:18px;flex:none;display:inline-block;}
+  .cb-wrap input{position:absolute;inset:0;opacity:0;margin:0;width:100%;height:100%;cursor:pointer;}
+  .cb-wrap .box{
+    position:absolute;inset:0;border:1.5px solid #d5d9e0;border-radius:5px;background:#fff;
+    display:flex;align-items:center;justify-content:center;pointer-events:none;transition:background .12s,border-color .12s;
+  }
+  .cb-wrap .box svg{width:11px;height:11px;opacity:0;transition:opacity .1s;}
+  .cb-wrap input:checked + .box{background:var(--dark-blue--700);border-color:var(--dark-blue--700);}
+  .cb-wrap input:checked + .box svg{opacity:1;}
+  .cb-wrap input:focus-visible + .box{outline:2px solid var(--brand);outline-offset:2px;}
+  .facet-row .count{color:var(--colortext);
+    margin-left:auto;color:var(--ink-soft);font-size:12px;}
+  .dot{width:9px;height:9px;border-radius:50%;display:inline-block;flex:none;}
+  .soon-note{font-size:12px;color:var(--ink-soft);font-style:italic;line-height:1.4;}
+
+  .category-heading{margin-bottom:60px;}
+  .category-heading h1{font-size:28px;font-weight:800;color:var(--dark-blue--700);margin:0 0 6px;letter-spacing:-.2px;}
+  .category-heading .count{font-size:14px;color:var(--ink-soft);}
+
+  #subfamiliaRow{position:relative;margin-bottom:20px;}
+  .subfam-track{
+    display:flex;gap:14px;overflow-x:auto;scroll-behavior:smooth;
+    padding:4px 6px 12px;scrollbar-width:none;-ms-overflow-style:none;
+  }
+  .subfam-track::-webkit-scrollbar{display:none;}
+  .subfam-card{
+    position:relative;flex:none;width:148px;border-radius:10px;border:1.5px solid #e5e5e5;
+    background:#ededed;display:flex;align-items:center;justify-content:center;
+    gap:10px;padding:16px 10px;cursor:pointer;transition:border-color .12s,background .12s;user-select:none;
+  }
+  .subfam-card:hover{background:rgb(227,242,253);border-color:var(--brand);}
+  .subfam-card:hover .subfam-label{color:rgb(66, 136, 171);font-weight:700;}
+  .subfam-card.active{background:rgb(227,242,253); border-color:var(--brand);}
+  .subfam-media{width:40px;height:40px;display:flex;align-items:center;justify-content:center;flex:none;}
+  .subfam-media img{max-width:100%;max-height:100%;object-fit:contain;}
+  .subfam-label{font-size:13px;font-weight:600;color:var(--ink);text-align:center;line-height:1.3;transition:color .12s,font-weight .12s;}
+  .subfam-check{
+    position:absolute;top:8px;right:8px;width:18px;height:18px;border-radius:5px;
+    background:var(--dark-blue--700);display:flex;align-items:center;justify-content:center;
+  }
+  .subfam-check svg{width:11px;height:11px;}
+  .subfam-nav{
+    position:absolute;top:50%;transform:translateY(-50%);width:30px;height:30px;border-radius:50%;
+    background:#fff;border:1px solid var(--line);display:flex;align-items:center;justify-content:center;
+    cursor:pointer;font-size:15px;color:var(--ink-soft);box-shadow:0 2px 8px rgba(0,0,0,.1);z-index:2;
+  }
+  .subfam-nav.prev{left:-14px;}
+  .subfam-nav.next{right:-14px;}
+
+  .macro-row{
+    display:flex;align-items:center;justify-content:space-between;gap:8px;
+    padding:6px 10px;font-size:14px;color:var(--colortext);cursor:pointer;
+    border-left:2.5px solid transparent;margin-left:-10px;border-radius:6px;
+    transition:color .12s,border-color .12s,background .12s,font-weight .12s;
+  }
+  .macro-row:hover{
+    background:rgb(227,242,253);
+    border-left-color:rgb(0,110,165);
+    color:rgb(0,110,165);
+    font-weight:700;
+  }
+  .macro-row.active{color:var(--brand-dark);font-weight:700;border-left-color:var(--brand);}
+  .macro-row .count{color:var(--ink-soft);font-size:12px;font-weight:400;}
+
+  .toolbar-top{
+    display:flex;align-items:center;flex-wrap:wrap;gap:12px;
+    margin-bottom:18px;
+  }
+  .toolbar-top:empty{display:none;margin-bottom:0;}
+  .toolbar-top .label{font-size:13px;color:var(--ink-soft);font-weight:600;}
+  .chip{
+    display:flex;align-items:center;gap:8px;background:#e6f8ff;color:var(--brand-dark);
+    border-radius:20px;padding:6px 12px;font-size:13px;font-weight:600;
+  }
+  .chip button{border:none;background:none;color:var(--brand-dark);cursor:pointer;font-size:14px;line-height:1;}
+  .clear-btn{
+    margin-left:auto;border:1px solid var(--line);background:#fff;border-radius:var(--radius-sm);
+    padding:8px 14px;font-size:13px;font-weight:600;cursor:pointer;transition:border-color .12s,color .12s;
+  }
+  .clear-btn:hover{border-color:rgb(0,110,165);color:rgb(0,110,165);}
+  .count-row{
+    display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px;
+  }
+  .count-row .showing{font-size:14px;color:var(--ink-soft);}
+  .toolbar-right{display:flex;align-items:center;gap:10px;}
+  select.sort{
+    border:1px solid var(--line);border-radius:var(--radius-sm);padding:8px 12px;font-size:13px;background:#fff;cursor:pointer;
+    transition:border-color .12s;
+  }
+  select.sort:hover{border-color:#c3cad6;}
+  .view-toggle{display:flex;border:1px solid var(--line);border-radius:var(--radius-sm);overflow:hidden;}
+  .view-toggle button{
+    border:none;background:#fff;padding:8px 10px;cursor:pointer;font-size:15px;color:var(--ink-soft);
+    transition:background .12s,color .12s;
+  }
+  .view-toggle button:hover:not(.active){background:var(--bg-card);}
+  .view-toggle button.active{background:var(--brand);color:#fff;}
+
+  .grid{
+    display:grid;grid-template-columns:repeat(3,1fr);gap:20px;
+  }
+  .grid.list{grid-template-columns:repeat(2,1fr);}
+  .grid.list .card{
+    display:grid;grid-template-columns:180px 1fr;grid-template-rows:auto auto;
+    column-gap:0;row-gap:0;
+  }
+  .grid.list .card .media{grid-column:1;grid-row:1;}
+  .grid.list .card .card-body{grid-column:2;grid-row:1;}
+  .grid.list .compare-row{
+    grid-column:1/-1;grid-row:2;
+    flex-direction:row-reverse;justify-content:flex-end;
+    padding:14px 20px;border-top:1px solid #edeff2;
+  }
+
+  .card{
+    border:1px solid #eaeaea;
+    border-radius:var(--radius);overflow:hidden;
+    display:flex;flex-direction:column;background:#fff;
+    box-shadow:var(--shadow-sm);
+    transition:box-shadow .18s ease, border-color .18s ease;
+  }
+  .card:hover{
+    box-shadow:var(--shadow-md);
+    border-color:#dde1e7;
+  }
+  .card .media{
+    position:relative;aspect-ratio:1/1;background:var(--bg-card);
+    display:flex;align-items:center;justify-content:center;overflow:hidden;
+    margin:12px;border-radius:12px;
+        max-height: 250px;
+
+  }
+  .card .media img{width:100%;height:100%;object-fit:contain;padding:12%;box-sizing:border-box;transition:transform .25s ease, opacity .15s ease;}
+  .card:hover .media img{transform:scale(1.08);}
+  .badge{
+    position:absolute;top:8px;right:8px;background:#fff;border:1px solid var(--line);
+    border-radius:20px;padding:5px 10px;font-size:11px;font-weight:600;
+  }
+  .nav-arrow{
+    position:absolute;top:50%;transform:translateY(-50%);background:#fff;border:1px solid var(--line);
+    width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+    cursor:pointer;font-size:14px;color:var(--ink-soft);z-index:3;
+    opacity:0;pointer-events:none;transition:opacity .15s ease,background .12s;
+    box-shadow:0 2px 6px rgba(0,0,0,.12);
+  }
+  .card:hover .nav-arrow{opacity:1;pointer-events:auto;}
+  .nav-arrow.prev{left:8px;}
+  .nav-arrow.next{right:8px;}
+  .nav-arrow:hover{background:var(--bg-card);}
+
+  .card-body{padding:14px 20px 4px;display:flex;flex-direction:column;flex:1;}
+  .card-title{font-family:'Noto Sans',sans-serif; font-size:18px;font-weight:600;line-height:1.35;letter-spacing:-.1px; color: #0A0E1F;}
+  .specs{display:flex;gap:10px;margin:14px 0;}
+  .spec{font-size:11px;color:var(--ink-soft);flex:1;min-width:0;}
+  .spec b{font-family:'Noto Sans',sans-serif;
+    display:block;font-size:11px;letter-spacing:.4px;text-transform:uppercase;color:#8e8e8e;margin-bottom:4px;font-weight:400;
+  }
+  .spec .val{display:flex;align-items:center;gap:4px;font-size:13px;color:#5c5c5c;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .btn-row{display:flex;gap:8px;margin-top:auto;padding-bottom:14px;}
+  .btn{
+    flex:1;text-align:center;padding:9px 6px;border-radius:var(--radius-sm);font-size:12px;font-weight:600;
+    cursor:pointer;border:1px solid transparent;transition:background .15s,border-color .15s,transform .1s;
+  }
+  .btn:active{transform:scale(.97);}
+  .btn.primary{background:var(--btn-blue);color:#fff;display:flex;align-items:center;justify-content:center;gap:6px;}
+  .btn.primary:hover{background:var(--btn-blue-dark);}
+  .btn.outline{background:#fff;border-color:var(--line);color:var(--ink);display:flex;align-items:center;justify-content:center;gap:6px;}
+  .btn.outline:hover{background:var(--bg-card);border-color:#d5d9e0;}
+  .btn.disabled{background:#eef1f4;color:#aab1bb;cursor:not-allowed;}
+  .btn:focus-visible,.nav-arrow:focus-visible,.pagination button:focus-visible,.view-toggle button:focus-visible{
+    outline:none;box-shadow:var(--focus-ring);
+  }
+  .compare-row{
+    display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--ink-soft);
+    padding:12px 20px;border-top:1px solid #edeff2;cursor:pointer;
+  }
+  .compare-row .cb-wrap{width:16px;height:16px;}
+
+  .pagination{display:flex;justify-content:center;gap:8px;margin-top:32px;}
+  .pagination button{
+    border:1px solid var(--line);background:#fff;border-radius:var(--radius-sm);padding:8px 14px;
+    cursor:pointer;font-size:13px;font-weight:600;transition:border-color .12s,background .12s;
+  }
+  .pagination button:hover:not(.active):not(:disabled){border-color:#c3cad6;background:var(--bg-card);}
+  .pagination button.active{background:var(--brand);color:#fff;border-color:var(--brand);}
+  .pagination button:disabled{opacity:.4;cursor:not-allowed;}
+
+  .state-msg{
+    padding:64px 20px;text-align:center;color:var(--ink-soft);font-size:14px;grid-column:1/-1;
+    display:flex;flex-direction:column;align-items:center;gap:12px;
+  }
+  .state-msg svg{color:#c3cad6;}
+  .state-msg .state-title{font-size:15px;font-weight:700;color:var(--ink);}
+
+  footer.simple{border-top:1px solid var(--line);padding:24px 40px;font-size:12px;color:var(--ink-soft);text-align:center;margin-top:40px;}
+
+  footer.site{background:#141821;color:#c7ccd4;margin-top:56px;padding:52px 40px 0;}
+  .footer-top{display:flex;flex-wrap:wrap;gap:48px;justify-content:space-between;max-width:1360px;margin:0 auto;padding-bottom:36px;}
+  .footer-brand{max-width:340px;}
+  .footer-brand .logo{color:#fff;margin-bottom:14px;}
+  .footer-brand p{font-size:14px;line-height:1.6;color:#9aa1ad;margin:0 0 18px;}
+  .footer-newsletter{display:flex;gap:10px;}
+  .footer-newsletter input{
+    flex:1;min-width:0;background:#1d222d;border:1px solid #2b3140;border-radius:8px;
+    padding:11px 14px;color:#fff;font-size:13px;font-family:inherit;
+  }
+  .footer-newsletter input::placeholder{color:#6d7480;}
+  .footer-newsletter button{
+    background:var(--brand);color:#0b2230;border:none;border-radius:8px;
+    padding:11px 18px;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;
+  }
+  .footer-cols{display:flex;gap:64px;flex-wrap:wrap;}
+  .footer-col b{display:block;color:#fff;font-size:14px;font-weight:700;margin-bottom:16px;}
+  .footer-col a{display:block;font-size:14px;color:#9aa1ad;margin-bottom:12px;}
+  .footer-col a:hover{color:#fff;}
+  .footer-social{display:flex;gap:12px;}
+  .footer-social a{
+    width:34px;height:34px;border-radius:50%;background:#1d222d;display:flex;
+    align-items:center;justify-content:center;color:#fff;flex:none;
+  }
+  .footer-bottom{border-top:1px solid #262c38;padding:20px 0;text-align:center;font-size:12px;color:#6d7480;}
+  .compare-bar{
+    position:fixed;left:50%;bottom:20px;transform:translateX(-50%);
+    width:calc(100% - 80px);max-width:1500px;z-index:500;
+  }
+  .compare-bar-inner{
+    background:#fff;border-radius:16px;box-shadow:0 16px 44px rgba(10,14,25,.22);
+    padding:16px 22px;border:1px solid #eef0f3;
+  }
+  .compare-bar-header{display:flex;align-items:center;justify-content:space-between;cursor:pointer;}
+  .compare-bar-title{font-size:15px;font-weight:700;color:var(--ink);display:flex;align-items:center;gap:10px;}
+  .compare-count{
+    background:var(--brand);color:#fff;font-size:12px;font-weight:700;
+    width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex:none;
+  }
+  .compare-toggle{
+    border:none;background:none;cursor:pointer;color:var(--ink-soft);
+    width:30px;height:30px;display:flex;align-items:center;justify-content:center;border-radius:7px;
+    transition:background .12s,transform .2s;flex:none;
+  }
+  .compare-toggle:hover{background:var(--bg-card);}
+  .compare-bar.collapsed .compare-bar-body{display:none;}
+  .compare-bar.collapsed .compare-toggle svg{transform:rotate(180deg);}
+  .compare-bar-body{display:flex;align-items:center;gap:16px;margin-top:16px;flex-wrap:wrap;}
+  .compare-items{display:flex;gap:12px;flex:1;flex-wrap:wrap;}
+  .compare-chip{
+    display:flex;align-items:center;gap:12px;background:#f5f6f7;border:1px solid #eceef1;
+    border-radius:12px;padding:8px 16px 8px 8px;min-width:280px;flex:1;max-width:360px;
+  }
+  .compare-chip .thumb{
+    width:48px;height:48px;border-radius:8px;background:transparent;
+    display:flex;align-items:center;justify-content:center;flex:none;overflow:hidden;
+  }
+  .compare-chip .thumb img{width:100%;height:100%;object-fit:contain;}
+  .compare-chip .info{display:flex;flex-direction:column;gap:2px;min-width:0;}
+  .compare-chip .sku{font-size:11px;color:var(--ink-soft);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .compare-chip .name{font-size:13px;font-weight:700;color:var(--ink);line-height:1.3;}
+  .compare-chip .remove{
+    font-size:12px;color:#d1453b;text-decoration:underline;cursor:pointer;background:none;border:none;
+    padding:0;width:fit-content;font-family:inherit;
+  }
+  .compare-chip .remove:hover{color:#a8342c;}
+  .compare-slot-empty{
+    width:64px;height:64px;border-radius:12px;border:1.5px dashed #d8dce1;
+    display:flex;align-items:center;justify-content:center;color:#c3c9d1;flex:none;font-size:20px;
+  }
+  .compare-cta{
+    margin-left:auto;background:var(--btn-blue);color:#fff;border:none;border-radius:var(--radius-sm);
+    padding:13px 22px;font-size:14px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:8px;
+    white-space:nowrap;transition:background .15s;flex:none;
+  }
+  .compare-cta:hover{background:var(--btn-blue-dark);}
+  .compare-cta.disabled{background:#c3cad6;cursor:not-allowed;pointer-events:none;}
+
+  @media (max-width:700px){
+    footer.site{padding:40px 20px 0;}
+    .footer-top{flex-direction:column;gap:32px;}
+    .footer-cols{gap:32px;}
+  }
+
+  @media (max-width:900px){
+    .layout{flex-direction:column;
+      gap:24px;
+      }
+    aside.filters{
+      width:100%;
+      position:static;
+      max-height:none;
+      overflow-y:visible;
+    }
+    main.results{width:100%;}
+    .grid{grid-template-columns:repeat(2,1fr);gap:16px;}
+  }
+  @media (max-width:560px){
+    .grid{grid-template-columns:1fr;gap:14px;}
+    header.topbar{padding:14px 18px;}
+    .layout{padding:16px 18px 40px;gap:20px;}
+    .card-body{padding:2px 10px 10px;}
+    .specs{flex-wrap:wrap;gap:8px 12px;}
+    .compare-bar{width:calc(100% - 24px);bottom:12px;}
+    .compare-bar-inner{padding:14px 16px;}
+    .compare-bar-body{gap:12px;}
+    .compare-cta{margin-left:0;width:100%;justify-content:center;}
+  }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="logo">MACROLED</div>
+  <nav class="mainnav">
+    <span>Productos ▾</span><span>Macroled ARQ</span><span>Proyectos Lumínicos</span><span>Descargas</span><span>Contacto</span>
+  </nav>
+  <div class="topbar-right">
+    <span style="font-size:13px;font-weight:600;">ES</span>
+    <div class="search-box">🔍 Buscar</div>
+  </div>
+</header>
+
+<div class="crumb" id="breadcrumb">Inicio &nbsp;›&nbsp; <b>Productos</b></div>
+
+<div class="layout">
+  <aside class="filters">
+    <div class="category-heading" id="categoryHeading" style="display:none;"></div>
+    <div id="filtersPanel"></div>
+  </aside>
+
+  <main class="results">
+    <div id="subfamiliaRow" style="display:none;"></div>
+    <div class="toolbar-top" id="chipsBar"></div>
+
+    <div class="count-row">
+      <div class="showing" id="showingLabel">Cargando productos…</div>
+      <div class="toolbar-right">
+        <select class="sort" id="sortSelect">
+          <option value="">Ordenar por</option>
+          <option value="nuevo:desc">Novedades primero</option>
+        </select>
+        <div class="view-toggle">
+          <button id="btnGrid" class="active" title="Vista grilla">▦</button>
+          <button id="btnList" title="Vista lista">☰</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid" id="grid"></div>
+
+    <div class="pagination" id="pagination"></div>
+  </main>
+</div>
+
+<footer class="site">
+  <div class="footer-top">
+    <div class="footer-brand">
+      <div class="logo">MACROLED</div>
+      <p>Suscribite a nuestro newsletter para enterarte de las últimas novedades y lanzamientos.</p>
+      <div class="footer-newsletter">
+        <input type="email" placeholder="Ingresá tu email">
+        <button>Suscribirme</button>
+      </div>
+    </div>
+    <div class="footer-cols">
+      <div class="footer-col">
+        <b>Soluciones eléctricas</b>
+        <a href="#">Productos</a>
+        <a href="#">Proyectos Lumínicos</a>
+        <a href="#">Macroled ARQ</a>
+      </div>
+      <div class="footer-col">
+        <b>Contacto</b>
+        <a href="#">Descargas</a>
+      </div>
+      <div class="footer-col">
+        <b>Nuestras Redes</b>
+        <div class="footer-social">
+          <a href="#" title="YouTube">▶</a>
+          <a href="#" title="Facebook">f</a>
+          <a href="#" title="Instagram">◎</a>
+          <a href="#" title="LinkedIn">in</a>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="footer-bottom">Macroled © 2026. Todos los derechos reservados</div>
+</footer>
+
+<div class="compare-bar" id="compareBar" style="display:none;">
+  <div class="compare-bar-inner">
+    <div class="compare-bar-header" id="compareBarHeader">
+      <div class="compare-bar-title">Productos seleccionados <span class="compare-count" id="compareCount">0</span></div>
+      <button class="compare-toggle" id="compareToggle" aria-label="Minimizar / expandir">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>
+      </button>
+    </div>
+    <div class="compare-bar-body" id="compareBarBody"></div>
+  </div>
+</div>
+
+<script src="comparar.js"></script>
+<script>
+// Resguardo: si por lo que sea comparar.js no cargó (nombre de archivo
+// distinto, 404, etc.), esto evita que el checkbox "Comparar" quede roto —
+// en vez de un stub que no hace nada (y por eso el checkbox se destildaba
+// solo al instante), este fallback funciona en memoria para la sesión
+// actual, aunque no persista entre recargas. Avisa por consola cuál es el
+// problema real para que se pueda corregir la ruta del archivo.
+if(!window.MacroledCompare){
+  console.warn('[catalogo] comparar.js no cargó (revisá que el archivo esté en la misma carpeta/URL que este HTML, con ese nombre exacto, y mirá la pestaña Network del navegador por un 404). Usando un modo de emergencia SIN persistencia entre recargas.');
+  const _fallbackList = [];
+  window.MacroledCompare = {
+    MAX: 3,
+    getCompareList: () => _fallbackList.slice(),
+    addToCompare: (product) => {
+      if(!product || !product.sku) return _fallbackList.slice();
+      if(_fallbackList.some(p => p.sku === product.sku)) return _fallbackList.slice();
+      if(_fallbackList.length >= 3) return _fallbackList.slice();
+      _fallbackList.push({ sku: product.sku, nombre: product.nombre || "", img: product.img || "" });
+      return _fallbackList.slice();
+    },
+    removeFromCompare: (sku) => {
+      const idx = _fallbackList.findIndex(p => p.sku === sku);
+      if(idx >= 0) _fallbackList.splice(idx, 1);
+      return _fallbackList.slice();
+    },
+    clearCompare: () => { _fallbackList.length = 0; },
+    isInCompare: (sku) => _fallbackList.some(p => p.sku === sku)
+  };
+}
+
+/* =========================================================
+   CONFIG
+   ========================================================= */
+const TS_HOST = "https://typesense.coresagroup.com";
+const TS_API_KEY = "g0oiNYY8THGuU9jnCsvqIH1X9HtvYRCR";
+const COLLECTION = "Macroled_Prueba";
+const PER_PAGE = 18;
+
+const FACET_FIELDS = ["macrofamilia", "rango_temperatura", "color", "rango_potencia"];
+const SUBFAMILIA_FIELD = "subfamilia";
+const FAMILIA_FIELD = "familia";
+
+const FACET_LABELS = {
+  macrofamilia: "Macrofamilias",
+  rango_temperatura: "Temperatura color",
+  color: "Color",
+  rango_potencia: "Potencia",
+  familia: "Familia"
+};
+
+const SUBFAMILIA_IMAGES = {
+  "Línea Opal": "https://s3.coresagroup.com/MACROLED/250/bulbosnew.png",
+  "Dicroicas": "https://s3.coresagroup.com/MACROLED/250/dricoicasnewn.png",
+  "AR111": "https://s3.coresagroup.com/MACROLED/250/ar111new.png",
+  "Bipin": "https://s3.coresagroup.com/MACROLED/250/bipinnewn.png",
+  "Tubos": "https://s3.coresagroup.com/MACROLED/250/par-lednewn.png",
+  "PAR": "https://s3.coresagroup.com/MACROLED/250/par-lednewn.png",
+  "Filamento": "https://s3.coresagroup.com/MACROLED/250/filamentonewn.png"
+};
+
+const CCT_DOT = {
+  "2000K": "#ff8a00", "2700K": "#ffab40", "3000K": "#ffb84d",
+  "4000K": "#cfe8ff", "4500K": "#bfe3ff", "5000K": "#5ec8f2",
+  "5700K": "#29b6f6", "6500K": "#3b82f6"
+};
+
+const ICON_SIZE = 'width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"';
+const FACET_ICONS = {
+  macrofamilia: `<svg ${ICON_SIZE}><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>`,
+  rango_temperatura: `<svg ${ICON_SIZE}><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>`,
+  color: `<svg ${ICON_SIZE}><path d="M12 2a10 10 0 1 0 0 20 3 3 0 0 0 0-6h-1a2 2 0 0 1 0-4h3a2 2 0 0 0 2-2 10 10 0 0 0-4-8z"/><circle cx="7.5" cy="10.5" r="1" fill="currentColor" stroke="none"/><circle cx="12" cy="7" r="1" fill="currentColor" stroke="none"/><circle cx="16.5" cy="10.5" r="1" fill="currentColor" stroke="none"/></svg>`,
+  rango_potencia: `<svg ${ICON_SIZE}><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>`
+};
+const ICON_ANGULO = `<svg ${ICON_SIZE}><path d="M4 20h16"/><path d="M4 20V4"/><path d="M4 20L18 6"/></svg>`;
+const ICON_FLUJO = `<svg ${ICON_SIZE}><path d="M9 18h6"/><path d="M10 22h4"/><path d="M12 2a7 7 0 0 0-4 12.7c.6.5 1 1.3 1 2.1V17h6v-.2c0-.8.4-1.6 1-2.1A7 7 0 0 0 12 2z"/></svg>`;
+const ICON_LINK = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>`;
+const ICON_DOC = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>`;
+const ICON_CHECK = `<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`;
+const ICON_COMPARE = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 3 21 3 21 7"/><line x1="21" y1="3" x2="10" y2="14"/><path d="M21 14v5a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h5"/></svg>`;
+
+/* =========================================================
+   STATE
+   ========================================================= */
+const state = {
+  selected: { macrofamilia: new Set(), rango_temperatura: new Set(), color: new Set(), rango_potencia: new Set(), subfamilia: new Set(), familia: new Set() },
+  page: 1,
+  sortBy: "",
+  view: "grid",
+  collapsed: { rango_temperatura: true, color: true, rango_potencia: true, familia: false },
+  compareCollapsed: false
+};
+const COMPARE_MAX = window.MacroledCompare ? window.MacroledCompare.MAX : 3;
+
+/* =========================================================
+   TYPESENSE FETCH
+   ========================================================= */
+async function searchTypesense(){
+  const activeMacro = [...state.selected.macrofamilia][0];
+  const facetFields = activeMacro ? [...FACET_FIELDS, SUBFAMILIA_FIELD, FAMILIA_FIELD] : FACET_FIELDS;
+
+  const filterParts = [];
+  for(const field of FACET_FIELDS){
+    const vals = [...state.selected[field]];
+    if(vals.length){
+      const escaped = vals.map(v => `\`${v}\``).join(",");
+      filterParts.push(`${field}:=[${escaped}]`);
+    }
+  }
+  if(activeMacro && state.selected.subfamilia.size){
+    const escaped = [...state.selected.subfamilia].map(v => `\`${v}\``).join(",");
+    filterParts.push(`${SUBFAMILIA_FIELD}:=[${escaped}]`);
+  }
+  if(activeMacro && state.selected.familia.size){
+    const escaped = [...state.selected.familia].map(v => `\`${v}\``).join(",");
+    filterParts.push(`${FAMILIA_FIELD}:=[${escaped}]`);
+  }
+  const params = new URLSearchParams({
+    q: "*",
+    query_by: "nombre,descripcion",
+    facet_by: facetFields.join(","),
+    per_page: String(PER_PAGE),
+    page: String(state.page)
+  });
+  if(filterParts.length) params.set("filter_by", filterParts.join(" && "));
+  if(state.sortBy) params.set("sort_by", state.sortBy);
+
+  const url = `${TS_HOST}/collections/${COLLECTION}/documents/search?${params.toString()}`;
+
+  try{
+    const res = await fetch(url, { headers: { "X-TYPESENSE-API-KEY": TS_API_KEY } });
+    if(!res.ok){
+      if(activeMacro && (facetFields.includes(SUBFAMILIA_FIELD) || facetFields.includes(FAMILIA_FIELD))){
+        console.warn("Facet 'subfamilia' o 'familia' no disponible en Typesense todavía, reintentando sin ellas.");
+        params.set("facet_by", FACET_FIELDS.join(","));
+        const retryUrl = `${TS_HOST}/collections/${COLLECTION}/documents/search?${params.toString()}`;
+        const retryRes = await fetch(retryUrl, { headers: { "X-TYPESENSE-API-KEY": TS_API_KEY } });
+        if(retryRes.ok) return await retryRes.json();
+      }
+      const errText = await res.text();
+      throw new Error(`Typesense ${res.status}: ${errText}`);
+    }
+    return await res.json();
+  }catch(err){
+    console.error("Error consultando Typesense:", err);
+    document.getElementById("grid").innerHTML =
+      `<div class="state-msg">
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4"/><path d="M12 17h.01"/><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></svg>
+        <span class="state-title">No se pudo conectar con Typesense</span>
+        <span style="font-size:12px">${err.message}</span>
+      </div>`;
+    document.getElementById("showingLabel").textContent = "Error al cargar productos";
+    return null;
+  }
+}
+
+/* =========================================================
+   RENDER: SIDEBAR FACETS
+   ========================================================= */
+function renderFacets(facetCounts){
+  const panel = document.getElementById("filtersPanel");
+  panel.innerHTML = "";
+  const activeMacro = [...state.selected.macrofamilia][0];
+
+  if(activeMacro){
+    const familiaData = (facetCounts || []).find(f => f.field_name === FAMILIA_FIELD);
+    const familiaCounts = familiaData ? familiaData.counts : [];
+
+    const familiaGroup = document.createElement("div");
+    familiaGroup.className = "facet-group" + (state.collapsed.familia ? " collapsed" : "");
+    familiaGroup.innerHTML = `
+      <div class="facet-title" data-field="${FAMILIA_FIELD}">
+        <span class="ft-label">${FACET_ICONS.macrofamilia}<span>${FACET_LABELS.familia}</span></span><span class="chev">⌃</span>
+      </div>
+      <div class="facet-body"></div>
+    `;
+    const familiaBody = familiaGroup.querySelector(".facet-body");
+    familiaCounts.forEach(c => {
+      const row = document.createElement("label");
+      row.className = "facet-row";
+      const checked = state.selected.familia.has(c.value) ? "checked" : "";
+      row.innerHTML = `
+        <span class="cb-wrap">
+          <input type="checkbox" data-field="${FAMILIA_FIELD}" data-value="${c.value}" ${checked}>
+          <span class="box">${ICON_CHECK}</span>
+        </span>
+        <span>${c.value}</span><span class="count">${c.count}</span>
+      `;
+      familiaBody.appendChild(row);
+    });
+    if(!familiaCounts.length){
+      familiaBody.innerHTML = `<span class="soon-note">Sin valores disponibles.</span>`;
+    }
+    panel.appendChild(familiaGroup);
+  }
+
+  for(const field of FACET_FIELDS){
+    if(field === "macrofamilia" && activeMacro) continue;
+
+    const facetData = (facetCounts || []).find(f => f.field_name === field);
+    const counts = facetData ? facetData.counts : [];
+
+    const group = document.createElement("div");
+    group.className = "facet-group" + (state.collapsed[field] ? " collapsed" : "");
+    group.innerHTML = `
+      <div class="facet-title" data-field="${field}">
+        <span class="ft-label">${FACET_ICONS[field] || ""}<span>${FACET_LABELS[field]}</span></span><span class="chev">⌃</span>
+      </div>
+      <div class="facet-body"></div>
+    `;
+    const body = group.querySelector(".facet-body");
+
+    counts.forEach(c => {
+      if(field === "macrofamilia"){
+        const row = document.createElement("div");
+        row.className = "macro-row";
+        row.dataset.macro = c.value;
+        row.innerHTML = `<span>${c.value}</span><span class="count">${c.count}</span>`;
+        body.appendChild(row);
+        return;
+      }
+      const row = document.createElement("label");
+      row.className = "facet-row";
+      const checked = state.selected[field].has(c.value) ? "checked" : "";
+      const dot = field === "rango_temperatura"
+        ? `<span class="dot" style="background:${CCT_DOT[c.value] || '#ccc'}"></span>` : "";
+      row.innerHTML = `
+        <span class="cb-wrap">
+          <input type="checkbox" data-field="${field}" data-value="${c.value}" ${checked}>
+          <span class="box">${ICON_CHECK}</span>
+        </span>
+        ${dot}<span>${c.value}</span><span class="count">${c.count}</span>
+      `;
+      body.appendChild(row);
+    });
+
+    if(!counts.length){
+      body.innerHTML = `<span class="soon-note">Sin valores disponibles.</span>`;
+    }
+
+    panel.appendChild(group);
+  }
+
+  [["Angulo iluminación", ICON_ANGULO], ["Flujo lumínico", ICON_FLUJO]].forEach(([label, icon]) => {
+    const group = document.createElement("div");
+    group.className = "facet-group collapsed";
+    group.innerHTML = `
+      <div class="facet-title"><span class="ft-label">${icon}<span>${label}</span></span><span class="chev">⌃</span></div>
+      <div class="facet-body"><span class="soon-note">Falta un campo facetable dedicado en Typesense para este filtro.</span></div>
+    `;
+    panel.appendChild(group);
+  });
+
+  panel.querySelectorAll(".facet-title").forEach(title => {
+    title.addEventListener("click", () => {
+      const field = title.dataset.field;
+      title.parentElement.classList.toggle("collapsed");
+      if(field) state.collapsed[field] = title.parentElement.classList.contains("collapsed");
+    });
+  });
+
+  panel.querySelectorAll('.macro-row[data-macro]').forEach(row => {
+    row.addEventListener("click", () => {
+      const val = row.dataset.macro;
+      const already = state.selected.macrofamilia.has(val);
+      state.selected.macrofamilia.clear();
+      state.selected.subfamilia.clear();
+      state.selected.familia.clear();
+      if(!already) state.selected.macrofamilia.add(val);
+      state.page = 1;
+      loadAndRender();
+    });
+  });
+
+  panel.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+    cb.addEventListener("change", () => {
+      const { field, value } = cb.dataset;
+      if(cb.checked) state.selected[field].add(value); else state.selected[field].delete(value);
+      state.page = 1;
+      loadAndRender();
+    });
+  });
+}
+
+/* =========================================================
+   RENDER: APPLIED FILTER CHIPS
+   ========================================================= */
+function renderChips(){
+  const bar = document.getElementById("chipsBar");
+  const CHIP_FIELDS = FACET_FIELDS.filter(f => f !== "macrofamilia");
+  const chips = [];
+  for(const field of CHIP_FIELDS){
+    state.selected[field].forEach(v => chips.push({ field, value: v }));
+  }
+  state.selected.subfamilia.forEach(v => chips.push({ field: "subfamilia", value: v }));
+  state.selected.familia.forEach(v => chips.push({ field: "familia", value: v }));
+  if(!chips.length){ bar.style.display = "none"; return; }
+  bar.style.display = "flex";
+  bar.innerHTML = `<span class="label">Filtros aplicados</span>` +
+    chips.map(c => `<span class="chip" data-field="${c.field}" data-value="${c.value}">${c.value}<button>×</button></span>`).join("") +
+    `<button class="clear-btn" id="clearAll">Borrar filtros</button>`;
+
+  bar.querySelectorAll(".chip button").forEach(btn => {
+    btn.addEventListener("click", (e) => {
+      const chip = e.target.closest(".chip");
+      state.selected[chip.dataset.field].delete(chip.dataset.value);
+      state.page = 1;
+      loadAndRender();
+    });
+  });
+  document.getElementById("clearAll").addEventListener("click", () => {
+    CHIP_FIELDS.forEach(f => state.selected[f].clear());
+    state.selected.subfamilia.clear();
+    state.selected.familia.clear();
+    state.page = 1;
+    loadAndRender();
+  });
+}
+
+/* =========================================================
+   RENDER: CARDS
+   ========================================================= */
+function parseImages(doc){
+  let imgs = [];
+  const raw = doc.multiimage;
+  if(Array.isArray(raw)){
+    imgs = raw;
+  }else if(typeof raw === "string" && raw.trim()){
+    try{
+      const parsed = JSON.parse(raw);
+      imgs = Array.isArray(parsed) ? parsed : [parsed].filter(Boolean);
+    }catch(_){
+      imgs = raw.split(/[,;|]/).map(s => s.trim()).filter(Boolean);
+    }
+  }
+  return [...new Set(imgs.filter(Boolean))];
+}
+
+// El documento real de Typesense no tiene un array `atributos` — usa campos
+// nombrados directos (mismo descubrimiento que en comparar.html). Mostramos
+// hasta 3 de los que tengan dato cargado, en este orden de preferencia.
+function buildSpecs(doc){
+  const candidates = [
+    { label: "Potencia", value: doc.potencia_filtro },
+    { label: "Lm/W", value: doc.lumenes_w },
+    { label: "Temp. color", value: doc.temperatura_filtro },
+    { label: "Peso", value: doc.peso },
+    { label: "IP", value: doc.ip },
+    { label: "Vida útil", value: doc.vida_util }
+  ];
+  return candidates
+    .filter(c => c.value !== undefined && c.value !== null && c.value !== "")
+    .slice(0, 3);
+}
+
+function cardTemplate(doc){
+  const imgs = parseImages(doc);
+  const nVariants = Array.isArray(doc.variantes_sku) ? doc.variantes_sku.length : 0;
+
+  const specs = buildSpecs(doc);
+  const specsHtml = specs.length
+    ? specs.map(s => {
+        const isLuz = /luz|temperatura/i.test(s.label);
+        const firstToken = s.value.split(";")[0].trim();
+        const dot = isLuz && CCT_DOT[firstToken] ? `<span class="dot" style="background:${CCT_DOT[firstToken]}"></span>` : "";
+        return `<div class="spec"><b>${s.label}</b><span class="val">${dot}${s.value}</span></div>`;
+      }).join("")
+    : `<div class="spec" style="flex:none"><span class="soon-note">Sin specs cargadas</span></div>`;
+
+
+  const productHref = doc.link_ficha_web || "javascript:void(0)";
+  const verProductoBtn = `<a class="btn primary" href="${productHref}" ${doc.link_ficha_web ? 'target="_blank"' : 'onclick="event.preventDefault()" title="Falta cargar link_ficha_web"'}>${ICON_LINK} Ver producto</a>`;
+
+  const fichaBtn = doc.ficha_tecnica
+    ? `<a class="btn outline" href="${doc.ficha_tecnica}" target="_blank">${ICON_DOC} Descargar ficha</a>`
+    : `<span class="btn disabled" title="Sin ficha técnica cargada">${ICON_DOC} Descargar ficha</span>`;
+
+  const sku = (doc.sku || doc.id || "").toString();
+  const escAttr = (s) => (s || "").toString().replace(/"/g, "&quot;");
+
+  return `
+    <div class="card" data-sku="${escAttr(sku)}">
+      <div class="media">
+        ${nVariants > 1 ? `<span class="badge">${nVariants} variantes</span>` : ""}
+        ${imgs.length ? `<img src="${imgs[0]}" alt="${doc.nombre || ""}" data-idx="0" data-imgs='${JSON.stringify(imgs)}'>` : `<span style="color:#c3c9d1;font-size:12px">Sin imagen</span>`}
+        ${imgs.length > 1 ? `<div class="nav-arrow prev">‹</div><div class="nav-arrow next">›</div>` : ""}
+      </div>
+      <div class="card-body">
+        <div class="card-title">${doc.nombre || "Producto sin nombre"}</div>
+        <div class="specs">${specsHtml}</div>
+        <div class="btn-row">${verProductoBtn}${fichaBtn}</div>
+      </div>
+      <label class="compare-row">
+        <span class="cb-wrap">
+          <input type="checkbox" class="compare-checkbox"
+            data-sku="${escAttr(sku)}"
+            data-nombre="${escAttr(doc.nombre || "Producto sin nombre")}"
+            data-img="${escAttr(imgs[0] || "")}">
+          <span class="box">${ICON_CHECK}</span>
+        </span> Comparar
+      </label>
+    </div>
+  `;
+}
+
+function wireCarousels(){
+  document.querySelectorAll(".card .media").forEach(media => {
+    const img = media.querySelector("img");
+    if(!img) return;
+    const imgs = JSON.parse(img.dataset.imgs || "[]");
+    if(imgs.length < 2) return;
+
+    let idx = 0;
+    // La imagen 0 ya está cargada (es la que se ve por defecto en la card)
+    const loadedSet = new Set([0]);
+    const prev = media.querySelector(".prev");
+    const next = media.querySelector(".next");
+
+    // Precarga en cadena: solo la próxima imagen, no todas de una.
+    // Cubre el caso más común (un click a la vez) sin gastar ancho de
+    // banda en imágenes que el usuario quizás nunca llega a ver.
+    const preload = (i) => {
+      if(loadedSet.has(i)) return;
+      const pre = new Image();
+      pre.onload = () => loadedSet.add(i);
+      pre.src = imgs[i];
+    };
+
+    media.addEventListener("mouseenter", () => {
+      preload((idx + 1) % imgs.length);
+    });
+
+    const goTo = (newIdx) => {
+      idx = (newIdx + imgs.length) % imgs.length;
+      const targetIdx = idx;
+      const target = imgs[targetIdx];
+
+      if(loadedSet.has(targetIdx)){
+        img.style.opacity = "1";
+        img.src = target;
+      } else {
+        // Todavía no está en caché: bajamos la opacidad para que se vea
+        // que está cargando, en vez de que el click no muestre nada.
+        img.style.opacity = "0.4";
+        const pre = new Image();
+        pre.onload = () => {
+          loadedSet.add(targetIdx);
+          // Solo aplicamos si el usuario no siguió clickeando mientras tanto
+          // (evita que una carga vieja pise una más nueva)
+          if(idx === targetIdx){
+            img.src = target;
+            img.style.opacity = "1";
+          }
+        };
+        pre.src = target;
+      }
+
+      // Encadenamos la precarga de la próxima
+      preload((targetIdx + 1) % imgs.length);
+    };
+
+    if(prev){
+      prev.addEventListener("click", (e) => { e.preventDefault(); e.stopPropagation(); goTo(idx - 1); });
+    }
+    if(next){
+      next.addEventListener("click", (e) => { e.preventDefault(); e.stopPropagation(); goTo(idx + 1); });
+    }
+
+    media.closest(".card").addEventListener("mouseleave", () => goTo(0));
+  });
+}
+
+/* =========================================================
+   BARRA DE COMPARACIÓN (hasta 3 productos) — leída/escrita en
+   localStorage vía compare.js, compartida con comparar.html
+   ========================================================= */
+function renderCompareBar(){
+  const bar = document.getElementById("compareBar");
+  const body = document.getElementById("compareBarBody");
+  const countEl = document.getElementById("compareCount");
+  const list = window.MacroledCompare.getCompareList();
+
+  if(!list.length){
+    bar.style.display = "none";
+    return;
+  }
+  bar.style.display = "block";
+  bar.classList.toggle("collapsed", state.compareCollapsed);
+  countEl.textContent = list.length;
+
+  const chips = list.map(p => `
+    <div class="compare-chip">
+      <div class="thumb">${p.img ? `<img src="${p.img}" alt="">` : ""}</div>
+      <div class="info">
+        ${p.sku ? `<span class="sku">${p.sku}</span>` : ""}
+        <span class="name">${p.nombre}</span>
+        <button type="button" class="remove" data-remove="${p.sku}">Quitar</button>
+      </div>
+    </div>
+  `).join("");
+
+  const emptySlots = Array.from({ length: Math.max(0, COMPARE_MAX - list.length) })
+    .map(() => `<div class="compare-slot-empty">+</div>`).join("");
+
+  const ctaDisabled = list.length < 2;
+  body.innerHTML = `
+    <div class="compare-items">${chips}${emptySlots}</div>
+    <a href="comparar.html" class="compare-cta${ctaDisabled ? " disabled" : ""}"
+       title="${ctaDisabled ? "Agregá al menos 2 productos para comparar" : ""}">
+      ${ICON_COMPARE} Comparar productos
+    </a>
+  `;
+
+  body.querySelectorAll("[data-remove]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      window.MacroledCompare.removeFromCompare(btn.dataset.remove);
+      renderCompareBar();
+      syncCompareCheckboxes();
+    });
+  });
+}
+
+function syncCompareCheckboxes(){
+  const list = window.MacroledCompare.getCompareList();
+  const atLimit = list.length >= COMPARE_MAX;
+  document.querySelectorAll(".compare-checkbox").forEach(cb => {
+    const sku = cb.dataset.sku;
+    const isSelected = list.some(p => p.sku === sku);
+    cb.checked = isSelected;
+    cb.disabled = atLimit && !isSelected;
+    const row = cb.closest(".compare-row");
+    if(row) row.title = cb.disabled ? `Máximo ${COMPARE_MAX} productos para comparar` : "";
+  });
+}
+
+function wireCompareCheckboxes(){
+  document.querySelectorAll(".compare-checkbox").forEach(cb => {
+    cb.addEventListener("change", () => {
+      const { sku, nombre, img } = cb.dataset;
+      if(cb.checked){
+        const updated = window.MacroledCompare.addToCompare({ sku, nombre, img });
+        if(!updated.some(p => p.sku === sku)) cb.checked = false; // ya estaba en el máximo
+      } else {
+        window.MacroledCompare.removeFromCompare(sku);
+      }
+      renderCompareBar();
+      syncCompareCheckboxes();
+    });
+  });
+}
+
+// Si se agrega/saca un producto desde otra pestaña (ej. comparar.html abierta
+// al lado) o desde este mismo catálogo, refrescamos la barra sin recargar.
+window.addEventListener("macroled-compare-changed", () => { renderCompareBar(); syncCompareCheckboxes(); });
+window.addEventListener("storage", (e) => { if(e.key === "macroled_compare"){ renderCompareBar(); syncCompareCheckboxes(); } });
+
+
+function renderCards(hits, found){
+  const grid = document.getElementById("grid");
+  if(!hits || !hits.length){
+    grid.innerHTML = `<div class="state-msg">
+      <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <span class="state-title">No encontramos productos</span>
+      <span>Probá sacando algún filtro para ver más resultados.</span>
+    </div>`;
+    return;
+  }
+  grid.innerHTML = hits.map(h => cardTemplate(h.document)).join("");
+  wireCarousels();
+  wireCompareCheckboxes();
+  syncCompareCheckboxes();
+}
+
+function renderPagination(found){
+  const totalPages = Math.max(1, Math.ceil(found / PER_PAGE));
+  const el = document.getElementById("pagination");
+  if(totalPages <= 1){ el.innerHTML = ""; return; }
+  let html = `<button ${state.page === 1 ? "disabled" : ""} data-p="${state.page - 1}">‹ Anterior</button>`;
+  for(let p = 1; p <= totalPages; p++){
+    if(p === 1 || p === totalPages || Math.abs(p - state.page) <= 1){
+      html += `<button class="${p === state.page ? "active" : ""}" data-p="${p}">${p}</button>`;
+    }else if(p === state.page - 2 || p === state.page + 2){
+      html += `<span style="align-self:center">…</span>`;
+    }
+  }
+  html += `<button ${state.page === totalPages ? "disabled" : ""} data-p="${state.page + 1}">Siguiente ›</button>`;
+  el.innerHTML = html;
+  el.querySelectorAll("button[data-p]").forEach(btn => {
+    btn.addEventListener("click", () => { state.page = Number(btn.dataset.p); loadAndRender(); });
+  });
+}
+
+/* =========================================================
+   RENDER: FILA DE SUBFAMILIAS (slider, multi-select)
+   ========================================================= */
+function renderSubfamiliaRow(facetCounts){
+  const holder = document.getElementById("subfamiliaRow");
+  const activeMacro = [...state.selected.macrofamilia][0];
+
+  if(!activeMacro){
+    holder.style.display = "none";
+    holder.innerHTML = "";
+    return;
+  }
+
+  const facetData = (facetCounts || []).find(f => f.field_name === SUBFAMILIA_FIELD);
+  let items = facetData ? facetData.counts : null;
+
+  if(!items || !items.length){
+    const known = Object.keys(SUBFAMILIA_IMAGES);
+    if(!known.length){
+      holder.style.display = "none";
+      holder.innerHTML = "";
+      return;
+    }
+    items = known.map(v => ({ value: v, count: null }));
+  }
+
+  holder.style.display = "block";
+  holder.innerHTML = `
+    <div class="subfam-track">
+      ${items.map(it => {
+        const img = SUBFAMILIA_IMAGES[it.value];
+        const active = state.selected.subfamilia.has(it.value) ? " active" : "";
+        return `
+          <div class="subfam-card${active}" data-subfam="${it.value}">
+            ${active ? `<span class="subfam-check">${ICON_CHECK}</span>` : ""}
+            <div class="subfam-media">${img ? `<img src="${img}" alt="${it.value}">` : ""}</div>
+            <div class="subfam-label">${it.value}</div>
+          </div>
+        `;
+      }).join("")}
+    </div>
+    <button class="subfam-nav prev" aria-label="Anterior">‹</button>
+    <button class="subfam-nav next" aria-label="Siguiente">›</button>
+  `;
+
+  holder.querySelectorAll(".subfam-card").forEach(card => {
+    card.addEventListener("click", () => {
+      const v = card.dataset.subfam;
+      if(state.selected.subfamilia.has(v)) state.selected.subfamilia.delete(v);
+      else state.selected.subfamilia.add(v);
+      state.page = 1;
+      loadAndRender();
+    });
+  });
+
+  const track = holder.querySelector(".subfam-track");
+  holder.querySelector(".prev").addEventListener("click", () => track.scrollBy({ left: -320, behavior: "smooth" }));
+  holder.querySelector(".next").addEventListener("click", () => track.scrollBy({ left: 320, behavior: "smooth" }));
+}
+
+/* =========================================================
+   RENDER: BREADCRUMB (Inicio > Productos > Macrofamilia)
+   ========================================================= */
+function renderBreadcrumb(){
+  const holder = document.getElementById("breadcrumb");
+  const active = [...state.selected.macrofamilia][0];
+  if(!active){
+    holder.innerHTML = `Inicio &nbsp;›&nbsp; <b>Productos</b>`;
+    return;
+  }
+  holder.innerHTML = `Inicio &nbsp;›&nbsp; <a id="crumbProductos">Productos</a> &nbsp;›&nbsp; <b class="crumb-active">${active}</b>`;
+  document.getElementById("crumbProductos").addEventListener("click", () => {
+    state.selected.macrofamilia.clear();
+    state.selected.subfamilia.clear();
+    state.selected.familia.clear();
+    state.page = 1;
+    loadAndRender();
+  });
+}
+
+/* =========================================================
+   RENDER: ENCABEZADO DE MACROFAMILIA SELECCIONADA
+   ========================================================= */
+function renderCategoryHeading(found){
+  const holder = document.getElementById("categoryHeading");
+  const active = [...state.selected.macrofamilia][0];
+  if(!active){
+    holder.style.display = "none";
+    holder.innerHTML = "";
+    return;
+  }
+  holder.style.display = "block";
+  holder.innerHTML = `<h1>${active}</h1><div class="count">${found} resultados</div>`;
+}
+
+/* =========================================================
+   MAIN LOAD
+   ========================================================= */
+async function loadAndRender(){
+  document.getElementById("showingLabel").textContent = "Cargando productos…";
+  const data = await searchTypesense();
+  if(!data) return;
+
+  renderFacets(data.facet_counts);
+  renderBreadcrumb();
+  renderCategoryHeading(data.found);
+  renderSubfamiliaRow(data.facet_counts);
+  renderChips();
+  renderCards(data.hits, data.found);
+  renderPagination(data.found);
+  renderCompareBar();
+
+  const from = data.hits.length ? (state.page - 1) * PER_PAGE + 1 : 0;
+  const to = (state.page - 1) * PER_PAGE + data.hits.length;
+  document.getElementById("showingLabel").textContent = `Mostrando ${to} de ${data.found} productos`;
+}
+
+/* =========================================================
+   TOOLBAR EVENTS
+   ========================================================= */
+document.getElementById("sortSelect").addEventListener("change", (e) => {
+  state.sortBy = e.target.value;
+  state.page = 1;
+  loadAndRender();
+});
+document.getElementById("btnGrid").addEventListener("click", () => {
+  state.view = "grid";
+  document.getElementById("grid").classList.remove("list");
+  document.getElementById("btnGrid").classList.add("active");
+  document.getElementById("btnList").classList.remove("active");
+});
+document.getElementById("btnList").addEventListener("click", () => {
+  state.view = "list";
+  document.getElementById("grid").classList.add("list");
+  document.getElementById("btnList").classList.add("active");
+  document.getElementById("btnGrid").classList.remove("active");
+});
+
+document.getElementById("compareBarHeader").addEventListener("click", () => {
+  state.compareCollapsed = !state.compareCollapsed;
+  document.getElementById("compareBar").classList.toggle("collapsed", state.compareCollapsed);
+});
+
+loadAndRender();
+</script>
+</body>
+</html>

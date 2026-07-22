@@ -1,0 +1,820 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Macroled — Comparar productos (prototipo)</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  /* ---- Tokens reutilizados del catálogo Macroled, para consistencia visual ---- */
+  :root{
+    --brand:#00bdff;
+    --brand-dark:#0090c7;
+    --ink:#141821;
+    --ink-soft:#5b6472;
+    --line:#e6e9ee;
+    --bg-card:#efefef;
+    --bg-page:#f5f5f5;
+    --radius:12px;
+    --radius-sm:8px;
+    --dark-blue--700:#00152B;
+    --colortext:#5D5C5C;
+    --btn-blue:#0077a8;
+    --btn-blue-dark:#005f87;
+    --shadow-sm:0 1px 2px rgba(20,24,33,.05);
+    --shadow-md:0 16px 40px rgba(10,14,25,.14);
+    --focus-ring:0 0 0 3px rgba(0,189,255,.35);
+    --section-bg:#eaf1f6;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;font-family:'Noto Sans',sans-serif;color:var(--ink);background:var(--bg-page);-webkit-font-smoothing:antialiased;}
+  a{color:inherit;text-decoration:none;}
+  button{font-family:inherit;}
+
+  /* ---- Header / footer (idénticos al catálogo) ---- */
+  header.topbar{
+    display:flex;align-items:center;justify-content:space-between;padding:18px 40px;
+    border-bottom:1px solid var(--line);flex-wrap:wrap;gap:16px;background:#fff;
+  }
+  .logo{font-weight:800;font-size:22px;letter-spacing:.5px;color:var(--brand);}
+  nav.mainnav{display:flex;gap:28px;font-size:14px;font-weight:600;color:var(--ink);}
+  .topbar-right{display:flex;align-items:center;gap:16px;}
+  .search-box{display:flex;align-items:center;gap:8px;border:1px solid var(--line);border-radius:10px;padding:8px 14px;min-width:220px;color:var(--ink-soft);font-size:13px;}
+
+  footer.site{background:#141821;color:#c7ccd4;margin-top:56px;padding:52px 40px 0;}
+  .footer-top{display:flex;flex-wrap:wrap;gap:48px;justify-content:space-between;max-width:1360px;margin:0 auto;padding-bottom:36px;}
+  .footer-brand{max-width:340px;}
+  .footer-brand .logo{color:#fff;margin-bottom:14px;}
+  .footer-brand p{font-size:14px;line-height:1.6;color:#9aa1ad;margin:0 0 18px;}
+  .footer-newsletter{display:flex;gap:10px;}
+  .footer-newsletter input{flex:1;min-width:0;background:#1d222d;border:1px solid #2b3140;border-radius:8px;padding:11px 14px;color:#fff;font-size:13px;font-family:inherit;}
+  .footer-newsletter input::placeholder{color:#6d7480;}
+  .footer-newsletter button{background:var(--brand);color:#0b2230;border:none;border-radius:8px;padding:11px 18px;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;}
+  .footer-cols{display:flex;gap:64px;flex-wrap:wrap;}
+  .footer-col b{display:block;color:#fff;font-size:14px;font-weight:700;margin-bottom:16px;}
+  .footer-col a{display:block;font-size:14px;color:#9aa1ad;margin-bottom:12px;}
+  .footer-col a:hover{color:#fff;}
+  .footer-social{display:flex;gap:12px;}
+  .footer-social a{width:34px;height:34px;border-radius:50%;background:#1d222d;display:flex;align-items:center;justify-content:center;color:#fff;flex:none;}
+  .footer-bottom{border-top:1px solid #262c38;padding:20px 0;text-align:center;font-size:12px;color:#6d7480;}
+
+  /* ---- Page shell ---- */
+  .page{max-width:1400px;margin:0 auto;padding:24px 40px 64px;}
+  .back-link{display:inline-flex;align-items:center;gap:6px;font-size:14px;font-weight:600;color:var(--btn-blue);cursor:pointer;margin-bottom:22px;}
+  .back-link:hover{color:var(--btn-blue-dark);}
+  .page-head{display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:14px;margin-bottom:22px;}
+  .page-head h1{font-size:30px;font-weight:800;color:var(--dark-blue--700);margin:0 0 6px;letter-spacing:-.3px;}
+  .page-head .count{font-size:14px;color:var(--ink-soft);}
+
+  .toolbar{display:flex;align-items:center;justify-content:flex-end;flex-wrap:wrap;gap:14px;margin-bottom:18px;}
+  .diff-toggle{display:flex;align-items:center;gap:10px;font-size:14px;color:var(--ink);font-weight:600;cursor:pointer;user-select:none;}
+  .switch{position:relative;width:38px;height:22px;border-radius:20px;background:#d5d9e0;flex:none;transition:background .15s;}
+  .switch input{position:absolute;inset:0;opacity:0;margin:0;cursor:pointer;}
+  .switch .knob{position:absolute;top:2px;left:2px;width:18px;height:18px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.25);transition:transform .15s;}
+  .switch input:checked ~ .knob{transform:translateX(16px);}
+  .switch.on{background:var(--brand);}
+  .print-btn{
+    display:flex;align-items:center;gap:8px;background:var(--dark-blue--700);color:#fff;border:none;
+    border-radius:var(--radius-sm);padding:11px 18px;font-size:13.5px;font-weight:700;cursor:pointer;transition:background .15s;
+  }
+  .print-btn:hover{background:#001f3d;}
+
+  /* ---- Comparison grid ---- */
+  .compare-shell{
+    background:#fff;border:1px solid #eaeaea;border-radius:var(--radius);overflow-x:auto;box-shadow:var(--shadow-sm);
+  }
+  .compare-grid{
+    display:grid;
+    grid-template-columns: repeat(4, minmax(180px, 1fr));
+    min-width:760px;
+  }
+  .cell{padding:16px 20px;border-bottom:1px solid #edeff2;display:flex;align-items:center;min-width:0;}
+  .cell.label{
+    background:#f7f8f9;font-size:13.5px;font-weight:600;color:var(--colortext);
+  }
+  .cell.section{
+    grid-column:1/-1;background:var(--section-bg);color:var(--dark-blue--700);
+    font-size:12.5px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;padding:12px 20px;
+  }
+  .cell.value{font-size:14px;color:var(--ink);justify-content:center;text-align:center;}
+  .cell.value .dash{color:#c3c9d1;}
+  /* línea divisoria entre cada columna de producto */
+  .cell.coldata{border-left:1px solid var(--line);}
+
+  /* tooltip de ayuda junto a cada término — el ícono es chico y discreto,
+     el globo de texto se posiciona con JS (position:fixed) para no quedar
+     recortado por el overflow-x:auto de .compare-shell */
+  .spec-help{
+    display:inline-flex;align-items:center;justify-content:center;flex:none;
+    width:16px;height:16px;border-radius:50%;background:#aab1bb;color:#fff;
+    font-size:10px;font-weight:700;font-style:normal;margin-left:6px;cursor:help;
+    transition:background .12s;
+  }
+  .spec-help:hover{background:var(--brand-dark);}
+  .tip-bubble{
+    position:fixed;z-index:2000;background:var(--dark-blue--700);color:#fff;
+    font-size:11.5px;font-weight:500;font-style:normal;line-height:1.4;
+    padding:9px 11px;border-radius:8px;max-width:220px;box-shadow:0 10px 24px rgba(0,0,0,.2);
+    pointer-events:none;opacity:0;transform:translateY(4px);transition:opacity .12s,transform .12s;
+  }
+  .tip-bubble.show{opacity:1;transform:translateY(0);}
+
+  .header-label{align-items:flex-start;flex-direction:column;justify-content:end;gap:10px;padding:20px 16px;}
+  .header-label .diff-toggle{display:flex;align-items:center;gap:9px;font-size:12.5px;color:var(--ink);font-weight:600;cursor:pointer;user-select:none;line-height:1.3;}
+
+  /* header row (product card) */
+  .cell.product-head{
+    position:relative;flex-direction:column;align-items:center;gap:6px;padding:22px 18px 18px;
+    border-bottom:1px solid #edeff2;
+  }
+  .cell.product-head .remove{
+    position:absolute;top:10px;right:10px;width:26px;height:26px;border-radius:50%;border:1px solid var(--line);
+    background:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--ink-soft);transition:background .12s;
+  }
+  .cell.product-head .remove:hover{background:var(--bg-card);}
+  .cell.product-head .thumb{width:110px;height:110px;border-radius:50%;background:var(--bg-card);display:flex;align-items:center;justify-content:center;overflow:hidden;}
+  .cell.product-head .thumb img{width:100%;height:100%;object-fit:contain;padding:14%;box-sizing:border-box;}
+  .cell.product-head .family{font-size:11px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:var(--ink-soft);margin-top:8px;}
+  .cell.product-head .pname{font-size:16px;font-weight:700;color:var(--dark-blue--700);text-align:center;line-height:1.3;}
+  .cell.product-head .psku{font-size:12px;color:var(--ink-soft);}
+  .cell.product-head .phead-btns{display:flex;flex-direction:column;gap:8px;width:100%;margin-top:6px;}
+  .phead-btns .btn{
+    display:flex;align-items:center;justify-content:center;gap:6px;font-size:12.5px;font-weight:600;
+    border-radius:var(--radius-sm);padding:9px 8px;cursor:pointer;border:1px solid transparent;transition:background .15s;
+  }
+  .phead-btns .btn.primary{background:var(--btn-blue);color:#fff;}
+  .phead-btns .btn.primary:hover{background:var(--btn-blue-dark);}
+  .phead-btns .btn.outline{background:#fff;border-color:var(--line);color:var(--ink);}
+  .phead-btns .btn.outline:hover{background:var(--bg-card);}
+
+  /* celda de encabezado vacía con CTA "Agregar" — vive solo en la fila de
+     encabezado, para no pelear con el grid-column:1/-1 de las secciones */
+  .cell.add-slot{align-items:stretch;padding:20px;}
+  .add-slot .box{
+    width:100%;min-height:200px;border:1.5px dashed #d3d9e0;border-radius:var(--radius-sm);
+    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;cursor:pointer;
+    color:var(--ink-soft);transition:border-color .15s,background .15s,color .15s;
+  }
+  .cell.value.empty-col{border-left:1px dashed #e3e7ec;}
+  .add-slot .box:hover{border-color:var(--brand);background:#f3fbff;color:var(--brand-dark);}
+  .add-slot .box .plus{
+    width:36px;height:36px;border-radius:50%;border:1.5px solid currentColor;display:flex;align-items:center;justify-content:center;font-size:20px;
+  }
+  .add-slot .box span.lbl{font-size:13px;font-weight:600;}
+
+  /* ---- Modal ---- */
+  .modal-overlay{
+    position:fixed;inset:0;background:rgba(10,14,25,.5);display:none;align-items:center;justify-content:center;z-index:1000;padding:20px;
+  }
+  .modal-overlay.open{display:flex;}
+  .modal-card{
+    background:#fff;border-radius:14px;width:100%;max-width:560px;max-height:82vh;display:flex;flex-direction:column;
+    box-shadow:var(--shadow-md);overflow:hidden;
+  }
+  .modal-head{display:flex;align-items:center;justify-content:space-between;padding:20px 22px;border-bottom:1px solid var(--line);}
+  .modal-head h3{margin:0;font-size:17px;font-weight:700;color:var(--ink);}
+  .modal-head .close{border:none;background:none;cursor:pointer;color:var(--ink-soft);width:30px;height:30px;display:flex;align-items:center;justify-content:center;border-radius:8px;}
+  .modal-head .close:hover{background:var(--bg-card);}
+  .modal-search{padding:16px 22px;border-bottom:1px solid var(--line);}
+  .modal-search input{
+    width:100%;border:1px solid var(--line);border-radius:var(--radius-sm);padding:10px 14px;font-size:14px;
+    font-family:inherit;outline:none;transition:border-color .12s;
+  }
+  .modal-search input:focus{border-color:var(--brand);}
+  .modal-list{flex:1;overflow-y:auto;padding:6px 10px;}
+  .modal-item{display:flex;align-items:center;gap:14px;padding:10px 12px;border-radius:10px;}
+  .modal-item:hover{background:#f7f8f9;}
+  .modal-item .thumb{width:44px;height:44px;border-radius:9px;background:var(--bg-card);display:flex;align-items:center;justify-content:center;overflow:hidden;flex:none;}
+  .modal-item .thumb img{width:100%;height:100%;object-fit:contain;padding:10%;box-sizing:border-box;}
+  .modal-item .info{flex:1;min-width:0;}
+  .modal-item .name{font-size:14px;font-weight:700;color:var(--ink);}
+  .modal-item .sku{font-size:12px;color:var(--ink-soft);}
+  .modal-item .add-btn{
+    flex:none;border:1px solid var(--line);background:#fff;border-radius:var(--radius-sm);padding:8px 14px;
+    font-size:12.5px;font-weight:600;cursor:pointer;transition:border-color .12s,color .12s,background .12s;
+  }
+  .modal-item .add-btn:hover{border-color:var(--brand);color:var(--brand-dark);background:#f3fbff;}
+  .modal-item .added{font-size:12.5px;color:var(--ink-soft);flex:none;}
+  .modal-empty{padding:40px 20px;text-align:center;color:var(--ink-soft);font-size:13.5px;}
+  .modal-foot{padding:14px 22px;border-top:1px solid var(--line);text-align:center;}
+  .modal-foot a{font-size:13.5px;font-weight:600;color:var(--btn-blue);cursor:pointer;}
+  .modal-foot a:hover{color:var(--btn-blue-dark);}
+
+  @media print{
+    header.topbar, footer.site, .back-link, .toolbar, .add-slot,
+    .cell.product-head .remove, .modal-overlay, .tip-bubble, .spec-help{display:none !important;}
+    *{-webkit-print-color-adjust:exact;print-color-adjust:exact;color-adjust:exact;}
+    body{background:#fff;}
+    .page{padding:0;max-width:none;}
+    .compare-shell{border:none;box-shadow:none;overflow:visible;}
+    .compare-grid{min-width:0 !important;}
+    @page{size:landscape;margin:14mm;}
+  }
+
+  @media (max-width:900px){
+    .page{padding:20px 20px 48px;}
+    .compare-grid{grid-template-columns:repeat(4, minmax(150px, 1fr));min-width:640px;}
+    .cell{padding:12px 14px;font-size:13px;}
+    .cell.product-head{padding:16px 12px 14px;}
+    .cell.product-head .thumb{width:80px;height:80px;}
+  }
+  @media (max-width:560px){
+    header.topbar{padding:14px 18px;}
+    header.topbar nav.mainnav{display:none;}
+    .page{padding:18px 14px 40px;}
+    .page-head h1{font-size:24px;}
+    .compare-grid{grid-template-columns:repeat(4, minmax(135px, 1fr));min-width:560px;}
+    .cell{padding:10px 12px;}
+    .cell.product-head .pname{font-size:14px;}
+    .print-btn{width:100%;justify-content:center;}
+    .toolbar{justify-content:stretch;}
+  }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="logo">MACROLED</div>
+  <nav class="mainnav">
+    <span>Productos ▾</span><span>Macroled ARQ</span><span>Proyectos Lumínicos</span><span>Descargas</span><span>Contacto</span>
+  </nav>
+  <div class="topbar-right">
+    <span style="font-size:13px;font-weight:600;">ES</span>
+    <div class="search-box">🔍 Buscar</div>
+  </div>
+</header>
+
+<div class="page">
+  <a class="back-link" id="backLink">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+    Volver a productos
+  </a>
+
+  <div class="page-head">
+    <div>
+      <h1>Comparar productos</h1>
+      <div class="count" id="countLabel">0 productos</div>
+    </div>
+  </div>
+
+  <div class="toolbar">
+    <button class="print-btn" id="printBtn">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 3 21 3 21 7"/><line x1="21" y1="3" x2="10" y2="14"/><path d="M21 14v5a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h5"/></svg>
+      Imprimir comparación
+    </button>
+  </div>
+
+  <div class="compare-shell">
+    <div class="compare-grid" id="compareGrid"></div>
+  </div>
+</div>
+
+<footer class="site">
+  <div class="footer-top">
+    <div class="footer-brand">
+      <div class="logo">MACROLED</div>
+      <p>Suscribite a nuestro newsletter para enterarte de las últimas novedades y lanzamientos.</p>
+      <div class="footer-newsletter">
+        <input type="email" placeholder="Ingresá tu email">
+        <button>Suscribirme</button>
+      </div>
+    </div>
+    <div class="footer-cols">
+      <div class="footer-col">
+        <b>Soluciones eléctricas</b>
+        <a href="#">Productos</a>
+        <a href="#">Proyectos Lumínicos</a>
+        <a href="#">Macroled ARQ</a>
+      </div>
+      <div class="footer-col">
+        <b>Contacto</b>
+        <a href="#">Descargas</a>
+      </div>
+      <div class="footer-col">
+        <b>Nuestras Redes</b>
+        <div class="footer-social">
+          <a href="#" title="YouTube">▶</a>
+          <a href="#" title="Facebook">f</a>
+          <a href="#" title="Instagram">◎</a>
+          <a href="#" title="LinkedIn">in</a>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="footer-bottom">Macroled © 2026. Todos los derechos reservados</div>
+</footer>
+
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal-card">
+    <div class="modal-head">
+      <h3>Buscar producto para comparar</h3>
+      <button class="close" id="modalClose">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="modal-search">
+      <input type="text" id="modalSearchInput" placeholder="Buscar por nombre, SKU o descripción…">
+    </div>
+    <div class="modal-list" id="modalList"></div>
+    <div class="modal-foot"><a id="viewAllLink">Ver todos los productos →</a></div>
+  </div>
+</div>
+
+<script src="comparar.js"></script>
+<script>
+// Resguardo: si por lo que sea comparar.js no cargó (nombre de archivo
+// distinto, 404, etc.), esto evita que la página se rompa — funciona en
+// memoria para la sesión actual (sin persistencia entre recargas) y avisa
+// por consola cuál es el problema real.
+if(!window.MacroledCompare){
+  console.warn('[comparar] comparar.js no cargó (revisá que el archivo esté en la misma carpeta/URL que este HTML, con ese nombre exacto, y mirá la pestaña Network del navegador por un 404). Usando un modo de emergencia SIN persistencia entre recargas.');
+  const _fallbackList = [];
+  window.MacroledCompare = {
+    MAX: 3,
+    getCompareList: () => _fallbackList.slice(),
+    addToCompare: (product) => {
+      if(!product || !product.sku) return _fallbackList.slice();
+      if(_fallbackList.some(p => p.sku === product.sku)) return _fallbackList.slice();
+      if(_fallbackList.length >= 3) return _fallbackList.slice();
+      _fallbackList.push({ sku: product.sku, nombre: product.nombre || "", img: product.img || "" });
+      return _fallbackList.slice();
+    },
+    removeFromCompare: (sku) => {
+      const idx = _fallbackList.findIndex(p => p.sku === sku);
+      if(idx >= 0) _fallbackList.splice(idx, 1);
+      return _fallbackList.slice();
+    },
+    clearCompare: () => { _fallbackList.length = 0; },
+    isInCompare: (sku) => _fallbackList.some(p => p.sku === sku)
+  };
+}
+
+const SPEC_SCHEMA = [
+  { categoria: "Características eléctricas", filas: [
+    { label: "Potencia", key: "potencia", tip: "Consumo eléctrico, en vatios (W)." },
+    { label: "Factor de potencia", key: "factor_potencia", tip: "Qué tan eficiente es el uso de la energía. Más cerca de 1 es mejor." },
+    { label: "THD", key: "thd", tip: "Distorsión armónica de la corriente. Cuanto más bajo, mejor calidad eléctrica." },
+    { label: "Anti high volt", key: "anti_hv", tip: "Protección contra picos de tensión en la red eléctrica." },
+    { label: "On-Off", key: "on_off", tip: "Ciclos de encendido/apagado que soporta sin degradarse." },
+    { label: "SDCM", key: "sdcm", tip: "Uniformidad de color entre unidades. Más bajo es más consistente." }
+  ]},
+  { categoria: "Características lumínicas", filas: [
+    { label: "Lm/W", key: "lm_w", tip: "Eficiencia lumínica: lúmenes que produce por cada vatio consumido." },
+    { label: "Temperatura de color", key: "temp_color", tip: "Tono de la luz en Kelvin: más bajo es más cálida, más alto es más fría." },
+    { label: "Ángulo de apertura", key: "angulo_apertura", tip: "Ángulo en el que se distribuye la luz." },
+    { label: "CRI", key: "cri", tip: "Fidelidad de color bajo esta luz, en una escala de 0 a 100." },
+    { label: "UGR", key: "ugr", tip: "Nivel de deslumbramiento molesto que puede causar la luminaria." },
+    { label: "LM80", key: "lm80", tip: "Ensayo que certifica cuánto se deprecia la luz del LED con el tiempo." },
+    { label: "Dimerizable", key: "dimerizable", tip: "Si permite regular la intensidad de la luz." }
+  ]},
+  { categoria: "Características materiales", filas: [
+    { label: "Tamaño", key: "tamano" },
+    { label: "Peso", key: "peso" },
+    { label: "Material del cuerpo", key: "material_cuerpo" },
+    { label: "Material del lente", key: "material_lente" },
+    { label: "Protección IP", key: "ip", tip: "Grado de protección contra polvo y agua." },
+    { label: "Protección IK", key: "ik", tip: "Grado de protección contra impactos mecánicos." },
+    { label: "Vida útil", key: "vida_util" }
+  ]},
+  { categoria: "Características comerciales", filas: [
+    { label: "Garantía", key: "garantia" },
+    { label: "EAN 13", key: "ean13" },
+    { label: "SKU", key: "sku" }
+  ]}
+];
+
+// Arranca vacío: los productos vienen de localStorage (compare.js), resueltos
+// contra Typesense en resolveProductsFromStorage() más abajo.
+let comparedProducts = [];
+
+const TS_HOST = "https://typesense.coresagroup.com";
+const TS_API_KEY = "g0oiNYY8THGuU9jnCsvqIH1X9HtvYRCR";
+const COLLECTION = "Macroled_Prueba";
+
+// Mientras el campo dedicado `especificaciones` no esté cargado en Typesense,
+// intentamos rellenar las filas de la tabla buscando coincidencias por nombre
+function normalizeText(s){
+  return (s || "").toString().normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
+}
+
+// El documento real de Typesense no usa un array `atributos` — tiene campos
+// nombrados directos. Este mapa conecta cada key de nuestro SPEC_SCHEMA con
+// el nombre real del campo en Typesense.
+const FIELD_MAP = {
+  potencia: "potencia_filtro",
+  factor_potencia: "factor_potencia",
+  thd: "thd",
+  on_off: "on_off_switch",
+  sdcm: "sdcm",
+  lm_w: "lumenes_w",
+  temp_color: "temperatura_filtro",
+  ugr: "ugr",
+  lm80: "lm80",
+  tamano: "dimensiones",
+  peso: "peso",
+  material_cuerpo: "material_cuerpo",
+  material_lente: "material_lente",
+  ip: "ip",
+  ik: "ik",
+  vida_util: "vida_util",
+  garantia: "garantia_tiempo",
+  sku: "sku"
+};
+
+// Estas specs no tienen columna fija en el schema real — se buscan dentro de
+// los atributos dinámicos attr_1/2/3 (con su etiqueta en nombre_attr1/2/3),
+// que es el mecanismo que usan para lo que varía según la macrofamilia.
+const DYNAMIC_MATCHERS = [
+  { key: "anti_hv", test: /anti.*(alto|hv|volt)/ },
+  { key: "angulo_apertura", test: /angulo/ },
+  { key: "cri", test: /\bcri\b/ }
+];
+
+function parseImages(doc){
+  let imgs = [];
+  if(doc.multiimagen){
+    try{
+      const parsed = JSON.parse(doc.multiimagen);
+      if(Array.isArray(parsed)) imgs = parsed;
+    }catch(_){
+      imgs = doc.multiimagen.split(/[,|]/).map(s => s.trim()).filter(Boolean);
+    }
+  }
+  if(!imgs.length && doc.imagen) imgs = [doc.imagen];
+  return imgs;
+}
+
+function mapAtributosToSpecs(doc){
+  const specs = {};
+
+  for(const key in FIELD_MAP){
+    const raw = doc[FIELD_MAP[key]];
+    if(raw !== undefined && raw !== null && raw !== ""){
+      specs[key] = raw.toString();
+    }
+  }
+
+  if(typeof doc.dimerizable === "boolean"){
+    specs.dimerizable = doc.dimerizable ? "Sí" : "No";
+  }
+  if(doc.ean13){
+    specs.ean13 = doc.ean13.toString();
+  }
+
+  [1, 2, 3].forEach(n => {
+    const nombre = doc[`nombre_attr${n}`];
+    const valor = doc[`attr_${n}`];
+    if(!nombre || !valor) return;
+    const match = DYNAMIC_MATCHERS.find(m => !specs[m.key] && m.test.test(normalizeText(nombre)));
+    if(match) specs[match.key] = valor;
+  });
+
+  if(!specs.sku && doc.sku) specs.sku = doc.sku;
+
+  console.log(`[comparar] "${doc.nombre}" — documento completo:`, doc);
+  console.log(`[comparar] "${doc.nombre}" → specs mapeados:`, specs);
+  return specs;
+}
+
+function escAttr(s){
+  return (s || "").toString().replace(/"/g, "&quot;");
+}
+
+async function searchTypesenseModal(query){
+  const params = new URLSearchParams({
+    q: query && query.trim() ? query.trim() : "*",
+    query_by: "nombre,sku,descripcion",
+    // atributos y atributo_variante tienen index:false en el schema — Typesense
+    // no los trae por default en la búsqueda aunque estén store:true, hay que
+    // pedirlos a mano acá o vuelven undefined.
+    include_fields: "nombre,sku,descripcion,macrofamilia,familia,imagen,multiimagen,ficha_tecnica,link_ficha_web,potencia_filtro,factor_potencia,thd,on_off_switch,sdcm,lumenes_w,temperatura_filtro,ugr,lm80,dimensiones,peso,material_cuerpo,material_lente,ip,ik,vida_util,garantia_tiempo,ean13,dimerizable,attr_1,attr_2,attr_3,nombre_attr1,nombre_attr2,nombre_attr3",
+    per_page: "20",
+    page: "1"
+  });
+  const url = `${TS_HOST}/collections/${COLLECTION}/documents/search?${params.toString()}`;
+  try{
+    const res = await fetch(url, { headers: { "X-TYPESENSE-API-KEY": TS_API_KEY } });
+    if(!res.ok) throw new Error(`Typesense ${res.status}`);
+    const data = await res.json();
+    return (data.hits || []).map(h => h.document);
+  }catch(err){
+    console.error("Error buscando en Typesense:", err);
+    return null; // null = error de conexión, distinto de [] = sin resultados
+  }
+}
+
+const COMPARE_MAX = 3;
+const ICON_CHECK = `<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`;
+const ICON_LINK = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>`;
+const ICON_DOC = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>`;
+
+let showOnlyDiffs = false;
+let tipBubble = null;
+
+function ensureTipBubble(){
+  if(!tipBubble){
+    tipBubble = document.createElement("div");
+    tipBubble.className = "tip-bubble";
+    document.body.appendChild(tipBubble);
+  }
+  return tipBubble;
+}
+
+function showTip(el){
+  const bubble = ensureTipBubble();
+  bubble.textContent = el.dataset.tip || "";
+  bubble.style.left = "-9999px";
+  bubble.style.top = "-9999px";
+  bubble.classList.add("show");
+
+  const iconRect = el.getBoundingClientRect();
+  const bubbleRect = bubble.getBoundingClientRect();
+  let left = iconRect.left + iconRect.width / 2 - bubbleRect.width / 2;
+  left = Math.max(8, Math.min(left, window.innerWidth - bubbleRect.width - 8));
+  let top = iconRect.top - bubbleRect.height - 10;
+  if(top < 8) top = iconRect.bottom + 10; // si no entra arriba, la mostramos debajo
+
+  bubble.style.left = `${left}px`;
+  bubble.style.top = `${top}px`;
+}
+
+function hideTip(){
+  if(tipBubble) tipBubble.classList.remove("show");
+}
+
+function wireTooltips(container){
+  container.querySelectorAll(".spec-help").forEach(el => {
+    el.addEventListener("mouseenter", () => showTip(el));
+    el.addEventListener("mouseleave", hideTip);
+    el.addEventListener("focus", () => showTip(el)); // accesible también por teclado
+    el.addEventListener("blur", hideTip);
+  });
+}
+
+/* =========================================================
+   RENDER
+   ========================================================= */
+function buildRows(){
+  const rows = [];
+  SPEC_SCHEMA.forEach(section => {
+    const filas = section.filas.filter(f => {
+      if(!showOnlyDiffs) return true;
+      const vals = comparedProducts.map(p => p.specs[f.key] ?? "—");
+      return !vals.every(v => v === vals[0]);
+    });
+    if(!filas.length) return;
+    rows.push({ type: "section", label: section.categoria });
+    filas.forEach(f => rows.push({ type: "row", label: f.label, key: f.key, tip: f.tip }));
+  });
+  return rows;
+}
+
+function render(){
+  const grid = document.getElementById("compareGrid");
+  const rows = buildRows();
+
+  document.getElementById("countLabel").textContent =
+    `${comparedProducts.length} producto${comparedProducts.length === 1 ? "" : "s"}`;
+
+  // Fila de encabezado: primera celda ahora tiene el toggle de diferencias adentro,
+  // seguida siempre de 3 columnas (producto o slot "Agregar")
+  let html = `
+    <div class="cell label header-label" style="border-bottom:1px solid #edeff2;">
+      <label class="diff-toggle">
+        <span class="switch" id="diffSwitch"><input type="checkbox" id="diffCheckbox"><span class="knob"></span></span>
+        Mostrar solo las diferencias
+      </label>
+    </div>`;
+
+  for(let i = 0; i < COMPARE_MAX; i++){
+    const p = comparedProducts[i];
+    if(p){
+      html += `
+        <div class="cell product-head coldata">
+          <button class="remove" data-remove="${p.id}" title="Quitar de la comparación">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+          <div class="thumb"><img src="${p.img}" alt=""></div>
+          <div class="family">${p.family || ""}</div>
+          <div class="pname">${p.name}</div>
+          <div class="psku">SKU: ${p.sku}</div>
+          <div class="phead-btns">
+            <a class="btn primary" href="${p.ficha}">${ICON_LINK} Ver producto</a>
+            <a class="btn outline" href="${p.ficha_pdf}">${ICON_DOC} Ficha técnica</a>
+          </div>
+        </div>`;
+    }else{
+      html += `
+        <div class="cell add-slot coldata">
+          <div class="box" data-open-modal="1">
+            <span class="plus">+</span>
+            <span class="lbl">Agregar</span>
+          </div>
+        </div>`;
+    }
+  }
+
+  // Filas de specs: misma lógica de 3 columnas fijas, celda vacía si no hay producto ahí
+  rows.forEach(row => {
+    if(row.type === "section"){
+      html += `<div class="cell section">${row.label}</div>`;
+      return;
+    }
+    const helpIcon = row.tip ? `<span class="spec-help" tabindex="0" data-tip="${escAttr(row.tip)}">i</span>` : "";
+    html += `<div class="cell label">${row.label}${helpIcon}</div>`;
+    for(let i = 0; i < COMPARE_MAX; i++){
+      const p = comparedProducts[i];
+      if(p){
+        const val = p.specs[row.key];
+        html += `<div class="cell value coldata">${val ? val : '<span class="dash">—</span>'}</div>`;
+      }else{
+        html += `<div class="cell value empty-col coldata"></div>`;
+      }
+    }
+  });
+
+  grid.innerHTML = html;
+
+  grid.querySelectorAll("[data-remove]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      comparedProducts = comparedProducts.filter(p => p.id !== btn.dataset.remove);
+      window.MacroledCompare.removeFromCompare(btn.dataset.remove);
+      render();
+    });
+  });
+  grid.querySelectorAll("[data-open-modal]").forEach(el => el.addEventListener("click", openModal));
+  wireTooltips(grid);
+
+  // el toggle se re-crea en cada render, así que hay que re-conectar su listener
+  document.getElementById("diffCheckbox").addEventListener("change", (e) => {
+    showOnlyDiffs = e.target.checked;
+    document.getElementById("diffSwitch").classList.toggle("on", showOnlyDiffs);
+    render();
+  });
+  if(showOnlyDiffs){
+    document.getElementById("diffCheckbox").checked = true;
+    document.getElementById("diffSwitch").classList.add("on");
+  }
+}
+
+/* =========================================================
+   MODAL "Buscar producto para comparar"
+   ========================================================= */
+let modalSearchTimer = null;
+let modalCurrentDocs = [];
+
+async function renderModalList(query){
+  const list = document.getElementById("modalList");
+  list.innerHTML = `<div class="modal-empty">Buscando…</div>`;
+
+  const docs = await searchTypesenseModal(query);
+
+  if(docs === null){
+    list.innerHTML = `<div class="modal-empty">No se pudo conectar con Typesense. Revisá la consola para más detalle.</div>`;
+    return;
+  }
+  modalCurrentDocs = docs;
+
+  if(!docs.length){
+    list.innerHTML = `<div class="modal-empty">No encontramos productos con ese criterio.</div>`;
+    return;
+  }
+
+  list.innerHTML = docs.map(doc => {
+    const img = parseImages(doc)[0] || "";
+    const sku = doc.sku || doc.id || "";
+    const already = comparedProducts.some(cp => cp.sku === sku);
+    const disabledAtLimit = !already && comparedProducts.length >= COMPARE_MAX;
+    const action = already
+      ? `<span class="added">Ya agregado</span>`
+      : `<button class="add-btn" data-sku="${escAttr(sku)}" ${disabledAtLimit ? "disabled" : ""}>+ Agregar</button>`;
+    return `
+      <div class="modal-item">
+        <div class="thumb">${img ? `<img src="${img}" alt="">` : ""}</div>
+        <div class="info">
+          <div class="name">${doc.nombre || "Producto sin nombre"}</div>
+          <div class="sku">${sku}</div>
+        </div>
+        ${action}
+      </div>`;
+  }).join("");
+
+  list.querySelectorAll("[data-sku]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      if(comparedProducts.length >= COMPARE_MAX) return;
+      const doc = modalCurrentDocs.find(d => (d.sku || d.id) === btn.dataset.sku);
+      if(!doc) return;
+      const imgs = parseImages(doc);
+      const sku = doc.sku || doc.id || "";
+      comparedProducts.push({
+        id: sku,
+        sku: sku,
+        family: doc.familia || doc.macrofamilia || "",
+        name: doc.nombre || "Producto sin nombre",
+        img: imgs[0] || "",
+        ficha: doc.link_ficha_web || "#",
+        ficha_pdf: doc.ficha_tecnica || "#",
+        specs: mapAtributosToSpecs(doc)
+      });
+      window.MacroledCompare.addToCompare({ sku, nombre: doc.nombre || "", img: imgs[0] || "" });
+      closeModal();
+      render();
+    });
+  });
+}
+
+function openModal(){
+  document.getElementById("modalOverlay").classList.add("open");
+  document.getElementById("modalSearchInput").value = "";
+  renderModalList("");
+  document.getElementById("modalSearchInput").focus();
+}
+function closeModal(){
+  document.getElementById("modalOverlay").classList.remove("open");
+}
+
+document.getElementById("modalClose").addEventListener("click", closeModal);
+document.getElementById("modalOverlay").addEventListener("click", (e) => {
+  if(e.target.id === "modalOverlay") closeModal();
+});
+document.getElementById("modalSearchInput").addEventListener("input", (e) => {
+  clearTimeout(modalSearchTimer);
+  const val = e.target.value;
+  modalSearchTimer = setTimeout(() => renderModalList(val), 250);
+});
+document.getElementById("viewAllLink").addEventListener("click", () => {
+  document.getElementById("modalSearchInput").value = "";
+  renderModalList("");
+});
+
+/* =========================================================
+   TOOLBAR
+   ========================================================= */
+document.getElementById("printBtn").addEventListener("click", () => window.print());
+document.getElementById("backLink").addEventListener("click", () => window.history.back());
+
+/* =========================================================
+   CARGA INICIAL — resuelve los SKUs guardados en localStorage
+   (compare.js) contra Typesense para traer los datos completos
+   ========================================================= */
+const RESOLVE_FIELDS = "nombre,sku,descripcion,macrofamilia,familia,imagen,multiimagen,ficha_tecnica,link_ficha_web,potencia_filtro,factor_potencia,thd,on_off_switch,sdcm,lumenes_w,temperatura_filtro,ugr,lm80,dimensiones,peso,material_cuerpo,material_lente,ip,ik,vida_util,garantia_tiempo,ean13,dimerizable,attr_1,attr_2,attr_3,nombre_attr1,nombre_attr2,nombre_attr3";
+
+async function resolveProductsFromStorage(){
+  const stored = window.MacroledCompare.getCompareList(); // [{sku, nombre, img}]
+
+  if(!stored.length){
+    comparedProducts = [];
+    render();
+    return;
+  }
+
+  const escaped = stored.map(p => `\`${p.sku}\``).join(",");
+  const params = new URLSearchParams({
+    q: "*",
+    query_by: "nombre",
+    filter_by: `sku:=[${escaped}]`,
+    include_fields: RESOLVE_FIELDS,
+    per_page: String(stored.length)
+  });
+
+  try{
+    const res = await fetch(`${TS_HOST}/collections/${COLLECTION}/documents/search?${params.toString()}`, {
+      headers: { "X-TYPESENSE-API-KEY": TS_API_KEY }
+    });
+    if(!res.ok) throw new Error(`Typesense ${res.status}`);
+    const data = await res.json();
+    const docsBySku = {};
+    (data.hits || []).forEach(h => { docsBySku[h.document.sku] = h.document; });
+
+    comparedProducts = stored.map(p => {
+      const doc = docsBySku[p.sku];
+      if(!doc){
+        // el SKU guardado ya no existe en Typesense (o fue borrado) — lo
+        // mostramos igual con lo mínimo que teníamos guardado localmente
+        return { id: p.sku, sku: p.sku, family: "", name: p.nombre || p.sku, img: p.img || "", ficha: "#", ficha_pdf: "#", specs: {} };
+      }
+      const imgs = parseImages(doc);
+      return {
+        id: doc.sku, sku: doc.sku, family: doc.familia || doc.macrofamilia || "",
+        name: doc.nombre || p.nombre || "Producto sin nombre",
+        img: imgs[0] || p.img || "",
+        ficha: doc.link_ficha_web || "#", ficha_pdf: doc.ficha_tecnica || "#",
+        specs: mapAtributosToSpecs(doc)
+      };
+    });
+  }catch(err){
+    console.error("No se pudieron resolver los productos guardados contra Typesense:", err);
+    comparedProducts = stored.map(p => ({ id: p.sku, sku: p.sku, family: "", name: p.nombre || p.sku, img: p.img || "", ficha: "#", ficha_pdf: "#", specs: {} }));
+  }
+  render();
+}
+
+// Si desde otra pestaña (el catálogo) se agrega/saca un producto, refrescamos.
+window.addEventListener("storage", (e) => { if(e.key === "macroled_compare") resolveProductsFromStorage(); });
+
+resolveProductsFromStorage();
+</script>
+</body>
+</html>
