@@ -1,0 +1,55 @@
+<div id="macroled-home" class="ml-home">
+    <header class="ml-hero" aria-labelledby="ml-hero-title">
+      <video class="ml-hero__video" autoplay muted loop playsinline preload="metadata" poster="assets/images/hero-poster.webp" aria-hidden="true">
+        <source src="https://s3.coresagroup.com/MACROLED/video/prueba.mp4" type="video/mp4">
+      </video>
+      <div class="ml-hero__fallback" aria-hidden="true"></div>
+      <div class="ml-hero__overlay"></div>
+      <div class="ml-hero__content">
+        <h1 id="ml-hero-title">Calidad y diseño en iluminación LED para transformar espacios</h1>
+        <a class="ml-button ml-button--primary" href="#ml-explore">Ver productos</a>
+      </div>
+    </header>
+
+    <main>
+      <section id="ml-explore" class="ml-explore" aria-label="Explorar productos">
+        <div class="ml-tabs-wrap">
+          <div class="ml-tabs" role="tablist" aria-label="Ambiente de producto">
+            <button class="ml-tab" type="button" role="tab" id="ml-tab-interior" aria-controls="ml-panel-interior" aria-selected="true" tabindex="0" data-tab="interior">Interior</button>
+            <button class="ml-tab" type="button" role="tab" id="ml-tab-exterior" aria-controls="ml-panel-exterior" aria-selected="false" tabindex="-1" data-tab="exterior">Exterior</button>
+            <button class="ml-tab" type="button" role="tab" id="ml-tab-proyectos" aria-controls="ml-panel-proyectos" aria-selected="false" tabindex="-1" data-tab="proyectos">Proyectos</button>
+          </div>
+        </div>
+        <div class="ml-tab-stage">
+          <section class="ml-panel" id="ml-panel-interior" role="tabpanel" aria-labelledby="ml-tab-interior" data-panel="interior"></section>
+          <section class="ml-panel" id="ml-panel-exterior" role="tabpanel" aria-labelledby="ml-tab-exterior" data-panel="exterior" hidden></section>
+          <section class="ml-panel" id="ml-panel-proyectos" role="tabpanel" aria-labelledby="ml-tab-proyectos" data-panel="proyectos" hidden></section>
+        </div>
+      </section>
+
+      <section class="ml-foa ml-shell" aria-labelledby="ml-foa-title">
+        <div class="ml-foa__visual ml-placeholder" role="img" aria-label="Imagen de Casa FOA pendiente"></div>
+        <div class="ml-foa__copy"><h2 id="ml-foa-title">Casa FOA</h2><p>Contenido e imagen definitivos pendientes. Este bloque está preparado para contar la participación de Macroled con una narrativa editorial.</p><a class="ml-text-link" href="#">Conocer más <span aria-hidden="true">↗</span></a></div>
+      </section>
+
+      <section class="ml-news ml-shell" aria-labelledby="ml-news-title">
+        <div class="ml-section-heading"><h2 id="ml-news-title">Últimas novedades</h2></div>
+        <div class="ml-news__grid" data-news></div>
+      </section>
+
+      <section class="ml-faq ml-shell" aria-labelledby="ml-faq-title">
+        <div class="ml-section-heading"><h2 id="ml-faq-title">Preguntas y respuestas</h2></div>
+        <div class="ml-faq__list" data-faq></div>
+      </section>
+
+      <section class="ml-contact" aria-labelledby="ml-contact-title">
+        <p class="ml-eyebrow">Hablemos de tu espacio</p><h2 id="ml-contact-title">Estamos para asesorarte</h2><p>Encontrá la solución de iluminación indicada para tu proyecto.</p><a class="ml-button ml-button--light" href="/contacto">Ir a contacto <span aria-hidden="true">↗</span></a>
+      </section>
+    </main>
+
+    <footer class="ml-footer">
+      <div class="ml-footer__top"><div><a class="ml-logo" href="/">MACROLED<span>®</span></a><p>Soluciones de iluminación LED.</p></div><form class="ml-newsletter" action="#" data-placeholder-form><label for="ml-email">Newsletter</label><div><input id="ml-email" type="email" placeholder="Tu email" disabled><button type="button" disabled aria-label="Suscripción pendiente">→</button></div><small>Formulario pendiente de integración.</small></form></div>
+      <div class="ml-footer__links"><div><h3>Productos</h3><a href="#ml-explore">Interior</a><a href="#ml-explore">Exterior</a><a href="#ml-explore">Proyectos lumínicos</a></div><div><h3>Macroled</h3><a href="/contacto">Contacto</a><a href="#">Descargas</a><a href="#">Casa FOA</a></div><div><h3>Seguinos</h3><a href="https://www.instagram.com/" rel="noopener">Instagram</a><a href="#">LinkedIn</a></div></div>
+      <div class="ml-footer__bottom"><span>Macroled® · Coresa Group SRL</span><span>© 2026 Todos los derechos reservados</span></div>
+    </footer>
+  </div>

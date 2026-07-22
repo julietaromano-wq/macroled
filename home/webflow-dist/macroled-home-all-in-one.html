@@ -1,0 +1,224 @@
+<div id="macroled-home" class="ml-home">
+    <header class="ml-hero" aria-labelledby="ml-hero-title">
+      <video class="ml-hero__video" autoplay muted loop playsinline preload="metadata" aria-hidden="true">
+        <source src="https://s3.coresagroup.com/MACROLED/video/prueba.mp4" type="video/mp4">
+      </video>
+      <div class="ml-hero__fallback" aria-hidden="true"></div>
+      <div class="ml-hero__overlay"></div>
+      <div class="ml-hero__content">
+        <h1 id="ml-hero-title">Calidad y diseño en iluminación LED para transformar espacios</h1>
+        <a class="ml-button ml-button--primary" href="#ml-explore">Ver productos</a>
+      </div>
+    </header>
+
+    <main>
+      <section id="ml-explore" class="ml-explore" aria-label="Explorar productos">
+        <div class="ml-tabs-wrap">
+          <div class="ml-tabs" role="tablist" aria-label="Ambiente de producto">
+            <button class="ml-tab" type="button" role="tab" id="ml-tab-interior" aria-controls="ml-panel-interior" aria-selected="true" tabindex="0" data-tab="interior">Interior</button>
+            <button class="ml-tab" type="button" role="tab" id="ml-tab-exterior" aria-controls="ml-panel-exterior" aria-selected="false" tabindex="-1" data-tab="exterior">Exterior</button>
+            <button class="ml-tab" type="button" role="tab" id="ml-tab-proyectos" aria-controls="ml-panel-proyectos" aria-selected="false" tabindex="-1" data-tab="proyectos">Proyectos</button>
+          </div>
+        </div>
+        <div class="ml-tab-stage">
+          <section class="ml-panel" id="ml-panel-interior" role="tabpanel" aria-labelledby="ml-tab-interior" data-panel="interior"></section>
+          <section class="ml-panel" id="ml-panel-exterior" role="tabpanel" aria-labelledby="ml-tab-exterior" data-panel="exterior" hidden></section>
+          <section class="ml-panel" id="ml-panel-proyectos" role="tabpanel" aria-labelledby="ml-tab-proyectos" data-panel="proyectos" hidden></section>
+        </div>
+      </section>
+
+      <section class="ml-foa ml-shell" aria-labelledby="ml-foa-title">
+        <div class="ml-foa__visual ml-placeholder" role="img" aria-label="Imagen de Casa FOA pendiente"></div>
+        <div class="ml-foa__copy"><h2 id="ml-foa-title">Casa FOA</h2><p>Contenido e imagen definitivos pendientes. Este bloque está preparado para contar la participación de Macroled con una narrativa editorial.</p><a class="ml-text-link" href="#">Conocer más <span aria-hidden="true">↗</span></a></div>
+      </section>
+
+      <section class="ml-news ml-shell" aria-labelledby="ml-news-title">
+        <div class="ml-section-heading"><h2 id="ml-news-title">Últimas novedades</h2></div>
+        <div class="ml-news__grid" data-news></div>
+      </section>
+
+      <section class="ml-faq ml-shell" aria-labelledby="ml-faq-title">
+        <div class="ml-section-heading"><h2 id="ml-faq-title">Preguntas y respuestas</h2></div>
+        <div class="ml-faq__list" data-faq></div>
+      </section>
+
+      <section class="ml-contact" aria-labelledby="ml-contact-title">
+        <p class="ml-eyebrow">Hablemos de tu espacio</p><h2 id="ml-contact-title">Estamos para asesorarte</h2><p>Encontrá la solución de iluminación indicada para tu proyecto.</p><a class="ml-button ml-button--light" href="/contacto">Ir a contacto <span aria-hidden="true">↗</span></a>
+      </section>
+    </main>
+
+    <footer class="ml-footer">
+      <div class="ml-footer__top"><div><a class="ml-logo" href="/">MACROLED<span>®</span></a><p>Soluciones de iluminación LED.</p></div><form class="ml-newsletter" action="#" data-placeholder-form><label for="ml-email">Newsletter</label><div><input id="ml-email" type="email" placeholder="Tu email" disabled><button type="button" disabled aria-label="Suscripción pendiente">→</button></div><small>Formulario pendiente de integración.</small></form></div>
+      <div class="ml-footer__links"><div><h3>Productos</h3><a href="#ml-explore">Interior</a><a href="#ml-explore">Exterior</a><a href="#ml-explore">Proyectos lumínicos</a></div><div><h3>Macroled</h3><a href="/contacto">Contacto</a><a href="#">Descargas</a><a href="#">Casa FOA</a></div><div><h3>Seguinos</h3><a href="https://www.instagram.com/" rel="noopener">Instagram</a><a href="#">LinkedIn</a></div></div>
+      <div class="ml-footer__bottom"><span>Macroled® · Coresa Group SRL</span><span>© 2026 Todos los derechos reservados</span></div>
+    </footer>
+  </div>
+<style>
+@import url("https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700;800&display=swap");
+.ml-home{--ml-ink:#071521;--ml-blue:#00152b;--ml-cyan:#00bdff;--ml-paper:#f4f3ef;--ml-line:rgba(7,21,33,.14);--ml-radius:1.25rem;font-family:"Noto Sans",Arial,sans-serif;color:var(--ml-ink);background:var(--ml-paper);line-height:1.5;-webkit-font-smoothing:antialiased;overflow:clip}.ml-home *{box-sizing:border-box}.ml-home a{color:inherit;text-decoration:none}.ml-home button,.ml-home input{font:inherit}.ml-home img,.ml-home video{display:block;max-width:100%}.ml-home h1,.ml-home h2,.ml-home h3,.ml-home p{margin:0}.ml-shell{width:min(100% - 3rem,90rem);margin-inline:auto}.ml-eyebrow{font-size:.72rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase}.ml-logo{font-size:1.15rem;font-weight:700;letter-spacing:.13em}.ml-logo span{font-size:.45em;vertical-align:top}.ml-button{display:inline-flex;align-items:center;justify-content:space-between;gap:2rem;min-width:12rem;padding:.95rem 1.1rem;border:1px solid currentColor;border-radius:999px;font-size:.82rem;font-weight:600;transition:background .25s,color .25s,transform .25s}.ml-button:hover{transform:translateY(-2px)}.ml-button--light{color:#fff}.ml-button--light:hover{color:var(--ml-blue);background:#fff}.ml-text-link{display:inline-flex;gap:.65rem;align-items:center;font-size:.82rem;font-weight:700;border-bottom:1px solid;padding-bottom:.3rem}.ml-text-link--light{color:#fff}.ml-placeholder{background:#d9e1df url('data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%201600%201000%22%20role%3D%22img%22%20aria-labelledby%3D%22t%20d%22%3E%3Ctitle%20id%3D%22t%22%3EImagen%20pendiente%3C%2Ftitle%3E%3Cdesc%20id%3D%22d%22%3EPlaceholder%20editorial%20para%20reemplazar%20por%20una%20imagen%20de%20Macroled.%3C%2Fdesc%3E%3Cdefs%3E%3ClinearGradient%20id%3D%22g%22%20x1%3D%220%22%20y1%3D%220%22%20x2%3D%221%22%20y2%3D%221%22%3E%3Cstop%20stop-color%3D%22%23dfe8e6%22%2F%3E%3Cstop%20offset%3D%22.5%22%20stop-color%3D%22%23f0ede4%22%2F%3E%3Cstop%20offset%3D%221%22%20stop-color%3D%22%23b8c8cf%22%2F%3E%3C%2FlinearGradient%3E%3CradialGradient%20id%3D%22l%22%3E%3Cstop%20stop-color%3D%22%23fff%22%20stop-opacity%3D%22.95%22%2F%3E%3Cstop%20offset%3D%221%22%20stop-color%3D%22%23fff%22%20stop-opacity%3D%220%22%2F%3E%3C%2FradialGradient%3E%3C%2Fdefs%3E%3Crect%20width%3D%221600%22%20height%3D%221000%22%20fill%3D%22url(%23g)%22%2F%3E%3Ccircle%20cx%3D%221180%22%20cy%3D%22220%22%20r%3D%22360%22%20fill%3D%22url(%23l)%22%2F%3E%3Cpath%20d%3D%22M0%20820C380%20680%20660%20920%20990%20770s440-80%20610%200v230H0z%22%20fill%3D%22%2300152b%22%20opacity%3D%22.1%22%2F%3E%3Ctext%20x%3D%2280%22%20y%3D%22900%22%20fill%3D%22%2300152b%22%20font-family%3D%22Arial%2Csans-serif%22%20font-size%3D%2230%22%20letter-spacing%3D%226%22%3EIMAGEN%20PENDIENTE%20%C2%B7%20MACROLED%3C%2Ftext%3E%3C%2Fsvg%3E%0A') center/cover no-repeat}
+.ml-hero{position:relative;min-height:100svh;color:#fff;background:#162634;isolation:isolate;overflow:hidden}.ml-hero__video,.ml-hero__fallback,.ml-hero__overlay{position:absolute;inset:0;width:100%;height:100%}.ml-hero__video{object-fit:cover;z-index:-3}.ml-hero__fallback{z-index:-2;background:#193046 none center/cover no-repeat}.ml-hero__overlay{z-index:-1;background:linear-gradient(90deg,rgba(0,15,31,.72),rgba(0,15,31,.08) 65%),linear-gradient(0deg,rgba(0,10,20,.5),transparent 55%);opacity:var(--ml-hero-overlay,.88)}.ml-hero__nav{position:absolute;z-index:2;top:0;left:0;width:100%;display:flex;justify-content:space-between;align-items:center;padding:1.5rem clamp(1.25rem,4vw,4.5rem)}.ml-hero__content{position:absolute;left:clamp(1.25rem,7vw,7rem);bottom:clamp(5rem,14vh,9rem);max-width:65rem}.ml-hero h1{margin:.8rem 0 2rem;font-size:clamp(2.5rem,5.4vw,6rem);font-weight:500;line-height:.98;letter-spacing:-.055em}.ml-hero__note{position:absolute;right:1rem;bottom:1rem;padding:.4rem .65rem;border-radius:99px;background:rgba(0,0,0,.3);font-size:.62rem;letter-spacing:.04em}
+.ml-tabs-wrap{position:sticky;top:0;z-index:20;padding:.65rem;background:rgba(255,255,255,.94);border-bottom:1px solid var(--ml-line);backdrop-filter:blur(16px)}.ml-tabs{display:grid;grid-template-columns:repeat(3,1fr);width:min(100%,42rem);margin:auto;padding:.25rem;border-radius:10px;background:#f5f5f5}.ml-tab{position:relative;border:0;border-radius:8px;background:transparent;padding:.75rem 1rem;color:#53606a;cursor:pointer;font-size:.78rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;transition:background-color .25s,color .25s,box-shadow .25s}.ml-tab[aria-selected=true]{color:#fff;background:#00bdff;box-shadow:0 8px 22px rgba(0,189,255,.2)}.ml-tab:focus-visible,.ml-home a:focus-visible,.ml-faq__trigger:focus-visible{outline:3px solid var(--ml-cyan);outline-offset:3px}.ml-tab-stage{background:var(--ml-panel-theme,#e6f8ff);transition:background-color .8s cubic-bezier(.2,.8,.2,1)}.ml-panel[hidden]{display:none}.ml-categories-zone{position:relative;z-index:1;background:#fff}.ml-panel__intro{padding:clamp(4rem,8vw,8rem) 0 2.25rem}.ml-panel__intro h2,.ml-section-heading h2{max-width:13ch;margin-top:.5rem;font-size:clamp(2.5rem,5vw,5.5rem);font-weight:500;line-height:1;letter-spacing:-.055em}.ml-panel__note{max-width:36rem;margin-top:1.25rem;color:#5e6870;font-size:.9rem}.ml-categories{display:grid;grid-template-columns:repeat(4,1fr);gap:1.25rem;padding-bottom:clamp(5rem,9vw,9rem)}.ml-category-card{display:flex;min-width:0;aspect-ratio:1.1;flex-direction:column;justify-content:space-between;padding:1rem;border-radius:12px;overflow:hidden;background:#f5f5f5;transition:background-color .3s ease}.ml-category-card:hover{background:#e6f8ff}.ml-category-card__media{display:grid;min-height:0;flex:1;place-items:center;overflow:hidden}.ml-category-card img{width:88%;height:88%;object-fit:contain;transition:transform .35s ease}.ml-category-card:hover img{transform:scale(1.08)}.ml-category-card h3{padding:.75rem .25rem .15rem;text-align:center;font-size:1rem;font-weight:600;line-height:1.3}.ml-featured-list{position:relative;background:linear-gradient(180deg,#fff 0,#e6f8ff clamp(16rem,28vw,28rem),rgba(230,248,255,0) clamp(38rem,55vw,55rem))}
+.ml-featured{--line-bg:#fff;--line-color:#071521;padding:clamp(1rem,3vw,2rem) 0 clamp(5rem,10vw,10rem);color:var(--line-color)}.ml-featured__story{display:grid;grid-template-columns:1.05fr .95fr;min-height:min(68vw,47rem);border-radius:clamp(1.25rem,3vw,2.5rem);overflow:hidden;background:var(--line-bg)}.ml-featured[data-layout=image-right] .ml-featured__media{order:2}.ml-featured[data-layout=image-full] .ml-featured__story{position:relative;display:block}.ml-featured[data-layout=image-full] .ml-featured__media{position:absolute;inset:0}.ml-featured[data-layout=image-full] .ml-featured__media:after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(0,0,0,.58),transparent 70%)}.ml-featured__media img{width:100%;height:100%;object-fit:cover}.ml-featured__copy{position:relative;z-index:1;display:flex;flex-direction:column;align-items:flex-start;justify-content:flex-end;padding:clamp(2rem,5vw,5rem)}.ml-featured__copy h3{font-size:clamp(2.4rem,5vw,5.5rem);font-weight:500;line-height:.95;letter-spacing:-.055em}.ml-featured__copy p{max-width:29rem;margin:1.25rem 0 2rem;opacity:.8}.ml-featured[data-layout=image-full] .ml-featured__copy{min-height:min(68vw,47rem);max-width:48rem}.ml-products-block{padding-top:1.25rem}.ml-products-label{display:flex;justify-content:space-between;gap:1rem;margin-bottom:.8rem;font-size:.68rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;opacity:.65}.ml-product-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1rem}.ml-product-state{grid-column:1/-1;padding:3rem 1rem;border:1px solid currentColor;border-radius:1rem;text-align:center;opacity:.7}.ml-product-card{display:flex;flex-direction:column;gap:.8rem;min-width:0;padding:.8rem;border-radius:1rem;background:#fff;color:var(--ml-ink);box-shadow:0 10px 35px rgba(0,17,33,.07);transition:transform .2s}.ml-product-card:hover{transform:translateY(-3px)}.ml-product-card--disabled:hover{transform:none}.ml-product-card__media{position:relative;display:grid;place-items:center;aspect-ratio:1;border-radius:.75rem;background:#f2f3f3;overflow:hidden}.ml-product-card__media img{width:84%;height:84%;object-fit:contain;transition:transform .25s}.ml-product-card:hover .ml-product-card__media img{transform:scale(1.05)}.ml-product-card__nav{position:absolute;bottom:.4rem;display:grid;place-items:center;width:2rem;height:2rem;border:0;border-radius:50%;background:rgba(255,255,255,.85);cursor:pointer}.ml-product-card__nav--prev{left:.4rem}.ml-product-card__nav--next{right:.4rem}.ml-product-card__title{font-size:.95rem;font-weight:600}.ml-product-card__attrs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.5rem}.ml-product-attr{min-width:0}.ml-product-attr__label,.ml-product-card__note{display:block;color:#7b8389;font-size:.58rem;text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.ml-product-attr__value{display:flex;align-items:center;gap:.25rem;font-size:.65rem;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.ml-product-dot{width:.45rem;height:.45rem;flex:0 0 auto;border-radius:50%}
+.ml-foa{display:grid;grid-template-columns:1.2fr .8fr;min-height:42rem;padding-block:clamp(5rem,10vw,10rem)}.ml-foa__visual{border-radius:2rem 0 0 2rem}.ml-foa__copy{display:flex;flex-direction:column;align-items:flex-start;justify-content:center;padding:clamp(2rem,5vw,5rem);border-radius:0 2rem 2rem 0;background:var(--ml-blue);color:#fff}.ml-foa h2{margin:.5rem 0 1.5rem;font-size:clamp(3rem,6vw,6rem);font-weight:500;letter-spacing:-.06em}.ml-foa__copy p:not(.ml-eyebrow){margin-bottom:2rem;opacity:.75}.ml-news,.ml-faq{padding-bottom:clamp(6rem,11vw,11rem)}.ml-section-heading{display:flex;flex-direction:column;margin-bottom:3rem}.ml-news__grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem}.ml-news-card{display:block}.ml-news-card__image{aspect-ratio:1.25;border-radius:1.25rem;object-fit:cover}.ml-news-card__meta{margin-top:1.2rem;color:#69737a;font-size:.65rem;letter-spacing:.1em;text-transform:uppercase}.ml-news-card h3{margin:.45rem 0;font-size:1.25rem}.ml-news-card p{color:#5c666e;font-size:.85rem}.ml-faq__list{border-top:1px solid var(--ml-line)}.ml-faq__item{border-bottom:1px solid var(--ml-line)}.ml-faq__trigger{display:flex;justify-content:space-between;width:100%;padding:1.5rem 0;border:0;background:none;color:inherit;text-align:left;cursor:pointer;font-size:clamp(1rem,2vw,1.35rem)}.ml-faq__answer{display:grid;grid-template-rows:0fr;transition:grid-template-rows .3s}.ml-faq__answer>div{overflow:hidden}.ml-faq__answer p{max-width:48rem;padding:0 0 1.5rem;color:#58636c}.ml-faq__trigger[aria-expanded=true]+.ml-faq__answer{grid-template-rows:1fr}.ml-faq__icon{transition:transform .3s}.ml-faq__trigger[aria-expanded=true] .ml-faq__icon{transform:rotate(45deg)}.ml-contact{display:flex;min-height:38rem;padding:5rem 1.5rem;flex-direction:column;align-items:center;justify-content:center;text-align:center;background:var(--ml-blue);color:#fff}.ml-contact h2{max-width:12ch;margin:.5rem 0 1rem;font-size:clamp(3rem,7vw,7.5rem);font-weight:500;line-height:.92;letter-spacing:-.06em}.ml-contact>p:not(.ml-eyebrow){margin-bottom:2rem;opacity:.75}.ml-footer{padding:clamp(3rem,7vw,7rem);background:#06101a;color:#fff}.ml-footer__top{display:flex;justify-content:space-between;gap:3rem;padding-bottom:4rem;border-bottom:1px solid rgba(255,255,255,.18)}.ml-footer__top p,.ml-newsletter small{margin-top:.75rem;color:rgba(255,255,255,.55);font-size:.75rem}.ml-newsletter{width:min(100%,24rem)}.ml-newsletter label{font-size:.75rem;font-weight:700;text-transform:uppercase}.ml-newsletter>div{display:flex;margin-top:.75rem;border-bottom:1px solid #fff}.ml-newsletter input{width:100%;padding:.75rem 0;border:0;background:transparent;color:#fff}.ml-newsletter button{border:0;background:none;color:#fff}.ml-footer__links{display:grid;grid-template-columns:repeat(3,1fr);gap:2rem;padding:4rem 0}.ml-footer__links h3{margin-bottom:1rem;font-size:.72rem;text-transform:uppercase}.ml-footer__links a{display:block;margin:.45rem 0;color:rgba(255,255,255,.65);font-size:.82rem}.ml-footer__bottom{display:flex;justify-content:space-between;gap:2rem;padding-top:1.5rem;border-top:1px solid rgba(255,255,255,.18);color:rgba(255,255,255,.5);font-size:.65rem}
+@media(max-width:980px){.ml-categories{grid-template-columns:repeat(2,1fr)}.ml-featured__story{min-height:38rem}.ml-product-grid{grid-template-columns:repeat(2,1fr)}.ml-foa{grid-template-columns:1fr}.ml-foa__visual{min-height:30rem;border-radius:2rem 2rem 0 0}.ml-foa__copy{border-radius:0 0 2rem 2rem}.ml-news__grid{grid-template-columns:1fr 1fr}.ml-news-card:last-child{display:none}}
+@media(max-width:640px){.ml-shell{width:min(100% - 2rem,90rem)}.ml-hero{min-height:100svh}.ml-hero h1 br{display:none}.ml-hero__note{display:none}.ml-tabs-wrap{padding:.45rem}.ml-tab{padding:.7rem .25rem;font-size:.66rem}.ml-panel__intro{padding-top:3.75rem}.ml-categories,.ml-product-grid{display:flex;width:calc(100% + 1rem);padding-right:1rem;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none}.ml-categories::-webkit-scrollbar,.ml-product-grid::-webkit-scrollbar{display:none}.ml-category-card{flex:0 0 78vw;scroll-snap-align:start}.ml-featured__story{display:flex!important;min-height:0;flex-direction:column}.ml-featured__media{position:relative!important;order:0!important;aspect-ratio:1.15}.ml-featured[data-layout=image-full] .ml-featured__media:after{display:none}.ml-featured__copy{min-height:22rem!important;color:var(--line-color)}.ml-product-card{flex:0 0 78vw;scroll-snap-align:start}.ml-news__grid{grid-template-columns:1fr}.ml-news-card:last-child{display:block}.ml-footer__top,.ml-footer__bottom{flex-direction:column}.ml-footer__links{grid-template-columns:1fr 1fr}}
+@media(prefers-reduced-motion:reduce){.ml-home *{scroll-behavior:auto!important;transition-duration:.01ms!important}.ml-hero__video{display:none}}
+.ml-home .ml-tabs-wrap{top:82px;padding:12px 1rem;background:transparent;border-bottom:0;backdrop-filter:none;pointer-events:none}.ml-home .ml-tabs{width:min(calc(100% - 2rem),360px);padding:4px;border-radius:999px;background:#fff;box-shadow:0 5px 18px rgba(0,21,43,.1);pointer-events:auto}.ml-home .ml-tab{border-radius:999px;padding:8px 12px;font-size:16px;font-weight:600;letter-spacing:0;text-transform:none}.ml-home .ml-tab[aria-selected=true]{color:#fff;background:#00ace8;font-weight:700;box-shadow:none}.ml-home .ml-category-card{background:#f5f5f5}.ml-home .ml-category-card:hover{background:#e6f8ff}.ml-home .ml-eyebrow{letter-spacing:0;text-transform:none}.ml-home .ml-button--primary{min-width:0;max-width:100%;gap:0;padding:16px 32px;border:0;border-radius:8px;background:#0086b5;color:#fff;font-size:16px;font-weight:600;line-height:1}.ml-home .ml-button--primary:hover{background:#006f98;color:#fff}
+.ml-home h1{font-size:clamp(2.5rem,5.4vw,4.2rem)}.ml-home h2{font-size:clamp(2rem,4.4vw,3.75rem)}.ml-home h3{font-size:clamp(1.65rem,3.8vw,3.5rem)}.ml-home h4{font-size:clamp(1.3rem,2.5vw,2rem)}.ml-home h5{font-size:clamp(1.1rem,1.8vw,1.4rem)}.ml-home .ml-panel__intro h2{margin-top:0}.ml-home .ml-panel__subtitle{max-width:48rem;margin-top:1rem;color:#53606a;font-size:clamp(1rem,1.45vw,1.25rem);line-height:1.5}.ml-home .ml-category-card h3{font-size:clamp(1.1rem,1.5vw,1.3rem)}.ml-home .ml-featured__copy h3{font-size:clamp(2.2rem,4.5vw,3.5rem)}.ml-home .ml-featured__copy p{font-size:clamp(1.05rem,1.35vw,1.25rem);line-height:1.55}.ml-home .ml-product-card__title{font-size:clamp(1.05rem,1.3vw,1.2rem);line-height:1.35}.ml-home .ml-product-attr__label,.ml-home .ml-product-card__note{font-size:.68rem}.ml-home .ml-product-attr__value{font-size:.78rem}.ml-home .ml-news-card h3{margin-top:1.2rem;font-size:clamp(1.2rem,2vw,1.6rem)}
+.ml-home .ml-category-controls{display:flex;justify-content:flex-end;gap:.65rem;margin-bottom:1rem}.ml-home .ml-category-arrow{display:grid;place-items:center;width:44px;height:44px;padding:0;border:0;border-radius:999px;background:#f5f5f5;color:#071521;cursor:pointer;font-size:1.25rem;line-height:1;transition:background-color .2s,color .2s,transform .2s}.ml-home .ml-category-arrow:hover{background:#00ace8;color:#fff;transform:translateY(-2px)}.ml-home .ml-categories--scroll{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none}.ml-home .ml-categories--scroll::-webkit-scrollbar{display:none}.ml-home .ml-categories--scroll .ml-category-card{flex:0 0 calc((100% - 3.75rem)/4);scroll-snap-align:start}@media(max-width:980px){.ml-home .ml-categories--scroll .ml-category-card{flex-basis:calc((100% - 1.25rem)/2)}}@media(max-width:640px){.ml-home .ml-category-controls{margin-bottom:.75rem}.ml-home .ml-category-arrow{width:40px;height:40px}.ml-home .ml-categories--scroll .ml-category-card{flex-basis:78vw}}
+.ml-home .ml-category-card{padding-bottom:24px}.ml-home .ml-category-card h3{padding-top:24px;padding-bottom:0}
+.ml-home .ml-hero__letter{display:inline-block;color:#fff;opacity:.22}.ml-home .ml-hero h1.is-illuminating .ml-hero__letter{animation:ml-letter-illuminate .65s cubic-bezier(.22,.7,.25,1) var(--letter-delay) 1 forwards}@keyframes ml-letter-illuminate{0%{opacity:.22}100%{opacity:1}}@media(prefers-reduced-motion:reduce){.ml-home .ml-hero__letter{color:#fff;opacity:1}}
+.ml-home .ml-featured__copy h3 strong{font-weight:800}.ml-home .ml-featured__copy p strong{font-weight:700}
+.ml-home .ml-button--secondary{min-width:0;max-width:100%;padding:15px 31px;border:1px solid currentColor;border-radius:8px;background:transparent;color:inherit;font-size:16px;font-weight:600;line-height:1}.ml-home .ml-button--secondary:hover{background:color-mix(in srgb,currentColor 10%,transparent);color:inherit}
+.ml-home .ml-category-carousel{position:relative;padding-bottom:clamp(5rem,9vw,9rem)}.ml-home .ml-category-carousel .ml-categories{width:100%;padding-bottom:0}.ml-home .ml-category-arrow{position:absolute;z-index:3;top:calc(50% - clamp(2.5rem,4.5vw,4.5rem));display:grid;place-items:center;width:48px;height:48px;padding:0;border:0;border-radius:999px;background:#0086b5;color:#fff;box-shadow:0 8px 22px rgba(0,21,43,.2);cursor:pointer;font-size:24px;font-weight:600;line-height:1;opacity:0;pointer-events:none;transform:translateY(-50%) scale(.88);transition:opacity .2s ease,transform .2s ease,background-color .2s ease}.ml-home .ml-category-arrow span{display:block;transform:translateY(-1px)}.ml-home .ml-category-arrow--prev{left:12px}.ml-home .ml-category-arrow--next{right:12px}.ml-home .ml-category-carousel:hover .ml-category-arrow,.ml-home .ml-category-carousel:focus-within .ml-category-arrow{opacity:1;pointer-events:auto;transform:translateY(-50%) scale(1)}.ml-home .ml-category-arrow:hover{background:#006f98;color:#fff;transform:translateY(-50%) scale(1.05)}@media(max-width:640px){.ml-home .ml-category-carousel{width:min(100% - 2rem,90rem)}.ml-home .ml-category-carousel .ml-category-arrow{display:none}}
+.ml-home .ml-hero__video{z-index:-2}.ml-home .ml-hero__fallback{z-index:-3}
+.ml-home .ml-category-arrow{background:#e1e4e6;color:#253441;box-shadow:none}.ml-home .ml-category-arrow:hover{background:#cfd4d8;color:#071521}.ml-home .ml-featured-list{background:linear-gradient(180deg,#fff 0,rgba(255,255,255,0) clamp(18rem,30vw,30rem))}
+.w-embed:has(>#macroled-home){display:block!important;width:100%!important;height:auto!important;min-height:0!important;max-height:none!important;overflow:visible!important}.ml-home#macroled-home{display:block!important;width:100%!important;height:auto!important;min-height:0!important;max-height:none!important;overflow:visible!important}.ml-home#macroled-home main{display:block;width:100%;height:auto;max-height:none;overflow:visible}
+
+</style>
+<script>
+(function (window) {
+  "use strict";
+  const PLACEHOLDER = "data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%201600%201000%22%20role%3D%22img%22%20aria-labelledby%3D%22t%20d%22%3E%3Ctitle%20id%3D%22t%22%3EImagen%20pendiente%3C%2Ftitle%3E%3Cdesc%20id%3D%22d%22%3EPlaceholder%20editorial%20para%20reemplazar%20por%20una%20imagen%20de%20Macroled.%3C%2Fdesc%3E%3Cdefs%3E%3ClinearGradient%20id%3D%22g%22%20x1%3D%220%22%20y1%3D%220%22%20x2%3D%221%22%20y2%3D%221%22%3E%3Cstop%20stop-color%3D%22%23dfe8e6%22%2F%3E%3Cstop%20offset%3D%22.5%22%20stop-color%3D%22%23f0ede4%22%2F%3E%3Cstop%20offset%3D%221%22%20stop-color%3D%22%23b8c8cf%22%2F%3E%3C%2FlinearGradient%3E%3CradialGradient%20id%3D%22l%22%3E%3Cstop%20stop-color%3D%22%23fff%22%20stop-opacity%3D%22.95%22%2F%3E%3Cstop%20offset%3D%221%22%20stop-color%3D%22%23fff%22%20stop-opacity%3D%220%22%2F%3E%3C%2FradialGradient%3E%3C%2Fdefs%3E%3Crect%20width%3D%221600%22%20height%3D%221000%22%20fill%3D%22url(%23g)%22%2F%3E%3Ccircle%20cx%3D%221180%22%20cy%3D%22220%22%20r%3D%22360%22%20fill%3D%22url(%23l)%22%2F%3E%3Cpath%20d%3D%22M0%20820C380%20680%20660%20920%20990%20770s440-80%20610%200v230H0z%22%20fill%3D%22%2300152b%22%20opacity%3D%22.1%22%2F%3E%3Ctext%20x%3D%2280%22%20y%3D%22900%22%20fill%3D%22%2300152b%22%20font-family%3D%22Arial%2Csans-serif%22%20font-size%3D%2230%22%20letter-spacing%3D%226%22%3EIMAGEN%20PENDIENTE%20%C2%B7%20MACROLED%3C%2Ftext%3E%3C%2Fsvg%3E%0A";
+  const g9 = { typesenseField: "subfamilia", typesenseValue: "G9", productCount: 4 };
+  const category = (title, id) => ({ title, image: PLACEHOLDER, href: "#", id });
+  const line = (title, description, theme, textColor, layout) => ({ title, description, image: PLACEHOLDER, href: "#", theme, textColor, layout, ...g9 });
+
+  window.MACROLED_HOME_CONFIG = {
+    assets: { placeholder: PLACEHOLDER },
+    typesense: {
+      host: "https://typesense.coresagroup.com",
+      apiKey: "g0oiNYY8THGuU9jnCsvqIH1X9HtvYRCR",
+      collection: "Macroled_Prueba",
+      queryBy: "nombre,descripcion"
+    },
+    tabs: {
+      interior: {
+        title: "Luz para habitar cada espacio",
+        subtitle: "Iluminación interior para crear ambientes cálidos, funcionales y únicos.",
+        categories: [
+          { ...category("Lámparas", "lamparas"), image: "https://s3.coresagroup.com/MACROLED/250/smartnew.png" },
+          { ...category("Interruptores y tomas", "interruptores-y-tomas"), image: "https://s3.coresagroup.com/MACROLED/250/lima.webp" },
+          { ...category("Tiras LED", "tiras-led"), image: "https://s3.coresagroup.com/MACROLED/250/smd5050a.png" },
+          { ...category("Paneles", "paneles"), image: "https://s3.coresagroup.com/MACROLED/250/7428325570818a.png" },
+          category("Sensores", "sensores"),
+          category("Artefactos para lámparas", "artefactos-para-lamparas")
+        ],
+        featuredLines: [
+          { ...line("Línea Monaco", "Módulos y tomas diseñados con un enfoque en estética, funcionalidad y seguridad. Incluye una amplia variedad de armadas con diferentes combinaciones de puntos, USB-C, dimmers y conectores multimedia", "#e9ecef", "#101820", "image-left"), titleEmphasis: "Monaco", descriptionEmphasis: "armadas" },
+          line("Línea interior 02", "Una composición amplia preparada para presentar la familia.", "#16283a", "#ffffff", "image-right"),
+          line("Línea interior 03", "Contenido comercial configurable desde un único archivo.", "#dbe8e5", "#101820", "image-full")
+        ]
+      },
+      exterior: {
+        title: "El espacio continúa afuera",
+        subtitle: "Iluminación exterior pensada para acompañar cada espacio al aire libre.",
+        categories: [
+          category("Reflectores", "reflectores"),
+          category("Solar", "solar"),
+          category("Tortugas", "tortugas"),
+          category("Estacas", "estacas")
+        ],
+        featuredLines: [
+          line("Línea exterior 01", "Nombre, imagen y descripción editorial pendientes.", "#d7e0d1", "#102016", "image-right"),
+          line("Línea exterior 02", "Preparada para una fotografía de ambiente de gran formato.", "#1b312c", "#ffffff", "image-left"),
+          line("Línea exterior 03", "La configuración permite cambiar el universo visual sin reprogramar.", "#e8dfcf", "#1c1812", "image-full")
+        ]
+      },
+      proyectos: {
+        title: "Rendimiento a gran escala",
+        subtitle: "Productos para proyectos lumínicos que exigen potencia, eficiencia y precisión.",
+        categories: ["Highbay Pro", "Luz de calle Standard", "Lumax", "Solar"].map((title, i) => ({ ...category(title, `proyectos-0${i + 1}`), subtitle: "Proyecto lumínico" })),
+        featuredLines: [
+          line("Highbay Pro", "Potencia y control para espacios de gran altura. Texto final pendiente.", "#00152b", "#ffffff", "image-left"),
+          line("Olimpus", "Presentación editorial de línea. Imagen y descripción definitivas pendientes.", "#c9d5dc", "#07141e", "image-right"),
+          line("Titan", "Bloque preparado para comunicar prestaciones y aplicaciones.", "#3b4449", "#ffffff", "image-full"),
+          line("Invictus", "La consulta de producto es temporalmente G9, como en todo el prototipo.", "#d9c8aa", "#1a1610", "image-left")
+        ]
+      }
+    },
+    news: [1, 2, 3].map(n => ({ title: `Novedad editorial 0${n}`, description: "Título, imagen, descripción y vínculo configurables.", image: PLACEHOLDER, href: "#" })),
+    faq: [
+      { question: "¿Cómo elijo la iluminación adecuada?", answer: "Respuesta definitiva pendiente. El equipo de Macroled puede asesorarte según el uso, las dimensiones y la atmósfera buscada." },
+      { question: "¿Dónde encuentro la información técnica?", answer: "Las fichas de los productos disponibles enlazan a su ficha web. También se podrá incorporar un acceso a descargas." },
+      { question: "¿Macroled trabaja con proyectos profesionales?", answer: "Sí. Esta respuesta es un placeholder editorial y debe validarse antes de publicar." }
+    ]
+  };
+})(window);
+
+(function (window) {
+  "use strict";
+  const CCT_DOT={"2000K":"#ff8a00","2700K":"#ffab40","3000K":"#ffb84d","4000K":"#cfe8ff","4500K":"#bfe3ff","5000K":"#5ec8f2","5700K":"#29b6f6","6500K":"#3b82f6"};
+  const cache=new Map();
+  const escapeHTML=value=>String(value??"").replace(/[&<>'"]/g,char=>({"&":"&amp;","<":"&lt;",">":"&gt;","'":"&#39;",'"':"&quot;"}[char]));
+  const safeUrl=value=>{try{const url=new URL(String(value),window.location.href);return ["http:","https:"].includes(url.protocol)?url.href:""}catch(_){return ""}};
+
+  function parseImages(doc){
+    const raw=doc.multiimage||doc.multiimagen;let imgs=[];
+    if(Array.isArray(raw)) imgs=raw;
+    else if(raw){try{const parsed=JSON.parse(raw);if(Array.isArray(parsed)) imgs=parsed}catch(_){imgs=String(raw).split(/[,|]/).map(s=>s.trim()).filter(Boolean)}}
+    if(!imgs.length&&doc.imagen) imgs=[doc.imagen];
+    return imgs.map(safeUrl).filter(Boolean);
+  }
+  function mergeVariantValue(doc,nombre,baseValor){
+    const base=String(baseValor??"");if(!Array.isArray(doc.atributo_variante)) return base;
+    const existing=base.split(";").map(s=>s.trim());
+    const extras=doc.atributo_variante.filter(v=>String(v.nombre||"").toLowerCase()===String(nombre||"").toLowerCase()&&v.valor&&!existing.includes(String(v.valor))).map(v=>String(v.valor));
+    return extras.length?[base,...extras].filter(Boolean).join(" ; "):base;
+  }
+  function buildSpecs(doc){
+    if(Array.isArray(doc.atributos)&&doc.atributos.length) return doc.atributos.slice(0,3).map(a=>({label:a.nombre,value:mergeVariantValue(doc,a.nombre,a.valor)}));
+    return [{label:doc.nombre_attr1,value:doc.attr_1},{label:doc.nombre_attr2,value:doc.attr_2},{label:doc.nombre_attr3,value:doc.attr_3}].filter(p=>p.label&&p.value).slice(0,3).map(p=>({label:p.label,value:mergeVariantValue(doc,p.label,p.value)}));
+  }
+  async function fetchProducts(field,value,count){
+    const cfg=window.MACROLED_HOME_CONFIG.typesense;
+    if(!cfg.host||!cfg.apiKey||!cfg.collection) throw new Error("Configuración Typesense incompleta");
+    const key=[field,value,count].join("|");if(cache.has(key)) return cache.get(key);
+    const params=new URLSearchParams({q:"*",query_by:cfg.queryBy||"nombre,descripcion",filter_by:`${field}:=${value}`,per_page:String(count),page:"1"});
+    const request=fetch(`${cfg.host}/collections/${encodeURIComponent(cfg.collection)}/documents/search?${params}`,{headers:{"X-TYPESENSE-API-KEY":cfg.apiKey}}).then(async res=>{if(!res.ok) throw new Error(`Typesense ${res.status}: ${await res.text()}`);return res.json()}).catch(error=>{cache.delete(key);throw error});
+    cache.set(key,request);return request;
+  }
+  function cardTemplate(doc){
+    const imgs=parseImages(doc),specs=buildSpecs(doc),link=safeUrl(doc.link_ficha_web),tag=link?"a":"div";
+    const attrs=specs.length?specs.map(spec=>{const value=String(spec.value||""),token=value.split(";")[0].trim(),dot=/luz|temperatura/i.test(spec.label)&&CCT_DOT[token]?`<span class="ml-product-dot" style="background:${CCT_DOT[token]}"></span>`:"";return `<div class="ml-product-attr"><span class="ml-product-attr__label">${escapeHTML(spec.label)}</span><span class="ml-product-attr__value">${dot}${escapeHTML(value)}</span></div>`}).join(""):`<span class="ml-product-card__note">Sin atributos cargados</span>`;
+    const image=imgs.length?`<img src="${escapeHTML(imgs[0])}" alt="${escapeHTML(doc.nombre||"Producto Macroled")}" loading="lazy" width="400" height="400" data-images="${escapeHTML(JSON.stringify(imgs))}" data-index="0">`:`<span class="ml-product-card__note">Sin imagen</span>`;
+    const nav=imgs.length>1?`<button type="button" class="ml-product-card__nav ml-product-card__nav--prev" aria-label="Imagen anterior">←</button><button type="button" class="ml-product-card__nav ml-product-card__nav--next" aria-label="Imagen siguiente">→</button>`:"";
+    return `<${tag} class="ml-product-card${link?"":" ml-product-card--disabled"}"${link?` href="${escapeHTML(link)}"`:""} data-id="${escapeHTML(doc.id||doc.sku||"")}"><div class="ml-product-card__media">${image}${nav}</div><div class="ml-product-card__title">${escapeHTML(doc.nombre||"Producto sin nombre")}</div><div class="ml-product-card__attrs">${attrs}</div></${tag}>`;
+  }
+  function wireCarousels(grid){
+    grid.querySelectorAll(".ml-product-card__media").forEach(media=>{const img=media.querySelector("img[data-images]");if(!img)return;let images=[];try{images=JSON.parse(img.dataset.images)}catch(_){return}const move=direction=>{let index=Number(img.dataset.index||0);index=(index+direction+images.length)%images.length;img.dataset.index=String(index);img.src=images[index]};media.querySelector(".ml-product-card__nav--prev")?.addEventListener("click",event=>{event.preventDefault();event.stopPropagation();move(-1)});media.querySelector(".ml-product-card__nav--next")?.addEventListener("click",event=>{event.preventDefault();event.stopPropagation();move(1)})});
+  }
+  async function renderGrid(grid){
+    const field=grid.dataset.productsField,value=grid.dataset.productsValue,count=Number(grid.dataset.productsCount||4);
+    grid.setAttribute("aria-busy","true");
+    try{const data=await fetchProducts(field,value,count);if(!data.hits?.length){grid.innerHTML=`<div class="ml-product-state">No hay productos para “${escapeHTML(value)}”.</div>`;return}grid.innerHTML=data.hits.map(hit=>cardTemplate(hit.document)).join("");wireCarousels(grid)}catch(error){console.error(`Macroled Home · Error consultando Typesense (${field}=${value})`,error);grid.innerHTML=`<div class="ml-product-state">No se pudieron cargar los productos. Verificá la configuración de Typesense y que “${escapeHTML(value)}” exista.</div>`}finally{grid.setAttribute("aria-busy","false")}
+  }
+  function init(root=document){root.querySelectorAll(".ml-product-grid:not([data-products-ready])").forEach(grid=>{grid.dataset.productsReady="true";renderGrid(grid)})}
+  window.MacroledProducts={init,parseImages,mergeVariantValue,buildSpecs,cardTemplate};
+})(window);
+
+(function(window){"use strict";
+  function quickScrollTo(top){if(matchMedia('(prefers-reduced-motion: reduce)').matches){window.scrollTo(0,top);return}const start=window.scrollY,distance=top-start;if(Math.abs(distance)<2)return;const duration=320,started=performance.now();const tick=now=>{const progress=Math.min((now-started)/duration,1),eased=1-Math.pow(1-progress,3);window.scrollTo(0,start+distance*eased);if(progress<1)requestAnimationFrame(tick)};requestAnimationFrame(tick)}
+  function init(root){const tabs=[...root.querySelectorAll('[role="tab"]')],panels=[...root.querySelectorAll('[role="tabpanel"]')],explore=root.querySelector(".ml-explore");
+    function activate(tab,{focus=false,scroll=false}={}){tabs.forEach(item=>{const active=item===tab;item.setAttribute("aria-selected",String(active));item.tabIndex=active?0:-1});panels.forEach(panel=>{panel.hidden=panel.dataset.panel!==tab.dataset.tab});window.MacroledHome?.activatePanel(tab.dataset.tab);if(focus)tab.focus({preventScroll:true});if(scroll)quickScrollTo(explore.getBoundingClientRect().top+window.scrollY)}
+    tabs.forEach((tab,index)=>{tab.addEventListener("click",()=>activate(tab,{scroll:true}));tab.addEventListener("keydown",event=>{let next;if(event.key==="ArrowRight")next=(index+1)%tabs.length;if(event.key==="ArrowLeft")next=(index-1+tabs.length)%tabs.length;if(event.key==="Home")next=0;if(event.key==="End")next=tabs.length-1;if(next!==undefined){event.preventDefault();activate(tabs[next],{focus:true,scroll:true})}})});activate(tabs.find(tab=>tab.getAttribute("aria-selected")==="true")||tabs[0])}
+  window.MacroledTabs={init};
+})(window);
+
+(function(window){"use strict";
+  const config=window.MACROLED_HOME_CONFIG,root=document.getElementById("macroled-home");if(!config||!root)return;
+  const esc=value=>String(value??"").replace(/[&<>'"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","'":"&#39;",'"':"&quot;"}[c]));
+  const emphasize=(value,term)=>{const safe=esc(value);if(!term)return safe;const safeTerm=esc(term);return safe.replace(safeTerm,`<strong>${safeTerm}</strong>`)};
+  function categoryTemplate(item){return `<a class="ml-category-card" href="${esc(item.href)}" data-editorial-id="${esc(item.id)}"><div class="ml-category-card__media"><img src="${esc(item.image)}" alt="" loading="lazy" width="800" height="800"></div><h3>${esc(item.title)}</h3></a>`}
+  function lineTemplate(item){return `<article class="ml-featured ml-shell" data-theme="${esc(item.theme)}" data-layout="${esc(item.layout)}" style="--line-bg:${esc(item.theme)};--line-color:${esc(item.textColor)}"><div class="ml-featured__story"><div class="ml-featured__media"><img src="${esc(item.image)}" alt="" loading="lazy" width="1600" height="1000"></div><div class="ml-featured__copy"><h3>${emphasize(item.title,item.titleEmphasis)}</h3><p>${emphasize(item.description,item.descriptionEmphasis)}</p><a class="ml-button ml-button--secondary" href="${esc(item.href)}">Ver productos</a></div></div><div class="ml-products-block"><div class="ml-product-grid" data-products-field="${esc(item.typesenseField)}" data-products-value="${esc(item.typesenseValue)}" data-products-count="${Number(item.productCount)}"><div class="ml-product-state">Cargando productos…</div></div></div></article>`}
+  function renderPanels(){Object.entries(config.tabs).forEach(([key,data])=>{const panel=root.querySelector(`[data-panel="${key}"]`),hasCarousel=data.categories.length>4,cards=data.categories.map(categoryTemplate).join("");panel.innerHTML=`<div class="ml-categories-zone"><div class="ml-panel__intro ml-shell"><h2>${esc(data.title)}</h2><p class="ml-panel__subtitle">${esc(data.subtitle)}</p></div>${hasCarousel?`<div class="ml-category-carousel ml-shell"><button type="button" class="ml-category-arrow ml-category-arrow--prev" data-category-direction="prev" aria-label="Ver categorías anteriores"><span aria-hidden="true">←</span></button><div class="ml-categories ml-categories--scroll">${cards}</div><button type="button" class="ml-category-arrow ml-category-arrow--next" data-category-direction="next" aria-label="Ver más categorías"><span aria-hidden="true">→</span></button></div>`:`<div class="ml-categories ml-shell">${cards}</div>`}</div><div class="ml-featured-list">${data.featuredLines.map(lineTemplate).join("")}</div>`})}
+  function initCategoryCarousels(){root.querySelectorAll(".ml-category-carousel").forEach(carousel=>{const track=carousel.querySelector(".ml-categories--scroll");carousel.querySelectorAll("[data-category-direction]").forEach(button=>button.addEventListener("click",()=>{const card=track.querySelector(".ml-category-card"),gap=parseFloat(getComputedStyle(track).gap)||0,amount=(card?.getBoundingClientRect().width||track.clientWidth)+gap;track.scrollBy({left:button.dataset.categoryDirection==="next"?amount:-amount,behavior:matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth"})}))})}
+  function renderCommon(){root.querySelector("[data-news]").innerHTML=config.news.map(item=>`<a class="ml-news-card" href="${esc(item.href)}"><img class="ml-news-card__image" src="${esc(item.image)}" alt="" loading="lazy" width="700" height="560"><h3>${esc(item.title)}</h3><p>${esc(item.description)}</p></a>`).join("");root.querySelector("[data-faq]").innerHTML=config.faq.map((item,index)=>`<div class="ml-faq__item"><button class="ml-faq__trigger" type="button" aria-expanded="false" aria-controls="ml-faq-answer-${index}"><span>${esc(item.question)}</span><span class="ml-faq__icon" aria-hidden="true">＋</span></button><div class="ml-faq__answer" id="ml-faq-answer-${index}"><div><p>${esc(item.answer)}</p></div></div></div>`).join("");root.querySelectorAll(".ml-faq__trigger").forEach(button=>button.addEventListener("click",()=>button.setAttribute("aria-expanded",String(button.getAttribute("aria-expanded")!=="true"))))}
+  let observer;function observeThemes(panel){observer?.disconnect();const stage=root.querySelector(".ml-tab-stage"),lines=[...panel.querySelectorAll(".ml-featured")];observer=new IntersectionObserver(entries=>{const visible=entries.filter(entry=>entry.isIntersecting).sort((a,b)=>b.intersectionRatio-a.intersectionRatio)[0];if(visible)stage.style.setProperty("--ml-panel-theme",visible.target.dataset.theme)},{rootMargin:"-25% 0px -45%",threshold:[0,.25,.5,.75]});lines.forEach(line=>observer.observe(line))}
+  function activatePanel(key){const panel=root.querySelector(`[data-panel="${key}"]`);if(!panel)return;window.MacroledProducts.init(panel);observeThemes(panel)}
+  function handleVideo(){const video=root.querySelector(".ml-hero__video");if(!video)return;if(matchMedia('(prefers-reduced-motion: reduce)').matches){video.pause();video.hidden=true;return}video.play().catch(()=>{video.hidden=true})}
+  function animateHeroTitle(){const title=root.querySelector("#ml-hero-title");if(!title||matchMedia("(prefers-reduced-motion: reduce)").matches)return;const text=title.textContent.trim();title.setAttribute("aria-label",text);title.textContent="";[...text].forEach((character,index)=>{const span=document.createElement("span");span.className="ml-hero__letter";span.setAttribute("aria-hidden","true");span.style.setProperty("--letter-delay",`${index*28}ms`);span.textContent=character===" "?"\u00a0":character;title.appendChild(span)});requestAnimationFrame(()=>title.classList.add("is-illuminating"))}
+  renderPanels();initCategoryCarousels();renderCommon();window.MacroledHome={activatePanel};window.MacroledTabs.init(root);handleVideo();animateHeroTitle();
+})(window);
+
+</script>
