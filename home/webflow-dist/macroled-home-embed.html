@@ -6,25 +6,53 @@
       <div class="ml-hero__fallback" aria-hidden="true"></div>
       <div class="ml-hero__overlay"></div>
       <div class="ml-hero__content">
-        <h1 id="ml-hero-title">Calidad y diseño en iluminación LED para transformar espacios</h1>
-        <a class="ml-button ml-button--primary" href="#ml-explore">Ver productos</a>
+        <h1 id="ml-hero-title">Calidad y diseño en iluminación&nbsp;LED para transformar espacios</h1>
+        <p class="ml-hero__subtitle">Productos, tecnología y asesoramiento para iluminar desde una casa hasta un gran proyecto.</p>
+        <a class="ml-button ml-button--primary" href="#productos-destacados">Ver productos</a>
       </div>
     </header>
 
     <main>
-      <section id="ml-explore" class="ml-explore" aria-label="Explorar productos">
-        <div class="ml-tabs-wrap">
-          <div class="ml-tabs" role="tablist" aria-label="Ambiente de producto">
-            <button class="ml-tab" type="button" role="tab" id="ml-tab-interior" aria-controls="ml-panel-interior" aria-selected="true" tabindex="0" data-tab="interior">Interior</button>
-            <button class="ml-tab" type="button" role="tab" id="ml-tab-exterior" aria-controls="ml-panel-exterior" aria-selected="false" tabindex="-1" data-tab="exterior">Exterior</button>
-            <button class="ml-tab" type="button" role="tab" id="ml-tab-proyectos" aria-controls="ml-panel-proyectos" aria-selected="false" tabindex="-1" data-tab="proyectos">Proyectos</button>
+      <section class="ml-featured-products" id="productos-destacados" aria-labelledby="ml-featured-products-title">
+        <div class="ml-featured-products__head ml-shell">
+          <h4 id="ml-featured-products-title">Productos destacados</h4>
+          <div class="ml-featured-products__tabs" role="tablist" aria-label="Filtrar productos destacados por ambiente">
+            <button class="ml-featured-products__tab is-active" type="button" role="tab" aria-selected="true" data-space="interior" data-label-active="Iluminación interior" data-label-inactive="Interior">Iluminación interior</button>
+            <button class="ml-featured-products__tab" type="button" role="tab" aria-selected="false" data-space="exterior" data-label-active="Iluminación exterior" data-label-inactive="Exterior">Exterior</button>
+            <button class="ml-featured-products__tab" type="button" role="tab" aria-selected="false" data-space="proyectos" data-label-active="Iluminación para proyectos" data-label-inactive="Proyectos">Proyectos</button>
           </div>
         </div>
-        <div class="ml-tab-stage">
-          <section class="ml-panel" id="ml-panel-interior" role="tabpanel" aria-labelledby="ml-tab-interior" data-panel="interior"></section>
-          <section class="ml-panel" id="ml-panel-exterior" role="tabpanel" aria-labelledby="ml-tab-exterior" data-panel="exterior" hidden></section>
-          <section class="ml-panel" id="ml-panel-proyectos" role="tabpanel" aria-labelledby="ml-tab-proyectos" data-panel="proyectos" hidden></section>
+        <div class="ml-featured-products__viewport">
+          <div class="ml-featured-products__track" data-featured-track aria-live="polite">
+            <div class="ml-featured-products__state">Cargando destacados…</div>
+          </div>
         </div>
+        <div class="ml-featured-products__controls ml-shell" hidden>
+          <div class="ml-featured-products__progress" aria-hidden="true">
+            <span data-featured-progress></span>
+          </div>
+          <div class="ml-featured-products__arrows">
+            <button class="ml-featured-products__nav" type="button" data-featured-prev aria-label="Producto anterior">←</button>
+            <button class="ml-featured-products__nav" type="button" data-featured-next aria-label="Producto siguiente">→</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="ml-project-lines" aria-labelledby="ml-project-lines-title" data-project-lines>
+        <div class="ml-project-lines__inner ml-shell">
+          <header class="ml-project-lines__header">
+            <h4 id="ml-project-lines-title">Luminarias profesionales para proyectos de gran escala</h4>
+            <a class="ml-project-lines__explore" href="#ml-section-proyectos">
+              <span>Productos para proyectos</span>
+              <span aria-hidden="true">→</span>
+            </a>
+          </header>
+          <div class="ml-project-lines__cards" data-project-lines-list></div>
+        </div>
+      </section>
+
+      <section id="ml-explore" class="ml-explore" aria-label="Explorar productos">
+        <div data-home-sections></div>
       </section>
 
       <section class="ml-foa ml-shell" aria-labelledby="ml-foa-title">

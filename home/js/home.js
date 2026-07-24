@@ -1,15 +1,140 @@
-(function(window){"use strict";
-  const config=window.MACROLED_HOME_CONFIG,root=document.getElementById("macroled-home");if(!config||!root)return;
-  const esc=value=>String(value??"").replace(/[&<>'"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","'":"&#39;",'"':"&quot;"}[c]));
-  const emphasize=(value,term)=>{const safe=esc(value);if(!term)return safe;const safeTerm=esc(term);return safe.replace(safeTerm,`<strong>${safeTerm}</strong>`)};
-  function categoryTemplate(item){return `<a class="ml-category-card" href="${esc(item.href)}" data-editorial-id="${esc(item.id)}"><div class="ml-category-card__media"><img src="${esc(item.image)}" alt="" loading="lazy" width="800" height="800"></div><h3>${esc(item.title)}</h3></a>`}
-  function lineTemplate(item){return `<article class="ml-featured ml-shell" data-theme="${esc(item.theme)}" data-layout="${esc(item.layout)}" style="--line-bg:${esc(item.theme)};--line-color:${esc(item.textColor)}"><div class="ml-featured__story"><div class="ml-featured__media"><img src="${esc(item.image)}" alt="" loading="lazy" width="1600" height="1000"></div><div class="ml-featured__copy"><h3>${emphasize(item.title,item.titleEmphasis)}</h3><p>${emphasize(item.description,item.descriptionEmphasis)}</p><a class="ml-button ml-button--secondary" href="${esc(item.href)}">Ver productos</a></div></div><div class="ml-products-block"><div class="ml-product-grid" data-products-field="${esc(item.typesenseField)}" data-products-value="${esc(item.typesenseValue)}" data-products-count="${Number(item.productCount)}"><div class="ml-product-state">Cargando productos…</div></div></div></article>`}
-  function renderPanels(){Object.entries(config.tabs).forEach(([key,data])=>{const panel=root.querySelector(`[data-panel="${key}"]`),hasCarousel=data.categories.length>4,cards=data.categories.map(categoryTemplate).join("");panel.innerHTML=`<div class="ml-categories-zone"><div class="ml-panel__intro ml-shell"><h2>${esc(data.title)}</h2><p class="ml-panel__subtitle">${esc(data.subtitle)}</p></div>${hasCarousel?`<div class="ml-category-carousel ml-shell"><button type="button" class="ml-category-arrow ml-category-arrow--prev" data-category-direction="prev" aria-label="Ver categorías anteriores"><span aria-hidden="true">←</span></button><div class="ml-categories ml-categories--scroll">${cards}</div><button type="button" class="ml-category-arrow ml-category-arrow--next" data-category-direction="next" aria-label="Ver más categorías"><span aria-hidden="true">→</span></button></div>`:`<div class="ml-categories ml-shell">${cards}</div>`}</div><div class="ml-featured-list">${data.featuredLines.map(lineTemplate).join("")}</div>`})}
-  function initCategoryCarousels(){root.querySelectorAll(".ml-category-carousel").forEach(carousel=>{const track=carousel.querySelector(".ml-categories--scroll");carousel.querySelectorAll("[data-category-direction]").forEach(button=>button.addEventListener("click",()=>{const card=track.querySelector(".ml-category-card"),gap=parseFloat(getComputedStyle(track).gap)||0,amount=(card?.getBoundingClientRect().width||track.clientWidth)+gap;track.scrollBy({left:button.dataset.categoryDirection==="next"?amount:-amount,behavior:matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth"})}))})}
-  function renderCommon(){root.querySelector("[data-news]").innerHTML=config.news.map(item=>`<a class="ml-news-card" href="${esc(item.href)}"><img class="ml-news-card__image" src="${esc(item.image)}" alt="" loading="lazy" width="700" height="560"><h3>${esc(item.title)}</h3><p>${esc(item.description)}</p></a>`).join("");root.querySelector("[data-faq]").innerHTML=config.faq.map((item,index)=>`<div class="ml-faq__item"><button class="ml-faq__trigger" type="button" aria-expanded="false" aria-controls="ml-faq-answer-${index}"><span>${esc(item.question)}</span><span class="ml-faq__icon" aria-hidden="true">＋</span></button><div class="ml-faq__answer" id="ml-faq-answer-${index}"><div><p>${esc(item.answer)}</p></div></div></div>`).join("");root.querySelectorAll(".ml-faq__trigger").forEach(button=>button.addEventListener("click",()=>button.setAttribute("aria-expanded",String(button.getAttribute("aria-expanded")!=="true"))))}
-  let observer;function observeThemes(panel){observer?.disconnect();const stage=root.querySelector(".ml-tab-stage"),lines=[...panel.querySelectorAll(".ml-featured")];observer=new IntersectionObserver(entries=>{const visible=entries.filter(entry=>entry.isIntersecting).sort((a,b)=>b.intersectionRatio-a.intersectionRatio)[0];if(visible)stage.style.setProperty("--ml-panel-theme",visible.target.dataset.theme)},{rootMargin:"-25% 0px -45%",threshold:[0,.25,.5,.75]});lines.forEach(line=>observer.observe(line))}
-  function activatePanel(key){const panel=root.querySelector(`[data-panel="${key}"]`);if(!panel)return;window.MacroledProducts.init(panel);observeThemes(panel)}
-  function handleVideo(){const video=root.querySelector(".ml-hero__video");if(!video)return;if(matchMedia('(prefers-reduced-motion: reduce)').matches){video.pause();video.hidden=true;return}video.play().catch(()=>{video.hidden=true})}
-  function animateHeroTitle(){const title=root.querySelector("#ml-hero-title");if(!title||matchMedia("(prefers-reduced-motion: reduce)").matches)return;const text=title.textContent.trim();title.setAttribute("aria-label",text);title.textContent="";[...text].forEach((character,index)=>{const span=document.createElement("span");span.className="ml-hero__letter";span.setAttribute("aria-hidden","true");span.style.setProperty("--letter-delay",`${index*28}ms`);span.textContent=character===" "?"\u00a0":character;title.appendChild(span)});requestAnimationFrame(()=>title.classList.add("is-illuminating"))}
-  renderPanels();initCategoryCarousels();renderCommon();window.MacroledHome={activatePanel};window.MacroledTabs.init(root);handleVideo();animateHeroTitle();
+(function (window) {
+  "use strict";
+
+  const config = window.MACROLED_HOME_CONFIG;
+  const root = document.getElementById("macroled-home");
+  if (!config || !root) return;
+
+  const esc = value => String(value ?? "").replace(/[&<>'"]/g, character => ({
+    "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", '"': "&quot;"
+  })[character]);
+
+  const emphasize = (value, term) => {
+    const safe = esc(value);
+    if (!term) return safe;
+    const safeTerm = esc(term);
+    return safe.replace(safeTerm, `<strong>${safeTerm}</strong>`);
+  };
+
+  function categoryTemplate(item) {
+    return `<a class="ml-category-card" href="${esc(item.href)}" data-editorial-id="${esc(item.id)}"><div class="ml-category-card__media"><img src="${esc(item.image)}" alt="" loading="lazy" width="800" height="800"></div><h3>${esc(item.title)}</h3></a>`;
+  }
+
+  function lineContentTemplate(item) {
+    const content = item.content || {};
+
+    if (content.mode === "static") {
+      const categories = config.manualCategories?.[content.categoryGroup] || content.items || [];
+      return `<div class="ml-line-content ml-line-content--static"><div class="ml-categories ml-line-subfamilies">${categories.map(categoryTemplate).join("")}</div></div>`;
+    }
+
+    const query = content.query || item;
+    return `<div class="ml-products-block"><div class="ml-product-grid" data-products-field="${esc(query.typesenseField)}" data-products-value="${esc(query.typesenseValue)}" data-products-count="${Number(query.productCount || 4)}"><div class="ml-product-state">Cargando productos…</div></div></div>`;
+  }
+
+  function lineTemplate(item) {
+    const mode = item.content?.mode || "typesense";
+    return `<article class="ml-featured ml-shell" data-theme="${esc(item.theme)}" data-layout="${esc(item.layout)}" data-content-mode="${esc(mode)}" style="--line-bg:${esc(item.theme)};--line-color:${esc(item.textColor)}"><div class="ml-featured__story"><div class="ml-featured__media"><img src="${esc(item.image)}" alt="" loading="lazy" width="1600" height="1000"></div><div class="ml-featured__copy"><h3>${emphasize(item.title, item.titleEmphasis)}</h3><p>${emphasize(item.description, item.descriptionEmphasis)}</p><a class="ml-button ml-button--secondary" href="${esc(item.href)}">Ver productos</a></div></div>${lineContentTemplate(item)}</article>`;
+  }
+
+  function renderSections() {
+    const container = root.querySelector("[data-home-sections]");
+    container.innerHTML = Object.entries(config.tabs).map(([key, data]) => {
+      const hasCarousel = data.categories.length > 4;
+      const cards = data.categories.map(categoryTemplate).join("");
+      const categories = hasCarousel
+        ? `<div class="ml-category-carousel ml-shell"><button type="button" class="ml-category-arrow ml-category-arrow--prev" data-category-direction="prev" aria-label="Ver categorías anteriores"><span aria-hidden="true">←</span></button><div class="ml-categories ml-categories--scroll">${cards}</div><button type="button" class="ml-category-arrow ml-category-arrow--next" data-category-direction="next" aria-label="Ver más categorías"><span aria-hidden="true">→</span></button></div>`
+        : `<div class="ml-categories ml-shell">${cards}</div>`;
+      const subtitle = data.subtitle ? `<p class="ml-panel__subtitle">${esc(data.subtitle)}</p>` : "";
+      const cta = data.cta
+        ? `<a class="ml-button ml-button--primary ml-panel__cta" href="${esc(data.cta.href)}">${esc(data.cta.label)} <span aria-hidden="true">→</span></a>`
+        : "";
+      return `<section class="ml-home-section" data-section="${esc(key)}" aria-labelledby="ml-section-${esc(key)}"><div class="ml-categories-zone"><div class="ml-panel__intro ml-shell"><div class="ml-panel__heading"><div><h4 id="ml-section-${esc(key)}">${esc(data.title)}</h4>${subtitle}</div>${cta}</div></div>${categories}</div><div class="ml-featured-list">${data.featuredLines.map(lineTemplate).join("")}</div></section>`;
+    }).join("");
+  }
+
+  function initCategoryCarousels() {
+    root.querySelectorAll(".ml-category-carousel").forEach(carousel => {
+      const track = carousel.querySelector(".ml-categories--scroll");
+      carousel.querySelectorAll("[data-category-direction]").forEach(button => button.addEventListener("click", () => {
+        const card = track.querySelector(".ml-category-card");
+        const gap = parseFloat(getComputedStyle(track).gap) || 0;
+        const amount = (card?.getBoundingClientRect().width || track.clientWidth) + gap;
+        track.scrollBy({
+          left: button.dataset.categoryDirection === "next" ? amount : -amount,
+          behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth"
+        });
+      }));
+    });
+  }
+
+  function initLineBackgrounds() {
+    root.querySelectorAll(".ml-featured-list").forEach(list => {
+      const lines = [...list.querySelectorAll(".ml-featured[data-theme]")];
+      if (!lines.length) return;
+
+      const setBackground = line => {
+        list.style.setProperty("--ml-panel-theme", line.dataset.theme);
+      };
+      setBackground(lines[0]);
+
+      if (!("IntersectionObserver" in window)) return;
+      const observer = new IntersectionObserver(entries => {
+        const active = entries
+          .filter(entry => entry.isIntersecting)
+          .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+        if (active) setBackground(active.target);
+      }, {
+        rootMargin: "-38% 0px -38% 0px",
+        threshold: [0, .25, .5, .75, 1]
+      });
+      lines.forEach(line => observer.observe(line));
+    });
+  }
+
+  function renderCommon() {
+    root.querySelector("[data-news]").innerHTML = config.news.map(item => `<a class="ml-news-card" href="${esc(item.href)}"><img class="ml-news-card__image" src="${esc(item.image)}" alt="" loading="lazy" width="700" height="560"><h3>${esc(item.title)}</h3><p>${esc(item.description)}</p></a>`).join("");
+    root.querySelector("[data-faq]").innerHTML = config.faq.map((item, index) => `<div class="ml-faq__item"><button class="ml-faq__trigger" type="button" aria-expanded="false" aria-controls="ml-faq-answer-${index}"><span>${esc(item.question)}</span><span class="ml-faq__icon" aria-hidden="true">＋</span></button><div class="ml-faq__answer" id="ml-faq-answer-${index}"><div><p>${esc(item.answer)}</p></div></div></div>`).join("");
+    root.querySelectorAll(".ml-faq__trigger").forEach(button => button.addEventListener("click", () => {
+      button.setAttribute("aria-expanded", String(button.getAttribute("aria-expanded") !== "true"));
+    }));
+  }
+
+  function handleVideo() {
+    const video = root.querySelector(".ml-hero__video");
+    if (!video) return;
+    if (matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      video.pause();
+      video.hidden = true;
+      return;
+    }
+    video.play().catch(() => { video.hidden = true; });
+  }
+
+  function animateHeroTitle() {
+    const title = root.querySelector("#ml-hero-title");
+    if (!title || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const text = title.textContent.trim();
+    title.setAttribute("aria-label", text);
+    title.textContent = "";
+    [...text].forEach((character, index) => {
+      const span = document.createElement("span");
+      span.className = "ml-hero__letter";
+      span.setAttribute("aria-hidden", "true");
+      span.style.setProperty("--letter-delay", `${index * 28}ms`);
+      span.textContent = character === " " ? "\u00a0" : character;
+      title.appendChild(span);
+    });
+    requestAnimationFrame(() => title.classList.add("is-illuminating"));
+  }
+
+  renderSections();
+  initCategoryCarousels();
+  initLineBackgrounds();
+  renderCommon();
+  window.MacroledProducts.init(root);
+  window.MacroledFeatured.init(root);
+  window.MacroledProjectLines.init(root);
+  handleVideo();
+  animateHeroTitle();
 })(window);
