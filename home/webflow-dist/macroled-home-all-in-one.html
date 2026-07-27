@@ -6,9 +6,25 @@
       <div class="ml-hero__fallback" aria-hidden="true"></div>
       <div class="ml-hero__overlay"></div>
       <div class="ml-hero__content">
-        <h1 id="ml-hero-title">Calidad y diseño en iluminación&nbsp;LED para transformar espacios</h1>
-        <p class="ml-hero__subtitle">Productos, tecnología y asesoramiento para iluminar desde una casa hasta un gran proyecto.</p>
-        <a class="ml-button ml-button--primary" href="#productos-destacados">Ver productos</a>
+        <div class="ml-hero__copy">
+          <h1 id="ml-hero-title">Iluminación LED para transformar espacios</h1>
+          <p class="ml-hero__subtitle">Productos de calidad y diseño para iluminar desde un hogar hasta un gran proyecto.</p>
+          <a class="ml-button ml-button--primary" href="#productos-destacados">Ver productos</a>
+        </div>
+        <dl class="ml-hero__metrics" aria-label="Indicadores de Macroled">
+          <div class="ml-hero__metric">
+            <dt>20+</dt>
+            <dd>Años de trayectoria</dd>
+          </div>
+          <div class="ml-hero__metric">
+            <dt>+1.600</dt>
+            <dd>Productos activos</dd>
+          </div>
+          <div class="ml-hero__metric">
+            <dt>100%</dt>
+            <dd>Cobertura nacional</dd>
+          </div>
+        </dl>
       </div>
     </header>
 
@@ -44,7 +60,6 @@
             <h4 id="ml-project-lines-title">Luminarias profesionales para proyectos de gran escala</h4>
             <a class="ml-project-lines__explore" href="#ml-section-proyectos">
               <span>Productos para proyectos</span>
-              <span aria-hidden="true">→</span>
             </a>
           </header>
           <div class="ml-project-lines__cards" data-project-lines-list></div>
@@ -71,7 +86,7 @@
       </section>
 
       <section class="ml-contact" aria-labelledby="ml-contact-title">
-        <p class="ml-eyebrow">Hablemos de tu espacio</p><h2 id="ml-contact-title">Estamos para asesorarte</h2><p>Encontrá la solución de iluminación indicada para tu proyecto.</p><a class="ml-button ml-button--light" href="/contacto">Ir a contacto <span aria-hidden="true">↗</span></a>
+        <p class="ml-eyebrow">Hablemos de tu espacio</p><h2 id="ml-contact-title">Estamos para asesorarte</h2><p>Encontrá la solución de iluminación indicada para tu proyecto.</p><a class="ml-button ml-button--primary ml-button--primary-light" href="/contacto">Ir a contacto</a>
       </section>
     </main>
 
@@ -83,6 +98,14 @@
   </div>
 <style>
 @import url("https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700;800&display=swap");
+html,
+body {
+  width: 100%;
+  min-height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
 .ml-home {
   --ml-ink: #071521;
   --ml-blue: #00152b;
@@ -178,7 +201,7 @@
   color: #fff;
 }
 .ml-placeholder {
-  background: #d9e1df url("data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%201600%201000%22%20role%3D%22img%22%20aria-labelledby%3D%22t%20d%22%3E%3Ctitle%20id%3D%22t%22%3EImagen%20pendiente%3C%2Ftitle%3E%3Cdesc%20id%3D%22d%22%3EPlaceholder%20editorial%20para%20reemplazar%20por%20una%20imagen%20de%20Macroled.%3C%2Fdesc%3E%3Cdefs%3E%3ClinearGradient%20id%3D%22g%22%20x1%3D%220%22%20y1%3D%220%22%20x2%3D%221%22%20y2%3D%221%22%3E%3Cstop%20stop-color%3D%22%23dfe8e6%22%2F%3E%3Cstop%20offset%3D%22.5%22%20stop-color%3D%22%23f0ede4%22%2F%3E%3Cstop%20offset%3D%221%22%20stop-color%3D%22%23b8c8cf%22%2F%3E%3C%2FlinearGradient%3E%3CradialGradient%20id%3D%22l%22%3E%3Cstop%20stop-color%3D%22%23fff%22%20stop-opacity%3D%22.95%22%2F%3E%3Cstop%20offset%3D%221%22%20stop-color%3D%22%23fff%22%20stop-opacity%3D%220%22%2F%3E%3C%2FradialGradient%3E%3C%2Fdefs%3E%3Crect%20width%3D%221600%22%20height%3D%221000%22%20fill%3D%22url(%23g)%22%2F%3E%3Ccircle%20cx%3D%221180%22%20cy%3D%22220%22%20r%3D%22360%22%20fill%3D%22url(%23l)%22%2F%3E%3Cpath%20d%3D%22M0%20820C380%20680%20660%20920%20990%20770s440-80%20610%200v230H0z%22%20fill%3D%22%2300152b%22%20opacity%3D%22.1%22%2F%3E%3Ctext%20x%3D%2280%22%20y%3D%22900%22%20fill%3D%22%2300152b%22%20font-family%3D%22Arial%2Csans-serif%22%20font-size%3D%2230%22%20letter-spacing%3D%226%22%3EIMAGEN%20PENDIENTE%20%C2%B7%20MACROLED%3C%2Ftext%3E%3C%2Fsvg%3E%0D%0A")
+  background: #d9e1df url("data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%201600%201000%22%20role%3D%22img%22%20aria-labelledby%3D%22t%20d%22%3E%3Ctitle%20id%3D%22t%22%3EImagen%20pendiente%3C%2Ftitle%3E%3Cdesc%20id%3D%22d%22%3EPlaceholder%20editorial%20para%20reemplazar%20por%20una%20imagen%20de%20Macroled.%3C%2Fdesc%3E%3Cdefs%3E%3ClinearGradient%20id%3D%22g%22%20x1%3D%220%22%20y1%3D%220%22%20x2%3D%221%22%20y2%3D%221%22%3E%3Cstop%20stop-color%3D%22%23dfe8e6%22%2F%3E%3Cstop%20offset%3D%22.5%22%20stop-color%3D%22%23f0ede4%22%2F%3E%3Cstop%20offset%3D%221%22%20stop-color%3D%22%23b8c8cf%22%2F%3E%3C%2FlinearGradient%3E%3CradialGradient%20id%3D%22l%22%3E%3Cstop%20stop-color%3D%22%23fff%22%20stop-opacity%3D%22.95%22%2F%3E%3Cstop%20offset%3D%221%22%20stop-color%3D%22%23fff%22%20stop-opacity%3D%220%22%2F%3E%3C%2FradialGradient%3E%3C%2Fdefs%3E%3Crect%20width%3D%221600%22%20height%3D%221000%22%20fill%3D%22url(%23g)%22%2F%3E%3Ccircle%20cx%3D%221180%22%20cy%3D%22220%22%20r%3D%22360%22%20fill%3D%22url(%23l)%22%2F%3E%3Cpath%20d%3D%22M0%20820C380%20680%20660%20920%20990%20770s440-80%20610%200v230H0z%22%20fill%3D%22%2300152b%22%20opacity%3D%22.1%22%2F%3E%3Ctext%20x%3D%2280%22%20y%3D%22900%22%20fill%3D%22%2300152b%22%20font-family%3D%22Arial%2Csans-serif%22%20font-size%3D%2230%22%20letter-spacing%3D%226%22%3EIMAGEN%20PENDIENTE%20%C2%B7%20MACROLED%3C%2Ftext%3E%3C%2Fsvg%3E%0A")
     center/cover no-repeat;
 }
 .ml-hero {
@@ -1208,14 +1231,15 @@
   line-height: 1.5;
 }
 .ml-featured-products {
-  padding: clamp(3rem, 7vw, 5rem) 0;
+  padding: clamp(3rem, 7vw, 7.5rem) 0;
   background: #fff;
   overflow: hidden;
 }
 .ml-featured-products__head {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 1rem;
+  gap: 1.50rem;
   margin-bottom: 0.5rem;
 }
 .ml-featured-products__head h4 {
@@ -1226,7 +1250,6 @@
   display: flex;
   gap: 0.35rem;
   width: max-content;
-  margin-left: auto;
   padding: 0.25rem;
   border-radius: 999px;
   background: #f5f5f5;
@@ -1262,10 +1285,10 @@
 }
 .ml-featured-products__track {
   display: flex;
-  width: min(100% - 3rem, 90rem);
+  width: min(100% - 7.5rem, 90rem);
   gap: 1rem;
   margin-inline: auto;
-  padding: 1.5rem 0.25rem;
+  padding: 3rem 0 2rem;
   overflow-x: auto;
   scroll-behavior: smooth;
   scroll-snap-type: x mandatory;
@@ -1787,6 +1810,270 @@
   opacity: 1;
 }
 
+/* Design system alignment · typography, color and actions */
+.ml-home {
+  --ml-grey-50: #ffffff;
+  --ml-grey-100: #fafafa;
+  --ml-grey-200: #f5f5f5;
+  --ml-grey-300: #ededed;
+  --ml-grey-500: #7a7a78;
+  --ml-grey-600: #5d5c5c;
+  --ml-dark-blue-700: #00152b;
+  --ml-light-blue-50: #e6f8ff;
+  --ml-light-blue-500: #00bdff;
+  --ml-light-blue-600: #00ace8;
+  --ml-light-blue-700: #0086b5;
+  --ml-light-blue-800: #00688c;
+  --ml-action-primary: var(--ml-light-blue-700);
+  --ml-action-primary-hover: var(--ml-light-blue-800);
+  font-size: 16px;
+}
+
+.ml-home h1,
+.ml-home h2,
+.ml-home h3,
+.ml-home h4 {
+  font-weight: 500;
+  text-wrap: balance;
+}
+
+.ml-home h1 {
+  font-size: clamp(2.5rem, 5.4vw, 4.2rem);
+  line-height: 0.98;
+  letter-spacing: -0.055em;
+}
+
+.ml-home h2 {
+  font-size: clamp(2rem, 4.4vw, 3.75rem);
+  line-height: 1;
+  letter-spacing: -0.05em;
+}
+
+.ml-home h3 {
+  font-size: clamp(1.65rem, 3.8vw, 3.5rem);
+  line-height: 1;
+  letter-spacing: -0.045em;
+}
+
+.ml-home h4 {
+  font-size: clamp(1.6rem, 3vw, 2.5rem);
+  line-height: 1;
+  letter-spacing: -0.05rem;
+}
+
+.ml-home p {
+  text-wrap: pretty;
+}
+
+.ml-home .ml-button {
+  min-width: 0;
+  justify-content: center;
+  gap: 0;
+  padding: 16px 32px;
+  border-radius: 8px;
+  font-family: "Noto Sans", Arial, sans-serif;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1;
+  transition:
+    background-color 0.25s,
+    border-color 0.25s,
+    color 0.25s,
+    transform 0.25s;
+}
+
+.ml-home .ml-button:active,
+.ml-home .ml-project-lines__explore:active {
+  transform: translateY(1px) scale(0.98);
+}
+
+.ml-home .ml-button--primary {
+  border: 0;
+  background: var(--ml-action-primary);
+  color: var(--ml-grey-50);
+}
+
+.ml-home .ml-button--primary:hover {
+  background: var(--ml-action-primary-hover);
+  color: var(--ml-grey-50);
+}
+
+.ml-home .ml-button--primary-light {
+  background: var(--ml-grey-100);
+  color: var(--ml-dark-blue-700);
+}
+
+.ml-home .ml-button--primary-light:hover {
+  background: var(--ml-light-blue-50);
+  color: var(--ml-dark-blue-700);
+}
+
+.ml-home .ml-button--secondary {
+  padding: 15px 31px;
+  border: 1px solid currentColor;
+  background: transparent;
+}
+
+.ml-home .ml-project-lines__explore {
+  min-height: 48px;
+  padding: 16px 32px;
+  border-radius: 8px;
+  background: var(--ml-grey-100);
+  color: var(--ml-dark-blue-700);
+  font-family: "Noto Sans", Arial, sans-serif;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1;
+}
+
+.ml-home .ml-project-lines__explore:hover {
+  background: var(--ml-light-blue-50);
+  color: var(--ml-dark-blue-700);
+  box-shadow: none;
+}
+
+/* Hero composition */
+.ml-home .ml-hero__content {
+  right: clamp(1.25rem, 7vw, 7rem);
+  display: grid;
+  grid-template-columns: minmax(0, 43rem) minmax(28rem, 1fr);
+  align-items: end;
+  gap: clamp(3rem, 7vw, 8rem);
+  max-width: none;
+}
+
+.ml-home .ml-hero__copy {
+  min-width: 0;
+}
+
+.ml-home .ml-hero h1 {
+  max-width: 14ch;
+  overflow-wrap: normal;
+  word-break: normal;
+  hyphens: none;
+}
+
+.ml-home .ml-hero__word {
+  display: inline-block;
+  white-space: nowrap;
+}
+
+.ml-home .ml-hero__metrics {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  align-items: stretch;
+  margin: 0 0 0.125rem;
+  padding: 0;
+}
+
+.ml-home .ml-hero__metric {
+  min-width: 0;
+  padding-inline: clamp(1.25rem, 2vw, 2rem);
+  border-left: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.ml-home .ml-hero__metric:first-child {
+  padding-left: 0;
+  border-left: 0;
+}
+
+.ml-home .ml-hero__metric:last-child {
+  padding-right: 0;
+}
+
+.ml-home .ml-hero__metric dt,
+.ml-home .ml-hero__metric dd {
+  margin: 0;
+}
+
+.ml-home .ml-hero__metric dt {
+  font-size: clamp(1.125rem, 1.5vw, 1.5rem);
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -0.025em;
+  font-variant-numeric: tabular-nums;
+}
+
+.ml-home .ml-hero__metric dd {
+  margin-top: 0.5rem;
+  color: rgba(255, 255, 255, 0.72);
+  font-size: clamp(0.75rem, 0.85vw, 0.875rem);
+  font-weight: 400;
+  line-height: 1.35;
+  text-wrap: pretty;
+}
+
+@media (max-width: 1360px) {
+  .ml-home .ml-hero__content {
+    grid-template-columns: minmax(0, 46rem);
+    gap: 3rem;
+  }
+
+  .ml-home .ml-hero__metrics {
+    width: min(100%, 42rem);
+  }
+}
+
+@media (max-width: 640px) {
+  .ml-home .ml-hero__content {
+    top: auto;
+    right: 1rem;
+    bottom: clamp(2rem, 7vh, 4rem);
+    left: 1rem;
+    gap: 2.25rem;
+  }
+
+  .ml-home .ml-hero h1 {
+    max-width: 12ch;
+  }
+
+  .ml-home .ml-hero__metrics {
+    width: 100%;
+  }
+
+  .ml-home .ml-hero__metric {
+    padding-inline: 0.75rem;
+  }
+
+  .ml-home .ml-hero__metric dt {
+    font-size: 1rem;
+  }
+
+  .ml-home .ml-hero__metric dd {
+    margin-top: 0.375rem;
+    font-size: 0.6875rem;
+  }
+}
+
+.ml-home .ml-featured-products__tab.is-active {
+  color: var(--ml-light-blue-500);
+}
+
+.ml-home .ml-featured-products__progress span,
+.ml-home .ml-featured-products__nav:hover {
+  background: var(--ml-action-primary);
+}
+
+.ml-home .ml-featured-products__nav {
+  border-color: var(--ml-action-primary);
+  color: var(--ml-action-primary);
+}
+
+.ml-home .ml-foa h2,
+.ml-home .ml-contact h2 {
+  font-size: clamp(2rem, 4.4vw, 3.75rem);
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: -0.05em;
+}
+
+@media (max-width: 640px) {
+  .ml-home .ml-button,
+  .ml-home .ml-project-lines__explore {
+    min-height: 48px;
+  }
+}
+
 .ml-project-lines__cards {
   transition: grid-template-columns 0.9s cubic-bezier(0.22, 1, 0.36, 1);
 }
@@ -1988,6 +2275,152 @@
   );
   opacity: 1;
 }
+
+/* Final design-system cascade · keep this block last */
+.ml-home {
+  --ml-grey-50: #ffffff;
+  --ml-grey-100: #fafafa;
+  --ml-grey-200: #f5f5f5;
+  --ml-grey-300: #ededed;
+  --ml-grey-500: #7a7a78;
+  --ml-grey-600: #5d5c5c;
+  --ml-dark-blue-700: #00152b;
+  --ml-light-blue-50: #e6f8ff;
+  --ml-light-blue-500: #00bdff;
+  --ml-light-blue-600: #00ace8;
+  --ml-light-blue-700: #0086b5;
+  --ml-light-blue-800: #00688c;
+  --ml-action-primary: var(--ml-light-blue-700);
+  --ml-action-primary-hover: var(--ml-light-blue-800);
+  font-size: 16px;
+}
+
+.ml-home h1,
+.ml-home h2,
+.ml-home h3,
+.ml-home h4 {
+  font-weight: 500;
+  text-wrap: balance;
+}
+
+.ml-home h1 {
+  font-size: clamp(2.5rem, 5.4vw, 4.2rem);
+  line-height: 0.98;
+  letter-spacing: -0.055em;
+}
+
+.ml-home h2,
+.ml-home .ml-foa h2,
+.ml-home .ml-contact h2 {
+  font-size: clamp(2rem, 4.4vw, 3.75rem);
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: -0.05em;
+}
+
+.ml-home h3 {
+  font-size: clamp(1.65rem, 3.8vw, 3.5rem);
+  line-height: 1;
+  letter-spacing: -0.045em;
+}
+
+.ml-home h4 {
+  font-size: clamp(1.6rem, 3vw, 2.5rem);
+  line-height: 1;
+  letter-spacing: -0.05rem;
+}
+
+.ml-home p {
+  text-wrap: pretty;
+}
+
+.ml-home .ml-button {
+  min-width: 0;
+  justify-content: center;
+  gap: 0;
+  padding: 16px 32px;
+  border-radius: 8px;
+  font-family: "Noto Sans", Arial, sans-serif;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1;
+  transition:
+    background-color 0.25s,
+    border-color 0.25s,
+    color 0.25s,
+    transform 0.25s;
+}
+
+.ml-home .ml-button:active,
+.ml-home .ml-project-lines__explore:active {
+  transform: translateY(1px) scale(0.98);
+}
+
+.ml-home .ml-button--primary {
+  border: 0;
+  background: var(--ml-action-primary);
+  color: var(--ml-grey-50);
+}
+
+.ml-home .ml-button--primary:hover {
+  background: var(--ml-action-primary-hover);
+  color: var(--ml-grey-50);
+}
+
+.ml-home .ml-button--primary-light {
+  background: var(--ml-grey-100);
+  color: var(--ml-dark-blue-700);
+}
+
+.ml-home .ml-button--primary-light:hover {
+  background: var(--ml-light-blue-50);
+  color: var(--ml-dark-blue-700);
+}
+
+.ml-home .ml-button--secondary {
+  padding: 15px 31px;
+  border: 1px solid currentColor;
+  background: transparent;
+}
+
+.ml-home .ml-project-lines__explore {
+  min-height: 48px;
+  padding: 16px 32px;
+  border-radius: 8px;
+  background: var(--ml-grey-100);
+  color: var(--ml-dark-blue-700);
+  font-family: "Noto Sans", Arial, sans-serif;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1;
+}
+
+.ml-home .ml-project-lines__explore:hover {
+  background: var(--ml-light-blue-50);
+  color: var(--ml-dark-blue-700);
+  box-shadow: none;
+}
+
+.ml-home .ml-featured-products__tab.is-active {
+  color: var(--ml-light-blue-500);
+}
+
+.ml-home .ml-featured-products__progress span,
+.ml-home .ml-featured-products__nav:hover {
+  background: var(--ml-action-primary);
+}
+
+.ml-home .ml-featured-products__nav {
+  border-color: var(--ml-action-primary);
+  color: var(--ml-action-primary);
+}
+
+@media (max-width: 640px) {
+  .ml-home .ml-button,
+  .ml-home .ml-project-lines__explore {
+    min-height: 48px;
+  }
+}
 .ml-project-line-card.is-expanded .ml-project-line-card__ambient {
   transform: scale(1.1);
   transform-origin: center;
@@ -2074,11 +2507,9 @@
 }
 .ml-project-lines__cards,
 .ml-project-lines__cards:has(.ml-project-line-card:nth-child(2).is-expanded) {
-  display: grid;
-  grid-template-columns: minmax(0, 3fr) minmax(15rem, 1fr);
-  grid-template-rows: repeat(2, minmax(0, 1fr));
+  display: flex;
   gap: 1rem;
-  height: 41.125rem;
+  height: 35rem;
 }
 .ml-project-line-card,
 .ml-project-line-card.is-collapsed,
@@ -2098,11 +2529,10 @@
     opacity 0.35s;
 }
 .ml-project-line-card.is-expanded {
-  grid-column: 1;
-  grid-row: 1/3;
+  width: 60%;
 }
 .ml-project-line-card.is-collapsed {
-  grid-column: 2;
+  width: 20%;
   opacity: 0.72;
   cursor: pointer;
 }
@@ -2441,12 +2871,91 @@
   opacity: 1;
 }
 
+/* Effective design-system overrides */
+.ml-home h1,
+.ml-home h2,
+.ml-home h3,
+.ml-home h4 {
+  font-weight: 500;
+  text-wrap: balance;
+}
+.ml-home h1 {
+  font-size: clamp(2.5rem, 5.4vw, 4.2rem);
+  line-height: 0.98;
+  letter-spacing: -0.055em;
+}
+.ml-home h2,
+.ml-home .ml-foa h2,
+.ml-home .ml-contact h2 {
+  font-size: clamp(2rem, 4.4vw, 3.75rem);
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: -0.05em;
+}
+.ml-home h3 {
+  font-size: clamp(1.65rem, 3.8vw, 3.5rem);
+  line-height: 1;
+  letter-spacing: -0.045em;
+}
+.ml-home h4 {
+  font-size: clamp(1.6rem, 3vw, 2.5rem);
+  line-height: 1;
+  letter-spacing: -0.05rem;
+}
+.ml-home .ml-button {
+  min-width: 0;
+  justify-content: center;
+  gap: 0;
+  padding: 16px 32px;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1;
+}
+.ml-home .ml-button--primary {
+  border: 0;
+  background: var(--ml-action-primary);
+  color: var(--ml-grey-50);
+}
+.ml-home .ml-button--primary:hover {
+  background: var(--ml-action-primary-hover);
+  color: var(--ml-grey-50);
+}
+.ml-home .ml-button--primary-light {
+  background: var(--ml-grey-100);
+  color: var(--ml-dark-blue-700);
+}
+.ml-home .ml-button--primary-light:hover {
+  background: var(--ml-light-blue-50);
+  color: var(--ml-dark-blue-700);
+}
+.ml-home .ml-button--secondary {
+  padding: 15px 31px;
+  border: 1px solid currentColor;
+  background: transparent;
+}
+.ml-home .ml-project-lines__explore {
+  min-height: 48px;
+  padding: 16px 32px;
+  border-radius: 8px;
+  background: var(--ml-grey-100);
+  color: var(--ml-dark-blue-700);
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1;
+}
+.ml-home .ml-project-lines__explore:hover {
+  background: var(--ml-light-blue-50);
+  color: var(--ml-dark-blue-700);
+  box-shadow: none;
+}
+
 </style>
 <script>
 (function (window) {
   "use strict";
 
-  const PLACEHOLDER = "data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%201600%201000%22%20role%3D%22img%22%20aria-labelledby%3D%22t%20d%22%3E%3Ctitle%20id%3D%22t%22%3EImagen%20pendiente%3C%2Ftitle%3E%3Cdesc%20id%3D%22d%22%3EPlaceholder%20editorial%20para%20reemplazar%20por%20una%20imagen%20de%20Macroled.%3C%2Fdesc%3E%3Cdefs%3E%3ClinearGradient%20id%3D%22g%22%20x1%3D%220%22%20y1%3D%220%22%20x2%3D%221%22%20y2%3D%221%22%3E%3Cstop%20stop-color%3D%22%23dfe8e6%22%2F%3E%3Cstop%20offset%3D%22.5%22%20stop-color%3D%22%23f0ede4%22%2F%3E%3Cstop%20offset%3D%221%22%20stop-color%3D%22%23b8c8cf%22%2F%3E%3C%2FlinearGradient%3E%3CradialGradient%20id%3D%22l%22%3E%3Cstop%20stop-color%3D%22%23fff%22%20stop-opacity%3D%22.95%22%2F%3E%3Cstop%20offset%3D%221%22%20stop-color%3D%22%23fff%22%20stop-opacity%3D%220%22%2F%3E%3C%2FradialGradient%3E%3C%2Fdefs%3E%3Crect%20width%3D%221600%22%20height%3D%221000%22%20fill%3D%22url(%23g)%22%2F%3E%3Ccircle%20cx%3D%221180%22%20cy%3D%22220%22%20r%3D%22360%22%20fill%3D%22url(%23l)%22%2F%3E%3Cpath%20d%3D%22M0%20820C380%20680%20660%20920%20990%20770s440-80%20610%200v230H0z%22%20fill%3D%22%2300152b%22%20opacity%3D%22.1%22%2F%3E%3Ctext%20x%3D%2280%22%20y%3D%22900%22%20fill%3D%22%2300152b%22%20font-family%3D%22Arial%2Csans-serif%22%20font-size%3D%2230%22%20letter-spacing%3D%226%22%3EIMAGEN%20PENDIENTE%20%C2%B7%20MACROLED%3C%2Ftext%3E%3C%2Fsvg%3E%0D%0A";
+  const PLACEHOLDER = "data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%201600%201000%22%20role%3D%22img%22%20aria-labelledby%3D%22t%20d%22%3E%3Ctitle%20id%3D%22t%22%3EImagen%20pendiente%3C%2Ftitle%3E%3Cdesc%20id%3D%22d%22%3EPlaceholder%20editorial%20para%20reemplazar%20por%20una%20imagen%20de%20Macroled.%3C%2Fdesc%3E%3Cdefs%3E%3ClinearGradient%20id%3D%22g%22%20x1%3D%220%22%20y1%3D%220%22%20x2%3D%221%22%20y2%3D%221%22%3E%3Cstop%20stop-color%3D%22%23dfe8e6%22%2F%3E%3Cstop%20offset%3D%22.5%22%20stop-color%3D%22%23f0ede4%22%2F%3E%3Cstop%20offset%3D%221%22%20stop-color%3D%22%23b8c8cf%22%2F%3E%3C%2FlinearGradient%3E%3CradialGradient%20id%3D%22l%22%3E%3Cstop%20stop-color%3D%22%23fff%22%20stop-opacity%3D%22.95%22%2F%3E%3Cstop%20offset%3D%221%22%20stop-color%3D%22%23fff%22%20stop-opacity%3D%220%22%2F%3E%3C%2FradialGradient%3E%3C%2Fdefs%3E%3Crect%20width%3D%221600%22%20height%3D%221000%22%20fill%3D%22url(%23g)%22%2F%3E%3Ccircle%20cx%3D%221180%22%20cy%3D%22220%22%20r%3D%22360%22%20fill%3D%22url(%23l)%22%2F%3E%3Cpath%20d%3D%22M0%20820C380%20680%20660%20920%20990%20770s440-80%20610%200v230H0z%22%20fill%3D%22%2300152b%22%20opacity%3D%22.1%22%2F%3E%3Ctext%20x%3D%2280%22%20y%3D%22900%22%20fill%3D%22%2300152b%22%20font-family%3D%22Arial%2Csans-serif%22%20font-size%3D%2230%22%20letter-spacing%3D%226%22%3EIMAGEN%20PENDIENTE%20%C2%B7%20MACROLED%3C%2Ftext%3E%3C%2Fsvg%3E%0A";
   const g9 = { typesenseField: "subfamilia", typesenseValue: "G9", productCount: 4 };
   const category = (title, id) => ({ title, image: PLACEHOLDER, href: "#", id });
   const line = (title, description, theme, textColor, layout) => ({
@@ -2918,7 +3427,7 @@
         : `<div class="ml-categories ml-shell">${cards}</div>`;
       const subtitle = data.subtitle ? `<p class="ml-panel__subtitle">${esc(data.subtitle)}</p>` : "";
       const cta = data.cta
-        ? `<a class="ml-button ml-button--primary ml-panel__cta" href="${esc(data.cta.href)}">${esc(data.cta.label)} <span aria-hidden="true">→</span></a>`
+        ? `<a class="ml-button ml-button--primary ml-panel__cta" href="${esc(data.cta.href)}">${esc(data.cta.label)}</a>`
         : "";
       return `<section class="ml-home-section" data-section="${esc(key)}" aria-labelledby="ml-section-${esc(key)}"><div class="ml-categories-zone"><div class="ml-panel__intro ml-shell"><div class="ml-panel__heading"><div><h4 id="ml-section-${esc(key)}">${esc(data.title)}</h4>${subtitle}</div>${cta}</div></div>${categories}</div><div class="ml-featured-list">${data.featuredLines.map(lineTemplate).join("")}</div></section>`;
     }).join("");
@@ -2988,13 +3497,25 @@
     const text = title.textContent.trim();
     title.setAttribute("aria-label", text);
     title.textContent = "";
-    [...text].forEach((character, index) => {
-      const span = document.createElement("span");
-      span.className = "ml-hero__letter";
-      span.setAttribute("aria-hidden", "true");
-      span.style.setProperty("--letter-delay", `${index * 28}ms`);
-      span.textContent = character === " " ? "\u00a0" : character;
-      title.appendChild(span);
+    let letterIndex = 0;
+    text.split(/(\s+)/).forEach(part => {
+      if (/^\s+$/.test(part)) {
+        title.appendChild(document.createTextNode(" "));
+        return;
+      }
+
+      const word = document.createElement("span");
+      word.className = "ml-hero__word";
+      word.setAttribute("aria-hidden", "true");
+      [...part].forEach(character => {
+        const letter = document.createElement("span");
+        letter.className = "ml-hero__letter";
+        letter.style.setProperty("--letter-delay", `${letterIndex * 28}ms`);
+        letter.textContent = character;
+        word.appendChild(letter);
+        letterIndex += 1;
+      });
+      title.appendChild(word);
     });
     requestAnimationFrame(() => title.classList.add("is-illuminating"));
   }

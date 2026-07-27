@@ -47,7 +47,7 @@
         : `<div class="ml-categories ml-shell">${cards}</div>`;
       const subtitle = data.subtitle ? `<p class="ml-panel__subtitle">${esc(data.subtitle)}</p>` : "";
       const cta = data.cta
-        ? `<a class="ml-button ml-button--primary ml-panel__cta" href="${esc(data.cta.href)}">${esc(data.cta.label)} <span aria-hidden="true">→</span></a>`
+        ? `<a class="ml-button ml-button--primary ml-panel__cta" href="${esc(data.cta.href)}">${esc(data.cta.label)}</a>`
         : "";
       return `<section class="ml-home-section" data-section="${esc(key)}" aria-labelledby="ml-section-${esc(key)}"><div class="ml-categories-zone"><div class="ml-panel__intro ml-shell"><div class="ml-panel__heading"><div><h4 id="ml-section-${esc(key)}">${esc(data.title)}</h4>${subtitle}</div>${cta}</div></div>${categories}</div><div class="ml-featured-list">${data.featuredLines.map(lineTemplate).join("")}</div></section>`;
     }).join("");
@@ -117,13 +117,25 @@
     const text = title.textContent.trim();
     title.setAttribute("aria-label", text);
     title.textContent = "";
-    [...text].forEach((character, index) => {
-      const span = document.createElement("span");
-      span.className = "ml-hero__letter";
-      span.setAttribute("aria-hidden", "true");
-      span.style.setProperty("--letter-delay", `${index * 28}ms`);
-      span.textContent = character === " " ? "\u00a0" : character;
-      title.appendChild(span);
+    let letterIndex = 0;
+    text.split(/(\s+)/).forEach(part => {
+      if (/^\s+$/.test(part)) {
+        title.appendChild(document.createTextNode(" "));
+        return;
+      }
+
+      const word = document.createElement("span");
+      word.className = "ml-hero__word";
+      word.setAttribute("aria-hidden", "true");
+      [...part].forEach(character => {
+        const letter = document.createElement("span");
+        letter.className = "ml-hero__letter";
+        letter.style.setProperty("--letter-delay", `${letterIndex * 28}ms`);
+        letter.textContent = character;
+        word.appendChild(letter);
+        letterIndex += 1;
+      });
+      title.appendChild(word);
     });
     requestAnimationFrame(() => title.classList.add("is-illuminating"));
   }
