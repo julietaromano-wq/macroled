@@ -254,19 +254,31 @@ con fill o con borde lleva flecha.**
      o `dark-blue-700`. Usar sobre fondos oscuros (hero, secciones tipo
      Casa FOA).
    - Las tres comparten forma: padding 16px 32px, radio 8px, texto
-     16px/600, sin sombra.
+     `1rem`/600 en desktop grande y `0.875rem`/600 hasta 1360px, sin sombra.
    - **Sin ícono de flecha en ninguna variante fill.**
 2. **Secundario (border)** — énfasis medio, `.ml-button--secondary`:
    - Sin fill, solo borde. Mantener contraste respecto de `--line-bg` /
      `--line-color` cuando se usa dentro de líneas editoriales.
+   - En hover pasa a fill completo con `--line-color` y usa
+     `--line-bg` para el texto. No usar un tinte parcial.
    - No competir visualmente con la acción primaria del mismo bloque.
    - **Sin ícono de flecha.**
-3. **Terciario (solo texto)** — mínimo énfasis, `.ml-button--tertiary` /
-   uso tipo CTA de línea editorial:
-   - Sin fill ni borde, solo texto 16px/600.
+3. **Terciario (solo texto)** — mínimo énfasis,
+   `.ml-button--tertiary`:
+   - Clase canónica compartida por `.ml-project-line-card__cta` y el CTA
+     “Conocer más” de Casa FOA.
+   - Sin fill ni borde, texto `1rem`/600 en desktop grande y
+     `0.875rem`/600 hasta 1360px.
+   - Padding vertical `0.75rem`, gap `0.6rem`, color heredado de la
+     superficie donde se usa.
    - **Único nivel que puede llevar ícono de flecha**, con el
-     desplazamiento de 4px en hover ya usado en el CTA de líneas de
-     proyecto.
+     desplazamiento de 4px en hover.
+
+```html
+<a class="ml-button--tertiary" href="#">
+  Conocer más <span aria-hidden="true">→</span>
+</a>
+```
 
 No agregar flecha a botones primarios o secundarios existentes ni a
 nuevos que se creen, aunque el pedido puntual no lo aclare — es una regla
