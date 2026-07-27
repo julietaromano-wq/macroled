@@ -3,7 +3,7 @@
 
   const FEATURED_FIELD = "destacados_en";
   const DEFAULT_SPACE = "interior";
-  const FEATURED_COUNT = 8;
+  const FEATURED_COUNT = 250;
   let currentSpace = DEFAULT_SPACE;
   let isFetching = false;
 

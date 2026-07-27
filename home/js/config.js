@@ -29,6 +29,12 @@
       { ...category("Interruptores y tomas", "interruptores-y-tomas"), image: "https://s3.coresagroup.com/MACROLED/250/lima.webp" },
       { ...category("Tiras LED", "tiras-led"), image: "https://s3.coresagroup.com/MACROLED/250/smd5050a.png" }
     ],
+    monaco: [
+      { ...category("Armadas", "monaco-armadas"), image: "https://s3.coresagroup.com/MACROLED/250/milan.png" },
+      { ...category("Bastidor + Módulos", "monaco-bastidor-modulos"), image: "https://s3.coresagroup.com/MACROLED/250/milan-bastidores.png" },
+      { ...category("Tapas", "monaco-tapas"), image: "https://s3.coresagroup.com/MACROLED/250/milan-tapas.png" },
+      { ...category("Luz de pasillo", "monaco-luz-pasillo"), image: "https://d1zltvqju4u8ql.cloudfront.net/fit-in/2000x2000/MACROLED/WEB/portada_luz_pasillo.webp" }
+    ],
     exterior: [
       category("Reflectores", "reflectores"),
       category("Solar", "solar"),
@@ -58,34 +64,38 @@
         categories: MANUAL_CATEGORIES.interior,
         featuredLines: [
           {
-            ...line("Línea Monaco", "Módulos para", "#e9ecef", "#101820", "image-left"),
+            ...line("Línea Monaco", "Módulos y tomas diseñados con un enfoque en estética, funcionalidad y seguridad. Una propuesta versátil con armadas, conexiones y componentes pensados para adaptarse a instalaciones eléctricas contemporáneas.", "#e9ecef", "#101820", "image-left"),
+            image: "https://cdn.prod.website-files.com/65f1fdd7248b6709fdebe904/69a977bb0fe12ec5b81b7e9b_monaco-cover%20copia.webp",
+            imageFit: "contain",
             titleEmphasis: "Monaco",
-            content: { mode: "static", categoryGroup: "interior" }
+            content: { mode: "static", categoryGroup: "monaco" }
           },
           line("Línea interior 02", "Una composición amplia preparada para presentar la familia.", "#16283a", "#ffffff", "image-right"),
           line("Línea interior 03", "Contenido comercial configurable desde un único archivo.", "#dbe8e5", "#101820", "image-full")
         ]
+      }
+    },
+    categoriesTest: {
+      interior: {
+        labelActive: "Iluminación interior",
+        labelInactive: "Interior",
+        color: "#ffffff",
+        textColor: "#00152b",
+        categories: MANUAL_CATEGORIES.interior
       },
       exterior: {
-        title: "El espacio continúa afuera",
-        subtitle: "Iluminación exterior pensada para acompañar cada espacio al aire libre.",
-        categories: MANUAL_CATEGORIES.exterior,
-        featuredLines: [
-          line("Línea exterior 01", "Nombre, imagen y descripción editorial pendientes.", "#d7e0d1", "#102016", "image-right"),
-          line("Línea exterior 02", "Preparada para una fotografía de ambiente de gran formato.", "#1b312c", "#ffffff", "image-left"),
-          line("Línea exterior 03", "La configuración permite cambiar el universo visual sin reprogramar.", "#e8dfcf", "#1c1812", "image-full")
-        ]
+        labelActive: "Iluminación exterior",
+        labelInactive: "Exterior",
+        color: "#ffffff",
+        textColor: "#00152b",
+        categories: MANUAL_CATEGORIES.exterior
       },
       proyectos: {
-        title: "Rendimiento a gran escala",
-        subtitle: "Productos para proyectos lumínicos que exigen potencia, eficiencia y precisión.",
-        categories: MANUAL_CATEGORIES.proyectos,
-        featuredLines: [
-          line("Highbay Pro", "Potencia y control para espacios de gran altura. Texto final pendiente.", "#00152b", "#ffffff", "image-left"),
-          line("Olimpus", "Presentación editorial de línea. Imagen y descripción definitivas pendientes.", "#c9d5dc", "#07141e", "image-right"),
-          line("Titan", "Bloque preparado para comunicar prestaciones y aplicaciones.", "#3b4449", "#ffffff", "image-full"),
-          line("Invictus", "La consulta de producto es temporalmente G9, como en todo el prototipo.", "#d9c8aa", "#1a1610", "image-left")
-        ]
+        labelActive: "Iluminación para proyectos",
+        labelInactive: "Proyectos",
+        color: "#ffffff",
+        textColor: "#00152b",
+        categories: MANUAL_CATEGORIES.proyectos
       }
     },
     news: [1, 2, 3].map(number => ({

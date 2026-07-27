@@ -30,6 +30,12 @@
       { ...category("Interruptores y tomas", "interruptores-y-tomas"), image: "https://s3.coresagroup.com/MACROLED/250/lima.webp" },
       { ...category("Tiras LED", "tiras-led"), image: "https://s3.coresagroup.com/MACROLED/250/smd5050a.png" }
     ],
+    monaco: [
+      { ...category("Armadas", "monaco-armadas"), image: "https://s3.coresagroup.com/MACROLED/250/milan.png" },
+      { ...category("Bastidor + Módulos", "monaco-bastidor-modulos"), image: "https://s3.coresagroup.com/MACROLED/250/milan-bastidores.png" },
+      { ...category("Tapas", "monaco-tapas"), image: "https://s3.coresagroup.com/MACROLED/250/milan-tapas.png" },
+      { ...category("Luz de pasillo", "monaco-luz-pasillo"), image: "https://d1zltvqju4u8ql.cloudfront.net/fit-in/2000x2000/MACROLED/WEB/portada_luz_pasillo.webp" }
+    ],
     exterior: [
       category("Reflectores", "reflectores"),
       category("Solar", "solar"),
@@ -59,34 +65,38 @@
         categories: MANUAL_CATEGORIES.interior,
         featuredLines: [
           {
-            ...line("Línea Monaco", "Módulos para", "#e9ecef", "#101820", "image-left"),
+            ...line("Línea Monaco", "Módulos y tomas diseñados con un enfoque en estética, funcionalidad y seguridad. Una propuesta versátil con armadas, conexiones y componentes pensados para adaptarse a instalaciones eléctricas contemporáneas.", "#e9ecef", "#101820", "image-left"),
+            image: "https://cdn.prod.website-files.com/65f1fdd7248b6709fdebe904/69a977bb0fe12ec5b81b7e9b_monaco-cover%20copia.webp",
+            imageFit: "contain",
             titleEmphasis: "Monaco",
-            content: { mode: "static", categoryGroup: "interior" }
+            content: { mode: "static", categoryGroup: "monaco" }
           },
           line("Línea interior 02", "Una composición amplia preparada para presentar la familia.", "#16283a", "#ffffff", "image-right"),
           line("Línea interior 03", "Contenido comercial configurable desde un único archivo.", "#dbe8e5", "#101820", "image-full")
         ]
+      }
+    },
+    categoriesTest: {
+      interior: {
+        labelActive: "Iluminación interior",
+        labelInactive: "Interior",
+        color: "#ffffff",
+        textColor: "#00152b",
+        categories: MANUAL_CATEGORIES.interior
       },
       exterior: {
-        title: "El espacio continúa afuera",
-        subtitle: "Iluminación exterior pensada para acompañar cada espacio al aire libre.",
-        categories: MANUAL_CATEGORIES.exterior,
-        featuredLines: [
-          line("Línea exterior 01", "Nombre, imagen y descripción editorial pendientes.", "#d7e0d1", "#102016", "image-right"),
-          line("Línea exterior 02", "Preparada para una fotografía de ambiente de gran formato.", "#1b312c", "#ffffff", "image-left"),
-          line("Línea exterior 03", "La configuración permite cambiar el universo visual sin reprogramar.", "#e8dfcf", "#1c1812", "image-full")
-        ]
+        labelActive: "Iluminación exterior",
+        labelInactive: "Exterior",
+        color: "#ffffff",
+        textColor: "#00152b",
+        categories: MANUAL_CATEGORIES.exterior
       },
       proyectos: {
-        title: "Rendimiento a gran escala",
-        subtitle: "Productos para proyectos lumínicos que exigen potencia, eficiencia y precisión.",
-        categories: MANUAL_CATEGORIES.proyectos,
-        featuredLines: [
-          line("Highbay Pro", "Potencia y control para espacios de gran altura. Texto final pendiente.", "#00152b", "#ffffff", "image-left"),
-          line("Olimpus", "Presentación editorial de línea. Imagen y descripción definitivas pendientes.", "#c9d5dc", "#07141e", "image-right"),
-          line("Titan", "Bloque preparado para comunicar prestaciones y aplicaciones.", "#3b4449", "#ffffff", "image-full"),
-          line("Invictus", "La consulta de producto es temporalmente G9, como en todo el prototipo.", "#d9c8aa", "#1a1610", "image-left")
-        ]
+        labelActive: "Iluminación para proyectos",
+        labelInactive: "Proyectos",
+        color: "#ffffff",
+        textColor: "#00152b",
+        categories: MANUAL_CATEGORIES.proyectos
       }
     },
     news: [1, 2, 3].map(number => ({
@@ -168,7 +178,7 @@
 
   const FEATURED_FIELD = "destacados_en";
   const DEFAULT_SPACE = "interior";
-  const FEATURED_COUNT = 8;
+  const FEATURED_COUNT = 250;
   let currentSpace = DEFAULT_SPACE;
   let isFetching = false;
 
@@ -277,152 +287,111 @@
 (function (window) {
   "use strict";
 
-  /**
-   * ================================================================
-   * CONFIGURACIÓN MANUAL — LÍNEAS DESTACADAS PARA PROYECTOS
-   *
-   * Reemplazar aquí las imágenes, textos y enlaces reales.
-   * ambientImage: fotografía del producto instalado y en uso.
-   * title/subtitle: contenido visible al expandir la tarjeta.
-   * href: destino de “Ver todos los productos”.
-   * ================================================================
-   */
-  const PROJECT_LINES = [
+  const LINES = [
     {
-      id: "luz-calle-standard",
+      id: "street",
       title: "Luz de calle Standard",
       subtitle: "Para proyectos, vías, parques y espacios públicos.",
+      productImage: "assets/images/project-street-product-source.png",
       ambientImage: "assets/images/project-street-ambient-dark.png",
-      href: "#"
+      href: "#ml-section-proyectos"
     },
     {
       id: "invictus",
       title: "Invictus",
       subtitle: "Potencia y precisión para grandes áreas, fachadas y espacios deportivos.",
+      productImage: "assets/images/project-invictus-product.png",
       ambientImage: "assets/images/project-invictus-ambient.png",
-      href: "#"
+      href: "#ml-section-proyectos"
     },
     {
-      id: "highbay-pro",
+      id: "highbay",
       title: "Highbay PRO",
       subtitle: "Iluminación profesional para naves industriales y espacios de gran altura.",
+      productImage: "assets/images/project-highbay-product-source.webp",
       ambientImage: "assets/images/project-highbay-ambient.png",
-      href: "#"
+      href: "#ml-section-proyectos"
     }
   ];
 
   const esc = value => String(value ?? "").replace(/[&<>'"]/g, character => ({
-    "&": "&amp;",
-    "<": "&lt;",
-    ">": "&gt;",
-    "'": "&#39;",
-    '"': "&quot;"
+    "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", '"': "&quot;"
   })[character]);
 
-  function cardTemplate(item, index) {
-    const expanded = index === 0;
+  function template(item, index) {
     return `
-      <article class="ml-project-line-card ${expanded ? "is-expanded" : "is-collapsed"}"
-        data-project-line-card="${esc(item.id)}"
-        style="--project-card-index:${index};view-transition-name:project-${esc(item.id)}"
-        tabindex="${expanded ? "-1" : "0"}"
-        aria-label="${expanded ? esc(item.title) : `Abrir ${esc(item.title)}`}">
-        <div class="ml-project-line-card__trigger">
-          <span class="ml-project-line-card__media" aria-hidden="true">
-            <img class="ml-project-line-card__ambient" src="${esc(item.ambientImage)}" alt="" loading="lazy">
-          </span>
-          <span class="ml-project-line-card__shade" aria-hidden="true"></span>
-          <div class="ml-project-line-card__collapsed-content">
-            <span class="ml-project-line-card__collapsed-title">${esc(item.title)}</span>
-            <span class="ml-project-line-card__open-icon" aria-hidden="true">→</span>
-          </div>
-          <div class="ml-project-line-card__content">
-            <h3 class="ml-project-line-card__title">${esc(item.title)}</h3>
-            <div class="ml-project-line-card__details">
-              <p class="ml-project-line-card__subtitle">${esc(item.subtitle)}</p>
-              <a class="ml-project-line-card__cta" href="${esc(item.href)}">
-                Ver todos los productos <span aria-hidden="true">→</span>
-              </a>
-            </div>
-          </div>
+      <article class="ml-project-lines-concept__card${index === 0 ? " is-expanded" : ""}"
+        data-project-lines-concept-card="${esc(item.id)}"
+        tabindex="${index === 0 ? "-1" : "0"}"
+        aria-label="${index === 0 ? esc(item.title) : `Expandir ${esc(item.title)}`}">
+        <img class="ml-project-lines-concept__ambient" src="${esc(item.ambientImage)}"
+          alt="${esc(item.title)} instalada en un proyecto" loading="lazy">
+        <span class="ml-project-lines-concept__shade" aria-hidden="true"></span>
+        <img class="ml-project-lines-concept__product" src="${esc(item.productImage)}"
+          alt="" loading="lazy" aria-hidden="true">
+        <div class="ml-project-lines-concept__closed">
+          <span>${esc(item.title)}</span>
+          <span class="ml-project-lines-concept__arrow" aria-hidden="true">↓</span>
+        </div>
+        <div class="ml-project-lines-concept__open">
+          <h3>${esc(item.title)}</h3>
+          <p>${esc(item.subtitle)}</p>
+          <a href="${esc(item.href)}">Ver todos los productos <span aria-hidden="true">→</span></a>
         </div>
       </article>`;
   }
 
-  function applyActive(container, activeCard) {
-    container.querySelectorAll("[data-project-line-card]").forEach(card => {
-      const expanded = card === activeCard;
-      card.classList.toggle("is-expanded", expanded);
-      card.classList.toggle("is-collapsed", !expanded);
-      card.tabIndex = expanded ? -1 : 0;
-      card.setAttribute("aria-label", expanded ? card.dataset.projectLineCard : `Abrir ${card.dataset.projectLineCard}`);
-    });
-  }
-
-  function setActive(container, activeCard, reduceMotion) {
-    if (reduceMotion) {
-      applyActive(container, activeCard);
-      return;
-    }
-
-    const cards = [...container.querySelectorAll("[data-project-line-card]")];
-    const previousRects = new Map(cards.map(card => [card, card.getBoundingClientRect()]));
-    applyActive(container, activeCard);
-
-    requestAnimationFrame(() => {
-      cards.forEach(card => {
-        const previous = previousRects.get(card);
-        const next = card.getBoundingClientRect();
-        if (!previous || !next.width || !next.height) return;
-        card.animate([
-          {
-            transform: `translate(${previous.left - next.left}px,${previous.top - next.top}px) scale(${previous.width / next.width},${previous.height / next.height})`,
-            transformOrigin: "top left"
-          },
-          { transform: "none", transformOrigin: "top left" }
-        ], {
-          duration: 680,
-          easing: "cubic-bezier(.22,1,.36,1)"
-        });
-      });
-    });
-  }
-
   function init(root) {
-    const section = root.querySelector("[data-project-lines]");
-    const list = section?.querySelector("[data-project-lines-list]");
+    const section = root.querySelector("[data-project-lines-concept]");
+    const list = section?.querySelector("[data-project-lines-concept-list]");
     if (!list) return;
 
-    const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
-    list.classList.add("is-awaiting-reveal");
-    list.innerHTML = PROJECT_LINES.map(cardTemplate).join("");
+    list.innerHTML = LINES.map(template).join("");
+    const cards = [...list.querySelectorAll("[data-project-lines-concept-card]")];
 
-    list.querySelectorAll("[data-project-line-card]").forEach(card => {
-      card.addEventListener("click", event => {
-        if (event.target.closest("a") || card.classList.contains("is-expanded")) return;
-        setActive(list, card, reduceMotion);
+    const updateTitleAlignment = () => {
+      cards.forEach(card => {
+        const title = card.querySelector(".ml-project-lines-concept__closed > span:first-child");
+        if (!title) return;
+        const lineHeight = parseFloat(getComputedStyle(title).lineHeight);
+        card.classList.toggle(
+          "has-multiline-title",
+          Number.isFinite(lineHeight) && title.getBoundingClientRect().height > lineHeight * 1.5
+        );
       });
-      card.addEventListener("keydown", event => {
-        if ((event.key !== "Enter" && event.key !== " ") || card.classList.contains("is-expanded")) return;
-        event.preventDefault();
-        setActive(list, card, reduceMotion);
-      });
-    });
+    };
 
-    if (reduceMotion || !("IntersectionObserver" in window)) {
-      list.classList.remove("is-awaiting-reveal");
-      return;
+    requestAnimationFrame(updateTitleAlignment);
+    document.fonts?.ready.then(updateTitleAlignment);
+    if ("ResizeObserver" in window) {
+      const titleObserver = new ResizeObserver(() => requestAnimationFrame(updateTitleAlignment));
+      titleObserver.observe(list);
     }
 
-    const revealObserver = new IntersectionObserver(entries => {
-      if (!entries.some(entry => entry.isIntersecting)) return;
-      requestAnimationFrame(() => list.classList.remove("is-awaiting-reveal"));
-      revealObserver.disconnect();
-    }, { threshold: .14 });
-    revealObserver.observe(section);
+    const activate = activeCard => {
+      cards.forEach(card => {
+        const expanded = card === activeCard;
+        card.classList.toggle("is-expanded", expanded);
+        card.tabIndex = expanded ? -1 : 0;
+        card.setAttribute("aria-label", expanded
+          ? card.querySelector(".ml-project-lines-concept__open h3").textContent
+          : `Expandir ${card.querySelector(".ml-project-lines-concept__closed span").textContent}`);
+      });
+    };
+
+    cards.forEach(card => {
+      card.addEventListener("click", event => {
+        if (!event.target.closest("a")) activate(card);
+      });
+      card.addEventListener("keydown", event => {
+        if (event.key !== "Enter" && event.key !== " ") return;
+        event.preventDefault();
+        activate(card);
+      });
+    });
   }
 
-  window.MacroledProjectLines = { init };
+  window.MacroledProjectLinesConcept = { init };
 })(window);
 
 (function (window) {
@@ -443,8 +412,19 @@
     return safe.replace(safeTerm, `<strong>${safeTerm}</strong>`);
   };
 
+  const buttonTone = color => {
+    const hex = String(color || "").trim().replace(/^#/, "");
+    if (!/^[\da-f]{3}$|^[\da-f]{6}$/i.test(hex)) return "dark";
+    const normalized = hex.length === 3
+      ? hex.split("").map(character => character + character).join("")
+      : hex;
+    const [red, green, blue] = [0, 2, 4].map(index => parseInt(normalized.slice(index, index + 2), 16));
+    const luminance = (red * 0.299 + green * 0.587 + blue * 0.114) / 255;
+    return luminance > 0.55 ? "light" : "dark";
+  };
+
   function categoryTemplate(item) {
-    return `<a class="ml-category-card" href="${esc(item.href)}" data-editorial-id="${esc(item.id)}"><div class="ml-category-card__media"><img src="${esc(item.image)}" alt="" loading="lazy" width="800" height="800"></div><h3>${esc(item.title)}</h3></a>`;
+    return `<a class="ml-category-card" href="${esc(item.href)}" data-editorial-id="${esc(item.id)}"><h3>${esc(item.title)}</h3><div class="ml-category-card__media"><img src="${esc(item.image)}" alt="" loading="lazy" width="800" height="800"></div></a>`;
   }
 
   function lineContentTemplate(item) {
@@ -461,7 +441,7 @@
 
   function lineTemplate(item) {
     const mode = item.content?.mode || "typesense";
-    return `<article class="ml-featured ml-shell" data-theme="${esc(item.theme)}" data-layout="${esc(item.layout)}" data-content-mode="${esc(mode)}" style="--line-bg:${esc(item.theme)};--line-color:${esc(item.textColor)}"><div class="ml-featured__story"><div class="ml-featured__media"><img src="${esc(item.image)}" alt="" loading="lazy" width="1600" height="1000"></div><div class="ml-featured__copy"><h3>${emphasize(item.title, item.titleEmphasis)}</h3><p>${emphasize(item.description, item.descriptionEmphasis)}</p><a class="ml-button ml-button--secondary" href="${esc(item.href)}">Ver productos</a></div></div>${lineContentTemplate(item)}</article>`;
+    return `<article class="ml-featured ml-shell" data-theme="${esc(item.theme)}" data-layout="${esc(item.layout)}" data-image-fit="${esc(item.imageFit || "cover")}" data-button-tone="${buttonTone(item.textColor)}" data-content-mode="${esc(mode)}" style="--line-bg:${esc(item.theme)};--line-color:${esc(item.textColor)}"><div class="ml-featured__story"><div class="ml-featured__media"><img src="${esc(item.image)}" alt="" loading="lazy" width="1600" height="1000"></div><div class="ml-featured__copy"><h3>${emphasize(item.title, item.titleEmphasis)}</h3><p>${emphasize(item.description, item.descriptionEmphasis)}</p><div class="ml-featured__actions"><a class="ml-button ml-button--primary" href="${esc(item.href)}">Ver productos</a><a class="ml-button--tertiary" href="${esc(item.catalogHref || "#")}">Ver catálogo <span aria-hidden="true">→</span></a></div></div></div>${lineContentTemplate(item)}</article>`;
   }
 
   function renderSections() {
@@ -476,8 +456,80 @@
       const cta = data.cta
         ? `<a class="ml-button ml-button--primary ml-panel__cta" href="${esc(data.cta.href)}">${esc(data.cta.label)}</a>`
         : "";
-      return `<section class="ml-home-section" data-section="${esc(key)}" aria-labelledby="ml-section-${esc(key)}"><div class="ml-categories-zone"><div class="ml-panel__intro ml-shell"><div class="ml-panel__heading"><div><h4 id="ml-section-${esc(key)}">${esc(data.title)}</h4>${subtitle}</div>${cta}</div></div>${categories}</div><div class="ml-featured-list">${data.featuredLines.map(lineTemplate).join("")}</div></section>`;
+      return `<section class="ml-home-section" data-section="${esc(key)}" aria-label="${esc(data.title)}"><div class="ml-featured-list">${data.featuredLines.map(lineTemplate).join("")}</div></section>`;
     }).join("");
+  }
+
+  function placeFeaturedProducts() {
+    const featuredProducts = root.querySelector("#productos-destacados");
+    const professionalLighting = root.querySelector("[data-project-lines-concept]");
+    if (!featuredProducts || !professionalLighting) return;
+    professionalLighting.insertAdjacentElement("afterend", featuredProducts);
+  }
+
+  function placePrimarySections() {
+    const professionalLighting = root.querySelector("[data-project-lines-concept]");
+    const categoriesTest = root.querySelector("[data-categories-test]");
+    if (!professionalLighting || !categoriesTest) return;
+    professionalLighting.insertAdjacentElement("afterend", categoriesTest);
+  }
+
+  function renderCategoriesTest() {
+    const section = root.querySelector("[data-categories-test]");
+    const tabs = section?.querySelector("[data-categories-test-tabs]");
+    const grid = section?.querySelector("[data-categories-test-grid]");
+    const entries = Object.entries(config.categoriesTest || {});
+    if (!section || !tabs || !grid || !entries.length) return;
+
+    grid.id = "ml-categories-test-panel";
+    tabs.innerHTML = entries.map(([key, item], index) => `
+      <button class="ml-categories-test__tab ml-featured-products__tab${index === 0 ? " is-active" : ""}"
+        id="ml-categories-test-tab-${esc(key)}"
+        type="button"
+        role="tab"
+        aria-controls="${grid.id}"
+        aria-selected="${index === 0}"
+        tabindex="${index === 0 ? "0" : "-1"}"
+        data-categories-test-tab="${esc(key)}">${esc(index === 0 ? item.labelActive : item.labelInactive)}</button>
+    `).join("");
+    const activate = key => {
+      const item = config.categoriesTest[key];
+      if (!item) return;
+      section.dataset.activeCategory = key;
+      section.style.setProperty("--categories-test-color", item.color);
+      section.style.setProperty("--categories-test-text", item.textColor);
+      grid.innerHTML = item.categories.map(categoryTemplate).join("");
+      grid.setAttribute("aria-labelledby", `ml-categories-test-tab-${key}`);
+      tabs.querySelectorAll("[data-categories-test-tab]").forEach(button => {
+        const active = button.dataset.categoriesTestTab === key;
+        const buttonConfig = config.categoriesTest[button.dataset.categoriesTestTab];
+        button.classList.toggle("is-active", active);
+        button.setAttribute("aria-selected", String(active));
+        button.tabIndex = active ? 0 : -1;
+        button.textContent = active ? buttonConfig.labelActive : buttonConfig.labelInactive;
+      });
+    };
+
+    tabs.addEventListener("click", event => {
+      const button = event.target.closest("[data-categories-test-tab]");
+      if (button) activate(button.dataset.categoriesTestTab);
+    });
+    tabs.addEventListener("keydown", event => {
+      if (!["ArrowLeft", "ArrowRight", "Home", "End"].includes(event.key)) return;
+      const buttons = [...tabs.querySelectorAll("[data-categories-test-tab]")];
+      const current = buttons.indexOf(document.activeElement);
+      if (current < 0) return;
+      event.preventDefault();
+      const next = event.key === "Home"
+        ? 0
+        : event.key === "End"
+          ? buttons.length - 1
+          : (current + (event.key === "ArrowRight" ? 1 : -1) + buttons.length) % buttons.length;
+      buttons[next].focus();
+      activate(buttons[next].dataset.categoriesTestTab);
+    });
+
+    activate(entries[0][0]);
   }
 
   function initCategoryCarousels() {
@@ -499,13 +551,23 @@
     root.querySelectorAll(".ml-featured-list").forEach(list => {
       const lines = [...list.querySelectorAll(".ml-featured[data-theme]")];
       if (!lines.length) return;
+      const section = list.closest(".ml-home-section");
 
       const setBackground = line => {
         list.style.setProperty("--ml-panel-theme", line.dataset.theme);
+        section?.style.setProperty("--ml-section-theme", line.dataset.theme);
       };
       setBackground(lines[0]);
 
       if (!("IntersectionObserver" in window)) return;
+      const sectionObserver = new IntersectionObserver(entries => {
+        section?.classList.toggle("is-line-theme-active", entries[0]?.isIntersecting === true);
+      }, {
+        rootMargin: "-35% 0px -35% 0px",
+        threshold: 0
+      });
+      sectionObserver.observe(list);
+
       const observer = new IntersectionObserver(entries => {
         const active = entries
           .filter(entry => entry.isIntersecting)
@@ -568,12 +630,15 @@
   }
 
   renderSections();
+  placePrimarySections();
+  placeFeaturedProducts();
+  renderCategoriesTest();
   initCategoryCarousels();
   initLineBackgrounds();
   renderCommon();
   window.MacroledProducts.init(root);
   window.MacroledFeatured.init(root);
-  window.MacroledProjectLines.init(root);
+  window.MacroledProjectLinesConcept.init(root);
   handleVideo();
   animateHeroTitle();
 })(window);

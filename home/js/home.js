@@ -16,8 +16,19 @@
     return safe.replace(safeTerm, `<strong>${safeTerm}</strong>`);
   };
 
+  const buttonTone = color => {
+    const hex = String(color || "").trim().replace(/^#/, "");
+    if (!/^[\da-f]{3}$|^[\da-f]{6}$/i.test(hex)) return "dark";
+    const normalized = hex.length === 3
+      ? hex.split("").map(character => character + character).join("")
+      : hex;
+    const [red, green, blue] = [0, 2, 4].map(index => parseInt(normalized.slice(index, index + 2), 16));
+    const luminance = (red * 0.299 + green * 0.587 + blue * 0.114) / 255;
+    return luminance > 0.55 ? "light" : "dark";
+  };
+
   function categoryTemplate(item) {
-    return `<a class="ml-category-card" href="${esc(item.href)}" data-editorial-id="${esc(item.id)}"><div class="ml-category-card__media"><img src="${esc(item.image)}" alt="" loading="lazy" width="800" height="800"></div><h3>${esc(item.title)}</h3></a>`;
+    return `<a class="ml-category-card" href="${esc(item.href)}" data-editorial-id="${esc(item.id)}"><h3>${esc(item.title)}</h3><div class="ml-category-card__media"><img src="${esc(item.image)}" alt="" loading="lazy" width="800" height="800"></div></a>`;
   }
 
   function lineContentTemplate(item) {
@@ -34,7 +45,7 @@
 
   function lineTemplate(item) {
     const mode = item.content?.mode || "typesense";
-    return `<article class="ml-featured ml-shell" data-theme="${esc(item.theme)}" data-layout="${esc(item.layout)}" data-content-mode="${esc(mode)}" style="--line-bg:${esc(item.theme)};--line-color:${esc(item.textColor)}"><div class="ml-featured__story"><div class="ml-featured__media"><img src="${esc(item.image)}" alt="" loading="lazy" width="1600" height="1000"></div><div class="ml-featured__copy"><h3>${emphasize(item.title, item.titleEmphasis)}</h3><p>${emphasize(item.description, item.descriptionEmphasis)}</p><a class="ml-button ml-button--secondary" href="${esc(item.href)}">Ver productos</a></div></div>${lineContentTemplate(item)}</article>`;
+    return `<article class="ml-featured ml-shell" data-theme="${esc(item.theme)}" data-layout="${esc(item.layout)}" data-image-fit="${esc(item.imageFit || "cover")}" data-button-tone="${buttonTone(item.textColor)}" data-content-mode="${esc(mode)}" style="--line-bg:${esc(item.theme)};--line-color:${esc(item.textColor)}"><div class="ml-featured__story"><div class="ml-featured__media"><img src="${esc(item.image)}" alt="" loading="lazy" width="1600" height="1000"></div><div class="ml-featured__copy"><h3>${emphasize(item.title, item.titleEmphasis)}</h3><p>${emphasize(item.description, item.descriptionEmphasis)}</p><div class="ml-featured__actions"><a class="ml-button ml-button--primary" href="${esc(item.href)}">Ver productos</a><a class="ml-button--tertiary" href="${esc(item.catalogHref || "#")}">Ver catálogo <span aria-hidden="true">→</span></a></div></div></div>${lineContentTemplate(item)}</article>`;
   }
 
   function renderSections() {
@@ -49,8 +60,80 @@
       const cta = data.cta
         ? `<a class="ml-button ml-button--primary ml-panel__cta" href="${esc(data.cta.href)}">${esc(data.cta.label)}</a>`
         : "";
-      return `<section class="ml-home-section" data-section="${esc(key)}" aria-labelledby="ml-section-${esc(key)}"><div class="ml-categories-zone"><div class="ml-panel__intro ml-shell"><div class="ml-panel__heading"><div><h4 id="ml-section-${esc(key)}">${esc(data.title)}</h4>${subtitle}</div>${cta}</div></div>${categories}</div><div class="ml-featured-list">${data.featuredLines.map(lineTemplate).join("")}</div></section>`;
+      return `<section class="ml-home-section" data-section="${esc(key)}" aria-label="${esc(data.title)}"><div class="ml-featured-list">${data.featuredLines.map(lineTemplate).join("")}</div></section>`;
     }).join("");
+  }
+
+  function placeFeaturedProducts() {
+    const featuredProducts = root.querySelector("#productos-destacados");
+    const professionalLighting = root.querySelector("[data-project-lines-concept]");
+    if (!featuredProducts || !professionalLighting) return;
+    professionalLighting.insertAdjacentElement("afterend", featuredProducts);
+  }
+
+  function placePrimarySections() {
+    const professionalLighting = root.querySelector("[data-project-lines-concept]");
+    const categoriesTest = root.querySelector("[data-categories-test]");
+    if (!professionalLighting || !categoriesTest) return;
+    professionalLighting.insertAdjacentElement("afterend", categoriesTest);
+  }
+
+  function renderCategoriesTest() {
+    const section = root.querySelector("[data-categories-test]");
+    const tabs = section?.querySelector("[data-categories-test-tabs]");
+    const grid = section?.querySelector("[data-categories-test-grid]");
+    const entries = Object.entries(config.categoriesTest || {});
+    if (!section || !tabs || !grid || !entries.length) return;
+
+    grid.id = "ml-categories-test-panel";
+    tabs.innerHTML = entries.map(([key, item], index) => `
+      <button class="ml-categories-test__tab ml-featured-products__tab${index === 0 ? " is-active" : ""}"
+        id="ml-categories-test-tab-${esc(key)}"
+        type="button"
+        role="tab"
+        aria-controls="${grid.id}"
+        aria-selected="${index === 0}"
+        tabindex="${index === 0 ? "0" : "-1"}"
+        data-categories-test-tab="${esc(key)}">${esc(index === 0 ? item.labelActive : item.labelInactive)}</button>
+    `).join("");
+    const activate = key => {
+      const item = config.categoriesTest[key];
+      if (!item) return;
+      section.dataset.activeCategory = key;
+      section.style.setProperty("--categories-test-color", item.color);
+      section.style.setProperty("--categories-test-text", item.textColor);
+      grid.innerHTML = item.categories.map(categoryTemplate).join("");
+      grid.setAttribute("aria-labelledby", `ml-categories-test-tab-${key}`);
+      tabs.querySelectorAll("[data-categories-test-tab]").forEach(button => {
+        const active = button.dataset.categoriesTestTab === key;
+        const buttonConfig = config.categoriesTest[button.dataset.categoriesTestTab];
+        button.classList.toggle("is-active", active);
+        button.setAttribute("aria-selected", String(active));
+        button.tabIndex = active ? 0 : -1;
+        button.textContent = active ? buttonConfig.labelActive : buttonConfig.labelInactive;
+      });
+    };
+
+    tabs.addEventListener("click", event => {
+      const button = event.target.closest("[data-categories-test-tab]");
+      if (button) activate(button.dataset.categoriesTestTab);
+    });
+    tabs.addEventListener("keydown", event => {
+      if (!["ArrowLeft", "ArrowRight", "Home", "End"].includes(event.key)) return;
+      const buttons = [...tabs.querySelectorAll("[data-categories-test-tab]")];
+      const current = buttons.indexOf(document.activeElement);
+      if (current < 0) return;
+      event.preventDefault();
+      const next = event.key === "Home"
+        ? 0
+        : event.key === "End"
+          ? buttons.length - 1
+          : (current + (event.key === "ArrowRight" ? 1 : -1) + buttons.length) % buttons.length;
+      buttons[next].focus();
+      activate(buttons[next].dataset.categoriesTestTab);
+    });
+
+    activate(entries[0][0]);
   }
 
   function initCategoryCarousels() {
@@ -72,13 +155,23 @@
     root.querySelectorAll(".ml-featured-list").forEach(list => {
       const lines = [...list.querySelectorAll(".ml-featured[data-theme]")];
       if (!lines.length) return;
+      const section = list.closest(".ml-home-section");
 
       const setBackground = line => {
         list.style.setProperty("--ml-panel-theme", line.dataset.theme);
+        section?.style.setProperty("--ml-section-theme", line.dataset.theme);
       };
       setBackground(lines[0]);
 
       if (!("IntersectionObserver" in window)) return;
+      const sectionObserver = new IntersectionObserver(entries => {
+        section?.classList.toggle("is-line-theme-active", entries[0]?.isIntersecting === true);
+      }, {
+        rootMargin: "-35% 0px -35% 0px",
+        threshold: 0
+      });
+      sectionObserver.observe(list);
+
       const observer = new IntersectionObserver(entries => {
         const active = entries
           .filter(entry => entry.isIntersecting)
@@ -141,12 +234,15 @@
   }
 
   renderSections();
+  placePrimarySections();
+  placeFeaturedProducts();
+  renderCategoriesTest();
   initCategoryCarousels();
   initLineBackgrounds();
   renderCommon();
   window.MacroledProducts.init(root);
   window.MacroledFeatured.init(root);
-  window.MacroledProjectLines.init(root);
+  window.MacroledProjectLinesConcept.init(root);
   handleVideo();
   animateHeroTitle();
 })(window);

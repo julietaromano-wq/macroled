@@ -24,20 +24,20 @@
           <p class="ml-hero__subtitle">Productos de calidad y diseño para iluminar desde un hogar hasta un gran proyecto.</p>
           <a class="ml-button ml-button--primary" href="#productos-destacados">Ver productos</a>
         </div>
-        <dl class="ml-hero__metrics" aria-label="Indicadores de Macroled">
+        <div class="ml-hero__metrics" aria-label="Indicadores de Macroled">
           <div class="ml-hero__metric">
-            <dt>20+</dt>
-            <dd>Años de trayectoria</dd>
+            <div class="ml-hero__metric-value">20+</div>
+            <p class="ml-hero__metric-label">Años de trayectoria</p>
           </div>
           <div class="ml-hero__metric">
-            <dt>+1.600</dt>
-            <dd>Productos activos</dd>
+            <div class="ml-hero__metric-value">+1.600</div>
+            <p class="ml-hero__metric-label">Productos activos</p>
           </div>
           <div class="ml-hero__metric">
-            <dt>100%</dt>
-            <dd>Cobertura nacional</dd>
+            <div class="ml-hero__metric-value">100%</div>
+            <p class="ml-hero__metric-label">Cobertura nacional</p>
           </div>
-        </dl>
+        </div>
       </div>
     </header>
 
@@ -67,15 +67,15 @@
         </div>
       </section>
 
-      <section class="ml-project-lines" aria-labelledby="ml-project-lines-title" data-project-lines>
-        <div class="ml-project-lines__inner ml-shell">
-          <header class="ml-project-lines__header">
-            <h4 id="ml-project-lines-title">Luminarias profesionales para proyectos de gran escala</h4>
-            <a class="ml-project-lines__explore" href="#ml-section-proyectos">
-              <span>Productos para proyectos</span>
+      <section class="ml-project-lines-concept" aria-labelledby="ml-project-lines-concept-title" data-project-lines-concept>
+        <div class="ml-project-lines-concept__inner ml-shell">
+          <header class="ml-project-lines-concept__header">
+            <h4 id="ml-project-lines-concept-title">Luminarias profesionales para proyectos de gran escala</h4>
+            <a class="ml-button ml-button--primary ml-button--primary-light ml-project-lines-concept__explore" href="#ml-section-proyectos">
+              Productos para proyectos
             </a>
           </header>
-          <div class="ml-project-lines__cards" data-project-lines-list></div>
+          <div class="ml-project-lines-concept__cards" data-project-lines-concept-list></div>
         </div>
       </section>
 
@@ -83,9 +83,22 @@
         <div data-home-sections></div>
       </section>
 
+      <section class="ml-categories-test" aria-labelledby="ml-categories-test-title" data-categories-test>
+        <div class="ml-categories-test__backdrop" aria-hidden="true"></div>
+        <div class="ml-categories-test__content ml-shell">
+          <h4 id="ml-categories-test-title">Explorá nuestras categorías</h4>
+          <p class="ml-categories-test__subtitle">Soluciones para cada espacio y proyecto.</p>
+          <div class="ml-categories-test__tabs ml-featured-products__tabs" role="tablist" aria-label="Explorar categorías por ambiente" data-categories-test-tabs></div>
+          <div class="ml-categories-test__grid ml-categories" role="tabpanel" aria-live="polite" data-categories-test-grid></div>
+        </div>
+      </section>
+
       <section class="ml-foa ml-shell" aria-labelledby="ml-foa-title">
-        <div class="ml-foa__visual ml-placeholder" role="img" aria-label="Imagen de Casa FOA pendiente"></div>
-        <div class="ml-foa__copy"><h2 id="ml-foa-title">Casa FOA</h2><p>Contenido e imagen definitivos pendientes. Este bloque está preparado para contar la participación de Macroled con una narrativa editorial.</p><a class="ml-text-link" href="#">Conocer más <span aria-hidden="true">↗</span></a></div>
+        <div class="ml-foa__content">
+          <h2 id="ml-foa-title">Sponsors oficiales de Casa FOA 2026</h2>
+          <p>Macroled acompaña Casa FOA 2026, potenciando con tecnología y diseño el trabajo de quienes proyectan el futuro de la arquitectura argentina.</p>
+          <a class="ml-button--tertiary" href="https://www.macroled.com.ar/casafoa">Descubrí Macroled en Casa FOA <span aria-hidden="true">→</span></a>
+        </div>
       </section>
 
       <section class="ml-news ml-shell" aria-labelledby="ml-news-title">
@@ -112,7 +125,7 @@
   <script src="js/config.js"></script>
   <script src="js/products.js"></script>
   <script src="js/featured.js"></script>
-  <script src="js/project-lines.js"></script>
+  <script src="js/project-lines-concept.js"></script>
   <script src="js/home.js"></script>
 </body>
 </html>

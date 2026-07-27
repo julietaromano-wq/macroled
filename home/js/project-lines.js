@@ -64,7 +64,7 @@
             <h3 class="ml-project-line-card__title">${esc(item.title)}</h3>
             <div class="ml-project-line-card__details">
               <p class="ml-project-line-card__subtitle">${esc(item.subtitle)}</p>
-              <a class="ml-project-line-card__cta" href="${esc(item.href)}">
+              <a class="ml-project-line-card__cta ml-button--tertiary" href="${esc(item.href)}">
                 Ver todos los productos <span aria-hidden="true">→</span>
               </a>
             </div>
