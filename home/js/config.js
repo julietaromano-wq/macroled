@@ -25,9 +25,9 @@
   const MANUAL_CATEGORIES = {
     interior: [
       { ...category("Lámparas", "lamparas"), image: "https://s3.coresagroup.com/MACROLED/250/smartnew.png" },
-      { ...category("Artefactos para lámparas", "artefactos-para-lamparas"), image: "https://s3.coresagroup.com/MACROLED/250/7428325570818a.png" },
+      { ...category("Artefactos para lámparas", "artefactos-para-lamparas"), image: "https://s3.coresagroup.com/MACROLED/250/policarbonato-aplicar-dicroica.png" },
       { ...category("Interruptores y tomas", "interruptores-y-tomas"), image: "https://s3.coresagroup.com/MACROLED/250/lima.webp" },
-      { ...category("Tiras LED", "tiras-led"), image: "https://s3.coresagroup.com/MACROLED/250/smd5050a.png" }
+      { ...category("Tiras LED", "tiras-led"), image: "https://s3.coresagroup.com/MACROLED/250/neon.png", badge: "Nuevo" }
     ],
     monaco: [
       { ...category("Armadas", "monaco-armadas"), image: "https://s3.coresagroup.com/MACROLED/250/milan.png" },
@@ -36,13 +36,18 @@
       { ...category("Luz de pasillo", "monaco-luz-pasillo"), image: "https://d1zltvqju4u8ql.cloudfront.net/fit-in/2000x2000/MACROLED/WEB/portada_luz_pasillo.webp" }
     ],
     exterior: [
-      category("Reflectores", "reflectores"),
-      category("Solar", "solar"),
-      category("Tortugas", "tortugas"),
-      category("Estacas", "estacas")
+      { ...category("Reflectores", "reflectores"), image: "https://s3.coresagroup.com/MACROLED/250/reflectores-smart.png" },
+      { ...category("Solar", "solar"), image: "https://s3.coresagroup.com/MACROLED/250/solar.png" },
+      { ...category("Tortugas", "tortugas"), image: "https://s3.coresagroup.com/MACROLED/250/tortugas.png" },
+      { ...category("Estacas", "estacas"), image: "https://s3.coresagroup.com/MACROLED/250/estacas-led-integrado.png" }
     ],
-    proyectos: ["Highbay Pro", "Luz de calle Standard", "Lumax", "Solar"].map((title, index) => ({
-      ...category(title, `proyectos-0${index + 1}`),
+    proyectos: [
+      { ...category("Luz de calle", "proyectos-01"), image: "https://d1zltvqju4u8ql.cloudfront.net/fit-in/1000x1000/MACROLED/WEB/SLG2-100W-757-CW_FRONT.webp", badge: "Nuevo" },
+      { ...category("Lumax", "proyectos-02"), image: "https://s3.coresagroup.com/MACROLED/250/lumax.png", badge: "Nuevo" },
+      { ...category("Highbay Classic", "proyectos-03"), image: "https://s3.coresagroup.com/MACROLED/250/galponeras-eco.webp" },
+      { ...category("Highbay Pro", "proyectos-04"), image: "https://s3.coresagroup.com/MACROLED/250/PHB-200W-90D-857-CW.png" }
+    ].map((item) => ({
+      ...item,
       subtitle: "Proyecto lumínico"
     }))
   };
@@ -70,8 +75,29 @@
             titleEmphasis: "Monaco",
             content: { mode: "static", categoryGroup: "monaco" }
           },
-          line("Línea interior 02", "Una composición amplia preparada para presentar la familia.", "#16283a", "#ffffff", "image-right"),
-          line("Línea interior 03", "Contenido comercial configurable desde un único archivo.", "#dbe8e5", "#101820", "image-full")
+          {
+            ...line("Reflectores PRO", "La combinación ideal entre rendimiento y practicidad. Reflectores para exterior pensados para iluminar accesos, fachadas, patios y áreas abiertas con una instalación versátil y una luz confiable.", "#16283a", "#e4ebf0", "image-right"),
+            image: "https://cdn.prod.website-files.com/65f1fdd7248b6709fdebe904/699cb28af6cdd53e774759f0_FAMILIA%20REFLECTORES%20PRO.webp",
+            imageFit: "contain-right"
+          },
+          {
+            ...line("Luminarias Skyline", "Iluminación arquitectónica con rieles magnéticos de 48V que combinan seguridad, versatilidad y estética premium. Luminarias con opciones Smart de blancos dinámicos y automatización.", "#07090c", "#e4ebf0", "image-left"),
+            image: "https://s3.coresagroup.com/MACROLED/250/skyline.png",
+            imageFit: "contain-centered",
+            visualTheme: "silver-dark",
+            titleEmphasis: "Luminarias",
+            titleEmphasisWeight: 700,
+            content: {
+              mode: "typesense",
+              query: {
+                typesenseFilters: [
+                  { field: "subfamilia", value: "Luminarias" },
+                  { field: "familia", value: "Skyline" }
+                ],
+                productCount: 4
+              }
+            }
+          }
         ]
       }
     },

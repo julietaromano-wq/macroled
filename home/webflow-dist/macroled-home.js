@@ -26,9 +26,9 @@
   const MANUAL_CATEGORIES = {
     interior: [
       { ...category("Lámparas", "lamparas"), image: "https://s3.coresagroup.com/MACROLED/250/smartnew.png" },
-      { ...category("Artefactos para lámparas", "artefactos-para-lamparas"), image: "https://s3.coresagroup.com/MACROLED/250/7428325570818a.png" },
+      { ...category("Artefactos para lámparas", "artefactos-para-lamparas"), image: "https://s3.coresagroup.com/MACROLED/250/policarbonato-aplicar-dicroica.png" },
       { ...category("Interruptores y tomas", "interruptores-y-tomas"), image: "https://s3.coresagroup.com/MACROLED/250/lima.webp" },
-      { ...category("Tiras LED", "tiras-led"), image: "https://s3.coresagroup.com/MACROLED/250/smd5050a.png" }
+      { ...category("Tiras LED", "tiras-led"), image: "https://s3.coresagroup.com/MACROLED/250/neon.png", badge: "Nuevo" }
     ],
     monaco: [
       { ...category("Armadas", "monaco-armadas"), image: "https://s3.coresagroup.com/MACROLED/250/milan.png" },
@@ -37,13 +37,18 @@
       { ...category("Luz de pasillo", "monaco-luz-pasillo"), image: "https://d1zltvqju4u8ql.cloudfront.net/fit-in/2000x2000/MACROLED/WEB/portada_luz_pasillo.webp" }
     ],
     exterior: [
-      category("Reflectores", "reflectores"),
-      category("Solar", "solar"),
-      category("Tortugas", "tortugas"),
-      category("Estacas", "estacas")
+      { ...category("Reflectores", "reflectores"), image: "https://s3.coresagroup.com/MACROLED/250/reflectores-smart.png" },
+      { ...category("Solar", "solar"), image: "https://s3.coresagroup.com/MACROLED/250/solar.png" },
+      { ...category("Tortugas", "tortugas"), image: "https://s3.coresagroup.com/MACROLED/250/tortugas.png" },
+      { ...category("Estacas", "estacas"), image: "https://s3.coresagroup.com/MACROLED/250/estacas-led-integrado.png" }
     ],
-    proyectos: ["Highbay Pro", "Luz de calle Standard", "Lumax", "Solar"].map((title, index) => ({
-      ...category(title, `proyectos-0${index + 1}`),
+    proyectos: [
+      { ...category("Luz de calle", "proyectos-01"), image: "https://d1zltvqju4u8ql.cloudfront.net/fit-in/1000x1000/MACROLED/WEB/SLG2-100W-757-CW_FRONT.webp", badge: "Nuevo" },
+      { ...category("Lumax", "proyectos-02"), image: "https://s3.coresagroup.com/MACROLED/250/lumax.png", badge: "Nuevo" },
+      { ...category("Highbay Classic", "proyectos-03"), image: "https://s3.coresagroup.com/MACROLED/250/galponeras-eco.webp" },
+      { ...category("Highbay Pro", "proyectos-04"), image: "https://s3.coresagroup.com/MACROLED/250/PHB-200W-90D-857-CW.png" }
+    ].map((item) => ({
+      ...item,
       subtitle: "Proyecto lumínico"
     }))
   };
@@ -71,8 +76,29 @@
             titleEmphasis: "Monaco",
             content: { mode: "static", categoryGroup: "monaco" }
           },
-          line("Línea interior 02", "Una composición amplia preparada para presentar la familia.", "#16283a", "#ffffff", "image-right"),
-          line("Línea interior 03", "Contenido comercial configurable desde un único archivo.", "#dbe8e5", "#101820", "image-full")
+          {
+            ...line("Reflectores PRO", "La combinación ideal entre rendimiento y practicidad. Reflectores para exterior pensados para iluminar accesos, fachadas, patios y áreas abiertas con una instalación versátil y una luz confiable.", "#16283a", "#e4ebf0", "image-right"),
+            image: "https://cdn.prod.website-files.com/65f1fdd7248b6709fdebe904/699cb28af6cdd53e774759f0_FAMILIA%20REFLECTORES%20PRO.webp",
+            imageFit: "contain-right"
+          },
+          {
+            ...line("Luminarias Skyline", "Iluminación arquitectónica con rieles magnéticos de 48V que combinan seguridad, versatilidad y estética premium. Luminarias con opciones Smart de blancos dinámicos y automatización.", "#07090c", "#e4ebf0", "image-left"),
+            image: "https://s3.coresagroup.com/MACROLED/250/skyline.png",
+            imageFit: "contain-centered",
+            visualTheme: "silver-dark",
+            titleEmphasis: "Luminarias",
+            titleEmphasisWeight: 700,
+            content: {
+              mode: "typesense",
+              query: {
+                typesenseFilters: [
+                  { field: "subfamilia", value: "Luminarias" },
+                  { field: "familia", value: "Skyline" }
+                ],
+                productCount: 4
+              }
+            }
+          }
         ]
       }
     },
@@ -146,11 +172,17 @@
     if(Array.isArray(doc.atributos)&&doc.atributos.length) return doc.atributos.slice(0,3).map(a=>({label:a.nombre,value:mergeVariantValue(doc,a.nombre,a.valor)}));
     return [{label:doc.nombre_attr1,value:doc.attr_1},{label:doc.nombre_attr2,value:doc.attr_2},{label:doc.nombre_attr3,value:doc.attr_3}].filter(p=>p.label&&p.value).slice(0,3).map(p=>({label:p.label,value:mergeVariantValue(doc,p.label,p.value)}));
   }
-  async function fetchProducts(field,value,count){
+  const filterValue=value=>String(value??"").replace(/`/g,"\\`");
+  const buildFilter=(field,value,filters)=>{
+    if(Array.isArray(filters)&&filters.length) return filters.map(filter=>`${filter.field}:=\`${filterValue(filter.value)}\``).join(" && ");
+    return `${field}:=\`${filterValue(value)}\``;
+  };
+  async function fetchProducts(field,value,count,filters){
     const cfg=window.MACROLED_HOME_CONFIG.typesense;
     if(!cfg.host||!cfg.apiKey||!cfg.collection) throw new Error("Configuración Typesense incompleta");
-    const key=[field,value,count].join("|");if(cache.has(key)) return cache.get(key);
-    const params=new URLSearchParams({q:"*",query_by:cfg.queryBy||"nombre,descripcion",filter_by:`${field}:=${value}`,per_page:String(count),page:"1"});
+    const filterBy=buildFilter(field,value,filters);
+    const key=[filterBy,count].join("|");if(cache.has(key)) return cache.get(key);
+    const params=new URLSearchParams({q:"*",query_by:cfg.queryBy||"nombre,descripcion",filter_by:filterBy,per_page:String(count),page:"1"});
     const request=fetch(`${cfg.host}/collections/${encodeURIComponent(cfg.collection)}/documents/search?${params}`,{headers:{"X-TYPESENSE-API-KEY":cfg.apiKey}}).then(async res=>{if(!res.ok) throw new Error(`Typesense ${res.status}: ${await res.text()}`);return res.json()}).catch(error=>{cache.delete(key);throw error});
     cache.set(key,request);return request;
   }
@@ -165,9 +197,11 @@
     grid.querySelectorAll(".ml-product-card__media").forEach(media=>{const img=media.querySelector("img[data-images]");if(!img)return;let images=[];try{images=JSON.parse(img.dataset.images)}catch(_){return}const move=direction=>{let index=Number(img.dataset.index||0);index=(index+direction+images.length)%images.length;img.dataset.index=String(index);img.src=images[index]};media.querySelector(".ml-product-card__nav--prev")?.addEventListener("click",event=>{event.preventDefault();event.stopPropagation();move(-1)});media.querySelector(".ml-product-card__nav--next")?.addEventListener("click",event=>{event.preventDefault();event.stopPropagation();move(1)})});
   }
   async function renderGrid(grid){
-    const field=grid.dataset.productsField,value=grid.dataset.productsValue,count=Number(grid.dataset.productsCount||4);
+    const field=grid.dataset.productsField,value=grid.dataset.productsValue,count=Number(grid.dataset.productsCount||4);let filters=[];
+    try{filters=JSON.parse(grid.dataset.productsFilters||"[]")}catch(_){filters=[]}
     grid.setAttribute("aria-busy","true");
-    try{const data=await fetchProducts(field,value,count);if(!data.hits?.length){grid.innerHTML=`<div class="ml-product-state">No hay productos para “${escapeHTML(value)}”.</div>`;return}grid.innerHTML=data.hits.map(hit=>cardTemplate(hit.document)).join("");wireCarousels(grid)}catch(error){console.error(`Macroled Home · Error consultando Typesense (${field}=${value})`,error);grid.innerHTML=`<div class="ml-product-state">No se pudieron cargar los productos. Verificá la configuración de Typesense y que “${escapeHTML(value)}” exista.</div>`}finally{grid.setAttribute("aria-busy","false")}
+    const label=filters.length?filters.map(filter=>filter.value).join(" / "):value;
+    try{const data=await fetchProducts(field,value,count,filters);if(!data.hits?.length){grid.innerHTML=`<div class="ml-product-state">No hay productos para “${escapeHTML(label)}”.</div>`;return}grid.innerHTML=data.hits.map(hit=>cardTemplate(hit.document)).join("");wireCarousels(grid)}catch(error){console.error(`Macroled Home · Error consultando Typesense (${buildFilter(field,value,filters)})`,error);grid.innerHTML=`<div class="ml-product-state">No se pudieron cargar los productos. Verificá la configuración de Typesense y que “${escapeHTML(label)}” exista.</div>`}finally{grid.setAttribute("aria-busy","false")}
   }
   function init(root=document){root.querySelectorAll(".ml-product-grid:not([data-products-ready])").forEach(grid=>{grid.dataset.productsReady="true";renderGrid(grid)})}
   window.MacroledProducts={init,parseImages,mergeVariantValue,buildSpecs,cardTemplate,wireCarousels};
@@ -177,9 +211,8 @@
   "use strict";
 
   const FEATURED_FIELD = "destacados_en";
-  const DEFAULT_SPACE = "interior";
   const FEATURED_COUNT = 250;
-  let currentSpace = DEFAULT_SPACE;
+  let currentSpace = null;
   let isFetching = false;
 
   async function fetchFeatured(space) {
@@ -187,7 +220,9 @@
     const params = new URLSearchParams({
       q: "*",
       query_by: cfg.queryBy || "nombre,descripcion",
-      filter_by: `${FEATURED_FIELD}:=${space}`,
+      filter_by: space
+        ? `${FEATURED_FIELD}:=${space}`
+        : `${FEATURED_FIELD}:=[interior,exterior,proyectos]`,
       per_page: String(FEATURED_COUNT),
       page: "1"
     });
@@ -203,9 +238,13 @@
     const progress = root.querySelector("[data-featured-progress]");
     const prev = root.querySelector("[data-featured-prev]");
     const next = root.querySelector("[data-featured-next]");
+    const arrows = root.querySelector(".ml-featured-products__arrows");
+    const viewport = root.querySelector(".ml-featured-products__viewport");
     const needsScroll = track.scrollWidth > track.clientWidth + 4;
     controls.hidden = !needsScroll;
+    arrows.hidden = !needsScroll;
     if (!needsScroll) return;
+    if (arrows.parentElement !== viewport) viewport.append(arrows);
 
     const cards = [...track.querySelectorAll(".ml-product-card")];
     const firstLeft = cards[0].getBoundingClientRect().left;
@@ -218,7 +257,9 @@
       const visibleRatio = Math.min(1, track.clientWidth / track.scrollWidth);
       const progressRatio = max > 0 ? Math.max(0, Math.min(1, track.scrollLeft / max)) : 0;
       const barWidth = progressBar.clientWidth;
-      progress.style.width = `${visibleRatio * 100}%`;
+      const hasProgress = track.scrollLeft > 4;
+      progressBar.classList.toggle("has-progress", hasProgress);
+      progress.style.width = hasProgress ? `${visibleRatio * 100}%` : "0";
       progress.style.transform = `translateX(${progressRatio * barWidth * (1 - visibleRatio)}px)`;
     };
     track.onscroll = update;
@@ -230,6 +271,40 @@
     };
     prev.onclick = () => moveToCard(-1);
     next.onclick = () => moveToCard(1);
+
+    let dragStartX = 0;
+    let dragStartScroll = 0;
+    let dragged = false;
+
+    track.onpointerdown = event => {
+      if (event.pointerType !== "mouse" || event.button !== 0) return;
+      dragStartX = event.clientX;
+      dragStartScroll = track.scrollLeft;
+      dragged = false;
+      track.classList.add("is-dragging");
+      track.setPointerCapture(event.pointerId);
+    };
+    track.onpointermove = event => {
+      if (!track.hasPointerCapture(event.pointerId)) return;
+      const distance = event.clientX - dragStartX;
+      if (Math.abs(distance) > 4) dragged = true;
+      track.scrollLeft = dragStartScroll - distance;
+    };
+    const stopDragging = event => {
+      if (!track.hasPointerCapture(event.pointerId)) return;
+      track.releasePointerCapture(event.pointerId);
+      track.classList.remove("is-dragging");
+    };
+    track.onpointerup = stopDragging;
+    track.onpointercancel = stopDragging;
+    track.ondragstart = () => false;
+    track.onclick = event => {
+      if (!dragged) return;
+      event.preventDefault();
+      event.stopPropagation();
+      dragged = false;
+    };
+
     track._featuredResizeObserver?.disconnect();
     track._featuredResizeObserver = new ResizeObserver(update);
     track._featuredResizeObserver.observe(track);
@@ -246,7 +321,7 @@
     try {
       const data = await fetchFeatured(space);
       if (!data.hits?.length) {
-        track.innerHTML = '<div class="ml-featured-products__state">Todavía no hay productos destacados cargados para este ambiente.</div>';
+        track.innerHTML = '<div class="ml-featured-products__state">Todavía no hay productos destacados cargados.</div>';
         return;
       }
       track.innerHTML = data.hits.map(hit => window.MacroledProducts.cardTemplate(hit.document)).join("");
@@ -254,8 +329,9 @@
       track.scrollLeft = 0;
       setupTrackControls(root, track);
     } catch (error) {
-      console.error(`Macroled Home · Error consultando Typesense (${FEATURED_FIELD}=${space})`, error);
-      track.innerHTML = `<div class="ml-featured-products__state">No se pudieron cargar los productos. Revisá que el campo “${FEATURED_FIELD}” exista y tenga el valor “${space}”.</div>`;
+      const filter = space ? `${FEATURED_FIELD}=${space}` : `${FEATURED_FIELD} no vacío`;
+      console.error(`Macroled Home · Error consultando Typesense (${filter})`, error);
+      track.innerHTML = `<div class="ml-featured-products__state">No se pudieron cargar los productos destacados. Revisá que el campo “${FEATURED_FIELD}” exista.</div>`;
     } finally {
       isFetching = false;
       track.setAttribute("aria-busy", "false");
@@ -265,7 +341,7 @@
   function init(root = document) {
     const section = root.querySelector("#productos-destacados");
     if (!section) return;
-    const tabs = [...section.querySelectorAll(".ml-featured-products__tab")];
+    const tabs = [...root.querySelectorAll("[data-featured-filter-tabs] .ml-featured-products__tab")];
     tabs.forEach(tab => tab.addEventListener("click", () => {
       const space = tab.dataset.space;
       if (space === currentSpace || isFetching) return;
@@ -278,7 +354,7 @@
       });
       render(section, currentSpace);
     }));
-    render(section, currentSpace);
+    render(section, null);
   }
 
   window.MacroledFeatured = { init };
@@ -292,6 +368,7 @@
       id: "street",
       title: "Luz de calle Standard",
       subtitle: "Para proyectos, vías, parques y espacios públicos.",
+      badge: "Nueva línea",
       productImage: "assets/images/project-street-product-source.png",
       ambientImage: "assets/images/project-street-ambient-dark.png",
       href: "#ml-section-proyectos"
@@ -318,27 +395,24 @@
     "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", '"': "&quot;"
   })[character]);
 
-  function template(item, index) {
+  function template(item) {
     return `
-      <article class="ml-project-lines-concept__card${index === 0 ? " is-expanded" : ""}"
+      <a class="ml-project-lines-concept__card"
         data-project-lines-concept-card="${esc(item.id)}"
-        tabindex="${index === 0 ? "-1" : "0"}"
-        aria-label="${index === 0 ? esc(item.title) : `Expandir ${esc(item.title)}`}">
+        href="${esc(item.href)}"
+        aria-label="${esc(item.title)}: ${esc(item.subtitle)}">
         <img class="ml-project-lines-concept__ambient" src="${esc(item.ambientImage)}"
           alt="${esc(item.title)} instalada en un proyecto" loading="lazy">
         <span class="ml-project-lines-concept__shade" aria-hidden="true"></span>
         <img class="ml-project-lines-concept__product" src="${esc(item.productImage)}"
           alt="" loading="lazy" aria-hidden="true">
-        <div class="ml-project-lines-concept__closed">
+        <div class="ml-project-lines-concept__content">
           <span>${esc(item.title)}</span>
-          <span class="ml-project-lines-concept__arrow" aria-hidden="true">↓</span>
-        </div>
-        <div class="ml-project-lines-concept__open">
-          <h3>${esc(item.title)}</h3>
+          <span class="ml-project-lines-concept__arrow" aria-hidden="true">&rarr;</span>
           <p>${esc(item.subtitle)}</p>
-          <a href="${esc(item.href)}">Ver todos los productos <span aria-hidden="true">→</span></a>
         </div>
-      </article>`;
+        ${item.badge ? `<span class="ml-project-lines-concept__badge">${esc(item.badge)}</span>` : ""}
+      </a>`;
   }
 
   function init(root) {
@@ -347,48 +421,6 @@
     if (!list) return;
 
     list.innerHTML = LINES.map(template).join("");
-    const cards = [...list.querySelectorAll("[data-project-lines-concept-card]")];
-
-    const updateTitleAlignment = () => {
-      cards.forEach(card => {
-        const title = card.querySelector(".ml-project-lines-concept__closed > span:first-child");
-        if (!title) return;
-        const lineHeight = parseFloat(getComputedStyle(title).lineHeight);
-        card.classList.toggle(
-          "has-multiline-title",
-          Number.isFinite(lineHeight) && title.getBoundingClientRect().height > lineHeight * 1.5
-        );
-      });
-    };
-
-    requestAnimationFrame(updateTitleAlignment);
-    document.fonts?.ready.then(updateTitleAlignment);
-    if ("ResizeObserver" in window) {
-      const titleObserver = new ResizeObserver(() => requestAnimationFrame(updateTitleAlignment));
-      titleObserver.observe(list);
-    }
-
-    const activate = activeCard => {
-      cards.forEach(card => {
-        const expanded = card === activeCard;
-        card.classList.toggle("is-expanded", expanded);
-        card.tabIndex = expanded ? -1 : 0;
-        card.setAttribute("aria-label", expanded
-          ? card.querySelector(".ml-project-lines-concept__open h3").textContent
-          : `Expandir ${card.querySelector(".ml-project-lines-concept__closed span").textContent}`);
-      });
-    };
-
-    cards.forEach(card => {
-      card.addEventListener("click", event => {
-        if (!event.target.closest("a")) activate(card);
-      });
-      card.addEventListener("keydown", event => {
-        if (event.key !== "Enter" && event.key !== " ") return;
-        event.preventDefault();
-        activate(card);
-      });
-    });
   }
 
   window.MacroledProjectLinesConcept = { init };
@@ -424,7 +456,8 @@
   };
 
   function categoryTemplate(item) {
-    return `<a class="ml-category-card" href="${esc(item.href)}" data-editorial-id="${esc(item.id)}"><h3>${esc(item.title)}</h3><div class="ml-category-card__media"><img src="${esc(item.image)}" alt="" loading="lazy" width="800" height="800"></div></a>`;
+    const badge = item.badge ? `<span class="ml-category-card__badge">${esc(item.badge)}</span>` : "";
+    return `<a class="ml-category-card" href="${esc(item.href)}" data-editorial-id="${esc(item.id)}"><h3>${esc(item.title)}</h3>${badge}<div class="ml-category-card__media"><img src="${esc(item.image)}" alt="" loading="lazy" width="800" height="800"></div></a>`;
   }
 
   function lineContentTemplate(item) {
@@ -436,12 +469,13 @@
     }
 
     const query = content.query || item;
-    return `<div class="ml-products-block"><div class="ml-product-grid" data-products-field="${esc(query.typesenseField)}" data-products-value="${esc(query.typesenseValue)}" data-products-count="${Number(query.productCount || 4)}"><div class="ml-product-state">Cargando productos…</div></div></div>`;
+    const filters = Array.isArray(query.typesenseFilters) ? JSON.stringify(query.typesenseFilters) : "";
+    return `<div class="ml-products-block"><div class="ml-product-grid" data-products-field="${esc(query.typesenseField)}" data-products-value="${esc(query.typesenseValue)}" data-products-filters="${esc(filters)}" data-products-count="${Number(query.productCount || 4)}"><div class="ml-product-state">Cargando productos…</div></div></div>`;
   }
 
   function lineTemplate(item) {
     const mode = item.content?.mode || "typesense";
-    return `<article class="ml-featured ml-shell" data-theme="${esc(item.theme)}" data-layout="${esc(item.layout)}" data-image-fit="${esc(item.imageFit || "cover")}" data-button-tone="${buttonTone(item.textColor)}" data-content-mode="${esc(mode)}" style="--line-bg:${esc(item.theme)};--line-color:${esc(item.textColor)}"><div class="ml-featured__story"><div class="ml-featured__media"><img src="${esc(item.image)}" alt="" loading="lazy" width="1600" height="1000"></div><div class="ml-featured__copy"><h3>${emphasize(item.title, item.titleEmphasis)}</h3><p>${emphasize(item.description, item.descriptionEmphasis)}</p><div class="ml-featured__actions"><a class="ml-button ml-button--primary" href="${esc(item.href)}">Ver productos</a><a class="ml-button--tertiary" href="${esc(item.catalogHref || "#")}">Ver catálogo <span aria-hidden="true">→</span></a></div></div></div>${lineContentTemplate(item)}</article>`;
+    return `<article class="ml-featured ml-shell" data-theme="${esc(item.theme)}" data-visual-theme="${esc(item.visualTheme || "solid")}" data-layout="${esc(item.layout)}" data-image-fit="${esc(item.imageFit || "cover")}" data-description-lines="${Number(item.descriptionLines || 0)}" data-button-tone="${buttonTone(item.textColor)}" data-content-mode="${esc(mode)}" style="--line-bg:${esc(item.theme)};--line-color:${esc(item.textColor)};--title-emphasis-weight:${Number(item.titleEmphasisWeight || 800)}"><div class="ml-featured__story"><div class="ml-featured__media"><img src="${esc(item.image)}" alt="" loading="lazy" width="1600" height="1000"></div><div class="ml-featured__copy"><h3>${emphasize(item.title, item.titleEmphasis)}</h3><p>${emphasize(item.description, item.descriptionEmphasis)}</p><div class="ml-featured__actions"><a class="ml-button ml-button--primary" href="${esc(item.href)}">Ver productos</a><a class="ml-button--tertiary" href="${esc(item.catalogHref || "#")}">Ver catálogo <span aria-hidden="true">→</span></a></div></div></div>${lineContentTemplate(item)}</article>`;
   }
 
   function renderSections() {
@@ -552,12 +586,40 @@
       const lines = [...list.querySelectorAll(".ml-featured[data-theme]")];
       if (!lines.length) return;
       const section = list.closest(".ml-home-section");
+      let activeBackground = "";
+      let activeLayer = null;
 
       const setBackground = line => {
-        list.style.setProperty("--ml-panel-theme", line.dataset.theme);
-        section?.style.setProperty("--ml-section-theme", line.dataset.theme);
+        const background = !line
+          ? "#fff"
+          : line.dataset.visualTheme === "silver-dark"
+          ? "radial-gradient(circle at 16% 12%, rgba(214, 220, 226, 0.24), transparent 34%), linear-gradient(125deg, #030405 0%, #101318 56%, #3d444b 100%)"
+          : line.dataset.theme;
+        if (background === activeBackground) return;
+        activeBackground = background;
+        const previousLayer = activeLayer;
+        const layer = document.createElement("div");
+        layer.className = "ml-line-theme-layer";
+        layer.setAttribute("aria-hidden", "true");
+        layer.style.setProperty("--ml-layer-background", background);
+        list.prepend(layer);
+        activeLayer = layer;
+        requestAnimationFrame(() => {
+          layer.classList.add("is-visible");
+          previousLayer?.classList.remove("is-visible");
+        });
+        if (previousLayer) {
+          const removePrevious = () => previousLayer.remove();
+          previousLayer.addEventListener("transitionend", removePrevious, { once: true });
+          setTimeout(removePrevious, 1400);
+        }
+        const theme = line?.dataset.theme || "#fff";
+        list.style.setProperty("--ml-panel-theme", theme);
+        list.style.setProperty("--ml-panel-background", background);
+        section?.style.setProperty("--ml-section-theme", theme);
+        section?.style.setProperty("--ml-section-background", background);
       };
-      setBackground(lines[0]);
+      setBackground(null);
 
       if (!("IntersectionObserver" in window)) return;
       const sectionObserver = new IntersectionObserver(entries => {
@@ -568,16 +630,27 @@
       });
       sectionObserver.observe(list);
 
-      const observer = new IntersectionObserver(entries => {
-        const active = entries
-          .filter(entry => entry.isIntersecting)
-          .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
-        if (active) setBackground(active.target);
-      }, {
-        rootMargin: "-38% 0px -38% 0px",
-        threshold: [0, .25, .5, .75, 1]
-      });
-      lines.forEach(line => observer.observe(line));
+      let scrollFrame = 0;
+      const updateStoryIntegration = () => {
+        scrollFrame = 0;
+        const viewportBottom = window.innerHeight || document.documentElement.clientHeight;
+        let integratedLine = null;
+        lines.forEach(line => {
+          const story = line.querySelector(".ml-featured__story");
+          if (!story) return;
+          const bounds = story.getBoundingClientRect();
+          const isIntegrated = bounds.bottom <= viewportBottom + 1;
+          line.classList.toggle("is-story-integrated", isIntegrated);
+          if (isIntegrated) integratedLine = line;
+        });
+        setBackground(integratedLine);
+      };
+      const requestStoryUpdate = () => {
+        if (!scrollFrame) scrollFrame = requestAnimationFrame(updateStoryIntegration);
+      };
+      window.addEventListener("scroll", requestStoryUpdate, { passive: true });
+      window.addEventListener("resize", requestStoryUpdate);
+      updateStoryIntegration();
     });
   }
 

@@ -23,6 +23,7 @@ const streetAmbientData = `data:image/png;base64,${(await readFile(resolve(proje
 const streetAmbientDarkData = `data:image/png;base64,${(await readFile(resolve(project, "assets/images/project-street-ambient-dark.png"))).toString("base64")}`;
 const highbayAmbientData = `data:image/png;base64,${(await readFile(resolve(project, "assets/images/project-highbay-ambient.png"))).toString("base64")}`;
 const invictusAmbientData = `data:image/png;base64,${(await readFile(resolve(project, "assets/images/project-invictus-ambient.png"))).toString("base64")}`;
+const conversionLightingData = `data:image/png;base64,${(await readFile(resolve(project, "assets/images/conversion-lighting-background.png"))).toString("base64")}`;
 const streetProductData = `data:image/png;base64,${(await readFile(resolve(project, "assets/images/project-street-product.png"))).toString("base64")}`;
 const highbayProductData = `data:image/png;base64,${(await readFile(resolve(project, "assets/images/project-highbay-product.png"))).toString("base64")}`;
 const invictusProductData = `data:image/png;base64,${(await readFile(resolve(project, "assets/images/project-invictus-product.png"))).toString("base64")}`;
@@ -45,6 +46,8 @@ const inlineMarkup = html.slice(start, end).trim()
 const inlineCss = (await readFile(resolve(project, "css/home.css"), "utf8"))
   .replaceAll("../assets/images/editorial-placeholder.svg", svgData)
   .replaceAll("../assets/images/casa-foa-banner-generated.png", casaFoaData)
+  .replaceAll("../assets/images/project-invictus-ambient.png", invictusAmbientData)
+  .replaceAll("../assets/images/conversion-lighting-background.png", conversionLightingData)
   .replace("url('../assets/images/hero-poster.webp')", "none");
 const inlineJs = javascript.join("\n")
   .replaceAll('"assets/images/editorial-placeholder.svg"', JSON.stringify(svgData))

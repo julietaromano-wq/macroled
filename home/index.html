@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/home.css?v=20260724-5">
+  <link rel="stylesheet" href="css/home.css?v=20260728-1">
 </head>
 <body>
   <div id="macroled-home" class="ml-home">
@@ -20,36 +20,18 @@
       <div class="ml-hero__overlay"></div>
       <div class="ml-hero__content">
         <div class="ml-hero__copy">
-          <h1 id="ml-hero-title">Iluminación LED para transformar espacios</h1>
-          <p class="ml-hero__subtitle">Productos de calidad y diseño para iluminar desde un hogar hasta un gran proyecto.</p>
-          <a class="ml-button ml-button--primary" href="#productos-destacados">Ver productos</a>
-        </div>
-        <div class="ml-hero__metrics" aria-label="Indicadores de Macroled">
-          <div class="ml-hero__metric">
-            <div class="ml-hero__metric-value">20+</div>
-            <p class="ml-hero__metric-label">Años de trayectoria</p>
-          </div>
-          <div class="ml-hero__metric">
-            <div class="ml-hero__metric-value">+1.600</div>
-            <p class="ml-hero__metric-label">Productos activos</p>
-          </div>
-          <div class="ml-hero__metric">
-            <div class="ml-hero__metric-value">100%</div>
-            <p class="ml-hero__metric-label">Cobertura nacional</p>
-          </div>
+          <h1 id="ml-hero-title">La iluminación alcanza otro nivel</h1>
+          <p class="ml-hero__subtitle">Tecnología lumínica con la precisión técnica que exige cada proyecto.</p>
+          <a class="ml-button ml-button--primary" href="#productos-destacados">Explorá nuestros productos</a>
         </div>
       </div>
     </header>
 
     <main>
       <section class="ml-featured-products" id="productos-destacados" aria-labelledby="ml-featured-products-title">
-        <div class="ml-featured-products__head ml-shell">
-          <h4 id="ml-featured-products-title">Productos destacados</h4>
-          <div class="ml-featured-products__tabs" role="tablist" aria-label="Filtrar productos destacados por ambiente">
-            <button class="ml-featured-products__tab is-active" type="button" role="tab" aria-selected="true" data-space="interior" data-label-active="Iluminación interior" data-label-inactive="Interior">Iluminación interior</button>
-            <button class="ml-featured-products__tab" type="button" role="tab" aria-selected="false" data-space="exterior" data-label-active="Iluminación exterior" data-label-inactive="Exterior">Exterior</button>
-            <button class="ml-featured-products__tab" type="button" role="tab" aria-selected="false" data-space="proyectos" data-label-active="Iluminación para proyectos" data-label-inactive="Proyectos">Proyectos</button>
-          </div>
+        <div class="ml-featured-products__head ml-section-heading ml-shell">
+          <h2 id="ml-featured-products-title">Productos destacados</h2>
+          <p class="ml-featured-products__subtitle">Soluciones para cada espacio y proyecto.</p>
         </div>
         <div class="ml-featured-products__viewport">
           <div class="ml-featured-products__track" data-featured-track aria-live="polite">
@@ -61,8 +43,16 @@
             <span data-featured-progress></span>
           </div>
           <div class="ml-featured-products__arrows">
-            <button class="ml-featured-products__nav" type="button" data-featured-prev aria-label="Producto anterior">←</button>
-            <button class="ml-featured-products__nav" type="button" data-featured-next aria-label="Producto siguiente">→</button>
+            <button class="ml-featured-products__nav" type="button" data-featured-prev aria-label="Producto anterior">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M19 12H5m6-6-6 6 6 6"/>
+              </svg>
+            </button>
+            <button class="ml-featured-products__nav" type="button" data-featured-next aria-label="Producto siguiente">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M5 12h14m-6-6 6 6-6 6"/>
+              </svg>
+            </button>
           </div>
         </div>
       </section>
@@ -70,7 +60,7 @@
       <section class="ml-project-lines-concept" aria-labelledby="ml-project-lines-concept-title" data-project-lines-concept>
         <div class="ml-project-lines-concept__inner ml-shell">
           <header class="ml-project-lines-concept__header">
-            <h4 id="ml-project-lines-concept-title">Luminarias profesionales para proyectos de gran escala</h4>
+            <h2 id="ml-project-lines-concept-title">Luminarias profesionales para proyectos de gran escala</h2>
             <a class="ml-button ml-button--primary ml-button--primary-light ml-project-lines-concept__explore" href="#ml-section-proyectos">
               Productos para proyectos
             </a>
@@ -84,10 +74,8 @@
       </section>
 
       <section class="ml-categories-test" aria-labelledby="ml-categories-test-title" data-categories-test>
-        <div class="ml-categories-test__backdrop" aria-hidden="true"></div>
         <div class="ml-categories-test__content ml-shell">
-          <h4 id="ml-categories-test-title">Explorá nuestras categorías</h4>
-          <p class="ml-categories-test__subtitle">Soluciones para cada espacio y proyecto.</p>
+          <h2 id="ml-categories-test-title">Explorá nuestras categorías</h2>
           <div class="ml-categories-test__tabs ml-featured-products__tabs" role="tablist" aria-label="Explorar categorías por ambiente" data-categories-test-tabs></div>
           <div class="ml-categories-test__grid ml-categories" role="tabpanel" aria-live="polite" data-categories-test-grid></div>
         </div>
@@ -111,16 +99,31 @@
         <div class="ml-faq__list" data-faq></div>
       </section>
 
-      <section class="ml-contact" aria-labelledby="ml-contact-title">
-        <p class="ml-eyebrow">Hablemos de tu espacio</p><h2 id="ml-contact-title">Estamos para asesorarte</h2><p>Encontrá la solución de iluminación indicada para tu proyecto.</p><a class="ml-button ml-button--primary ml-button--primary-light" href="/contacto">Ir a contacto</a>
+      <section class="ml-conversion ml-shell" aria-label="Novedades y contacto">
+        <div class="ml-conversion__inner ml-shell">
+          <article class="ml-conversion__card ml-conversion__card--contact" aria-labelledby="ml-contact-title">
+            <div class="ml-conversion__content">
+              <h3 id="ml-contact-title">Estamos para asesorarte</h3>
+              <p>Contanos qué necesitás y nuestro equipo te ayudará a encontrar la solución de iluminación indicada.</p>
+              <a class="ml-conversion__button ml-conversion__button--dark" href="/contacto">
+                Ir a contacto
+              </a>
+            </div>
+          </article>
+
+          <article class="ml-conversion__card ml-conversion__card--newsletter" aria-labelledby="ml-newsletter-title">
+            <div class="ml-conversion__content">
+              <h3 id="ml-newsletter-title">Nuevas líneas, directo a tu email</h3>
+              <p>Recibí novedades de productos, lanzamientos y soluciones para tus proyectos.</p>
+              <a class="ml-conversion__button ml-conversion__button--light" href="/newsletter">
+                Quiero recibir novedades
+              </a>
+            </div>
+          </article>
+        </div>
       </section>
     </main>
 
-    <footer class="ml-footer">
-      <div class="ml-footer__top"><div><a class="ml-logo" href="/">MACROLED<span>®</span></a><p>Soluciones de iluminación LED.</p></div><form class="ml-newsletter" action="#" data-placeholder-form><label for="ml-email">Newsletter</label><div><input id="ml-email" type="email" placeholder="Tu email" disabled><button type="button" disabled aria-label="Suscripción pendiente">→</button></div><small>Formulario pendiente de integración.</small></form></div>
-      <div class="ml-footer__links"><div><h3>Productos</h3><a href="#ml-explore">Interior</a><a href="#ml-explore">Exterior</a><a href="#ml-explore">Proyectos lumínicos</a></div><div><h3>Macroled</h3><a href="/contacto">Contacto</a><a href="#">Descargas</a><a href="#">Casa FOA</a></div><div><h3>Seguinos</h3><a href="https://www.instagram.com/" rel="noopener">Instagram</a><a href="#">LinkedIn</a></div></div>
-      <div class="ml-footer__bottom"><span>Macroled® · Coresa Group SRL</span><span>© 2026 Todos los derechos reservados</span></div>
-    </footer>
   </div>
   <script src="js/config.js"></script>
   <script src="js/products.js"></script>

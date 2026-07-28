@@ -6,6 +6,7 @@
       id: "street",
       title: "Luz de calle Standard",
       subtitle: "Para proyectos, vías, parques y espacios públicos.",
+      badge: "Nueva línea",
       productImage: "assets/images/project-street-product-source.png",
       ambientImage: "assets/images/project-street-ambient-dark.png",
       href: "#ml-section-proyectos"
@@ -32,27 +33,24 @@
     "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", '"': "&quot;"
   })[character]);
 
-  function template(item, index) {
+  function template(item) {
     return `
-      <article class="ml-project-lines-concept__card${index === 0 ? " is-expanded" : ""}"
+      <a class="ml-project-lines-concept__card"
         data-project-lines-concept-card="${esc(item.id)}"
-        tabindex="${index === 0 ? "-1" : "0"}"
-        aria-label="${index === 0 ? esc(item.title) : `Expandir ${esc(item.title)}`}">
+        href="${esc(item.href)}"
+        aria-label="${esc(item.title)}: ${esc(item.subtitle)}">
         <img class="ml-project-lines-concept__ambient" src="${esc(item.ambientImage)}"
           alt="${esc(item.title)} instalada en un proyecto" loading="lazy">
         <span class="ml-project-lines-concept__shade" aria-hidden="true"></span>
         <img class="ml-project-lines-concept__product" src="${esc(item.productImage)}"
           alt="" loading="lazy" aria-hidden="true">
-        <div class="ml-project-lines-concept__closed">
+        <div class="ml-project-lines-concept__content">
           <span>${esc(item.title)}</span>
-          <span class="ml-project-lines-concept__arrow" aria-hidden="true">↓</span>
-        </div>
-        <div class="ml-project-lines-concept__open">
-          <h3>${esc(item.title)}</h3>
+          <span class="ml-project-lines-concept__arrow" aria-hidden="true">&rarr;</span>
           <p>${esc(item.subtitle)}</p>
-          <a href="${esc(item.href)}">Ver todos los productos <span aria-hidden="true">→</span></a>
         </div>
-      </article>`;
+        ${item.badge ? `<span class="ml-project-lines-concept__badge">${esc(item.badge)}</span>` : ""}
+      </a>`;
   }
 
   function init(root) {
@@ -61,48 +59,6 @@
     if (!list) return;
 
     list.innerHTML = LINES.map(template).join("");
-    const cards = [...list.querySelectorAll("[data-project-lines-concept-card]")];
-
-    const updateTitleAlignment = () => {
-      cards.forEach(card => {
-        const title = card.querySelector(".ml-project-lines-concept__closed > span:first-child");
-        if (!title) return;
-        const lineHeight = parseFloat(getComputedStyle(title).lineHeight);
-        card.classList.toggle(
-          "has-multiline-title",
-          Number.isFinite(lineHeight) && title.getBoundingClientRect().height > lineHeight * 1.5
-        );
-      });
-    };
-
-    requestAnimationFrame(updateTitleAlignment);
-    document.fonts?.ready.then(updateTitleAlignment);
-    if ("ResizeObserver" in window) {
-      const titleObserver = new ResizeObserver(() => requestAnimationFrame(updateTitleAlignment));
-      titleObserver.observe(list);
-    }
-
-    const activate = activeCard => {
-      cards.forEach(card => {
-        const expanded = card === activeCard;
-        card.classList.toggle("is-expanded", expanded);
-        card.tabIndex = expanded ? -1 : 0;
-        card.setAttribute("aria-label", expanded
-          ? card.querySelector(".ml-project-lines-concept__open h3").textContent
-          : `Expandir ${card.querySelector(".ml-project-lines-concept__closed span").textContent}`);
-      });
-    };
-
-    cards.forEach(card => {
-      card.addEventListener("click", event => {
-        if (!event.target.closest("a")) activate(card);
-      });
-      card.addEventListener("keydown", event => {
-        if (event.key !== "Enter" && event.key !== " ") return;
-        event.preventDefault();
-        activate(card);
-      });
-    });
   }
 
   window.MacroledProjectLinesConcept = { init };

@@ -158,7 +158,7 @@ La raíz `.ml-home` declara:
 --ml-ink: #071521;
 --ml-blue: #00152b;      /* dark-blue-700 */
 --ml-cyan: #00bdff;      /* light-blue-500 */
---ml-paper: #f4f3ef;
+--ml-paper: #f5f5f5;
 --ml-line: rgba(7, 21, 33, 0.14);
 --ml-radius: 1.25rem;    /* 20px / radius-large */
 ```
@@ -176,7 +176,7 @@ La raíz `.ml-home` declara:
 | Hover de superficie | `#E6F8FF` (`light-blue-50`) |
 | Texto secundario | `#53606A` o `#5B6472` (valores editoriales actuales fuera de paleta) |
 | Línea/progreso inactivo | `#DFE4E7` (valor editorial actual fuera de paleta) |
-| Papel editorial | `#F4F3EF` (`--ml-paper`, fuera de paleta) |
+| Fondo gris claro | `#F5F5F5` (`--ml-paper`, equivalente a `grey-200`) |
 
 No reemplazar silenciosamente valores editoriales por el color primitivo
 "más cercano" si cambia contraste o jerarquía. Proponer la migración y
@@ -485,6 +485,12 @@ nuevos de Macroled.
   Macroled no tiene este token documentado todavía — sumarlo como
   `.ml-eyebrow` para usar en secciones de impacto (hero oscuro, section
   dark de líneas de proyecto), no en todos lados.
+- **Prohibido en cards de conversión**: no agregar eyebrows, microlabels,
+  categorías en mayúsculas ni texto introductorio sobre el título de cards
+  de contacto, newsletter, suscripción o CTA comercial. En estos componentes
+  la jerarquía comienza directamente con el título; usar contraste de fill,
+  escala tipográfica y posición para diferenciar acciones. Esta regla también
+  aplica a variantes futuras de `.ml-conversion`.
 - **H2 de impacto centrado**: dos líneas, centrado, peso normal/medium
   (no 700/800), tamaño grande (~48-56px en desktop), line-height ajustado
   (~1.1). Coincide en rango con el token `h2 global` que Macroled ya

@@ -28,7 +28,8 @@
   };
 
   function categoryTemplate(item) {
-    return `<a class="ml-category-card" href="${esc(item.href)}" data-editorial-id="${esc(item.id)}"><h3>${esc(item.title)}</h3><div class="ml-category-card__media"><img src="${esc(item.image)}" alt="" loading="lazy" width="800" height="800"></div></a>`;
+    const badge = item.badge ? `<span class="ml-category-card__badge">${esc(item.badge)}</span>` : "";
+    return `<a class="ml-category-card" href="${esc(item.href)}" data-editorial-id="${esc(item.id)}"><h3>${esc(item.title)}</h3>${badge}<div class="ml-category-card__media"><img src="${esc(item.image)}" alt="" loading="lazy" width="800" height="800"></div></a>`;
   }
 
   function lineContentTemplate(item) {
@@ -40,12 +41,13 @@
     }
 
     const query = content.query || item;
-    return `<div class="ml-products-block"><div class="ml-product-grid" data-products-field="${esc(query.typesenseField)}" data-products-value="${esc(query.typesenseValue)}" data-products-count="${Number(query.productCount || 4)}"><div class="ml-product-state">Cargando productos…</div></div></div>`;
+    const filters = Array.isArray(query.typesenseFilters) ? JSON.stringify(query.typesenseFilters) : "";
+    return `<div class="ml-products-block"><div class="ml-product-grid" data-products-field="${esc(query.typesenseField)}" data-products-value="${esc(query.typesenseValue)}" data-products-filters="${esc(filters)}" data-products-count="${Number(query.productCount || 4)}"><div class="ml-product-state">Cargando productos…</div></div></div>`;
   }
 
   function lineTemplate(item) {
     const mode = item.content?.mode || "typesense";
-    return `<article class="ml-featured ml-shell" data-theme="${esc(item.theme)}" data-layout="${esc(item.layout)}" data-image-fit="${esc(item.imageFit || "cover")}" data-button-tone="${buttonTone(item.textColor)}" data-content-mode="${esc(mode)}" style="--line-bg:${esc(item.theme)};--line-color:${esc(item.textColor)}"><div class="ml-featured__story"><div class="ml-featured__media"><img src="${esc(item.image)}" alt="" loading="lazy" width="1600" height="1000"></div><div class="ml-featured__copy"><h3>${emphasize(item.title, item.titleEmphasis)}</h3><p>${emphasize(item.description, item.descriptionEmphasis)}</p><div class="ml-featured__actions"><a class="ml-button ml-button--primary" href="${esc(item.href)}">Ver productos</a><a class="ml-button--tertiary" href="${esc(item.catalogHref || "#")}">Ver catálogo <span aria-hidden="true">→</span></a></div></div></div>${lineContentTemplate(item)}</article>`;
+    return `<article class="ml-featured ml-shell" data-theme="${esc(item.theme)}" data-visual-theme="${esc(item.visualTheme || "solid")}" data-layout="${esc(item.layout)}" data-image-fit="${esc(item.imageFit || "cover")}" data-description-lines="${Number(item.descriptionLines || 0)}" data-button-tone="${buttonTone(item.textColor)}" data-content-mode="${esc(mode)}" style="--line-bg:${esc(item.theme)};--line-color:${esc(item.textColor)};--title-emphasis-weight:${Number(item.titleEmphasisWeight || 800)}"><div class="ml-featured__story"><div class="ml-featured__media"><img src="${esc(item.image)}" alt="" loading="lazy" width="1600" height="1000"></div><div class="ml-featured__copy"><h3>${emphasize(item.title, item.titleEmphasis)}</h3><p>${emphasize(item.description, item.descriptionEmphasis)}</p><div class="ml-featured__actions"><a class="ml-button ml-button--primary" href="${esc(item.href)}">Ver productos</a><a class="ml-button--tertiary" href="${esc(item.catalogHref || "#")}">Ver catálogo <span aria-hidden="true">→</span></a></div></div></div>${lineContentTemplate(item)}</article>`;
   }
 
   function renderSections() {
@@ -156,12 +158,40 @@
       const lines = [...list.querySelectorAll(".ml-featured[data-theme]")];
       if (!lines.length) return;
       const section = list.closest(".ml-home-section");
+      let activeBackground = "";
+      let activeLayer = null;
 
       const setBackground = line => {
-        list.style.setProperty("--ml-panel-theme", line.dataset.theme);
-        section?.style.setProperty("--ml-section-theme", line.dataset.theme);
+        const background = !line
+          ? "#fff"
+          : line.dataset.visualTheme === "silver-dark"
+          ? "radial-gradient(circle at 16% 12%, rgba(214, 220, 226, 0.24), transparent 34%), linear-gradient(125deg, #030405 0%, #101318 56%, #3d444b 100%)"
+          : line.dataset.theme;
+        if (background === activeBackground) return;
+        activeBackground = background;
+        const previousLayer = activeLayer;
+        const layer = document.createElement("div");
+        layer.className = "ml-line-theme-layer";
+        layer.setAttribute("aria-hidden", "true");
+        layer.style.setProperty("--ml-layer-background", background);
+        list.prepend(layer);
+        activeLayer = layer;
+        requestAnimationFrame(() => {
+          layer.classList.add("is-visible");
+          previousLayer?.classList.remove("is-visible");
+        });
+        if (previousLayer) {
+          const removePrevious = () => previousLayer.remove();
+          previousLayer.addEventListener("transitionend", removePrevious, { once: true });
+          setTimeout(removePrevious, 1400);
+        }
+        const theme = line?.dataset.theme || "#fff";
+        list.style.setProperty("--ml-panel-theme", theme);
+        list.style.setProperty("--ml-panel-background", background);
+        section?.style.setProperty("--ml-section-theme", theme);
+        section?.style.setProperty("--ml-section-background", background);
       };
-      setBackground(lines[0]);
+      setBackground(null);
 
       if (!("IntersectionObserver" in window)) return;
       const sectionObserver = new IntersectionObserver(entries => {
@@ -172,16 +202,27 @@
       });
       sectionObserver.observe(list);
 
-      const observer = new IntersectionObserver(entries => {
-        const active = entries
-          .filter(entry => entry.isIntersecting)
-          .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
-        if (active) setBackground(active.target);
-      }, {
-        rootMargin: "-38% 0px -38% 0px",
-        threshold: [0, .25, .5, .75, 1]
-      });
-      lines.forEach(line => observer.observe(line));
+      let scrollFrame = 0;
+      const updateStoryIntegration = () => {
+        scrollFrame = 0;
+        const viewportBottom = window.innerHeight || document.documentElement.clientHeight;
+        let integratedLine = null;
+        lines.forEach(line => {
+          const story = line.querySelector(".ml-featured__story");
+          if (!story) return;
+          const bounds = story.getBoundingClientRect();
+          const isIntegrated = bounds.bottom <= viewportBottom + 1;
+          line.classList.toggle("is-story-integrated", isIntegrated);
+          if (isIntegrated) integratedLine = line;
+        });
+        setBackground(integratedLine);
+      };
+      const requestStoryUpdate = () => {
+        if (!scrollFrame) scrollFrame = requestAnimationFrame(updateStoryIntegration);
+      };
+      window.addEventListener("scroll", requestStoryUpdate, { passive: true });
+      window.addEventListener("resize", requestStoryUpdate);
+      updateStoryIntegration();
     });
   }
 
