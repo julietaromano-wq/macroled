@@ -47,7 +47,7 @@
 
   function lineTemplate(item) {
     const mode = item.content?.mode || "typesense";
-    return `<article class="ml-featured ml-shell" data-theme="${esc(item.theme)}" data-visual-theme="${esc(item.visualTheme || "solid")}" data-layout="${esc(item.layout)}" data-image-fit="${esc(item.imageFit || "cover")}" data-description-lines="${Number(item.descriptionLines || 0)}" data-button-tone="${buttonTone(item.textColor)}" data-content-mode="${esc(mode)}" style="--line-bg:${esc(item.theme)};--line-color:${esc(item.textColor)};--title-emphasis-weight:${Number(item.titleEmphasisWeight || 800)}"><div class="ml-featured__story"><div class="ml-featured__media"><img src="${esc(item.image)}" alt="" loading="lazy" width="1600" height="1000"></div><div class="ml-featured__copy"><h3>${emphasize(item.title, item.titleEmphasis)}</h3><p>${emphasize(item.description, item.descriptionEmphasis)}</p><div class="ml-featured__actions"><a class="ml-button ml-button--primary" href="${esc(item.href)}">Ver productos</a><a class="ml-button--tertiary" href="${esc(item.catalogHref || "#")}">Ver catálogo <span aria-hidden="true">→</span></a></div></div></div>${lineContentTemplate(item)}</article>`;
+    return `<article class="ml-featured ml-shell" data-theme="${esc(item.theme)}" data-visual-theme="${esc(item.visualTheme || "solid")}" data-layout="${esc(item.layout)}" data-image-fit="${esc(item.imageFit || "cover")}" data-description-lines="${Number(item.descriptionLines || 0)}" data-button-tone="${buttonTone(item.textColor)}" data-content-mode="${esc(mode)}" style="--line-bg:${esc(item.theme)};--line-color:${esc(item.textColor)};--title-emphasis-weight:${Number(item.titleEmphasisWeight || 600)}"><div class="ml-featured__story"><div class="ml-featured__media"><img src="${esc(item.image)}" alt="" loading="lazy" width="1600" height="1000"></div><div class="ml-featured__copy"><h3>${emphasize(item.title, item.titleEmphasis)}</h3><p>${emphasize(item.description, item.descriptionEmphasis)}</p><div class="ml-featured__actions"><a class="ml-button ml-button--primary" href="${esc(item.href)}">Ver productos</a><a class="ml-button--tertiary" href="${esc(item.catalogHref || "#")}">Ver catálogo <span aria-hidden="true">→</span></a></div></div></div>${lineContentTemplate(item)}</article>`;
   }
 
   function renderSections() {
@@ -227,7 +227,13 @@
   }
 
   function renderCommon() {
-    root.querySelector("[data-news]").innerHTML = config.news.map(item => `<a class="ml-news-card" href="${esc(item.href)}"><img class="ml-news-card__image" src="${esc(item.image)}" alt="" loading="lazy" width="700" height="560"><h3>${esc(item.title)}</h3><p>${esc(item.description)}</p></a>`).join("");
+    root.querySelector("[data-news]").innerHTML = config.news.map(item => {
+      const tag = item.href ? "a" : "article";
+      const href = item.href ? ` href="${esc(item.href)}"` : "";
+      const hoverImage = item.hoverImage || item.image;
+      const defaultImageClass = item.zoomDefaultImage ? " ml-news-card__image--zoomed" : "";
+      return `<${tag} class="ml-news-card"${href}><div class="ml-news-card__media"><img class="ml-news-card__image ml-news-card__image--default${defaultImageClass}" src="${esc(item.image)}" alt="${esc(item.title)}" loading="lazy" width="700" height="560"><img class="ml-news-card__image ml-news-card__image--hover" src="${esc(hoverImage)}" alt="" aria-hidden="true" loading="lazy" width="700" height="560"></div><h3>${esc(item.title)}</h3><p>${esc(item.description)}</p></${tag}>`;
+    }).join("");
     root.querySelector("[data-faq]").innerHTML = config.faq.map((item, index) => `<div class="ml-faq__item"><button class="ml-faq__trigger" type="button" aria-expanded="false" aria-controls="ml-faq-answer-${index}"><span>${esc(item.question)}</span><span class="ml-faq__icon" aria-hidden="true">＋</span></button><div class="ml-faq__answer" id="ml-faq-answer-${index}"><div><p>${esc(item.answer)}</p></div></div></div>`).join("");
     root.querySelectorAll(".ml-faq__trigger").forEach(button => button.addEventListener("click", () => {
       button.setAttribute("aria-expanded", String(button.getAttribute("aria-expanded") !== "true"));
@@ -274,6 +280,132 @@
     requestAnimationFrame(() => title.classList.add("is-illuminating"));
   }
 
+  function initSectionMotion() {
+    if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+    const projectSection = root.querySelector("[data-project-lines-concept]");
+    const featuredSection = root.querySelector("#productos-destacados");
+    const categoriesSection = root.querySelector("[data-categories-test]");
+    const foaSection = root.querySelector("[data-foa]");
+    const newsletterBanner = root.querySelector(".ml-newsletter-banner");
+    const featuredTrack = featuredSection?.querySelector("[data-featured-track]");
+    const categoriesGrid = categoriesSection?.querySelector("[data-categories-test-grid]");
+    const pendingSections = new Set();
+    let motionArmed = false;
+
+    const prepareCards = (container, selector) => {
+      if (!container) return;
+      [...container.querySelectorAll(selector)].forEach((card, index) => {
+        card.style.setProperty("--motion-order", index);
+      });
+    };
+
+    const reveal = section => {
+      prepareCards(
+        section,
+        section === projectSection
+          ? ".ml-project-lines-concept__card"
+          : section === featuredSection
+            ? ".ml-product-card"
+            : section.matches(".ml-featured")
+              ? section.dataset.contentMode === "static"
+                ? ".ml-category-card"
+                : ".ml-product-card"
+              : ".ml-category-card"
+      );
+      clearTimeout(section._motionSettleTimer);
+      section.classList.remove("is-motion-settled");
+      requestAnimationFrame(() => {
+        section.classList.add("is-motion-visible");
+        section._motionSettleTimer = setTimeout(() => {
+          section.classList.add("is-motion-settled");
+        }, 1500);
+      });
+    };
+
+    const revealPendingSections = () => {
+      if (!motionArmed) return;
+      pendingSections.forEach(section => reveal(section));
+      pendingSections.clear();
+    };
+
+    const armMotion = () => {
+      if (motionArmed) return;
+      motionArmed = true;
+      revealPendingSections();
+    };
+
+    window.addEventListener("wheel", armMotion, { passive: true, once: true });
+    window.addEventListener("touchmove", armMotion, { passive: true, once: true });
+    window.addEventListener("keydown", event => {
+      if (["ArrowDown", "ArrowUp", "PageDown", "PageUp", "Home", "End", " "].includes(event.key)) {
+        armMotion();
+      }
+    });
+
+    [projectSection, featuredSection, categoriesSection, foaSection, newsletterBanner].forEach(section => {
+      if (!section) return;
+      section.classList.add("ml-motion-ready");
+      const observer = new IntersectionObserver(entries => {
+        if (!entries[0]?.isIntersecting) return;
+        if (motionArmed) reveal(section);
+        else pendingSections.add(section);
+        observer.disconnect();
+      }, { threshold: 0.13, rootMargin: "0px 0px -8% 0px" });
+      observer.observe(section);
+    });
+
+    root.querySelectorAll(".ml-featured[data-content-mode]").forEach(line => {
+      const cardSelector = line.dataset.contentMode === "static"
+        ? ".ml-category-card"
+        : ".ml-product-card";
+      const content = line.querySelector(
+        line.dataset.contentMode === "static"
+          ? ".ml-line-content--static"
+          : ".ml-product-grid"
+      );
+      line.classList.add("ml-content-motion-ready");
+      prepareCards(line, cardSelector);
+
+      const observer = new IntersectionObserver(entries => {
+        if (!entries[0]?.isIntersecting) return;
+        if (motionArmed) reveal(line);
+        else pendingSections.add(line);
+        observer.disconnect();
+      }, { threshold: 0.12, rootMargin: "0px 0px -8% 0px" });
+      observer.observe(line);
+
+      if (content) {
+        new MutationObserver(() => {
+          prepareCards(line, cardSelector);
+          if (!line.classList.contains("is-motion-visible")) return;
+          line.classList.remove("is-motion-visible");
+          requestAnimationFrame(() => requestAnimationFrame(() => line.classList.add("is-motion-visible")));
+        }).observe(content, { childList: true });
+      }
+    });
+
+    const refreshDynamicCards = (section, container, selector) => {
+      if (!section || !container) return;
+      new MutationObserver(() => {
+        prepareCards(container, selector);
+        if (!section.classList.contains("is-motion-visible")) return;
+        clearTimeout(container._cardsMotionTimer);
+        container.classList.remove("is-cards-visible");
+        container.classList.add("is-cards-refreshing");
+        requestAnimationFrame(() => requestAnimationFrame(() => {
+          container.classList.add("is-cards-visible");
+          container._cardsMotionTimer = setTimeout(() => {
+            container.classList.remove("is-cards-refreshing", "is-cards-visible");
+          }, 1000);
+        }));
+      }).observe(container, { childList: true });
+    };
+
+    refreshDynamicCards(featuredSection, featuredTrack, ".ml-product-card");
+    refreshDynamicCards(categoriesSection, categoriesGrid, ".ml-category-card");
+  }
+
   renderSections();
   placePrimarySections();
   placeFeaturedProducts();
@@ -286,4 +418,5 @@
   window.MacroledProjectLinesConcept.init(root);
   handleVideo();
   animateHeroTitle();
+  initSectionMotion();
 })(window);

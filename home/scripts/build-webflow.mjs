@@ -29,7 +29,6 @@ const highbayProductData = `data:image/png;base64,${(await readFile(resolve(proj
 const invictusProductData = `data:image/png;base64,${(await readFile(resolve(project, "assets/images/project-invictus-product.png"))).toString("base64")}`;
 const highbayProductSourceData = `data:image/webp;base64,${(await readFile(resolve(project, "assets/images/project-highbay-product-source.webp"))).toString("base64")}`;
 const streetProductSourceData = `data:image/png;base64,${(await readFile(resolve(project, "assets/images/project-street-product-source.png"))).toString("base64")}`;
-const casaFoaData = `data:image/png;base64,${(await readFile(resolve(project, "assets/images/casa-foa-banner-generated.png"))).toString("base64")}`;
 const inlineMarkup = html.slice(start, end).trim()
   .replaceAll("assets/images/editorial-placeholder.svg", svgData)
   .replaceAll("assets/images/project-street-ambient.png", streetAmbientData)
@@ -45,7 +44,6 @@ const inlineMarkup = html.slice(start, end).trim()
   .replace(/\s*<source src="assets\/video\/macroled-hero\.(?:webm|mp4)"[^>]*>/g, "");
 const inlineCss = (await readFile(resolve(project, "css/home.css"), "utf8"))
   .replaceAll("../assets/images/editorial-placeholder.svg", svgData)
-  .replaceAll("../assets/images/casa-foa-banner-generated.png", casaFoaData)
   .replaceAll("../assets/images/project-invictus-ambient.png", invictusAmbientData)
   .replaceAll("../assets/images/conversion-lighting-background.png", conversionLightingData)
   .replace("url('../assets/images/hero-poster.webp')", "none");

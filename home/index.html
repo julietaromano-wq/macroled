@@ -62,7 +62,7 @@
           <header class="ml-project-lines-concept__header">
             <h2 id="ml-project-lines-concept-title">Luminarias profesionales para proyectos de gran escala</h2>
             <a class="ml-button ml-button--primary ml-button--primary-light ml-project-lines-concept__explore" href="#ml-section-proyectos">
-              Productos para proyectos
+              Ver productos
             </a>
           </header>
           <div class="ml-project-lines-concept__cards" data-project-lines-concept-list></div>
@@ -81,11 +81,17 @@
         </div>
       </section>
 
-      <section class="ml-foa ml-shell" aria-labelledby="ml-foa-title">
+      <section class="ml-foa ml-shell" aria-labelledby="ml-foa-title" data-foa>
+        <div class="ml-foa__slideshow" aria-hidden="true">
+          <img src="https://www.casafoa.com/landing/wp-content/uploads/2025/05/BEL4153_.jpg" alt="" loading="lazy">
+          <img src="https://www.casafoa.com/landing/wp-content/uploads/2025/06/DSC07392_.jpg" alt="" loading="lazy">
+          <img src="https://www.casafoa.com/landing/wp-content/uploads/2025/06/BEL4128_.jpg" alt="" loading="lazy">
+        </div>
+        <div class="ml-foa__overlay" aria-hidden="true"></div>
         <div class="ml-foa__content">
-          <h2 id="ml-foa-title">Sponsors oficiales de Casa FOA 2026</h2>
-          <p>Macroled acompaña Casa FOA 2026, potenciando con tecnología y diseño el trabajo de quienes proyectan el futuro de la arquitectura argentina.</p>
-          <a class="ml-button--tertiary" href="https://www.macroled.com.ar/casafoa">Descubrí Macroled en Casa FOA <span aria-hidden="true">→</span></a>
+          <img class="ml-foa__macroled-logo" src="https://cdn.prod.website-files.com/674eb5c4242fba76abefe2f3/69d3fb77a9a80b27e6d12c21_macroled.webp" alt="Macroled" loading="lazy">
+          <h2 id="ml-foa-title">Sponsor oficial de <strong>Casa FOA</strong></h2>
+          <a class="ml-button ml-button--primary ml-button--primary-light" href="https://www.macroled.com.ar/casafoa">Descubrí Casa FOA</a>
         </div>
       </section>
 
@@ -94,32 +100,40 @@
         <div class="ml-news__grid" data-news></div>
       </section>
 
-      <section class="ml-faq ml-shell" aria-labelledby="ml-faq-title">
-        <div class="ml-section-heading"><h2 id="ml-faq-title">Preguntas y respuestas</h2></div>
-        <div class="ml-faq__list" data-faq></div>
-      </section>
-
-      <section class="ml-conversion ml-shell" aria-label="Novedades y contacto">
+      <section class="ml-conversion ml-shell" aria-label="Preguntas frecuentes y contacto">
         <div class="ml-conversion__inner ml-shell">
-          <article class="ml-conversion__card ml-conversion__card--contact" aria-labelledby="ml-contact-title">
-            <div class="ml-conversion__content">
-              <h3 id="ml-contact-title">Estamos para asesorarte</h3>
+          <div class="ml-conversion__primary">
+            <header class="ml-conversion__intro">
+              <h2 id="ml-faq-title">Preguntas frecuentes</h2>
               <p>Contanos qué necesitás y nuestro equipo te ayudará a encontrar la solución de iluminación indicada.</p>
-              <a class="ml-conversion__button ml-conversion__button--dark" href="/contacto">
-                Ir a contacto
-              </a>
+              <div>
+                <a class="ml-conversion__button ml-conversion__button--dark" href="/contacto">
+                  Ir a contacto
+                </a>
+              </div>
+            </header>
+
+            <article class="ml-conversion__card ml-conversion__card--faq" aria-labelledby="ml-faq-title">
+              <div class="ml-conversion__faq-content">
+                <div class="ml-faq__list" data-faq></div>
+              </div>
+            </article>
+          </div>
+
+          <article class="ml-newsletter-banner" aria-labelledby="ml-newsletter-title">
+            <div class="ml-newsletter-banner__content">
+              <div class="ml-newsletter-banner__copy">
+                <h2 id="ml-newsletter-title">Nuevos productos directo a tu mail</h2>
+              </div>
+              <div class="ml-newsletter-banner__action">
+                <p>Recibí novedades de productos, lanzamientos y soluciones para tus proyectos.</p>
+                <a class="ml-conversion__button ml-conversion__button--light" href="/newsletter">
+                  Recibir novedades
+                </a>
+              </div>
             </div>
           </article>
 
-          <article class="ml-conversion__card ml-conversion__card--newsletter" aria-labelledby="ml-newsletter-title">
-            <div class="ml-conversion__content">
-              <h3 id="ml-newsletter-title">Nuevas líneas, directo a tu email</h3>
-              <p>Recibí novedades de productos, lanzamientos y soluciones para tus proyectos.</p>
-              <a class="ml-conversion__button ml-conversion__button--light" href="/newsletter">
-                Quiero recibir novedades
-              </a>
-            </div>
-          </article>
         </div>
       </section>
     </main>

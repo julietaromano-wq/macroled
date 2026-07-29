@@ -14,7 +14,7 @@
     {
       id: "invictus",
       title: "Invictus",
-      subtitle: "Potencia y precisión para grandes áreas, fachadas y espacios deportivos.",
+      subtitle: "Para grandes áreas, fachadas y espacios deportivos.",
       productImage: "assets/images/project-invictus-product.png",
       ambientImage: "assets/images/project-invictus-ambient.png",
       href: "#ml-section-proyectos"
@@ -22,7 +22,7 @@
     {
       id: "highbay",
       title: "Highbay PRO",
-      subtitle: "Iluminación profesional para naves industriales y espacios de gran altura.",
+      subtitle: "Para naves industriales y espacios de gran altura.",
       productImage: "assets/images/project-highbay-product-source.webp",
       ambientImage: "assets/images/project-highbay-ambient.png",
       href: "#ml-section-proyectos"
@@ -48,8 +48,8 @@
           <span>${esc(item.title)}</span>
           <span class="ml-project-lines-concept__arrow" aria-hidden="true">&rarr;</span>
           <p>${esc(item.subtitle)}</p>
+          ${item.badge ? `<span class="ml-project-lines-concept__badge">${esc(item.badge)}</span>` : ""}
         </div>
-        ${item.badge ? `<span class="ml-project-lines-concept__badge">${esc(item.badge)}</span>` : ""}
       </a>`;
   }
 

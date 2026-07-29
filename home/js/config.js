@@ -78,15 +78,16 @@
           {
             ...line("Reflectores PRO", "La combinación ideal entre rendimiento y practicidad. Reflectores para exterior pensados para iluminar accesos, fachadas, patios y áreas abiertas con una instalación versátil y una luz confiable.", "#16283a", "#e4ebf0", "image-right"),
             image: "https://cdn.prod.website-files.com/65f1fdd7248b6709fdebe904/699cb28af6cdd53e774759f0_FAMILIA%20REFLECTORES%20PRO.webp",
-            imageFit: "contain-right"
+            imageFit: "contain-right",
+            titleEmphasis: "PRO"
           },
           {
             ...line("Luminarias Skyline", "Iluminación arquitectónica con rieles magnéticos de 48V que combinan seguridad, versatilidad y estética premium. Luminarias con opciones Smart de blancos dinámicos y automatización.", "#07090c", "#e4ebf0", "image-left"),
             image: "https://s3.coresagroup.com/MACROLED/250/skyline.png",
             imageFit: "contain-centered",
             visualTheme: "silver-dark",
-            titleEmphasis: "Luminarias",
-            titleEmphasisWeight: 700,
+            titleEmphasis: "Skyline",
+            titleEmphasisWeight: 600,
             content: {
               mode: "typesense",
               query: {
@@ -124,12 +125,27 @@
         categories: MANUAL_CATEGORIES.proyectos
       }
     },
-    news: [1, 2, 3].map(number => ({
-      title: `Novedad editorial 0${number}`,
-      description: "Título, imagen, descripción y vínculo configurables.",
-      image: PLACEHOLDER,
-      href: "#"
-    })),
+    news: [
+      {
+        title: "Casa FOA 2026, Edición Pocito",
+        description: "Formamos parte de uno de los eventos de diseño más reconocidos del país, aportando luminarias LED que realzan texturas, colores y ambientes en proyectos de alto nivel estético.",
+        image: "https://www.casafoa.com/landing/wp-content/uploads/2026/04/Espacio-21-Casa-FOA-Juan-Cruz-Paredes-2.webp",
+        hoverImage: "https://www.casafoa.com/landing/wp-content/uploads/2026/04/Espacio-17-Casa-FOA-Juan-Cruz-Paredes-4.webp"
+      },
+      {
+        title: "Expo Construir",
+        description: "Presentamos nuestros últimos lanzamientos: las líneas Mónaco, Lima, Macroled ARQ, Skyline, Kyo, Taö y Höshi, pensadas para proyectos arquitectónicos.",
+        image: "http://s3.coresagroup.com.s3.amazonaws.com/NUEVO_MACROLED/expo2.jpg",
+        hoverImage: "http://s3.coresagroup.com.s3.amazonaws.com/NUEVO_MACROLED/expo_hover.jpg",
+        zoomDefaultImage: true
+      },
+      {
+        title: "Biel Light 2025",
+        description: "Durante cuatro días presentamos nuevas tecnologías, lanzamientos y demostraciones técnicas, con asesoramiento personalizado para distribuidores, instaladores y profesionales del sector.",
+        image: "https://cdn.prod.website-files.com/690a24d6bf8e2592b2f29d1f/69bc53bc8148c948726225fa_691b4529bb6b28848a915f53_015.coresa-p-2600-p-2000.webp",
+        hoverImage: "http://s3.coresagroup.com.s3.amazonaws.com/NUEVO_MACROLED/biel_hover.jpg"
+      }
+    ],
     faq: [
       {
         question: "¿Cómo elijo la iluminación adecuada?",
@@ -141,7 +157,19 @@
       },
       {
         question: "¿Macroled trabaja con proyectos profesionales?",
-        answer: "Sí. Esta respuesta es un placeholder editorial y debe validarse antes de publicar."
+        answer: "Sí. Nuestro equipo puede acompañarte en la elección de soluciones de iluminación para proyectos profesionales."
+      },
+      {
+        question: "¿Puedo recibir asesoramiento antes de elegir un producto?",
+        answer: "Sí. Contanos las características de tu espacio o proyecto y te ayudaremos a evaluar las alternativas disponibles."
+      },
+      {
+        question: "¿Cómo puedo comparar distintas alternativas?",
+        answer: "Podés revisar la información de cada producto y consultar a nuestro equipo para comparar prestaciones según tu necesidad."
+      },
+      {
+        question: "¿Cómo me contacto con el equipo de Macroled?",
+        answer: "Ingresá a la sección de contacto y dejanos los datos de tu consulta para que podamos orientarte."
       }
     ]
   };
