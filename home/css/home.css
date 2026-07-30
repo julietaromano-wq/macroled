@@ -3343,7 +3343,6 @@ body {
   isolation: isolate;
   border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: 1rem;
-  background: var(--ml-grey-900);
   color: var(--ml-text-inverse);
   cursor: pointer;
   text-decoration: none;
