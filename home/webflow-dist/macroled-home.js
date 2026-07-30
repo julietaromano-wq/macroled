@@ -25,10 +25,10 @@
    */
   const MANUAL_CATEGORIES = {
     interior: [
-      { ...category("Lámparas", "lamparas"), image: "https://s3.coresagroup.com/MACROLED/250/smartnew.png" },
-      { ...category("Artefactos para lámparas", "artefactos-para-lamparas"), image: "https://s3.coresagroup.com/MACROLED/250/policarbonato-aplicar-dicroica.png" },
-      { ...category("Interruptores y tomas", "interruptores-y-tomas"), image: "https://s3.coresagroup.com/MACROLED/250/lima.webp" },
-      { ...category("Tiras LED", "tiras-led"), image: "https://s3.coresagroup.com/MACROLED/250/neon.png", badge: "Nuevo" }
+      { ...category("Lámparas", "lamparas"), image: "https://s3.coresagroup.com/MACROLED/1000/7428325565203a.png" },
+      { ...category("Artefactos para lámparas", "artefactos-para-lamparas"), image: "https://s3.coresagroup.com/MACROLED/1000/7428325574748a.png" },
+      { ...category("Interruptores y tomas", "interruptores-y-tomas"), image: "https://d1zltvqju4u8ql.cloudfront.net/fit-in/2000x2000/MACROLED/WEB/LIMA-1CN-USB-CC-30W-B_FRONT.webp" },
+      { ...category("Tiras LED", "tiras-led"), image: "https://s3.coresagroup.com/MACROLED/1000/0742832556316a.png", badge: "Nuevo" }
     ],
     monaco: [
       { ...category("Armadas", "monaco-armadas"), image: "https://s3.coresagroup.com/MACROLED/250/milan.png" },
@@ -37,10 +37,10 @@
       { ...category("Luz de pasillo", "monaco-luz-pasillo"), image: "https://d1zltvqju4u8ql.cloudfront.net/fit-in/2000x2000/MACROLED/WEB/portada_luz_pasillo.webp" }
     ],
     exterior: [
-      { ...category("Reflectores", "reflectores"), image: "https://s3.coresagroup.com/MACROLED/250/reflectores-smart.png" },
-      { ...category("Solar", "solar"), image: "https://s3.coresagroup.com/MACROLED/250/solar.png" },
-      { ...category("Tortugas", "tortugas"), image: "https://s3.coresagroup.com/MACROLED/250/tortugas.png" },
-      { ...category("Estacas", "estacas"), image: "https://s3.coresagroup.com/MACROLED/250/estacas-led-integrado.png" }
+      { ...category("Reflectores", "reflectores"), image: "https://d1zltvqju4u8ql.cloudfront.net/fit-in/2000x2000/MACROLED/WEB/PFL-400W-060D-857-CW_PERS.webp" },
+      { ...category("Solar", "solar"), image: "https://s3.coresagroup.com/MACROLED/1000/7428325578388a.png" },
+      { ...category("Tortugas", "tortugas"), image: "https://s3.coresagroup.com/MACROLED/1000/7428325571648a.png" },
+      { ...category("Estacas", "estacas"), image: "https://s3.coresagroup.com/MACROLED/1000/7428325575684a.png" }
     ],
     proyectos: [
       { ...category("Luz de calle", "proyectos-01"), image: "https://d1zltvqju4u8ql.cloudfront.net/fit-in/1000x1000/MACROLED/WEB/SLG2-100W-757-CW_FRONT.webp", badge: "Nuevo" },
@@ -225,11 +225,12 @@
     grid.querySelectorAll(".ml-product-card__media").forEach(media=>{const img=media.querySelector("img[data-images]");if(!img)return;let images=[];try{images=JSON.parse(img.dataset.images)}catch(_){return}const move=direction=>{let index=Number(img.dataset.index||0);index=(index+direction+images.length)%images.length;img.dataset.index=String(index);img.src=images[index]};media.querySelector(".ml-product-card__nav--prev")?.addEventListener("click",event=>{event.preventDefault();event.stopPropagation();move(-1)});media.querySelector(".ml-product-card__nav--next")?.addEventListener("click",event=>{event.preventDefault();event.stopPropagation();move(1)})});
   }
   async function renderGrid(grid){
-    const field=grid.dataset.productsField,value=grid.dataset.productsValue,count=Number(grid.dataset.productsCount||4);let filters=[];
+    const field=grid.dataset.productsField,value=grid.dataset.productsValue,configuredCount=Number(grid.dataset.productsCount||4);
+    const count=matchMedia("(max-width: 640px), (min-width: 1601px)").matches?Math.max(configuredCount,5):configuredCount;let filters=[];
     try{filters=JSON.parse(grid.dataset.productsFilters||"[]")}catch(_){filters=[]}
     grid.setAttribute("aria-busy","true");
     const label=filters.length?filters.map(filter=>filter.value).join(" / "):value;
-    try{const data=await fetchProducts(field,value,count,filters);if(!data.hits?.length){grid.innerHTML=`<div class="ml-product-state">No hay productos para “${escapeHTML(label)}”.</div>`;return}grid.innerHTML=data.hits.map(hit=>cardTemplate(hit.document)).join("");wireCarousels(grid)}catch(error){console.error(`Macroled Home · Error consultando Typesense (${buildFilter(field,value,filters)})`,error);grid.innerHTML=`<div class="ml-product-state">No se pudieron cargar los productos. Verificá la configuración de Typesense y que “${escapeHTML(label)}” exista.</div>`}finally{grid.setAttribute("aria-busy","false")}
+    try{const data=await fetchProducts(field,value,count,filters);if(!data.hits?.length){grid.innerHTML=`<div class="ml-product-state">No hay productos para “${escapeHTML(label)}”.</div>`;return}grid.innerHTML=data.hits.map(hit=>cardTemplate(hit.document)).join("");wireCarousels(grid);const block=grid.closest(".ml-products-block");if(block)window.MacroledFeatured?.setupTrackControls(block,grid,{mobileOnly:true})}catch(error){console.error(`Macroled Home · Error consultando Typesense (${buildFilter(field,value,filters)})`,error);grid.innerHTML=`<div class="ml-product-state">No se pudieron cargar los productos. Verificá la configuración de Typesense y que “${escapeHTML(label)}” exista.</div>`}finally{grid.setAttribute("aria-busy","false")}
   }
   function init(root=document){root.querySelectorAll(".ml-product-grid:not([data-products-ready])").forEach(grid=>{grid.dataset.productsReady="true";renderGrid(grid)})}
   window.MacroledProducts={init,parseImages,mergeVariantValue,buildSpecs,cardTemplate,wireCarousels};
@@ -260,7 +261,7 @@
     return response.json();
   }
 
-  function setupTrackControls(root, track) {
+  function setupTrackControls(root, track, options = {}) {
     const controls = root.querySelector(".ml-featured-products__controls");
     const progressBar = root.querySelector(".ml-featured-products__progress");
     const progress = root.querySelector("[data-featured-progress]");
@@ -268,17 +269,20 @@
     const next = root.querySelector("[data-featured-next]");
     const arrows = root.querySelector(".ml-featured-products__arrows");
     const viewport = root.querySelector(".ml-featured-products__viewport");
-    const needsScroll = track.scrollWidth > track.clientWidth + 4;
-    controls.hidden = !needsScroll;
-    arrows.hidden = !needsScroll;
-    if (!needsScroll) return;
-    if (arrows.parentElement !== viewport) viewport.append(arrows);
+    const mobile = matchMedia("(max-width: 640px)");
+    if (!controls || !progressBar || !progress || !prev || !next || !arrows) return;
 
     const cards = [...track.querySelectorAll(".ml-product-card")];
-    const firstLeft = cards[0].getBoundingClientRect().left;
-    const positions = cards.map(card => card.getBoundingClientRect().left - firstLeft);
 
     const update = () => {
+      const enabled = !options.mobileOnly || mobile.matches;
+      const needsScroll = enabled && track.scrollWidth > track.clientWidth + 4;
+      controls.hidden = !needsScroll;
+      arrows.hidden = !needsScroll;
+      if (!needsScroll) return;
+      const arrowsTarget = mobile.matches || !viewport ? controls : viewport;
+      if (arrows.parentElement !== arrowsTarget) arrowsTarget.prepend(arrows);
+
       const max = track.scrollWidth - track.clientWidth;
       prev.disabled = track.scrollLeft <= 4;
       next.disabled = track.scrollLeft >= max - 4;
@@ -292,6 +296,8 @@
     };
     track.onscroll = update;
     const moveToCard = direction => {
+      const firstLeft = cards[0].getBoundingClientRect().left;
+      const positions = cards.map(card => card.getBoundingClientRect().left - firstLeft);
       const current = positions.reduce((closest, position, index) =>
         Math.abs(position - track.scrollLeft) < Math.abs(positions[closest] - track.scrollLeft) ? index : closest, 0);
       const target = Math.max(0, Math.min(cards.length - 1, current + direction));
@@ -336,6 +342,12 @@
     track._featuredResizeObserver?.disconnect();
     track._featuredResizeObserver = new ResizeObserver(update);
     track._featuredResizeObserver.observe(track);
+    if (track._featuredControlsMedia && track._featuredControlsMediaHandler) {
+      track._featuredControlsMedia.removeEventListener("change", track._featuredControlsMediaHandler);
+    }
+    track._featuredControlsMedia = mobile;
+    track._featuredControlsMediaHandler = update;
+    mobile.addEventListener("change", update);
     update();
   }
 
@@ -385,7 +397,7 @@
     render(section, null);
   }
 
-  window.MacroledFeatured = { init };
+  window.MacroledFeatured = { init, setupTrackControls };
 })(window);
 
 (function (window) {
@@ -488,6 +500,10 @@
     return `<a class="ml-category-card" href="${esc(item.href)}" data-editorial-id="${esc(item.id)}"><h3>${esc(item.title)}</h3>${badge}<div class="ml-category-card__media"><img src="${esc(item.image)}" alt="" loading="lazy" width="800" height="800"></div></a>`;
   }
 
+  function productControlsTemplate() {
+    return `<div class="ml-featured-products__controls ml-product-grid__controls" data-product-controls hidden><div class="ml-featured-products__arrows"><button class="ml-featured-products__nav" type="button" data-featured-prev aria-label="Producto anterior"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 12H5m6-6-6 6 6 6"/></svg></button><button class="ml-featured-products__nav" type="button" data-featured-next aria-label="Producto siguiente"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6"/></svg></button></div><div class="ml-featured-products__progress" aria-hidden="true"><span data-featured-progress></span></div></div>`;
+  }
+
   function lineContentTemplate(item) {
     const content = item.content || {};
 
@@ -498,7 +514,7 @@
 
     const query = content.query || item;
     const filters = Array.isArray(query.typesenseFilters) ? JSON.stringify(query.typesenseFilters) : "";
-    return `<div class="ml-products-block"><div class="ml-product-grid" data-products-field="${esc(query.typesenseField)}" data-products-value="${esc(query.typesenseValue)}" data-products-filters="${esc(filters)}" data-products-count="${Number(query.productCount || 4)}"><div class="ml-product-state">Cargando productos…</div></div></div>`;
+    return `<div class="ml-products-block"><div class="ml-product-grid" data-products-field="${esc(query.typesenseField)}" data-products-value="${esc(query.typesenseValue)}" data-products-filters="${esc(filters)}" data-products-count="${Number(query.productCount || 4)}"><div class="ml-product-state">Cargando productos…</div></div>${productControlsTemplate()}</div>`;
   }
 
   function lineTemplate(item) {
@@ -639,7 +655,7 @@
         if (previousLayer) {
           const removePrevious = () => previousLayer.remove();
           previousLayer.addEventListener("transitionend", removePrevious, { once: true });
-          setTimeout(removePrevious, 1400);
+          setTimeout(removePrevious, 2900);
         }
         const theme = line?.dataset.theme || "#fff";
         list.style.setProperty("--ml-panel-theme", theme);
@@ -647,7 +663,9 @@
         section?.style.setProperty("--ml-section-theme", theme);
         section?.style.setProperty("--ml-section-background", background);
       };
-      setBackground(null);
+      /* Start with Monaco's theme so the categories gradient and the first
+         editorial line meet on the exact same surface color. */
+      setBackground(lines[0]);
 
       if (!("IntersectionObserver" in window)) return;
       const sectionObserver = new IntersectionObserver(entries => {
@@ -662,12 +680,16 @@
       const updateStoryIntegration = () => {
         scrollFrame = 0;
         const viewportBottom = window.innerHeight || document.documentElement.clientHeight;
-        let integratedLine = null;
+        let integratedLine = lines[0];
         lines.forEach(line => {
           const story = line.querySelector(".ml-featured__story");
           if (!story) return;
           const bounds = story.getBoundingClientRect();
-          const isIntegrated = bounds.bottom <= viewportBottom + 1;
+          const visibleProgress = Math.min(
+            1,
+            Math.max(0, (viewportBottom - bounds.top) / Math.max(bounds.height, 1))
+          );
+          const isIntegrated = visibleProgress >= 0.06;
           line.classList.toggle("is-story-integrated", isIntegrated);
           if (isIntegrated) integratedLine = line;
         });
@@ -734,6 +756,56 @@
       title.appendChild(word);
     });
     requestAnimationFrame(() => title.classList.add("is-illuminating"));
+  }
+
+  function animateCategoriesTitle() {
+    const title = root.querySelector("#ml-categories-test-title");
+    if (!title || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const text = title.textContent.trim();
+    title.setAttribute("aria-label", text);
+    title.textContent = "";
+    let letterIndex = 0;
+    const letterCount = [...text.replace(/\s/g, "")].length;
+
+    text.split(/(\s+)/).forEach(part => {
+      if (/^\s+$/.test(part)) {
+        title.appendChild(document.createTextNode(" "));
+        return;
+      }
+
+      const word = document.createElement("span");
+      word.className = "ml-categories-title__word";
+      word.setAttribute("aria-hidden", "true");
+      [...part].forEach(character => {
+        const letter = document.createElement("span");
+        letter.className = "ml-categories-title__letter";
+        letter.style.setProperty("--letter-delay", `${letterIndex * 24}ms`);
+        const progress = letterCount > 1
+          ? Math.round((letterIndex / (letterCount - 1)) * 100)
+          : 100;
+        letter.style.setProperty(
+          "--letter-color",
+          `color-mix(in srgb, var(--ml-light-blue-500) ${100 - progress}%, var(--ml-dark-blue-700) ${progress}%)`
+        );
+        letter.textContent = character;
+        word.appendChild(letter);
+        letterIndex += 1;
+      });
+      title.appendChild(word);
+    });
+
+    const illuminate = () => title.classList.add("is-illuminating");
+    if (!("IntersectionObserver" in window)) {
+      requestAnimationFrame(illuminate);
+      return;
+    }
+
+    const observer = new IntersectionObserver(entries => {
+      if (!entries[0]?.isIntersecting) return;
+      illuminate();
+      observer.disconnect();
+    }, { threshold: 0.35, rootMargin: "0px 0px -8% 0px" });
+    observer.observe(title);
   }
 
   function initSectionMotion() {
@@ -874,6 +946,7 @@
   window.MacroledProjectLinesConcept.init(root);
   handleVideo();
   animateHeroTitle();
+  animateCategoriesTitle();
   initSectionMotion();
 })(window);
 

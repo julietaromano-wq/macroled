@@ -7,7 +7,7 @@
   <title>Macroled — Iluminación que transforma</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/home.css?v=20260728-1">
 </head>
 <body>
@@ -30,8 +30,13 @@
     <main>
       <section class="ml-featured-products" id="productos-destacados" aria-labelledby="ml-featured-products-title">
         <div class="ml-featured-products__head ml-section-heading ml-shell">
-          <h2 id="ml-featured-products-title">Productos destacados</h2>
-          <p class="ml-featured-products__subtitle">Soluciones para cada espacio y proyecto.</p>
+          <div class="ml-featured-products__heading-copy">
+            <h2 id="ml-featured-products-title">Productos destacados</h2>
+            <p class="ml-featured-products__subtitle">Una selección de luminarias y soluciones LED destacadas por su rendimiento, diseño y versatilidad para diferentes espacios y proyectos.</p>
+          </div>
+          <a class="ml-button--tertiary ml-featured-products__view-all" href="/productos">
+            Ver todos <span aria-hidden="true">→</span>
+          </a>
         </div>
         <div class="ml-featured-products__viewport">
           <div class="ml-featured-products__track" data-featured-track aria-live="polite">
@@ -60,7 +65,7 @@
       <section class="ml-project-lines-concept" aria-labelledby="ml-project-lines-concept-title" data-project-lines-concept>
         <div class="ml-project-lines-concept__inner ml-shell">
           <header class="ml-project-lines-concept__header">
-            <h2 id="ml-project-lines-concept-title">Luminarias profesionales para proyectos de gran escala</h2>
+            <h2 id="ml-project-lines-concept-title">Luminarias profesionales<br class="ml-project-lines-concept__title-break"> para obras de gran escala</h2>
             <a class="ml-button ml-button--primary ml-button--primary-light ml-project-lines-concept__explore" href="#ml-section-proyectos">
               Ver productos
             </a>
@@ -143,6 +148,6 @@
   <script src="js/products.js"></script>
   <script src="js/featured.js"></script>
   <script src="js/project-lines-concept.js"></script>
-  <script src="js/home.js"></script>
+  <script src="js/home.js?v=20260730-3"></script>
 </body>
 </html>

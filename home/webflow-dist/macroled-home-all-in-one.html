@@ -17,8 +17,13 @@
     <main>
       <section class="ml-featured-products" id="productos-destacados" aria-labelledby="ml-featured-products-title">
         <div class="ml-featured-products__head ml-section-heading ml-shell">
-          <h2 id="ml-featured-products-title">Productos destacados</h2>
-          <p class="ml-featured-products__subtitle">Soluciones para cada espacio y proyecto.</p>
+          <div class="ml-featured-products__heading-copy">
+            <h2 id="ml-featured-products-title">Productos destacados</h2>
+            <p class="ml-featured-products__subtitle">Una selección de luminarias y soluciones LED destacadas por su rendimiento, diseño y versatilidad para diferentes espacios y proyectos.</p>
+          </div>
+          <a class="ml-button--tertiary ml-featured-products__view-all" href="/productos">
+            Ver todos <span aria-hidden="true">→</span>
+          </a>
         </div>
         <div class="ml-featured-products__viewport">
           <div class="ml-featured-products__track" data-featured-track aria-live="polite">
@@ -47,7 +52,7 @@
       <section class="ml-project-lines-concept" aria-labelledby="ml-project-lines-concept-title" data-project-lines-concept>
         <div class="ml-project-lines-concept__inner ml-shell">
           <header class="ml-project-lines-concept__header">
-            <h2 id="ml-project-lines-concept-title">Luminarias profesionales para proyectos de gran escala</h2>
+            <h2 id="ml-project-lines-concept-title">Luminarias profesionales<br class="ml-project-lines-concept__title-break"> para obras de gran escala</h2>
             <a class="ml-button ml-button--primary ml-button--primary-light ml-project-lines-concept__explore" href="#ml-section-proyectos">
               Ver productos
             </a>
@@ -232,7 +237,7 @@ body {
   color: #fff;
 }
 .ml-placeholder {
-  background: #d9e1df url("data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%201600%201000%22%20role%3D%22img%22%20aria-labelledby%3D%22t%20d%22%3E%3Ctitle%20id%3D%22t%22%3EImagen%20pendiente%3C%2Ftitle%3E%3Cdesc%20id%3D%22d%22%3EPlaceholder%20editorial%20para%20reemplazar%20por%20una%20imagen%20de%20Macroled.%3C%2Fdesc%3E%3Cdefs%3E%3ClinearGradient%20id%3D%22g%22%20x1%3D%220%22%20y1%3D%220%22%20x2%3D%221%22%20y2%3D%221%22%3E%3Cstop%20stop-color%3D%22%23dfe8e6%22%2F%3E%3Cstop%20offset%3D%22.5%22%20stop-color%3D%22%23f0ede4%22%2F%3E%3Cstop%20offset%3D%221%22%20stop-color%3D%22%23b8c8cf%22%2F%3E%3C%2FlinearGradient%3E%3CradialGradient%20id%3D%22l%22%3E%3Cstop%20stop-color%3D%22%23fff%22%20stop-opacity%3D%22.95%22%2F%3E%3Cstop%20offset%3D%221%22%20stop-color%3D%22%23fff%22%20stop-opacity%3D%220%22%2F%3E%3C%2FradialGradient%3E%3C%2Fdefs%3E%3Crect%20width%3D%221600%22%20height%3D%221000%22%20fill%3D%22url(%23g)%22%2F%3E%3Ccircle%20cx%3D%221180%22%20cy%3D%22220%22%20r%3D%22360%22%20fill%3D%22url(%23l)%22%2F%3E%3Cpath%20d%3D%22M0%20820C380%20680%20660%20920%20990%20770s440-80%20610%200v230H0z%22%20fill%3D%22%2300152b%22%20opacity%3D%22.1%22%2F%3E%3Ctext%20x%3D%2280%22%20y%3D%22900%22%20fill%3D%22%2300152b%22%20font-family%3D%22Arial%2Csans-serif%22%20font-size%3D%2230%22%20letter-spacing%3D%226%22%3EIMAGEN%20PENDIENTE%20%C2%B7%20MACROLED%3C%2Ftext%3E%3C%2Fsvg%3E%0D%0A")
+  background: #d9e1df url("data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%201600%201000%22%20role%3D%22img%22%20aria-labelledby%3D%22t%20d%22%3E%3Ctitle%20id%3D%22t%22%3EImagen%20pendiente%3C%2Ftitle%3E%3Cdesc%20id%3D%22d%22%3EPlaceholder%20editorial%20para%20reemplazar%20por%20una%20imagen%20de%20Macroled.%3C%2Fdesc%3E%3Cdefs%3E%3ClinearGradient%20id%3D%22g%22%20x1%3D%220%22%20y1%3D%220%22%20x2%3D%221%22%20y2%3D%221%22%3E%3Cstop%20stop-color%3D%22%23dfe8e6%22%2F%3E%3Cstop%20offset%3D%22.5%22%20stop-color%3D%22%23f0ede4%22%2F%3E%3Cstop%20offset%3D%221%22%20stop-color%3D%22%23b8c8cf%22%2F%3E%3C%2FlinearGradient%3E%3CradialGradient%20id%3D%22l%22%3E%3Cstop%20stop-color%3D%22%23fff%22%20stop-opacity%3D%22.95%22%2F%3E%3Cstop%20offset%3D%221%22%20stop-color%3D%22%23fff%22%20stop-opacity%3D%220%22%2F%3E%3C%2FradialGradient%3E%3C%2Fdefs%3E%3Crect%20width%3D%221600%22%20height%3D%221000%22%20fill%3D%22url(%23g)%22%2F%3E%3Ccircle%20cx%3D%221180%22%20cy%3D%22220%22%20r%3D%22360%22%20fill%3D%22url(%23l)%22%2F%3E%3Cpath%20d%3D%22M0%20820C380%20680%20660%20920%20990%20770s440-80%20610%200v230H0z%22%20fill%3D%22%2300152b%22%20opacity%3D%22.1%22%2F%3E%3Ctext%20x%3D%2280%22%20y%3D%22900%22%20fill%3D%22%2300152b%22%20font-family%3D%22Arial%2Csans-serif%22%20font-size%3D%2230%22%20letter-spacing%3D%226%22%3EIMAGEN%20PENDIENTE%20%C2%B7%20MACROLED%3C%2Ftext%3E%3C%2Fsvg%3E%0A")
     center/cover no-repeat;
 }
 .ml-hero {
@@ -437,8 +442,9 @@ body {
   right: 1rem;
   padding: 0.45rem 0.65rem;
   border-radius: 999px;
-  background: #ffe8ad;
-  color: #7a5b06;
+  background: color-mix(in srgb, var(--ml-light-blue-400) 40%, transparent);
+  color: var(--ml-grey-900);
+  backdrop-filter: blur(10px);
   font-size: 14px;
   font-weight: 600;
   line-height: 1;
@@ -598,6 +604,11 @@ body {
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 1rem;
 }
+@media (min-width: 1601px) {
+  .ml-product-grid {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
+}
 .ml-product-state {
   grid-column: 1/-1;
   padding: 3rem 1rem;
@@ -628,7 +639,7 @@ body {
   position: relative;
   display: grid;
   place-items: center;
-  aspect-ratio: 1;
+  aspect-ratio: 1 / 1.2;
   border-radius: 0.75rem;
   background: #f2f3f3;
   overflow: hidden;
@@ -1115,11 +1126,26 @@ body {
     padding: 0 1rem;
   }
   .ml-product-card {
-    flex: 0 0 78vw;
+    flex: 0 0 50vw;
     scroll-snap-align: start;
   }
   .ml-home .ml-news__grid {
-    grid-template-columns: 1fr;
+    display: flex;
+    width: calc(100% + 1rem);
+    gap: 1rem;
+    padding-right: 1rem;
+    overflow-x: auto;
+    overscroll-behavior-inline: contain;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+  }
+  .ml-home .ml-news__grid::-webkit-scrollbar {
+    display: none;
+  }
+  .ml-home .ml-news-card {
+    flex: 0 0 82vw;
+    scroll-snap-align: start;
   }
   .ml-news-card:last-child {
     display: block;
@@ -1236,9 +1262,6 @@ body {
 .ml-home .ml-featured__copy p {
   font-size: clamp(1rem, 1.35vw, 1.125rem);
   line-height: 1.55;
-}
-.ml-home .ml-featured[data-image-fit="contain"] .ml-featured__copy p {
-  font-size: clamp(1rem, 1.1vw, 1.125rem);
 }
 .ml-home .ml-product-card__title {
   font-size: clamp(1.05rem, 1.3vw, 1.2rem);
@@ -1495,21 +1518,33 @@ body {
 }
 .ml-featured-products__head {
   display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 0.75rem;
+  align-items: flex-end;
+  flex-direction: row;
+  justify-content: space-between;
+  gap: clamp(2rem, 6vw, 6rem);
   margin-bottom: 0.5rem;
+}
+.ml-featured-products__heading-copy {
+  display: grid;
+  min-width: 0;
+  max-width: 48rem;
+  gap: 0.75rem;
 }
 .ml-featured-products__head h2 {
   margin: 0;
 }
 
 .ml-home .ml-featured-products__subtitle {
-  max-width: 32rem;
+  max-width: 46rem;
   margin: 0;
   color: var(--ml-text-secondary);
   font-size: clamp(1rem, 1.45vw, 1.25rem);
   line-height: 1.5;
+}
+.ml-home .ml-featured-products__view-all {
+  flex: 0 0 auto;
+  margin-bottom: 0.125rem;
+  white-space: nowrap;
 }
 .ml-featured-products__tabs {
   display: flex;
@@ -1539,10 +1574,10 @@ body {
   color: var(--ml-cyan);
 }
 .ml-featured-products__tab.is-active {
-  background: #fff;
-  color: var(--ml-cyan);
+  background: rgba(255, 232, 112, 0.78);
+  color: var(--ml-grey-900);
   font-weight: 600;
-  box-shadow: 0 1px 6px rgba(0, 21, 43, 0.045);
+  box-shadow: none;
 }
 .ml-featured-products__tab:focus-visible,
 .ml-featured-products__nav:focus-visible {
@@ -1729,6 +1764,9 @@ body {
 }
 @media (max-width: 900px) {
   .ml-featured-products__head {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 1.5rem;
     flex-wrap: wrap;
   }
   .ml-featured-products__tabs {
@@ -1757,20 +1795,74 @@ body {
     max-width: 100%;
   }
   .ml-featured-products__track {
-    width: calc(100% - 2rem);
+    width: calc(100% - 1rem);
+    margin-right: 0;
+    margin-left: 1rem;
+    padding-bottom: 1rem;
   }
   .ml-featured-products__viewport {
     --featured-track-edge: 1rem;
   }
   .ml-featured-products__track .ml-product-card {
-    flex-basis: 50vw;
+    max-width: 100%;
+    flex-basis: 60vw;
+    box-sizing: border-box;
   }
   .ml-featured-products__controls {
     width: calc(100% - 2rem);
+    min-height: 0;
+    flex-direction: column;
+    gap: 0.875rem;
+    margin-top: 1rem;
+  }
+  .ml-featured-products__arrows {
+    position: relative;
+    inset: auto;
+    display: flex;
+    order: 1;
+    justify-content: space-between;
+    width: 100%;
+    pointer-events: auto;
+  }
+  .ml-featured-products__progress {
+    order: 2;
+    width: min(9rem, 45%);
+    flex: 0 0 auto;
+  }
+  .ml-featured-products__nav,
+  .ml-featured-products__nav[data-featured-prev],
+  .ml-featured-products__nav[data-featured-next],
+  .ml-featured-products__nav[data-featured-prev]:hover,
+  .ml-featured-products__nav[data-featured-next]:hover {
+    position: static;
+    transform: none;
   }
   .ml-featured-products__nav {
     width: 2.375rem;
     height: 2.375rem;
+  }
+  .ml-featured-products__nav:disabled {
+    opacity: 0.3;
+  }
+  .ml-product-grid {
+    width: calc(100% + 1rem);
+    padding-right: 0;
+    scroll-padding-inline: 0;
+  }
+  .ml-product-grid .ml-product-card {
+    max-width: 100%;
+    flex-basis: 60vw;
+    box-sizing: border-box;
+  }
+  .ml-product-grid__controls {
+    width: 100%;
+    padding-inline: 0;
+  }
+  .ml-featured[data-content-mode="typesense"] .ml-featured-products__progress {
+    background: rgba(255, 255, 255, 0.24);
+  }
+  .ml-featured[data-content-mode="typesense"] .ml-featured-products__progress span {
+    background: #68d6ff;
   }
 }
 
@@ -2161,9 +2253,11 @@ body {
   --ml-grey-700: #2c2b2b;
   --ml-grey-800: #1c1c1a;
   --ml-grey-900: #0a0a0a;
+  --ml-dark-blue-200: #8a98a5;
   --ml-dark-blue-700: #00152b;
   --ml-dark-blue-800: #001121;
   --ml-light-blue-50: #e6f8ff;
+  --ml-light-blue-400: #4dccff;
   --ml-light-blue-500: #00bdff;
   --ml-light-blue-600: #00ace8;
   --ml-light-blue-700: #0086b5;
@@ -2468,7 +2562,8 @@ body {
 }
 
 .ml-home .ml-featured-products__tab.is-active {
-  color: var(--ml-light-blue-500);
+  background: var(--ml-grey-50);
+  color: var(--ml-grey-900);
 }
 
 .ml-home .ml-featured-products__progress span {
@@ -2700,9 +2795,11 @@ body {
   --ml-grey-300: #ededed;
   --ml-grey-500: #7a7a78;
   --ml-grey-600: #5d5c5c;
+  --ml-dark-blue-200: #8a98a5;
   --ml-dark-blue-700: #00152b;
   --ml-dark-blue-800: #001121;
   --ml-light-blue-50: #e6f8ff;
+  --ml-light-blue-400: #4dccff;
   --ml-light-blue-500: #00bdff;
   --ml-light-blue-600: #00ace8;
   --ml-light-blue-700: #0086b5;
@@ -2819,7 +2916,8 @@ body {
 }
 
 .ml-home .ml-featured-products__tab.is-active {
-  color: var(--ml-light-blue-500);
+  background: var(--ml-grey-50);
+  color: var(--ml-grey-900);
 }
 
 .ml-home .ml-featured-products__progress span {
@@ -2844,13 +2942,28 @@ body {
   position: absolute;
   z-index: -1;
   inset: 0;
-  background: var(--ml-layer-background, #fff);
+  background:
+    radial-gradient(
+      ellipse at 50% 8%,
+      color-mix(in srgb, var(--ml-grey-50) 14%, transparent) 0%,
+      transparent 58%
+    ),
+    var(--ml-layer-background, #fff);
+  filter: saturate(0.92);
   opacity: 0;
   pointer-events: none;
-  transition: opacity 1100ms cubic-bezier(0.22, 1, 0.36, 1);
+  transform: scale(1.018);
+  transform-origin: 50% 8%;
+  transition:
+    opacity 2200ms cubic-bezier(0.22, 1, 0.36, 1),
+    transform 2600ms cubic-bezier(0.16, 1, 0.3, 1),
+    filter 2200ms ease;
+  will-change: opacity, transform;
 }
 .ml-home .ml-featured-list > .ml-line-theme-layer.is-visible {
+  filter: saturate(1);
   opacity: 1;
+  transform: scale(1);
 }
 .ml-home .ml-featured-list > .ml-featured {
   position: relative;
@@ -3453,12 +3566,29 @@ body {
   display: flex;
   align-items: flex-end;
   justify-content: space-between;
-  gap: 2rem;
+  gap: clamp(1.5rem, 4vw, 4rem);
 }
 .ml-project-lines-concept__header h2 {
-  max-width: 38rem;
+  min-width: 0;
+  flex: 1 1 auto;
   margin: 0;
+  background: linear-gradient(
+    105deg,
+    var(--ml-dark-blue-200) 0%,
+    var(--ml-grey-100) 100%
+  );
+  background-clip: text;
+  color: transparent;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
   line-height: 1.2;
+}
+.ml-project-lines-concept__title-break {
+  display: block;
+}
+.ml-home .ml-project-lines-concept__explore {
+  flex: 0 0 auto;
+  white-space: nowrap;
 }
 .ml-project-lines-concept__cards {
   display: grid;
@@ -3471,9 +3601,9 @@ body {
   min-width: 0;
   overflow: hidden;
   isolation: isolate;
+  background-color: rgba(0, 0, 0, 0.5);
   border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: 1rem;
-  background: var(--ml-grey-900);
   color: var(--ml-text-inverse);
   cursor: pointer;
   text-decoration: none;
@@ -3526,18 +3656,22 @@ body {
 .ml-project-lines-concept__content {
   position: absolute;
   z-index: 2;
-  inset: 1.5rem 1.5rem auto;
+  inset: 1.5rem;
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
-  align-items: center;
+  grid-template-rows: auto auto 1fr;
+  align-items: start;
   gap: 1rem;
   font-size: 1.5rem;
   font-weight: 500;
   line-height: 1.2;
 }
 .ml-project-lines-concept__arrow {
+  align-self: start;
+  margin-top: 0.05em;
   font-size: 1.75rem;
   font-weight: 400;
+  line-height: 1;
   transition: transform 0.3s ease;
 }
 .ml-project-lines-concept__content p {
@@ -3555,11 +3689,15 @@ body {
 }
 .ml-project-lines-concept__badge {
   grid-column: 1 / -1;
+  grid-row: 3;
+  align-self: end;
+  justify-self: start;
   width: fit-content;
   padding: 0.45rem 0.65rem;
   border-radius: 999px;
-  background: rgba(122, 91, 6, 0.2);
-  color: #ffe8ad;
+  background: color-mix(in srgb, var(--ml-light-blue-400) 40%, transparent);
+  color: var(--ml-grey-50);
+  backdrop-filter: blur(10px);
   font-size: 14px;
   font-weight: 500;
   line-height: 1;
@@ -3606,6 +3744,9 @@ body {
   outline-offset: 4px;
 }
 @media (max-width: 900px) {
+  .ml-project-lines-concept__title-break {
+    display: none;
+  }
   .ml-project-lines-concept__header {
     align-items: flex-start;
     flex-direction: column;
@@ -3647,10 +3788,23 @@ body {
     padding: 4rem 0 5.5rem;
   }
   .ml-project-lines-concept__inner {
-    gap: 4rem;
+    display: flex;
+    flex-direction: column;
+    gap: 2.5rem;
+  }
+  .ml-project-lines-concept__header {
+    display: contents;
+  }
+  .ml-project-lines-concept__header h2 {
+    order: 1;
+  }
+  .ml-project-lines-concept__cards {
+    order: 2;
   }
   .ml-project-lines-concept__explore {
+    order: 3;
     width: 100%;
+    margin-top: 0.5rem;
   }
   .ml-project-lines-concept__content p {
     font-size: 1rem;
@@ -3742,12 +3896,33 @@ body {
   }
 
   .ml-home .ml-categories-test__grid {
+    display: grid;
+    width: 100%;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.75rem;
     margin-top: 2.5rem;
+    padding-right: 0;
+    overflow: visible;
+    scroll-snap-type: none;
+  }
+
+  .ml-home .ml-categories-test__grid .ml-category-card {
+    width: 100%;
+    min-width: 0;
+    flex: initial;
+    scroll-snap-align: none;
+  }
+
+  .ml-home .ml-categories-test__grid .ml-category-card__badge {
+    padding: 0.3rem 0.45rem;
+    font-size: 10px;
   }
 }
 
 .ml-home .ml-featured-products__tab {
+  padding: 16px 32px;
   font-size: 1rem;
+  line-height: 1;
 }
 
 @media (max-width: 1360px) {
@@ -3771,7 +3946,7 @@ body {
   .ml-home .ml-shell,
   .ml-home .ml-featured-products__track,
   .ml-home .ml-category-carousel {
-    width: min(100% - clamp(2rem, 8vw, 4rem), 1100px);
+    width: min(100% - clamp(2rem, 8vw, 4rem), 1180px);
     margin-inline: auto;
     padding-inline: 0;
   }
@@ -3779,7 +3954,7 @@ body {
   .ml-home .ml-hero__content {
     right: auto;
     left: 50%;
-    width: min(100% - clamp(2rem, 8vw, 4rem), 1100px);
+    width: min(100% - clamp(2rem, 8vw, 4rem), 1180px);
     transform: translateX(-50%);
   }
 
@@ -3788,13 +3963,14 @@ body {
   }
 
   .ml-home .ml-footer > * {
-    width: min(100% - clamp(2rem, 8vw, 4rem), 1100px);
+    width: min(100% - clamp(2rem, 8vw, 4rem), 1180px);
     margin-inline: auto;
   }
 }
 
 @media (max-width: 640px) {
   .ml-home .ml-featured-products__tab {
+    padding: 12px 16px;
     font-size: 0.8125rem;
   }
 }
@@ -3854,13 +4030,13 @@ body {
 .ml-home .ml-project-lines-concept {
   position: relative;
   z-index: 2;
-  border-radius: 0 0 clamp(2rem, 5vw, 4.5rem) clamp(2rem, 5vw, 4.5rem);
+  border-radius: 0 0 clamp(1.25rem, 2.5vw, 2rem) clamp(1.25rem, 2.5vw, 2rem);
 }
 
 .ml-home .ml-categories-test {
   z-index: 3;
-  margin-top: clamp(-4.5rem, -5vw, -2rem);
-  border-radius: clamp(2rem, 5vw, 4.5rem) clamp(2rem, 5vw, 4.5rem) 0 0;
+  margin-top: clamp(-2rem, -2.5vw, -1.25rem);
+  border-radius: clamp(1.25rem, 2.5vw, 2rem) clamp(1.25rem, 2.5vw, 2rem) 0 0;
 }
 
 /* FAQ + contact: quiet editorial split */
@@ -4033,7 +4209,7 @@ body {
 
 .ml-home .ml-conversion__button--dark {
   margin-top: clamp(1.5rem, 2.5vw, 2.25rem);
-  background: var(--ml-action-primary-hover);
+  background: var(--ml-action-primary);
   color: #fff;
 }
 
@@ -4043,7 +4219,7 @@ body {
   }
 
   .ml-home .ml-conversion__button--dark:hover {
-    background: #005675;
+    background: var(--ml-action-primary-hover);
     color: #fff;
   }
 }
@@ -4159,8 +4335,8 @@ body {
   }
 
   .ml-home .ml-categories-test {
-    margin-top: -2rem;
-    border-radius: 2rem 2rem 0 0;
+    margin-top: -1.25rem;
+    border-radius: 1.25rem 1.25rem 0 0;
   }
 }
 
@@ -4527,12 +4703,413 @@ body {
   }
 }
 
+/* Categories · premium illuminated product cards */
+.ml-home .ml-categories-test {
+  background: linear-gradient(
+    180deg,
+    var(--ml-grey-50) 0%,
+    var(--ml-grey-50) 58%,
+    color-mix(in srgb, var(--ml-grey-50) 68%, #e9ecef) 76%,
+    #e9ecef 100%
+  );
+}
+
+.ml-home #ml-categories-test-title {
+  width: fit-content;
+  color: var(--ml-dark-blue-700);
+}
+
+.ml-home .ml-categories-title__word {
+  display: inline-block;
+}
+
+.ml-home .ml-categories-title__letter {
+  display: inline-block;
+  color: var(--letter-color, var(--ml-dark-blue-700));
+  opacity: 0.16;
+}
+
+.ml-home
+  #ml-categories-test-title.is-illuminating
+  .ml-categories-title__letter {
+  animation: ml-category-letter-illuminate 0.7s
+    cubic-bezier(0.22, 0.7, 0.25, 1) var(--letter-delay) 1 forwards;
+}
+
+@keyframes ml-category-letter-illuminate {
+  from {
+    opacity: 0.16;
+    transform: translateY(0.08em);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.ml-home .ml-categories-test__grid .ml-category-card {
+  isolation: isolate;
+  aspect-ratio: 1;
+  padding: 1rem 1rem 0;
+  border: 1px solid color-mix(in srgb, var(--ml-grey-400) 42%, transparent);
+  background:
+    radial-gradient(
+      ellipse at 24% 12%,
+      color-mix(in srgb, var(--ml-grey-50) 82%, transparent) 0%,
+      transparent 42%
+    ),
+    linear-gradient(
+      135deg,
+      color-mix(in srgb, var(--ml-grey-100) 78%, transparent) 0%,
+      color-mix(in srgb, var(--ml-grey-200) 72%, transparent) 42%,
+      color-mix(in srgb, var(--ml-grey-50) 82%, transparent) 68%,
+      color-mix(in srgb, var(--ml-grey-300) 68%, transparent) 100%
+    );
+  backdrop-filter: blur(18px) saturate(0.82);
+  -webkit-backdrop-filter: blur(18px) saturate(0.82);
+  box-shadow: none;
+  transition:
+    background-color 0.35s ease,
+    border-color 0.35s ease,
+    box-shadow 0.35s ease,
+    transform 0.35s ease;
+}
+
+.ml-home .ml-categories-test__grid .ml-category-card h3 {
+  position: relative;
+  z-index: 2;
+  flex: 0 0 auto;
+  padding: 0.75rem 0.25rem 0.5rem;
+}
+
+.ml-home .ml-categories-test__grid .ml-category-card__media {
+  position: relative;
+  z-index: 1;
+  width: calc(100% + 2rem);
+  margin-inline: -1rem;
+  align-items: end;
+  justify-items: center;
+  overflow: hidden;
+}
+
+.ml-home .ml-categories-test__grid .ml-category-card img {
+  width: 100%;
+  height: 115%;
+  object-fit: contain;
+  object-position: center bottom;
+  transform: translateY(14%);
+  transform-origin: center bottom;
+  transition:
+    transform 0.65s cubic-bezier(0.22, 1, 0.36, 1),
+    filter 0.35s ease;
+}
+
+.ml-home
+  .ml-categories-test__grid
+  .ml-category-card[data-editorial-id="lamparas"]
+  img {
+  width: 84%;
+  height: 105%;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .ml-home .ml-categories-test__grid .ml-category-card:hover {
+    border-color: color-mix(in srgb, var(--ml-grey-400) 42%, transparent);
+    background:
+      radial-gradient(
+        ellipse at 32% 16%,
+        color-mix(in srgb, var(--ml-grey-50) 88%, transparent) 0%,
+        transparent 46%
+      ),
+      linear-gradient(
+        135deg,
+        color-mix(in srgb, var(--ml-grey-100) 82%, transparent) 0%,
+        color-mix(in srgb, var(--ml-grey-200) 76%, transparent) 38%,
+        color-mix(in srgb, var(--ml-grey-50) 88%, transparent) 72%,
+        color-mix(in srgb, var(--ml-grey-300) 72%, transparent) 100%
+      );
+    box-shadow: none;
+  }
+
+  .ml-home .ml-categories-test__grid .ml-category-card:hover img {
+    filter: saturate(1.03) contrast(1.02);
+    transform: translateY(14%) scale(1.06);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ml-home .ml-categories-title__letter {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* ==========================================================================
+   Canonical typography scale
+   Keep this section last: these semantic roles are the source of truth for
+   every text style rendered by the Home.
+   ========================================================================== */
+.ml-home {
+  /* Display XL — hero only */
+  --ml-type-display-xl-size: clamp(2.25rem, calc(1.75rem + 2vw), 4.2rem);
+  --ml-type-display-xl-weight: 500;
+  --ml-type-display-xl-leading: 1.02;
+  --ml-type-display-xl-tracking: -0.04em;
+
+  /* Display L — large editorial line titles only */
+  --ml-type-display-l-size: clamp(2.2rem, calc(1.8rem + 1.7vw), 3.5rem);
+  --ml-type-display-l-weight: 300;
+  --ml-type-display-l-leading: 1.08;
+  --ml-type-display-l-tracking: -0.025em;
+
+  /* Headings intentionally use normal tracking for readability */
+  --ml-type-heading-section-size: clamp(2rem, calc(1.75rem + 1vw), 2.9375rem);
+  --ml-type-heading-section-weight: 500;
+  --ml-type-heading-section-leading: 1.15;
+  --ml-type-heading-section-tracking: -0.020em;
+
+  --ml-type-heading-card-large-size: clamp(1.5rem, calc(1.3rem + 0.8vw), 2rem);
+  --ml-type-heading-card-large-weight: 400;
+  --ml-type-heading-card-large-leading: 1.2;
+  --ml-type-heading-card-large-tracking: -0.01em;
+
+  /* Product card titles */
+  --ml-type-heading-card-size: clamp(1.05rem, calc(1rem + 0.4vw), 1.2rem);
+  --ml-type-heading-card-weight: 600;
+  --ml-type-heading-card-leading: 1.3;
+  --ml-type-heading-card-tracking: 0;
+
+  /* Category card titles */
+  --ml-type-heading-category-size: clamp(1.05rem, calc(1rem + 0.3vw), 1.4rem);
+  --ml-type-heading-category-weight: 500;
+  --ml-type-heading-category-leading: 1.35;
+  --ml-type-heading-category-tracking: -0.01em;
+
+  /* Editorial/news card titles */
+  --ml-type-heading-news-card-size: clamp(1.2rem, calc(1.1rem + 0.5vw), 1.4rem);
+  --ml-type-heading-news-card-weight: 600;
+  --ml-type-heading-news-card-leading: 1.3;
+  --ml-type-heading-news-card-tracking: 0;
+
+  --ml-type-body-l-size: clamp(1rem, calc(0.95rem + 0.25vw), 1rem);
+  --ml-type-body-l-weight: 400;
+  --ml-type-body-l-leading: 1.6;
+
+  --ml-type-body-m-size: 1rem;
+  --ml-type-body-m-weight: 400;
+  --ml-type-body-m-leading: 1.6;
+
+  --ml-type-body-s-size: 0.875rem;
+  --ml-type-body-s-weight: 400;
+  --ml-type-body-s-leading: 1.55;
+
+  --ml-type-label-size: 0.75rem;
+  --ml-type-label-weight: 500;
+  --ml-type-label-leading: 1.3;
+  --ml-type-label-tracking: 0;
+  --ml-type-label-highlight-size: 0.875rem;
+  --ml-type-label-highlight-weight: 600;
+
+  --ml-type-button-size: 1rem;
+  --ml-type-button-weight: 600;
+  --ml-type-button-leading: 1;
+  --ml-type-button-tracking: 0;
+}
+
+/* Display XL */
+.ml-home #ml-hero-title {
+  font-size: var(--ml-type-display-xl-size);
+  font-weight: var(--ml-type-display-xl-weight);
+  line-height: var(--ml-type-display-xl-leading);
+  letter-spacing: var(--ml-type-display-xl-tracking);
+}
+
+/* Display L */
+.ml-home .ml-featured__copy h3 {
+  font-size: var(--ml-type-display-l-size);
+  font-weight: var(--ml-type-display-l-weight);
+  line-height: var(--ml-type-display-l-leading);
+  letter-spacing: var(--ml-type-display-l-tracking);
+}
+
+/* Heading · section */
+.ml-home #ml-featured-products-title,
+.ml-home #ml-project-lines-concept-title,
+.ml-home #ml-categories-test-title,
+.ml-home #ml-news-title,
+.ml-home #ml-faq-title,
+.ml-home #ml-newsletter-title {
+  font-size: var(--ml-type-heading-section-size);
+  font-weight: var(--ml-type-heading-section-weight);
+  line-height: var(--ml-type-heading-section-leading);
+  letter-spacing: var(--ml-type-heading-section-tracking);
+}
+
+.ml-home #ml-foa-title strong {
+  font-weight: 600;
+}
+
+/* Heading · card large */
+.ml-home #ml-foa-title,
+.ml-home .ml-foa #ml-foa-title,
+.ml-home .ml-project-lines-concept__content,
+.ml-home .ml-project-line-card__title,
+.ml-home .ml-project-line-card__collapsed-title {
+  font-size: var(--ml-type-heading-card-large-size);
+  font-weight: var(--ml-type-heading-card-large-weight);
+  line-height: var(--ml-type-heading-card-large-leading);
+  letter-spacing: var(--ml-type-heading-card-large-tracking);
+}
+
+/* Heading · product card */
+.ml-home .ml-product-card__title {
+  font-size: var(--ml-type-heading-card-size);
+  font-weight: var(--ml-type-heading-card-weight);
+  line-height: var(--ml-type-heading-card-leading);
+  letter-spacing: var(--ml-type-heading-card-tracking);
+}
+
+/* Heading · category card */
+.ml-home .ml-category-card h3 {
+  font-size: var(--ml-type-heading-category-size);
+  font-weight: var(--ml-type-heading-category-weight);
+  line-height: var(--ml-type-heading-category-leading);
+  letter-spacing: var(--ml-type-heading-category-tracking);
+}
+
+/* Heading · news card */
+.ml-home .ml-news-card h3 {
+  font-size: var(--ml-type-heading-news-card-size);
+  font-weight: var(--ml-type-heading-news-card-weight);
+  line-height: var(--ml-type-heading-news-card-leading);
+  letter-spacing: var(--ml-type-heading-news-card-tracking);
+}
+
+/* Body L */
+.ml-home .ml-hero__subtitle,
+.ml-home .ml-featured-products__subtitle,
+.ml-home .ml-featured__copy p,
+.ml-home .ml-project-lines-concept__content p,
+.ml-home .ml-project-line-card__subtitle,
+.ml-home .ml-conversion__intro p,
+.ml-home .ml-newsletter-banner p {
+  font-size: var(--ml-type-body-l-size);
+  font-weight: var(--ml-type-body-l-weight);
+  line-height: var(--ml-type-body-l-leading);
+  letter-spacing: 0;
+}
+
+/* Body M */
+.ml-home .ml-featured-products__state,
+.ml-home .ml-product-state {
+  font-size: var(--ml-type-body-m-size);
+  font-weight: var(--ml-type-body-m-weight);
+  line-height: var(--ml-type-body-m-leading);
+  letter-spacing: 0;
+}
+
+/* Body S */
+.ml-home .ml-news-card p,
+.ml-home .ml-conversion__card--faq .ml-faq__answer p {
+  font-size: var(--ml-type-body-s-size);
+  font-weight: var(--ml-type-body-s-weight);
+  line-height: var(--ml-type-body-s-leading);
+  letter-spacing: 0;
+}
+
+/* Label */
+.ml-home .ml-product-attr__label,
+.ml-home .ml-product-card__note {
+  font-size: var(--ml-type-label-size);
+  font-weight: var(--ml-type-label-weight);
+  line-height: var(--ml-type-label-leading);
+  letter-spacing: var(--ml-type-label-tracking);
+}
+
+/* Highlight label */
+.ml-home .ml-category-card__badge,
+.ml-home .ml-project-lines-concept__badge {
+  font-size: var(--ml-type-label-highlight-size);
+  font-weight: var(--ml-type-label-highlight-weight);
+  line-height: var(--ml-type-label-leading);
+  letter-spacing: var(--ml-type-label-tracking);
+}
+
+.ml-home .ml-product-attr__value {
+  font-size: var(--ml-type-body-s-size);
+  font-weight: 600;
+  line-height: var(--ml-type-body-s-leading);
+  letter-spacing: 0;
+}
+
+/* Button and interactive text */
+.ml-home .ml-button,
+.ml-home .ml-button--tertiary,
+.ml-home .ml-conversion__button,
+.ml-home .ml-featured-products__tab,
+.ml-home .ml-project-line-card__cta {
+  font-size: var(--ml-type-button-size);
+  font-weight: var(--ml-type-button-weight);
+  line-height: var(--ml-type-button-leading);
+  letter-spacing: var(--ml-type-button-tracking);
+}
+
+.ml-home .ml-conversion__card--faq .ml-faq__trigger {
+  font-size: var(--ml-type-body-m-size);
+  font-weight: 500;
+  line-height: 1.4;
+  letter-spacing: 0;
+}
+
+@media (max-width: 1360px) {
+  .ml-home {
+    --ml-type-button-size: 0.875rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .ml-home {
+    --ml-type-display-xl-size: clamp(2.25rem, 10vw, 2.75rem);
+  }
+
+  .ml-home .ml-featured-products__tab {
+    font-size: 0.8125rem;
+  }
+
+  .ml-home .ml-featured-products__track {
+    width: calc(100% - 1rem);
+    margin-right: 0;
+    margin-left: 1rem;
+  }
+
+  .ml-home .ml-foa.ml-shell {
+    width: 100%;
+    max-width: none;
+    margin-top: 0;
+    margin-right: 0;
+    margin-left: 0;
+    padding-right: 0;
+    padding-left: 0;
+    border-radius: 0;
+  }
+
+  /* Mobile product cards enter vertically so their right edge stays within
+     the horizontal track throughout the reveal animation. */
+  .ml-home .ml-featured-products.ml-motion-ready .ml-product-card,
+  .ml-home
+    .ml-featured[data-content-mode="typesense"].ml-content-motion-ready
+    .ml-product-card {
+    transform: translate3d(0, 1rem, 0);
+  }
+}
+
 </style>
 <script>
 (function (window) {
   "use strict";
 
-  const PLACEHOLDER = "data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%201600%201000%22%20role%3D%22img%22%20aria-labelledby%3D%22t%20d%22%3E%3Ctitle%20id%3D%22t%22%3EImagen%20pendiente%3C%2Ftitle%3E%3Cdesc%20id%3D%22d%22%3EPlaceholder%20editorial%20para%20reemplazar%20por%20una%20imagen%20de%20Macroled.%3C%2Fdesc%3E%3Cdefs%3E%3ClinearGradient%20id%3D%22g%22%20x1%3D%220%22%20y1%3D%220%22%20x2%3D%221%22%20y2%3D%221%22%3E%3Cstop%20stop-color%3D%22%23dfe8e6%22%2F%3E%3Cstop%20offset%3D%22.5%22%20stop-color%3D%22%23f0ede4%22%2F%3E%3Cstop%20offset%3D%221%22%20stop-color%3D%22%23b8c8cf%22%2F%3E%3C%2FlinearGradient%3E%3CradialGradient%20id%3D%22l%22%3E%3Cstop%20stop-color%3D%22%23fff%22%20stop-opacity%3D%22.95%22%2F%3E%3Cstop%20offset%3D%221%22%20stop-color%3D%22%23fff%22%20stop-opacity%3D%220%22%2F%3E%3C%2FradialGradient%3E%3C%2Fdefs%3E%3Crect%20width%3D%221600%22%20height%3D%221000%22%20fill%3D%22url(%23g)%22%2F%3E%3Ccircle%20cx%3D%221180%22%20cy%3D%22220%22%20r%3D%22360%22%20fill%3D%22url(%23l)%22%2F%3E%3Cpath%20d%3D%22M0%20820C380%20680%20660%20920%20990%20770s440-80%20610%200v230H0z%22%20fill%3D%22%2300152b%22%20opacity%3D%22.1%22%2F%3E%3Ctext%20x%3D%2280%22%20y%3D%22900%22%20fill%3D%22%2300152b%22%20font-family%3D%22Arial%2Csans-serif%22%20font-size%3D%2230%22%20letter-spacing%3D%226%22%3EIMAGEN%20PENDIENTE%20%C2%B7%20MACROLED%3C%2Ftext%3E%3C%2Fsvg%3E%0D%0A";
+  const PLACEHOLDER = "data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%201600%201000%22%20role%3D%22img%22%20aria-labelledby%3D%22t%20d%22%3E%3Ctitle%20id%3D%22t%22%3EImagen%20pendiente%3C%2Ftitle%3E%3Cdesc%20id%3D%22d%22%3EPlaceholder%20editorial%20para%20reemplazar%20por%20una%20imagen%20de%20Macroled.%3C%2Fdesc%3E%3Cdefs%3E%3ClinearGradient%20id%3D%22g%22%20x1%3D%220%22%20y1%3D%220%22%20x2%3D%221%22%20y2%3D%221%22%3E%3Cstop%20stop-color%3D%22%23dfe8e6%22%2F%3E%3Cstop%20offset%3D%22.5%22%20stop-color%3D%22%23f0ede4%22%2F%3E%3Cstop%20offset%3D%221%22%20stop-color%3D%22%23b8c8cf%22%2F%3E%3C%2FlinearGradient%3E%3CradialGradient%20id%3D%22l%22%3E%3Cstop%20stop-color%3D%22%23fff%22%20stop-opacity%3D%22.95%22%2F%3E%3Cstop%20offset%3D%221%22%20stop-color%3D%22%23fff%22%20stop-opacity%3D%220%22%2F%3E%3C%2FradialGradient%3E%3C%2Fdefs%3E%3Crect%20width%3D%221600%22%20height%3D%221000%22%20fill%3D%22url(%23g)%22%2F%3E%3Ccircle%20cx%3D%221180%22%20cy%3D%22220%22%20r%3D%22360%22%20fill%3D%22url(%23l)%22%2F%3E%3Cpath%20d%3D%22M0%20820C380%20680%20660%20920%20990%20770s440-80%20610%200v230H0z%22%20fill%3D%22%2300152b%22%20opacity%3D%22.1%22%2F%3E%3Ctext%20x%3D%2280%22%20y%3D%22900%22%20fill%3D%22%2300152b%22%20font-family%3D%22Arial%2Csans-serif%22%20font-size%3D%2230%22%20letter-spacing%3D%226%22%3EIMAGEN%20PENDIENTE%20%C2%B7%20MACROLED%3C%2Ftext%3E%3C%2Fsvg%3E%0A";
   const g9 = { typesenseField: "subfamilia", typesenseValue: "G9", productCount: 4 };
   const category = (title, id) => ({ title, image: PLACEHOLDER, href: "#", id });
   const line = (title, description, theme, textColor, layout) => ({
@@ -4555,10 +5132,10 @@ body {
    */
   const MANUAL_CATEGORIES = {
     interior: [
-      { ...category("Lámparas", "lamparas"), image: "https://s3.coresagroup.com/MACROLED/250/smartnew.png" },
-      { ...category("Artefactos para lámparas", "artefactos-para-lamparas"), image: "https://s3.coresagroup.com/MACROLED/250/policarbonato-aplicar-dicroica.png" },
-      { ...category("Interruptores y tomas", "interruptores-y-tomas"), image: "https://s3.coresagroup.com/MACROLED/250/lima.webp" },
-      { ...category("Tiras LED", "tiras-led"), image: "https://s3.coresagroup.com/MACROLED/250/neon.png", badge: "Nuevo" }
+      { ...category("Lámparas", "lamparas"), image: "https://s3.coresagroup.com/MACROLED/1000/7428325565203a.png" },
+      { ...category("Artefactos para lámparas", "artefactos-para-lamparas"), image: "https://s3.coresagroup.com/MACROLED/1000/7428325574748a.png" },
+      { ...category("Interruptores y tomas", "interruptores-y-tomas"), image: "https://d1zltvqju4u8ql.cloudfront.net/fit-in/2000x2000/MACROLED/WEB/LIMA-1CN-USB-CC-30W-B_FRONT.webp" },
+      { ...category("Tiras LED", "tiras-led"), image: "https://s3.coresagroup.com/MACROLED/1000/0742832556316a.png", badge: "Nuevo" }
     ],
     monaco: [
       { ...category("Armadas", "monaco-armadas"), image: "https://s3.coresagroup.com/MACROLED/250/milan.png" },
@@ -4567,10 +5144,10 @@ body {
       { ...category("Luz de pasillo", "monaco-luz-pasillo"), image: "https://d1zltvqju4u8ql.cloudfront.net/fit-in/2000x2000/MACROLED/WEB/portada_luz_pasillo.webp" }
     ],
     exterior: [
-      { ...category("Reflectores", "reflectores"), image: "https://s3.coresagroup.com/MACROLED/250/reflectores-smart.png" },
-      { ...category("Solar", "solar"), image: "https://s3.coresagroup.com/MACROLED/250/solar.png" },
-      { ...category("Tortugas", "tortugas"), image: "https://s3.coresagroup.com/MACROLED/250/tortugas.png" },
-      { ...category("Estacas", "estacas"), image: "https://s3.coresagroup.com/MACROLED/250/estacas-led-integrado.png" }
+      { ...category("Reflectores", "reflectores"), image: "https://d1zltvqju4u8ql.cloudfront.net/fit-in/2000x2000/MACROLED/WEB/PFL-400W-060D-857-CW_PERS.webp" },
+      { ...category("Solar", "solar"), image: "https://s3.coresagroup.com/MACROLED/1000/7428325578388a.png" },
+      { ...category("Tortugas", "tortugas"), image: "https://s3.coresagroup.com/MACROLED/1000/7428325571648a.png" },
+      { ...category("Estacas", "estacas"), image: "https://s3.coresagroup.com/MACROLED/1000/7428325575684a.png" }
     ],
     proyectos: [
       { ...category("Luz de calle", "proyectos-01"), image: "https://d1zltvqju4u8ql.cloudfront.net/fit-in/1000x1000/MACROLED/WEB/SLG2-100W-757-CW_FRONT.webp", badge: "Nuevo" },
@@ -4755,11 +5332,12 @@ body {
     grid.querySelectorAll(".ml-product-card__media").forEach(media=>{const img=media.querySelector("img[data-images]");if(!img)return;let images=[];try{images=JSON.parse(img.dataset.images)}catch(_){return}const move=direction=>{let index=Number(img.dataset.index||0);index=(index+direction+images.length)%images.length;img.dataset.index=String(index);img.src=images[index]};media.querySelector(".ml-product-card__nav--prev")?.addEventListener("click",event=>{event.preventDefault();event.stopPropagation();move(-1)});media.querySelector(".ml-product-card__nav--next")?.addEventListener("click",event=>{event.preventDefault();event.stopPropagation();move(1)})});
   }
   async function renderGrid(grid){
-    const field=grid.dataset.productsField,value=grid.dataset.productsValue,count=Number(grid.dataset.productsCount||4);let filters=[];
+    const field=grid.dataset.productsField,value=grid.dataset.productsValue,configuredCount=Number(grid.dataset.productsCount||4);
+    const count=matchMedia("(max-width: 640px), (min-width: 1601px)").matches?Math.max(configuredCount,5):configuredCount;let filters=[];
     try{filters=JSON.parse(grid.dataset.productsFilters||"[]")}catch(_){filters=[]}
     grid.setAttribute("aria-busy","true");
     const label=filters.length?filters.map(filter=>filter.value).join(" / "):value;
-    try{const data=await fetchProducts(field,value,count,filters);if(!data.hits?.length){grid.innerHTML=`<div class="ml-product-state">No hay productos para “${escapeHTML(label)}”.</div>`;return}grid.innerHTML=data.hits.map(hit=>cardTemplate(hit.document)).join("");wireCarousels(grid)}catch(error){console.error(`Macroled Home · Error consultando Typesense (${buildFilter(field,value,filters)})`,error);grid.innerHTML=`<div class="ml-product-state">No se pudieron cargar los productos. Verificá la configuración de Typesense y que “${escapeHTML(label)}” exista.</div>`}finally{grid.setAttribute("aria-busy","false")}
+    try{const data=await fetchProducts(field,value,count,filters);if(!data.hits?.length){grid.innerHTML=`<div class="ml-product-state">No hay productos para “${escapeHTML(label)}”.</div>`;return}grid.innerHTML=data.hits.map(hit=>cardTemplate(hit.document)).join("");wireCarousels(grid);const block=grid.closest(".ml-products-block");if(block)window.MacroledFeatured?.setupTrackControls(block,grid,{mobileOnly:true})}catch(error){console.error(`Macroled Home · Error consultando Typesense (${buildFilter(field,value,filters)})`,error);grid.innerHTML=`<div class="ml-product-state">No se pudieron cargar los productos. Verificá la configuración de Typesense y que “${escapeHTML(label)}” exista.</div>`}finally{grid.setAttribute("aria-busy","false")}
   }
   function init(root=document){root.querySelectorAll(".ml-product-grid:not([data-products-ready])").forEach(grid=>{grid.dataset.productsReady="true";renderGrid(grid)})}
   window.MacroledProducts={init,parseImages,mergeVariantValue,buildSpecs,cardTemplate,wireCarousels};
@@ -4790,7 +5368,7 @@ body {
     return response.json();
   }
 
-  function setupTrackControls(root, track) {
+  function setupTrackControls(root, track, options = {}) {
     const controls = root.querySelector(".ml-featured-products__controls");
     const progressBar = root.querySelector(".ml-featured-products__progress");
     const progress = root.querySelector("[data-featured-progress]");
@@ -4798,17 +5376,20 @@ body {
     const next = root.querySelector("[data-featured-next]");
     const arrows = root.querySelector(".ml-featured-products__arrows");
     const viewport = root.querySelector(".ml-featured-products__viewport");
-    const needsScroll = track.scrollWidth > track.clientWidth + 4;
-    controls.hidden = !needsScroll;
-    arrows.hidden = !needsScroll;
-    if (!needsScroll) return;
-    if (arrows.parentElement !== viewport) viewport.append(arrows);
+    const mobile = matchMedia("(max-width: 640px)");
+    if (!controls || !progressBar || !progress || !prev || !next || !arrows) return;
 
     const cards = [...track.querySelectorAll(".ml-product-card")];
-    const firstLeft = cards[0].getBoundingClientRect().left;
-    const positions = cards.map(card => card.getBoundingClientRect().left - firstLeft);
 
     const update = () => {
+      const enabled = !options.mobileOnly || mobile.matches;
+      const needsScroll = enabled && track.scrollWidth > track.clientWidth + 4;
+      controls.hidden = !needsScroll;
+      arrows.hidden = !needsScroll;
+      if (!needsScroll) return;
+      const arrowsTarget = mobile.matches || !viewport ? controls : viewport;
+      if (arrows.parentElement !== arrowsTarget) arrowsTarget.prepend(arrows);
+
       const max = track.scrollWidth - track.clientWidth;
       prev.disabled = track.scrollLeft <= 4;
       next.disabled = track.scrollLeft >= max - 4;
@@ -4822,6 +5403,8 @@ body {
     };
     track.onscroll = update;
     const moveToCard = direction => {
+      const firstLeft = cards[0].getBoundingClientRect().left;
+      const positions = cards.map(card => card.getBoundingClientRect().left - firstLeft);
       const current = positions.reduce((closest, position, index) =>
         Math.abs(position - track.scrollLeft) < Math.abs(positions[closest] - track.scrollLeft) ? index : closest, 0);
       const target = Math.max(0, Math.min(cards.length - 1, current + direction));
@@ -4866,6 +5449,12 @@ body {
     track._featuredResizeObserver?.disconnect();
     track._featuredResizeObserver = new ResizeObserver(update);
     track._featuredResizeObserver.observe(track);
+    if (track._featuredControlsMedia && track._featuredControlsMediaHandler) {
+      track._featuredControlsMedia.removeEventListener("change", track._featuredControlsMediaHandler);
+    }
+    track._featuredControlsMedia = mobile;
+    track._featuredControlsMediaHandler = update;
+    mobile.addEventListener("change", update);
     update();
   }
 
@@ -4915,7 +5504,7 @@ body {
     render(section, null);
   }
 
-  window.MacroledFeatured = { init };
+  window.MacroledFeatured = { init, setupTrackControls };
 })(window);
 
 (function (window) {
@@ -5018,6 +5607,10 @@ body {
     return `<a class="ml-category-card" href="${esc(item.href)}" data-editorial-id="${esc(item.id)}"><h3>${esc(item.title)}</h3>${badge}<div class="ml-category-card__media"><img src="${esc(item.image)}" alt="" loading="lazy" width="800" height="800"></div></a>`;
   }
 
+  function productControlsTemplate() {
+    return `<div class="ml-featured-products__controls ml-product-grid__controls" data-product-controls hidden><div class="ml-featured-products__arrows"><button class="ml-featured-products__nav" type="button" data-featured-prev aria-label="Producto anterior"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 12H5m6-6-6 6 6 6"/></svg></button><button class="ml-featured-products__nav" type="button" data-featured-next aria-label="Producto siguiente"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6"/></svg></button></div><div class="ml-featured-products__progress" aria-hidden="true"><span data-featured-progress></span></div></div>`;
+  }
+
   function lineContentTemplate(item) {
     const content = item.content || {};
 
@@ -5028,7 +5621,7 @@ body {
 
     const query = content.query || item;
     const filters = Array.isArray(query.typesenseFilters) ? JSON.stringify(query.typesenseFilters) : "";
-    return `<div class="ml-products-block"><div class="ml-product-grid" data-products-field="${esc(query.typesenseField)}" data-products-value="${esc(query.typesenseValue)}" data-products-filters="${esc(filters)}" data-products-count="${Number(query.productCount || 4)}"><div class="ml-product-state">Cargando productos…</div></div></div>`;
+    return `<div class="ml-products-block"><div class="ml-product-grid" data-products-field="${esc(query.typesenseField)}" data-products-value="${esc(query.typesenseValue)}" data-products-filters="${esc(filters)}" data-products-count="${Number(query.productCount || 4)}"><div class="ml-product-state">Cargando productos…</div></div>${productControlsTemplate()}</div>`;
   }
 
   function lineTemplate(item) {
@@ -5169,7 +5762,7 @@ body {
         if (previousLayer) {
           const removePrevious = () => previousLayer.remove();
           previousLayer.addEventListener("transitionend", removePrevious, { once: true });
-          setTimeout(removePrevious, 1400);
+          setTimeout(removePrevious, 2900);
         }
         const theme = line?.dataset.theme || "#fff";
         list.style.setProperty("--ml-panel-theme", theme);
@@ -5177,7 +5770,9 @@ body {
         section?.style.setProperty("--ml-section-theme", theme);
         section?.style.setProperty("--ml-section-background", background);
       };
-      setBackground(null);
+      /* Start with Monaco's theme so the categories gradient and the first
+         editorial line meet on the exact same surface color. */
+      setBackground(lines[0]);
 
       if (!("IntersectionObserver" in window)) return;
       const sectionObserver = new IntersectionObserver(entries => {
@@ -5192,12 +5787,16 @@ body {
       const updateStoryIntegration = () => {
         scrollFrame = 0;
         const viewportBottom = window.innerHeight || document.documentElement.clientHeight;
-        let integratedLine = null;
+        let integratedLine = lines[0];
         lines.forEach(line => {
           const story = line.querySelector(".ml-featured__story");
           if (!story) return;
           const bounds = story.getBoundingClientRect();
-          const isIntegrated = bounds.bottom <= viewportBottom + 1;
+          const visibleProgress = Math.min(
+            1,
+            Math.max(0, (viewportBottom - bounds.top) / Math.max(bounds.height, 1))
+          );
+          const isIntegrated = visibleProgress >= 0.06;
           line.classList.toggle("is-story-integrated", isIntegrated);
           if (isIntegrated) integratedLine = line;
         });
@@ -5264,6 +5863,56 @@ body {
       title.appendChild(word);
     });
     requestAnimationFrame(() => title.classList.add("is-illuminating"));
+  }
+
+  function animateCategoriesTitle() {
+    const title = root.querySelector("#ml-categories-test-title");
+    if (!title || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const text = title.textContent.trim();
+    title.setAttribute("aria-label", text);
+    title.textContent = "";
+    let letterIndex = 0;
+    const letterCount = [...text.replace(/\s/g, "")].length;
+
+    text.split(/(\s+)/).forEach(part => {
+      if (/^\s+$/.test(part)) {
+        title.appendChild(document.createTextNode(" "));
+        return;
+      }
+
+      const word = document.createElement("span");
+      word.className = "ml-categories-title__word";
+      word.setAttribute("aria-hidden", "true");
+      [...part].forEach(character => {
+        const letter = document.createElement("span");
+        letter.className = "ml-categories-title__letter";
+        letter.style.setProperty("--letter-delay", `${letterIndex * 24}ms`);
+        const progress = letterCount > 1
+          ? Math.round((letterIndex / (letterCount - 1)) * 100)
+          : 100;
+        letter.style.setProperty(
+          "--letter-color",
+          `color-mix(in srgb, var(--ml-light-blue-500) ${100 - progress}%, var(--ml-dark-blue-700) ${progress}%)`
+        );
+        letter.textContent = character;
+        word.appendChild(letter);
+        letterIndex += 1;
+      });
+      title.appendChild(word);
+    });
+
+    const illuminate = () => title.classList.add("is-illuminating");
+    if (!("IntersectionObserver" in window)) {
+      requestAnimationFrame(illuminate);
+      return;
+    }
+
+    const observer = new IntersectionObserver(entries => {
+      if (!entries[0]?.isIntersecting) return;
+      illuminate();
+      observer.disconnect();
+    }, { threshold: 0.35, rootMargin: "0px 0px -8% 0px" });
+    observer.observe(title);
   }
 
   function initSectionMotion() {
@@ -5404,6 +6053,7 @@ body {
   window.MacroledProjectLinesConcept.init(root);
   handleVideo();
   animateHeroTitle();
+  animateCategoriesTitle();
   initSectionMotion();
 })(window);
 

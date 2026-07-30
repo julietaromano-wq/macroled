@@ -24,10 +24,10 @@
    */
   const MANUAL_CATEGORIES = {
     interior: [
-      { ...category("Lámparas", "lamparas"), image: "https://s3.coresagroup.com/MACROLED/250/smartnew.png" },
-      { ...category("Artefactos para lámparas", "artefactos-para-lamparas"), image: "https://s3.coresagroup.com/MACROLED/250/policarbonato-aplicar-dicroica.png" },
-      { ...category("Interruptores y tomas", "interruptores-y-tomas"), image: "https://s3.coresagroup.com/MACROLED/250/lima.webp" },
-      { ...category("Tiras LED", "tiras-led"), image: "https://s3.coresagroup.com/MACROLED/250/neon.png", badge: "Nuevo" }
+      { ...category("Lámparas", "lamparas"), image: "https://s3.coresagroup.com/MACROLED/1000/7428325565203a.png" },
+      { ...category("Artefactos para lámparas", "artefactos-para-lamparas"), image: "https://s3.coresagroup.com/MACROLED/1000/7428325574748a.png" },
+      { ...category("Interruptores y tomas", "interruptores-y-tomas"), image: "https://d1zltvqju4u8ql.cloudfront.net/fit-in/2000x2000/MACROLED/WEB/LIMA-1CN-USB-CC-30W-B_FRONT.webp" },
+      { ...category("Tiras LED", "tiras-led"), image: "https://s3.coresagroup.com/MACROLED/1000/0742832556316a.png", badge: "Nuevo" }
     ],
     monaco: [
       { ...category("Armadas", "monaco-armadas"), image: "https://s3.coresagroup.com/MACROLED/250/milan.png" },
@@ -36,10 +36,10 @@
       { ...category("Luz de pasillo", "monaco-luz-pasillo"), image: "https://d1zltvqju4u8ql.cloudfront.net/fit-in/2000x2000/MACROLED/WEB/portada_luz_pasillo.webp" }
     ],
     exterior: [
-      { ...category("Reflectores", "reflectores"), image: "https://s3.coresagroup.com/MACROLED/250/reflectores-smart.png" },
-      { ...category("Solar", "solar"), image: "https://s3.coresagroup.com/MACROLED/250/solar.png" },
-      { ...category("Tortugas", "tortugas"), image: "https://s3.coresagroup.com/MACROLED/250/tortugas.png" },
-      { ...category("Estacas", "estacas"), image: "https://s3.coresagroup.com/MACROLED/250/estacas-led-integrado.png" }
+      { ...category("Reflectores", "reflectores"), image: "https://d1zltvqju4u8ql.cloudfront.net/fit-in/2000x2000/MACROLED/WEB/PFL-400W-060D-857-CW_PERS.webp" },
+      { ...category("Solar", "solar"), image: "https://s3.coresagroup.com/MACROLED/1000/7428325578388a.png" },
+      { ...category("Tortugas", "tortugas"), image: "https://s3.coresagroup.com/MACROLED/1000/7428325571648a.png" },
+      { ...category("Estacas", "estacas"), image: "https://s3.coresagroup.com/MACROLED/1000/7428325575684a.png" }
     ],
     proyectos: [
       { ...category("Luz de calle", "proyectos-01"), image: "https://d1zltvqju4u8ql.cloudfront.net/fit-in/1000x1000/MACROLED/WEB/SLG2-100W-757-CW_FRONT.webp", badge: "Nuevo" },

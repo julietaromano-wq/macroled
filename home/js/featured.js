@@ -23,7 +23,7 @@
     return response.json();
   }
 
-  function setupTrackControls(root, track) {
+  function setupTrackControls(root, track, options = {}) {
     const controls = root.querySelector(".ml-featured-products__controls");
     const progressBar = root.querySelector(".ml-featured-products__progress");
     const progress = root.querySelector("[data-featured-progress]");
@@ -31,17 +31,20 @@
     const next = root.querySelector("[data-featured-next]");
     const arrows = root.querySelector(".ml-featured-products__arrows");
     const viewport = root.querySelector(".ml-featured-products__viewport");
-    const needsScroll = track.scrollWidth > track.clientWidth + 4;
-    controls.hidden = !needsScroll;
-    arrows.hidden = !needsScroll;
-    if (!needsScroll) return;
-    if (arrows.parentElement !== viewport) viewport.append(arrows);
+    const mobile = matchMedia("(max-width: 640px)");
+    if (!controls || !progressBar || !progress || !prev || !next || !arrows) return;
 
     const cards = [...track.querySelectorAll(".ml-product-card")];
-    const firstLeft = cards[0].getBoundingClientRect().left;
-    const positions = cards.map(card => card.getBoundingClientRect().left - firstLeft);
 
     const update = () => {
+      const enabled = !options.mobileOnly || mobile.matches;
+      const needsScroll = enabled && track.scrollWidth > track.clientWidth + 4;
+      controls.hidden = !needsScroll;
+      arrows.hidden = !needsScroll;
+      if (!needsScroll) return;
+      const arrowsTarget = mobile.matches || !viewport ? controls : viewport;
+      if (arrows.parentElement !== arrowsTarget) arrowsTarget.prepend(arrows);
+
       const max = track.scrollWidth - track.clientWidth;
       prev.disabled = track.scrollLeft <= 4;
       next.disabled = track.scrollLeft >= max - 4;
@@ -55,6 +58,8 @@
     };
     track.onscroll = update;
     const moveToCard = direction => {
+      const firstLeft = cards[0].getBoundingClientRect().left;
+      const positions = cards.map(card => card.getBoundingClientRect().left - firstLeft);
       const current = positions.reduce((closest, position, index) =>
         Math.abs(position - track.scrollLeft) < Math.abs(positions[closest] - track.scrollLeft) ? index : closest, 0);
       const target = Math.max(0, Math.min(cards.length - 1, current + direction));
@@ -99,6 +104,12 @@
     track._featuredResizeObserver?.disconnect();
     track._featuredResizeObserver = new ResizeObserver(update);
     track._featuredResizeObserver.observe(track);
+    if (track._featuredControlsMedia && track._featuredControlsMediaHandler) {
+      track._featuredControlsMedia.removeEventListener("change", track._featuredControlsMediaHandler);
+    }
+    track._featuredControlsMedia = mobile;
+    track._featuredControlsMediaHandler = update;
+    mobile.addEventListener("change", update);
     update();
   }
 
@@ -148,5 +159,5 @@
     render(section, null);
   }
 
-  window.MacroledFeatured = { init };
+  window.MacroledFeatured = { init, setupTrackControls };
 })(window);

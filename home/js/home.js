@@ -32,6 +32,10 @@
     return `<a class="ml-category-card" href="${esc(item.href)}" data-editorial-id="${esc(item.id)}"><h3>${esc(item.title)}</h3>${badge}<div class="ml-category-card__media"><img src="${esc(item.image)}" alt="" loading="lazy" width="800" height="800"></div></a>`;
   }
 
+  function productControlsTemplate() {
+    return `<div class="ml-featured-products__controls ml-product-grid__controls" data-product-controls hidden><div class="ml-featured-products__arrows"><button class="ml-featured-products__nav" type="button" data-featured-prev aria-label="Producto anterior"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 12H5m6-6-6 6 6 6"/></svg></button><button class="ml-featured-products__nav" type="button" data-featured-next aria-label="Producto siguiente"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6"/></svg></button></div><div class="ml-featured-products__progress" aria-hidden="true"><span data-featured-progress></span></div></div>`;
+  }
+
   function lineContentTemplate(item) {
     const content = item.content || {};
 
@@ -42,7 +46,7 @@
 
     const query = content.query || item;
     const filters = Array.isArray(query.typesenseFilters) ? JSON.stringify(query.typesenseFilters) : "";
-    return `<div class="ml-products-block"><div class="ml-product-grid" data-products-field="${esc(query.typesenseField)}" data-products-value="${esc(query.typesenseValue)}" data-products-filters="${esc(filters)}" data-products-count="${Number(query.productCount || 4)}"><div class="ml-product-state">Cargando productos…</div></div></div>`;
+    return `<div class="ml-products-block"><div class="ml-product-grid" data-products-field="${esc(query.typesenseField)}" data-products-value="${esc(query.typesenseValue)}" data-products-filters="${esc(filters)}" data-products-count="${Number(query.productCount || 4)}"><div class="ml-product-state">Cargando productos…</div></div>${productControlsTemplate()}</div>`;
   }
 
   function lineTemplate(item) {
@@ -183,7 +187,7 @@
         if (previousLayer) {
           const removePrevious = () => previousLayer.remove();
           previousLayer.addEventListener("transitionend", removePrevious, { once: true });
-          setTimeout(removePrevious, 1400);
+          setTimeout(removePrevious, 2900);
         }
         const theme = line?.dataset.theme || "#fff";
         list.style.setProperty("--ml-panel-theme", theme);
@@ -191,7 +195,9 @@
         section?.style.setProperty("--ml-section-theme", theme);
         section?.style.setProperty("--ml-section-background", background);
       };
-      setBackground(null);
+      /* Start with Monaco's theme so the categories gradient and the first
+         editorial line meet on the exact same surface color. */
+      setBackground(lines[0]);
 
       if (!("IntersectionObserver" in window)) return;
       const sectionObserver = new IntersectionObserver(entries => {
@@ -206,12 +212,16 @@
       const updateStoryIntegration = () => {
         scrollFrame = 0;
         const viewportBottom = window.innerHeight || document.documentElement.clientHeight;
-        let integratedLine = null;
+        let integratedLine = lines[0];
         lines.forEach(line => {
           const story = line.querySelector(".ml-featured__story");
           if (!story) return;
           const bounds = story.getBoundingClientRect();
-          const isIntegrated = bounds.bottom <= viewportBottom + 1;
+          const visibleProgress = Math.min(
+            1,
+            Math.max(0, (viewportBottom - bounds.top) / Math.max(bounds.height, 1))
+          );
+          const isIntegrated = visibleProgress >= 0.06;
           line.classList.toggle("is-story-integrated", isIntegrated);
           if (isIntegrated) integratedLine = line;
         });
@@ -278,6 +288,56 @@
       title.appendChild(word);
     });
     requestAnimationFrame(() => title.classList.add("is-illuminating"));
+  }
+
+  function animateCategoriesTitle() {
+    const title = root.querySelector("#ml-categories-test-title");
+    if (!title || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const text = title.textContent.trim();
+    title.setAttribute("aria-label", text);
+    title.textContent = "";
+    let letterIndex = 0;
+    const letterCount = [...text.replace(/\s/g, "")].length;
+
+    text.split(/(\s+)/).forEach(part => {
+      if (/^\s+$/.test(part)) {
+        title.appendChild(document.createTextNode(" "));
+        return;
+      }
+
+      const word = document.createElement("span");
+      word.className = "ml-categories-title__word";
+      word.setAttribute("aria-hidden", "true");
+      [...part].forEach(character => {
+        const letter = document.createElement("span");
+        letter.className = "ml-categories-title__letter";
+        letter.style.setProperty("--letter-delay", `${letterIndex * 24}ms`);
+        const progress = letterCount > 1
+          ? Math.round((letterIndex / (letterCount - 1)) * 100)
+          : 100;
+        letter.style.setProperty(
+          "--letter-color",
+          `color-mix(in srgb, var(--ml-light-blue-500) ${100 - progress}%, var(--ml-dark-blue-700) ${progress}%)`
+        );
+        letter.textContent = character;
+        word.appendChild(letter);
+        letterIndex += 1;
+      });
+      title.appendChild(word);
+    });
+
+    const illuminate = () => title.classList.add("is-illuminating");
+    if (!("IntersectionObserver" in window)) {
+      requestAnimationFrame(illuminate);
+      return;
+    }
+
+    const observer = new IntersectionObserver(entries => {
+      if (!entries[0]?.isIntersecting) return;
+      illuminate();
+      observer.disconnect();
+    }, { threshold: 0.35, rootMargin: "0px 0px -8% 0px" });
+    observer.observe(title);
   }
 
   function initSectionMotion() {
@@ -418,5 +478,6 @@
   window.MacroledProjectLinesConcept.init(root);
   handleVideo();
   animateHeroTitle();
+  animateCategoriesTitle();
   initSectionMotion();
 })(window);

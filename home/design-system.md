@@ -190,36 +190,62 @@ El fondo del listado cambia con `--ml-panel-theme` mediante
 ## Tipografía
 
 Usar `"Noto Sans", Arial, sans-serif`. La home carga Noto Sans en pesos
-400, 500, 600, 700 y 800.
+300, 400, 500, 600, 700 y 800.
 
-**[CONFIRMADO]** Jerarquía de pesos actual (reemplaza al criterio
-anterior de "títulos grandes = 800"):
+La fuente de verdad tipográfica es la sección `Canonical typography
+scale`, ubicada al final de `home/css/home.css`. Los componentes se
+mapean a roles semánticos: no definir escalas nuevas según el elemento
+HTML (`h2`, `h3`, etc.) ni depender de la especificidad de selectores
+anteriores.
 
-- Peso 500 para titulares editoriales grandes (hero, `h2`, `h3`, títulos
-  de línea editorial).
-- Peso 600 para botones, controles, títulos de producto y acciones.
-- Reservar 700/800 para énfasis puntual, no como default de titular.
-- Tracking negativo en display; no usar mayúsculas espaciadas salvo
-  microetiquetas heredadas.
-- Cuerpo base con `line-height: 1.5`.
+Reglas:
 
-Escala efectiva:
+- El tracking negativo está reservado exclusivamente para `Display XL`
+  y `Display L`.
+- Los headings de sección usan tracking normal. Los títulos grandes de
+  card y los títulos de categoría admiten un ajuste sutil de `-0.01em`.
+- Peso 300 se reserva para los títulos editoriales `Display L`.
+- Peso 500 se usa en el hero, headings de sección y headings grandes de
+  card.
+- Peso 600 se usa en headings de card, botones, controles y énfasis.
+- Pesos 700/800 quedan reservados para énfasis puntual.
+- Los cuerpos usan interlíneas entre `1.55` y `1.6`.
+- Solo existe una adaptación tipográfica exclusiva para mobile:
+  `Display XL` cambia a `clamp(2.25rem, 10vw, 2.75rem)` hasta 640px.
 
-| Rol | Tamaño | Peso | Interlínea / tracking |
-|---|---|---:|---|
-| Hero `h1` | `clamp(2.5rem, 5.4vw, 4.2rem)` | 500 | `0.98`, `-0.055em` |
-| `h2` global | `clamp(2rem, 4.4vw, 3.75rem)` | 500 | cercano a 1 |
-| `h3` global | `clamp(1.65rem, 3.8vw, 3.5rem)` | 500 | display |
-| `h4` global/sección | `clamp(1.6rem, 3vw, 2.5rem)` | 500 | `1`, `-0.05rem` |
-| `h5` global | `clamp(1.1rem, 1.8vw, 1.4rem)` | según contexto | normal |
-| Subtítulo hero/panel | `clamp(1rem, 1.45vw, 1.25rem)` | 400 | `1.5` |
-| Título de categoría | `clamp(1.1rem, 1.5vw, 1.3rem)` | 600 | `1.3` |
-| Título de línea editorial | `clamp(2.2rem, 4.5vw, 3.5rem)` | 500 | display |
-| Cuerpo de línea editorial | `clamp(1.05rem, 1.35vw, 1.25rem)` | normal | `1.55` |
-| Título de producto | `clamp(1.05rem, 1.3vw, 1.2rem)` | 600 | `1.35` |
-| Label de atributo | `0.68rem` | normal | compacto |
-| Valor de atributo | `0.78rem` | normal | compacto |
-| Botones primarios | `16px` | 600 | `1` |
+Escala oficial:
+
+| Rol | Tamaño | Peso | Interlínea | Tracking |
+|---|---|---:|---:|---:|
+| Display XL | `clamp(2.25rem, calc(1.75rem + 2vw), 4.2rem)` | 500 | `1.02` | `-0.04em` |
+| Display L | `clamp(2.2rem, calc(1.8rem + 1.7vw), 3.5rem)` | 300 | `1.08` | `-0.025em` |
+| Heading section | `clamp(2rem, calc(1.75rem + 1vw), 2.9375rem)` | 500 | `1.15` | `0` |
+| Heading card large | `clamp(1.5rem, calc(1.3rem + 0.8vw), 2rem)` | 400 | `1.2` | `-0.01em` |
+| Heading product card | `clamp(1.05rem, calc(1rem + 0.4vw), 1.2rem)` | 600 | `1.3` | `0` |
+| Heading category card | `clamp(1.05rem, calc(1rem + 0.3vw), 1.4rem)` | 500 | `1.35` | `-0.01em` |
+| Heading news card | `clamp(1.2rem, calc(1.1rem + 0.5vw), 1.4rem)` | 600 | `1.3` | `0` |
+| Body L | `clamp(1rem, calc(0.95rem + 0.25vw), 1rem)` | 400 | `1.6` | `0` |
+| Body M | `1rem` | 400 | `1.6` | `0` |
+| Body S | `0.875rem` | 400 | `1.55` | `0` |
+| Label | `0.75rem` | 500 | `1.3` | `0` |
+| Button | `1rem` (`0.875rem` hasta 1360px) | 600 | `1` | `0` |
+
+Mapeo principal:
+
+| Rol | Componentes |
+|---|---|
+| Display XL | Título del hero |
+| Display L | Títulos de líneas editoriales destacadas |
+| Heading section | Productos destacados, líneas profesionales, categorías, Casa FOA, novedades, FAQ y newsletter |
+| Heading card large | Títulos de tarjetas de líneas profesionales |
+| Heading product card | Títulos de producto en Destacados y líneas editoriales |
+| Heading category card | Títulos de “Explorá nuestras categorías” y subfamilias editoriales |
+| Heading news card | Títulos de novedades |
+| Body L | Subtítulos de sección, descripciones editoriales y textos introductorios |
+| Body M | Estados de carga y mensajes generales |
+| Body S | Descripciones de novedades, respuestas FAQ y valores de atributos |
+| Label | Labels de atributos y badges |
+| Button | Botones, tabs y acciones |
 
 ## Layout y responsive
 
