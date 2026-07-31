@@ -9,5 +9,4 @@ venv/
 .env
 .env.local
 .codex/
-dist/
 ml.product-cards.html
