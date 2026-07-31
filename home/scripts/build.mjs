@@ -12,9 +12,6 @@ const javascriptFiles = [
   "home.js",
 ];
 
-const cssUrl = "https://s3.coresagroup.com.s3.amazonaws.com/NUEVO_MACROLED/home.css";
-const javascriptUrl = "https://s3.coresagroup.com.s3.amazonaws.com/NUEVO_MACROLED/home.bundle.js";
-
 export async function build() {
   await mkdir(distDirectory, { recursive: true });
 
@@ -46,9 +43,7 @@ export async function build() {
   const component = page.slice(componentStart, scriptsStart).trim();
   const embed = [
     "<!-- Generated file. Run npm run build after editing the Home. -->",
-    `<link rel="stylesheet" href="${cssUrl}">`,
     component,
-    `<script src="${javascriptUrl}"></script>`,
     "",
   ].join("\n");
 
