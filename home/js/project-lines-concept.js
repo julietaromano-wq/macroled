@@ -48,7 +48,7 @@
           <span>${esc(item.title)}</span>
           <span class="ml-project-lines-concept__arrow" aria-hidden="true">&rarr;</span>
           <p>${esc(item.subtitle)}</p>
-          ${item.badge ? `<span class="ml-project-lines-concept__badge">${esc(item.badge)}</span>` : ""}
+          ${item.badge ? `<span class="ml-highlight-badge ml-project-lines-concept__badge">${esc(item.badge)}</span>` : ""}
         </div>
       </a>`;
   }

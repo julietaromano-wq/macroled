@@ -28,7 +28,7 @@
   };
 
   function categoryTemplate(item) {
-    const badge = item.badge ? `<span class="ml-category-card__badge">${esc(item.badge)}</span>` : "";
+    const badge = item.badge ? `<span class="ml-highlight-badge ml-category-card__badge">${esc(item.badge)}</span>` : "";
     return `<a class="ml-category-card" href="${esc(item.href)}" data-editorial-id="${esc(item.id)}"><h3>${esc(item.title)}</h3>${badge}<div class="ml-category-card__media"><img src="${esc(item.image)}" alt="" loading="lazy" width="800" height="800"></div></a>`;
   }
 

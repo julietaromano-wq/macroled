@@ -3558,10 +3558,6 @@ body {
   align-self: end;
   justify-self: start;
   width: fit-content;
-  padding: 0.45rem 0.65rem;
-  border-radius: 999px;
-  background: color-mix(in srgb, var(--ml-light-blue-400) 40%, transparent);
-  color: var(--ml-grey-50);
   backdrop-filter: blur(10px);
   font-size: 14px;
   font-weight: 500;
@@ -3740,6 +3736,10 @@ body {
   margin: clamp(2rem, 4vw, 3rem) auto 0;
 }
 
+.ml-home .ml-categories-test__tab.is-active {
+  color: var(--ml-action-primary);
+}
+
 .ml-home .ml-categories-test__grid {
   margin-top: clamp(3rem, 5vw, 4.5rem);
   padding-bottom: 0;
@@ -3778,10 +3778,6 @@ body {
     scroll-snap-align: none;
   }
 
-  .ml-home .ml-categories-test__grid .ml-category-card__badge {
-    padding: 0.3rem 0.45rem;
-    font-size: 10px;
-  }
 }
 
 .ml-home .ml-featured-products__tab {
@@ -4621,16 +4617,6 @@ body {
   border: 1px solid color-mix(in srgb, var(--ml-grey-400) 42%, transparent);
   background:
     radial-gradient(
-      ellipse at 4% 68%,
-      color-mix(in srgb, var(--ml-light-blue-400) 8%, transparent) 0%,
-      transparent 38%
-    ),
-    radial-gradient(
-      ellipse at 88% 92%,
-      color-mix(in srgb, var(--ml-light-blue-400) 12%, transparent) 0%,
-      transparent 42%
-    ),
-    radial-gradient(
       ellipse at 24% 12%,
       color-mix(in srgb, var(--ml-grey-50) 82%, transparent) 0%,
       transparent 42%
@@ -4639,8 +4625,8 @@ body {
       135deg,
       color-mix(in srgb, var(--ml-grey-100) 78%, transparent) 0%,
       color-mix(in srgb, var(--ml-grey-200) 72%, transparent) 42%,
-      color-mix(in srgb, var(--ml-grey-50) 82%, transparent) 68%,
-      color-mix(in srgb, var(--ml-grey-300) 68%, transparent) 100%
+      color-mix(in srgb, var(--ml-grey-50) 96%, var(--ml-light-blue-400)) 68%,
+      color-mix(in srgb, var(--ml-grey-300) 92%, var(--ml-light-blue-400)) 100%
     );
   backdrop-filter: blur(18px) saturate(0.82);
   -webkit-backdrop-filter: blur(18px) saturate(0.82);
@@ -4657,6 +4643,29 @@ body {
   z-index: 2;
   flex: 0 0 auto;
   padding: 0.75rem 0.25rem 0.5rem;
+}
+
+.ml-home
+  .ml-categories-test__grid
+  .ml-category-card
+  .ml-category-card__badge {
+  position: absolute;
+  z-index: 3;
+  top: 1rem;
+  right: auto;
+  bottom: auto;
+  left: 1rem;
+  margin: 0;
+}
+
+@media (max-width: 640px) {
+  .ml-home
+    .ml-categories-test__grid
+    .ml-category-card
+    .ml-category-card__badge {
+    top: auto;
+    bottom: 1rem;
+  }
 }
 
 .ml-home .ml-categories-test__grid .ml-category-card__media {
@@ -4706,8 +4715,8 @@ body {
         135deg,
         color-mix(in srgb, var(--ml-grey-100) 82%, transparent) 0%,
         color-mix(in srgb, var(--ml-grey-200) 76%, transparent) 38%,
-        color-mix(in srgb, var(--ml-grey-50) 88%, transparent) 72%,
-        color-mix(in srgb, var(--ml-grey-300) 72%, transparent) 100%
+        color-mix(in srgb, var(--ml-grey-50) 96%, var(--ml-light-blue-400)) 72%,
+        color-mix(in srgb, var(--ml-grey-300) 92%, var(--ml-light-blue-400)) 100%
       );
     box-shadow: none;
   }
@@ -4788,8 +4797,13 @@ body {
   --ml-type-label-weight: 500;
   --ml-type-label-leading: 1.3;
   --ml-type-label-tracking: 0;
-  --ml-type-label-highlight-size: 0.875rem;
-  --ml-type-label-highlight-weight: 600;
+  --ml-type-label-highlight-size: clamp(
+    0.7rem,
+    calc(0.65rem + 0.25vw),
+    0.85rem
+  );
+  --ml-type-label-highlight-weight: 500;
+  --ml-type-label-highlight-tracking: 0.04em;
 
   --ml-type-button-size: 1rem;
   --ml-type-button-weight: 600;
@@ -4908,12 +4922,19 @@ body {
 }
 
 /* Highlight label */
-.ml-home .ml-category-card__badge,
-.ml-home .ml-project-lines-concept__badge {
+.ml-home .ml-highlight-badge {
+  padding: 0.3rem 0.5rem;
+  border-radius: 999px;
+  background: #c9b376;
+  color: var(--ml-dark-blue-700);
   font-size: var(--ml-type-label-highlight-size);
   font-weight: var(--ml-type-label-highlight-weight);
   line-height: var(--ml-type-label-leading);
-  letter-spacing: var(--ml-type-label-tracking);
+  letter-spacing: var(--ml-type-label-highlight-tracking);
+}
+
+.ml-home .ml-category-card__badge {
+  background: #e2d09e;
 }
 
 .ml-home .ml-product-attr__value {
