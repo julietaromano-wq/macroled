@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Macroled — Catálogo de productos (prototipo)</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://typesense.coresagroup.com" crossorigin>
+<link rel="dns-prefetch" href="https://typesense.coresagroup.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<div class="crumb" id="breadcrumb">Inicio &nbsp;›&nbsp; <b>Productos</b></div>
+
+<div class="mobile-category-heading" id="mobileCategoryHeading"></div>
+
+<div class="filters-backdrop" id="filtersBackdrop"></div>
+
+<div class="layout">
+  <aside class="filters" id="filtersAside">
+    <div class="filters-mobile-header">
+      <span>Filtros</span>
+      <button class="filters-close" id="filtersClose" aria-label="Cerrar filtros">×</button>
+    </div>
+    <div class="category-heading" id="categoryHeading" style="display:none;"></div>
+    <div id="filtersPanel"></div>
+    <div class="filters-mobile-nav" id="filtersMobileNav">
+      <div class="fmn-screen fmn-list active" id="fmnList"></div>
+      <div class="fmn-screen fmn-detail" id="fmnDetail">
+      <div class="fmn-detail-header">
+          <button class="fmn-back" id="fmnBack" aria-label="Volver">
+            <span class="fmn-back-icon">‹</span>
+            <span class="fmn-detail-title" id="fmnDetailTitle"></span>
+          </button>
+        </div>
+        <div class="fmn-detail-body" id="fmnDetailBody"></div>
+      </div>
+    </div>
+    <div class="filters-mobile-footer">
+      <button class="filters-apply" id="filtersApply">Ver resultados</button>
+    </div>
+  </aside>
+
+  <main class="results">
+    <div id="subfamiliaRow" style="display:none;"></div>
+    <div class="toolbar-top" id="chipsBar"></div>
+
+    <div class="count-row">
+      <div class="showing" id="showingLabel">Cargando productos…</div>
+      <div class="toolbar-right">
+        <button class="filters-toggle" id="filtersToggle">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="6" x2="20" y2="6"/><circle cx="9" cy="6" r="2.2" fill="#fff"/><line x1="4" y1="12" x2="20" y2="12"/><circle cx="16" cy="12" r="2.2" fill="#fff"/><line x1="4" y1="18" x2="20" y2="18"/><circle cx="11" cy="18" r="2.2" fill="#fff"/></svg>
+          Filtros
+        </button>
+        <select class="sort" id="sortSelect">
+          <option value="">Ordenar por</option>
+          <option value="nuevo:desc">Novedades primero</option>
+        </select>
+        <div class="view-toggle">
+          <button id="btnGrid" class="active" title="Vista grilla">▦</button>
+          <button id="btnList" title="Vista lista">☰</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid" id="grid"></div>
+
+    <div class="pagination" id="pagination"></div>
+  </main>
+</div>
+
+<div class="compare-bar" id="compareBar" style="display:none;">
+  <div class="compare-bar-inner">
+    <div class="compare-bar-header" id="compareBarHeader">
+      <div class="compare-bar-title">Productos seleccionados <span class="compare-count" id="compareCount">0</span></div>
+      <button class="compare-toggle" id="compareToggle" aria-label="Minimizar / expandir">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>
+      </button>
+    </div>
+    <div class="compare-bar-body" id="compareBarBody"></div>
+  </div>
+</div>
+
+<script src="comparar.js"></script>
+<script src="script.js"></script>
+</body>
+</html>
