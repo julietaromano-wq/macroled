@@ -397,24 +397,37 @@ function mergeVariantValue(doc, name, baseValue){
 }
 
 function buildSpecs(doc){
+  const isTemperature = attribute => /temperatura|luz|kelvin|\bcct\b/i.test(String(attribute.label || "")) || /\b\d{4}\s*k\b/i.test(String(attribute.value || ""));
+  const isSmart = attribute => /^smart$/i.test(String(attribute.value || "").trim()) || /\bsmart\b/i.test(String(attribute.label || ""));
+  let attributes;
   if(Array.isArray(doc.atributos) && doc.atributos.length){
-    return doc.atributos.slice(0, 3).map(attribute => ({
+    attributes = doc.atributos.map(attribute => ({
       label: attribute.nombre,
       value: mergeVariantValue(doc, attribute.nombre, attribute.valor)
     }));
+  }else{
+    attributes = [
+      { label: doc.nombre_attr1, value: doc.attr_1 },
+      { label: doc.nombre_attr2, value: doc.attr_2 },
+      { label: doc.nombre_attr3, value: doc.attr_3 }
+    ]
+      .filter(attribute => attribute.label && attribute.value)
+      .map(attribute => ({
+        label: attribute.label,
+        value: mergeVariantValue(doc, attribute.label, attribute.value)
+      }));
   }
-
-  return [
-    { label: doc.nombre_attr1, value: doc.attr_1 },
-    { label: doc.nombre_attr2, value: doc.attr_2 },
-    { label: doc.nombre_attr3, value: doc.attr_3 }
-  ]
-    .filter(attribute => attribute.label && attribute.value)
-    .slice(0, 3)
-    .map(attribute => ({
-      label: attribute.label,
-      value: mergeVariantValue(doc, attribute.label, attribute.value)
-    }));
+  const variant = doc.nombre_attr_variantes && doc.attr_variantes
+    ? { label: doc.nombre_attr_variantes, value: doc.attr_variantes }
+    : null;
+  const variantLabel = String(variant?.label || "").trim().toLowerCase();
+  const specs = attributes.filter(attribute =>
+    String(attribute.label || "").trim().toLowerCase() !== variantLabel
+    && !isTemperature(attribute)
+    && !isSmart(attribute)
+  );
+  if(variant && !isTemperature(variant) && !isSmart(variant)) specs.unshift(variant);
+  return specs.slice(0, 2);
 }
 
 // Nombre real del campo de Typesense para las variantes de tono
@@ -454,15 +467,27 @@ function tempCategoryColor(kelvinStr){
 }
 
 function buildTempBadge(doc){
-  // Prioridad: ATTR_Variantes (puede traer varios tonos separados por ";")
-  // y si no está, attr_3 — mismo campo dinámico que ya usan otros atributos.
-  const source = doc[ATTR_VARIANTES_FIELD] || doc.attr_3 || doc.rango_temperatura || doc.temperatura_filtro || "";
-  if(!source) return "";
+  // ATTR_Variantes solo aporta tonos cuando nombre_attr_variantes indica
+  // temperatura; en otros productos puede contener ángulos u otra variante.
+  const attributeSources = [
+    { label: doc.nombre_attr1, value: doc.attr_1 },
+    { label: doc.nombre_attr2, value: doc.attr_2 },
+    { label: doc.nombre_attr3, value: doc.attr_3 }
+  ].filter(attribute => /temperatura|luz|kelvin|\bcct\b/i.test(String(attribute.label || "")));
+  const sources = [
+    ...attributeSources.map(attribute => attribute.value),
+    doc.rango_temperatura,
+    doc.temperatura_filtro
+  ];
+  if(/temperatura|luz|kelvin|\bcct\b/i.test(String(doc.nombre_attr_variantes || ""))){
+    sources.unshift(doc[ATTR_VARIANTES_FIELD]);
+  }
 
   // Limpiamos y dejamos solo los tonos que están en nuestro mapa de colores
   // conocidos (evita que un valor raro/typo rompa el badge)
   const tones = [...new Set(
-    source.toString().split(";").map(t => t.trim()).filter(Boolean)
+    sources.flatMap(source => String(source || "").match(/\d{4}\s*K/gi) || [])
+      .map(t => t.replace(/\s+/g, "").toUpperCase())
   )].filter(t => CCT_DOT[t]);
 
   if(!tones.length) return "";

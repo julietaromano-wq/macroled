@@ -129,12 +129,14 @@
       {
         title: "Casa FOA 2026, Edición Pocito",
         description: "Formamos parte de uno de los eventos de diseño más reconocidos del país, aportando luminarias LED que realzan texturas, colores y ambientes en proyectos de alto nivel estético.",
+        href: "/novedades/casa-foa-2026-edicion-pocito",
         image: "https://www.casafoa.com/landing/wp-content/uploads/2026/04/Espacio-21-Casa-FOA-Juan-Cruz-Paredes-2.webp",
         hoverImage: "https://www.casafoa.com/landing/wp-content/uploads/2026/04/Espacio-17-Casa-FOA-Juan-Cruz-Paredes-4.webp"
       },
       {
         title: "Expo Construir",
         description: "Presentamos nuestros últimos lanzamientos: las líneas Mónaco, Lima, Macroled ARQ, Skyline, Kyo, Taö y Höshi, pensadas para proyectos arquitectónicos.",
+        href: "/novedades/expo-construir",
         image: "https://s3.coresagroup.com/NUEVO_MACROLED/expo2.jpg",
         hoverImage: "https://s3.coresagroup.com/NUEVO_MACROLED/expo_hover.jpg",
         zoomDefaultImage: true
@@ -142,6 +144,7 @@
       {
         title: "Biel Light 2025",
         description: "Durante cuatro días presentamos nuevas tecnologías, lanzamientos y demostraciones técnicas, con asesoramiento personalizado para distribuidores, instaladores y profesionales del sector.",
+        href: "/novedades/biel-light-2025",
         image: "https://cdn.prod.website-files.com/690a24d6bf8e2592b2f29d1f/69bc53bc8148c948726225fa_691b4529bb6b28848a915f53_015.coresa-p-2600-p-2000.webp",
         hoverImage: "https://s3.coresagroup.com/NUEVO_MACROLED/biel_hover.jpg"
       }

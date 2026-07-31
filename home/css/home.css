@@ -519,12 +519,64 @@ body {
   object-fit: contain;
   transition: transform 0.25s;
 }
+.ml-product-smart-badge,
+.ml-product-temp-badge {
+  position: absolute;
+  z-index: 2;
+  border-radius: 999px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  line-height: 1;
+  white-space: nowrap;
+}
+.ml-product-variant-badge {
+  position: absolute;
+  z-index: 2;
+  top: 0.6rem;
+  right: 0.6rem;
+  color: #00567a;
+  font-size: 0.68rem;
+  font-weight: 700;
+  line-height: 1;
+  white-space: nowrap;
+}
+.ml-product-smart-badge {
+  top: 0.6rem;
+  left: 0.6rem;
+  padding: 0.45rem 0.7rem;
+  color: #fff;
+  letter-spacing: 0.03em;
+  background: linear-gradient(135deg, #00bdff, #0090c7);
+  box-shadow: 0 3px 10px rgba(0, 144, 199, 0.35);
+}
+.ml-product-temp-badge {
+  right: 0.6rem;
+  bottom: 0.6rem;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.42rem 0.55rem 0.42rem 0.7rem;
+  color: #26313b;
+  background: #fff;
+  border: 1px solid #e1e4e8;
+}
+.ml-product-badge-dot {
+  width: 0.58rem;
+  height: 0.58rem;
+  flex: 0 0 auto;
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 1px rgba(20, 24, 33, 0.12);
+}
+.ml-product-badge-dot.is-split {
+  box-shadow: 0 0 0 1px rgba(20, 24, 33, 0.12);
+}
 .ml-product-card:hover .ml-product-card__media img {
   transform: scale(1.05);
 }
 .ml-product-card__nav {
   position: absolute;
-  bottom: 0.4rem;
+  top: 50%;
+  transform: translateY(-50%);
   display: grid;
   place-items: center;
   width: 2rem;
@@ -546,7 +598,7 @@ body {
 }
 .ml-product-card__attrs {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 0.5rem;
   margin-top: auto;
 }
@@ -717,6 +769,16 @@ body {
   min-width: 0;
   width: 100%;
 }
+a.ml-news-card {
+  color: inherit;
+  text-decoration: none;
+  cursor: pointer;
+}
+a.ml-news-card:focus-visible {
+  outline: 3px solid currentColor;
+  outline-offset: 0.4rem;
+  border-radius: 1.25rem;
+}
 .ml-news-card__media {
   position: relative;
   overflow: hidden;
@@ -763,10 +825,17 @@ body {
 .ml-news-card h3 {
   margin: 0.45rem 0;
   font-size: 1.25rem;
+  transition: color 0.2s ease;
 }
 .ml-news-card p {
   color: #5c666e;
   font-size: 0.85rem;
+}
+@media (hover: hover) and (pointer: fine) {
+  a.ml-news-card:hover h3 {
+    text-decoration: underline;
+    text-underline-offset: 0.18em;
+  }
 }
 .ml-faq__list {
   border-top: 1px solid var(--ml-line);

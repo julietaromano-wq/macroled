@@ -132,12 +132,14 @@
       {
         title: "Casa FOA 2026, Edición Pocito",
         description: "Formamos parte de uno de los eventos de diseño más reconocidos del país, aportando luminarias LED que realzan texturas, colores y ambientes en proyectos de alto nivel estético.",
+        href: "/novedades/casa-foa-2026-edicion-pocito",
         image: "https://www.casafoa.com/landing/wp-content/uploads/2026/04/Espacio-21-Casa-FOA-Juan-Cruz-Paredes-2.webp",
         hoverImage: "https://www.casafoa.com/landing/wp-content/uploads/2026/04/Espacio-17-Casa-FOA-Juan-Cruz-Paredes-4.webp"
       },
       {
         title: "Expo Construir",
         description: "Presentamos nuestros últimos lanzamientos: las líneas Mónaco, Lima, Macroled ARQ, Skyline, Kyo, Taö y Höshi, pensadas para proyectos arquitectónicos.",
+        href: "/novedades/expo-construir",
         image: "https://s3.coresagroup.com/NUEVO_MACROLED/expo2.jpg",
         hoverImage: "https://s3.coresagroup.com/NUEVO_MACROLED/expo_hover.jpg",
         zoomDefaultImage: true
@@ -145,6 +147,7 @@
       {
         title: "Biel Light 2025",
         description: "Durante cuatro días presentamos nuevas tecnologías, lanzamientos y demostraciones técnicas, con asesoramiento personalizado para distribuidores, instaladores y profesionales del sector.",
+        href: "/novedades/biel-light-2025",
         image: "https://cdn.prod.website-files.com/690a24d6bf8e2592b2f29d1f/69bc53bc8148c948726225fa_691b4529bb6b28848a915f53_015.coresa-p-2600-p-2000.webp",
         hoverImage: "https://s3.coresagroup.com/NUEVO_MACROLED/biel_hover.jpg"
       }
@@ -199,9 +202,45 @@
     const extras=doc.atributo_variante.filter(v=>String(v.nombre||"").toLowerCase()===String(nombre||"").toLowerCase()&&v.valor&&!existing.includes(String(v.valor))).map(v=>String(v.valor));
     return extras.length?[base,...extras].filter(Boolean).join(" ; "):base;
   }
+  function rawSpecs(doc){
+    if(Array.isArray(doc.atributos)&&doc.atributos.length) return doc.atributos.map(a=>({label:a.nombre,value:mergeVariantValue(doc,a.nombre,a.valor)}));
+    return [{label:doc.nombre_attr1,value:doc.attr_1},{label:doc.nombre_attr2,value:doc.attr_2},{label:doc.nombre_attr3,value:doc.attr_3}].filter(p=>p.label&&p.value).map(p=>({label:p.label,value:mergeVariantValue(doc,p.label,p.value)}));
+  }
+  const isTemperatureSpec=spec=>/temperatura|luz|kelvin|\bcct\b/i.test(String(spec.label||""))||/\b\d{4}\s*k\b/i.test(String(spec.value||""));
+  const isSmartSpec=spec=>/^smart$/i.test(String(spec.value||"").trim())||/\bsmart\b/i.test(String(spec.label||""));
+  const normalizedLabel=value=>String(value||"").trim().toLocaleLowerCase("es");
+  function variantSpec(doc){
+    const label=String(doc.nombre_attr_variantes||"").trim(),value=String(doc.attr_variantes||"").trim();
+    return label&&value?{label,value}:null;
+  }
   function buildSpecs(doc){
-    if(Array.isArray(doc.atributos)&&doc.atributos.length) return doc.atributos.slice(0,3).map(a=>({label:a.nombre,value:mergeVariantValue(doc,a.nombre,a.valor)}));
-    return [{label:doc.nombre_attr1,value:doc.attr_1},{label:doc.nombre_attr2,value:doc.attr_2},{label:doc.nombre_attr3,value:doc.attr_3}].filter(p=>p.label&&p.value).slice(0,3).map(p=>({label:p.label,value:mergeVariantValue(doc,p.label,p.value)}));
+    const variant=variantSpec(doc),variantLabel=normalizedLabel(variant?.label);
+    const specs=rawSpecs(doc).filter(spec=>normalizedLabel(spec.label)!==variantLabel&&!isTemperatureSpec(spec)&&!isSmartSpec(spec));
+    if(variant&&!isTemperatureSpec(variant)&&!isSmartSpec(variant))specs.unshift(variant);
+    return specs.slice(0,2);
+  }
+  function tempCategoryColor(value){const kelvin=parseInt(value,10);if(kelvin<=3000)return "#fff79b";if(kelvin<=4500)return "#d9d9d9";return "#bce4fa"}
+  function buildTempBadge(doc){
+    const candidates=[...rawSpecs(doc).filter(isTemperatureSpec).map(spec=>spec.value),doc.rango_temperatura,doc.temperatura_filtro];
+    const variant=variantSpec(doc);if(variant&&isTemperatureSpec(variant))candidates.unshift(variant.value);
+    const matches=candidates.flatMap(source=>String(source||"").match(/\d{4}\s*K/gi)||[]);
+    const tones=[...new Set(matches.map(value=>value.replace(/\s+/g,"").toUpperCase()).filter(value=>CCT_DOT[value]))].sort((a,b)=>parseInt(a,10)-parseInt(b,10));
+    if(!tones.length)return "";
+    const label=tones.length===1?tones[0]:`${tones[0]}–${tones[tones.length-1]}`;
+    const colors=[...new Set(tones.map(tempCategoryColor))];
+    const background=colors.length===1?colors[0]:`linear-gradient(to bottom, ${colors.map((color,index)=>{const step=100/colors.length;return `${color} ${index*step}%, ${color} ${(index+1)*step}%`}).join(", ")})`;
+    return `<span class="ml-product-temp-badge">${escapeHTML(label)}<span class="ml-product-badge-dot${colors.length>1?" is-split":""}" style="background:${background}"></span></span>`;
+  }
+  function buildVariantBadge(doc){
+    const configured=parseInt(doc.cant_variantes,10);
+    const fieldCount=variantSpec(doc)?.value.split(";").map(value=>value.trim()).filter(Boolean).length||0;
+    const skuCount=Array.isArray(doc.variantes_sku)?doc.variantes_sku.length:0;
+    const count=configured>0?configured:Math.max(fieldCount,skuCount);
+    return count>1?`<span class="ml-product-variant-badge">${count} variantes</span>`:"";
+  }
+  function buildSmartBadge(doc){
+    const directSmart=doc.smart===true||doc.es_smart===true||[doc.smart,doc.es_smart].some(value=>/^(si|sí|true|1|smart)$/i.test(String(value||"").trim()));
+    return directSmart||rawSpecs(doc).some(isSmartSpec)?'<span class="ml-product-smart-badge" aria-label="Producto Smart">SMART</span>':"";
   }
   const filterValue=value=>String(value??"").replace(/`/g,"\\`");
   const buildFilter=(field,value,filters)=>{
@@ -219,10 +258,10 @@
   }
   function cardTemplate(doc){
     const imgs=parseImages(doc),specs=buildSpecs(doc),link=safeUrl(doc.link_ficha_web),tag=link?"a":"div";
-    const attrs=specs.length?specs.map(spec=>{const value=String(spec.value||""),token=value.split(";")[0].trim(),dot=/luz|temperatura/i.test(spec.label)&&CCT_DOT[token]?`<span class="ml-product-dot" style="background:${CCT_DOT[token]}"></span>`:"";return `<div class="ml-product-attr"><span class="ml-product-attr__label">${escapeHTML(spec.label)}</span><span class="ml-product-attr__value">${dot}${escapeHTML(value)}</span></div>`}).join(""):`<span class="ml-product-card__note">Sin atributos cargados</span>`;
+    const attrs=specs.length?specs.map(spec=>`<div class="ml-product-attr"><span class="ml-product-attr__label">${escapeHTML(spec.label)}</span><span class="ml-product-attr__value">${escapeHTML(spec.value)}</span></div>`).join(""):`<span class="ml-product-card__note">Sin atributos cargados</span>`;
     const image=imgs.length?`<img src="${escapeHTML(imgs[0])}" alt="${escapeHTML(doc.nombre||"Producto Macroled")}" loading="lazy" width="400" height="400" data-images="${escapeHTML(JSON.stringify(imgs))}" data-index="0">`:`<span class="ml-product-card__note">Sin imagen</span>`;
     const nav=imgs.length>1?`<button type="button" class="ml-product-card__nav ml-product-card__nav--prev" aria-label="Imagen anterior">←</button><button type="button" class="ml-product-card__nav ml-product-card__nav--next" aria-label="Imagen siguiente">→</button>`:"";
-    return `<${tag} class="ml-product-card${link?"":" ml-product-card--disabled"}"${link?` href="${escapeHTML(link)}"`:""} data-id="${escapeHTML(doc.id||doc.sku||"")}"><div class="ml-product-card__media">${image}${nav}</div><div class="ml-product-card__title">${escapeHTML(doc.nombre||"Producto sin nombre")}</div><div class="ml-product-card__attrs">${attrs}</div></${tag}>`;
+    return `<${tag} class="ml-product-card${link?"":" ml-product-card--disabled"}"${link?` href="${escapeHTML(link)}"`:""} data-id="${escapeHTML(doc.id||doc.sku||"")}"><div class="ml-product-card__media">${buildSmartBadge(doc)}${buildVariantBadge(doc)}${buildTempBadge(doc)}${image}${nav}</div><div class="ml-product-card__title">${escapeHTML(doc.nombre||"Producto sin nombre")}</div><div class="ml-product-card__attrs">${attrs}</div></${tag}>`;
   }
   function wireCarousels(grid){
     grid.querySelectorAll(".ml-product-card__media").forEach(media=>{const img=media.querySelector("img[data-images]");if(!img)return;let images=[];try{images=JSON.parse(img.dataset.images)}catch(_){return}const move=direction=>{let index=Number(img.dataset.index||0);index=(index+direction+images.length)%images.length;img.dataset.index=String(index);img.src=images[index]};media.querySelector(".ml-product-card__nav--prev")?.addEventListener("click",event=>{event.preventDefault();event.stopPropagation();move(-1)});media.querySelector(".ml-product-card__nav--next")?.addEventListener("click",event=>{event.preventDefault();event.stopPropagation();move(1)})});
@@ -414,24 +453,24 @@
       title: "Luz de calle Standard",
       subtitle: "Para proyectos, vías, parques y espacios públicos.",
       badge: "Nueva línea",
-      productImage: "https://s3.coresagroup.com/MACROLED/1000/7428325578647a.png",
-      ambientImage: "https://s3.coresagroup.com/NUEVO_MACROLED/street_ambient.png",
+      productImage: "assets/images/project-street-product-source.png",
+      ambientImage: "assets/images/project-street-ambient-dark.png",
       href: "#ml-section-proyectos"
     },
     {
       id: "invictus",
       title: "Invictus",
       subtitle: "Para grandes áreas, fachadas y espacios deportivos.",
-      productImage: "https://s3.coresagroup.com/MACROLED/1000/INVICTUS-1500W-10D-857.png",
-      ambientImage: "https://s3.coresagroup.com/NUEVO_MACROLED/invictus_ambient.png",
+      productImage: "assets/images/project-invictus-product.png",
+      ambientImage: "assets/images/project-invictus-ambient.png",
       href: "#ml-section-proyectos"
     },
     {
       id: "highbay",
       title: "Highbay PRO",
       subtitle: "Para naves industriales y espacios de gran altura.",
-      productImage: "https://d1zltvqju4u8ql.cloudfront.net/fit-in/1000x1000/MACROLED/WEB/PHB-100W-90D-857-CW_FRONT.webp",
-      ambientImage: "https://s3.coresagroup.com.s3/NUEVO_MACROLED/highbay_ambient.png",
+      productImage: "assets/images/project-highbay-product-source.webp",
+      ambientImage: "assets/images/project-highbay-ambient.png",
       href: "#ml-section-proyectos"
     }
   ];

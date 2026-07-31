@@ -87,8 +87,6 @@ Trabajar en este orden:
    estilos.
 4. Mantener los valores editoriales reales documentados cuando no exista
    todavía un token equivalente.
-5. No modificar `home/webflow-dist/` manualmente: regenerarlo desde las
-   fuentes mediante `home/scripts/build-webflow.mjs`.
 
 La home usa el namespace `.ml-home` / `.ml-*`. Mantenerlo para evitar
 colisiones con Webflow.
