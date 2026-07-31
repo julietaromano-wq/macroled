@@ -1,0 +1,76 @@
+/* Preload Macroled — overlay hasta que Typesense / la página esté lista */
+html.ml-loading,
+html.ml-loading body {
+  background: #f5f5f5;
+}
+
+html.ml-loading body {
+  overflow: hidden;
+}
+
+html.ml-loading body > *:not(#ml-preload) {
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+#ml-preload {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f5f5f5;
+  color: #00152b;
+  transition: opacity 0.4s ease, visibility 0.4s ease;
+}
+
+#ml-preload.is-done {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.ml-preload__inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 24px;
+  width: min(280px, 78vw);
+  box-sizing: border-box;
+}
+
+.ml-preload__logo-wrap {
+  position: relative;
+  width: 100%;
+  max-width: 220px;
+  line-height: 0;
+}
+
+.ml-preload__logo {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* Base: gris clarito */
+.ml-preload__logo--base {
+  color: #d5dbe2;
+}
+
+/* Capa de color — el avance lo maneja JS con --ml-fill (0 a 1) */
+.ml-preload__logo--fill {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: auto;
+  color: #0077a8;
+  clip-path: inset(0 calc((1 - var(--ml-fill, 0)) * 100%) 0 0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ml-preload__logo--fill {
+    clip-path: inset(0 0 0 0);
+  }
+}

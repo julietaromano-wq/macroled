@@ -1,0 +1,37 @@
+<!--
+  PRELOAD MACROLED — qué embeber en cada página
+  Archivos: preload.css + preload.js (misma carpeta o ajustá la ruta)
+
+  NO hace falta pegar el <div id="ml-preload">...</div> en el body.
+  preload.js lo crea solo (logo gris → fill #0077a8).
+-->
+
+<!-- 1) En la etiqueta <html>: -->
+<html lang="es" class="ml-loading" data-ml-preload="typesense">
+<!--
+  data-ml-preload="typesense"  → esperá Typesense / primer render y llamá MacroledPreload.done()
+  data-ml-preload="dom"        → se oculta solo cuando el DOM está listo
+-->
+
+<!-- 2) Lo más arriba posible dentro de <head>: -->
+<link rel="stylesheet" href="preload.css">
+<script src="preload.js"></script>
+
+<!-- 3) Solo en páginas con Typesense, cuando terminó el primer render: -->
+<script>
+  if (window.MacroledPreload) window.MacroledPreload.done();
+</script>
+
+<!--
+  Ejemplo tipico:
+
+  let initialPreloadDone = false;
+  function finishInitialPreload(){
+    if (initialPreloadDone) return;
+    initialPreloadDone = true;
+    if (window.MacroledPreload) window.MacroledPreload.done();
+  }
+
+  // al final del primer loadAndRender / loadAllDescargables / etc.
+  finishInitialPreload();
+-->
