@@ -4615,10 +4615,21 @@ body {
 
 .ml-home .ml-categories-test__grid .ml-category-card {
   isolation: isolate;
-  aspect-ratio: 1;
+  aspect-ratio: auto;
+  gap: clamp(0.75rem, 1.5vw, 1.25rem);
   padding: 1rem 1rem 0;
   border: 1px solid color-mix(in srgb, var(--ml-grey-400) 42%, transparent);
   background:
+    radial-gradient(
+      ellipse at 4% 68%,
+      color-mix(in srgb, var(--ml-light-blue-400) 8%, transparent) 0%,
+      transparent 38%
+    ),
+    radial-gradient(
+      ellipse at 88% 92%,
+      color-mix(in srgb, var(--ml-light-blue-400) 12%, transparent) 0%,
+      transparent 42%
+    ),
     radial-gradient(
       ellipse at 24% 12%,
       color-mix(in srgb, var(--ml-grey-50) 82%, transparent) 0%,
@@ -4651,19 +4662,23 @@ body {
 .ml-home .ml-categories-test__grid .ml-category-card__media {
   position: relative;
   z-index: 1;
-  width: calc(100% + 2rem);
-  margin-inline: -1rem;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1;
+  flex: 0 0 auto;
+  margin-inline: 0;
   align-items: end;
   justify-items: center;
+  padding-bottom: 0.35rem;
   overflow: hidden;
 }
 
 .ml-home .ml-categories-test__grid .ml-category-card img {
-  width: 100%;
-  height: 115%;
+  width: 82%;
+  height: 82%;
   object-fit: contain;
   object-position: center bottom;
-  transform: translateY(14%);
+  transform: none;
   transform-origin: center bottom;
   transition:
     transform 0.65s cubic-bezier(0.22, 1, 0.36, 1),
@@ -4674,8 +4689,8 @@ body {
   .ml-categories-test__grid
   .ml-category-card[data-editorial-id="lamparas"]
   img {
-  width: 84%;
-  height: 105%;
+  width: 72%;
+  height: 82%;
 }
 
 @media (hover: hover) and (pointer: fine) {
@@ -4699,7 +4714,7 @@ body {
 
   .ml-home .ml-categories-test__grid .ml-category-card:hover img {
     filter: saturate(1.03) contrast(1.02);
-    transform: translateY(14%) scale(1.06);
+    transform: scale(1.08);
   }
 }
 

@@ -1,0 +1,11 @@
+{
+  "private": true,
+  "scripts": {
+    "build": "node home/scripts/build.mjs",
+    "watch": "node home/scripts/watch.mjs",
+    "dev": "npm run watch"
+  },
+  "devDependencies": {
+    "chokidar": "^4.0.3"
+  }
+}
