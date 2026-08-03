@@ -77,13 +77,15 @@
       dragStartX = event.clientX;
       dragStartScroll = track.scrollLeft;
       dragged = false;
-      track.classList.add("is-dragging");
       track.setPointerCapture(event.pointerId);
     };
     track.onpointermove = event => {
       if (!track.hasPointerCapture(event.pointerId)) return;
       const distance = event.clientX - dragStartX;
-      if (Math.abs(distance) > 4) dragged = true;
+      if (Math.abs(distance) > 4 && !dragged) {
+        dragged = true;
+        track.classList.add("is-dragging");
+      }
       track.scrollLeft = dragStartScroll - distance;
     };
     const stopDragging = event => {

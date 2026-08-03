@@ -148,24 +148,18 @@ Aliases exportados por Figma: `tiny` 2px, `xxxsmall` 4px, `xxsmall` 8px,
 Usar `99999px` para pills. La home conserva `999px` como equivalente
 práctico en controles existentes y `50%` para círculos.
 
-## Tokens semánticos reales de la home
+## Uso semántico de la paleta en la home
 
-La raíz `.ml-home` declara:
-
-```css
---ml-ink: #071521;
---ml-blue: #00152b;      /* dark-blue-700 */
---ml-cyan: #00bdff;      /* light-blue-500 */
---ml-paper: #f5f5f5;
---ml-line: rgba(7, 21, 33, 0.14);
---ml-radius: 1.25rem;    /* 20px / radius-large */
-```
+La home utiliza directamente los tokens canónicos de color de la paleta.
+La raíz `.ml-home` conserva `--ml-radius: 1.25rem` como alias local de
+`radius-large`.
 
 | Uso | Valor efectivo |
 |---|---|
-| Texto/tinta principal | `#071521` (`--ml-ink`, valor editorial fuera de la paleta primitiva) |
-| Fondo azul de marca | `#00152B` (`dark-blue-700`, `--ml-blue`) |
-| Acento luminoso/focus | `#00BDFF` (`light-blue-500`, `--ml-cyan`) |
+| Texto/tinta principal | `grey-800` (`#1C1C1A`) |
+| Texto secundario azul | `dark-blue-400` (`#334B63`) |
+| Fondo azul de marca | `dark-blue-700` (`#00152B`) |
+| Acento luminoso/focus | `light-blue-500` (`#00BDFF`) |
 | **Acción primaria (confirmado)** | `#0086B5` (`light-blue-700`) |
 | Acción primaria hover | `#006F98` (valor real legado; al refactorizar evaluar `light-blue-800` `#00688C`) |
 | Acción/tab alternativo | `#00ACE8` (`light-blue-600`) |
@@ -174,7 +168,7 @@ La raíz `.ml-home` declara:
 | Hover de superficie | `#E6F8FF` (`light-blue-50`) |
 | Texto secundario | `#53606A` o `#5B6472` (valores editoriales actuales fuera de paleta) |
 | Línea/progreso inactivo | `#DFE4E7` (valor editorial actual fuera de paleta) |
-| Fondo gris claro | `#F5F5F5` (`--ml-paper`, equivalente a `grey-200`) |
+| Fondo gris claro | `grey-200` (`#F5F5F5`) |
 
 No reemplazar silenciosamente valores editoriales por el color primitivo
 "más cercano" si cambia contraste o jerarquía. Proponer la migración y
@@ -274,7 +268,7 @@ con fill o con borde lleva flecha.**
    - Variante fill negro: fill `dark-blue-700` (`#00152B`), texto blanco.
      Usar sobre fondos claros que necesiten más contraste/seriedad que el
      azul de marca.
-   - Variante fill blanco: fill `grey-100` (`#FAFAFA`), texto `--ml-ink`
+   - Variante fill blanco: fill `grey-100` (`#FAFAFA`), texto `grey-800`
      o `dark-blue-700`. Usar sobre fondos oscuros (hero, secciones tipo
      Casa FOA).
    - Las tres comparten forma: padding 16px 32px, radio 8px, texto
@@ -327,8 +321,8 @@ Estilo efectivo:
 - Contenedor `display:flex`, gap 5.6px (`0.35rem`), padding 4px, pill,
   fondo `grey-200`.
 - Tab: padding 10.4px 17.6px, pill, 14px/600, texto `#5B6472`.
-- Activo: fondo blanco, texto `--ml-cyan`, sin sombra.
-- Focus: outline `3px solid --ml-cyan`, offset 3px.
+- Activo: fondo blanco, texto `light-blue-500`, sin sombra.
+- Focus: outline `3px solid light-blue-500`, offset 3px.
 - En <=900px ocupa el ancho disponible y permite scroll horizontal.
 
 Comportamiento:
@@ -552,7 +546,7 @@ nuevos de Macroled.
 ### Indicador de scroll horizontal (línea sutil)
 
 Patrón nuevo a documentar como componente: track de línea fina (~2px de
-alto), color `--ml-line` o equivalente en baja opacidad, con un segmento
+alto), color `grey-800` al 14% o equivalente en baja opacidad, con un segmento
 "activo" más brillante/blanco que indica la posición actual dentro de un
 carrusel horizontal. Usar como alternativa a dots o a flechas cuando el
 carrusel es largo y el usuario necesita noción de progreso, no solo de

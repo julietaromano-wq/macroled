@@ -40,11 +40,11 @@
     const candidates=[...rawSpecs(doc).filter(isTemperatureSpec).map(spec=>spec.value),doc.rango_temperatura,doc.temperatura_filtro];
     const variant=variantSpec(doc);if(variant&&isTemperatureSpec(variant))candidates.unshift(variant.value);
     const matches=candidates.flatMap(source=>String(source||"").match(/\d{4}\s*K/gi)||[]);
-    const tones=[...new Set(matches.map(value=>value.replace(/\s+/g,"").toUpperCase()).filter(value=>CCT_DOT[value]))].sort((a,b)=>parseInt(a,10)-parseInt(b,10));
+    const tones=[...new Set(matches.map(value=>value.replace(/\s+/g,"").toUpperCase()))].sort((a,b)=>parseInt(a,10)-parseInt(b,10));
     if(!tones.length)return "";
     const label=tones.length===1?tones[0]:`${tones[0]}–${tones[tones.length-1]}`;
     const colors=[...new Set(tones.map(tempCategoryColor))];
-    const background=colors.length===1?colors[0]:`linear-gradient(to bottom, ${colors.map((color,index)=>{const step=100/colors.length;return `${color} ${index*step}%, ${color} ${(index+1)*step}%`}).join(", ")})`;
+    const background=colors.length===1?colors[0]:`linear-gradient(to right, ${colors.map((color,index)=>{const step=100/colors.length;return `${color} ${index*step}%, ${color} ${(index+1)*step}%`}).join(", ")})`;
     return `<span class="ml-product-temp-badge">${escapeHTML(label)}<span class="ml-product-badge-dot${colors.length>1?" is-split":""}" style="background:${background}"></span></span>`;
   }
   function buildVariantBadge(doc){

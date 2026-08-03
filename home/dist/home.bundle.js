@@ -27,10 +27,10 @@
    */
   const MANUAL_CATEGORIES = {
     interior: [
-      { ...category("Lámparas", "lamparas"), image: "https://s3.coresagroup.com/MACROLED/1000/7428325565203a.png" },
-      { ...category("Artefactos para lámparas", "artefactos-para-lamparas"), image: "https://s3.coresagroup.com/MACROLED/1000/7428325574748a.png" },
-      { ...category("Interruptores y tomas", "interruptores-y-tomas"), image: "https://d1zltvqju4u8ql.cloudfront.net/fit-in/2000x2000/MACROLED/WEB/LIMA-1CN-USB-CC-30W-B_FRONT.webp" },
-      { ...category("Tiras LED", "tiras-led"), image: "https://s3.coresagroup.com/MACROLED/1000/0742832556316a.png", badge: "Nuevo" }
+      { ...category("Lámparas", "lamparas"), image: "https://d1zltvqju4u8ql.cloudfront.net/fit-in/250x250/filters:format(png)/MACROLED/1000/7428325565203a.png" },
+      { ...category("Artefactos para lámparas", "artefactos-para-lamparas"), image: "https://d1zltvqju4u8ql.cloudfront.net/fit-in/250x250/filters:format(png)/MACROLED/1000/7428325574748a.png" },
+      { ...category("Interruptores y tomas", "interruptores-y-tomas"), image: "https://d1zltvqju4u8ql.cloudfront.net/fit-in/250x250/MACROLED/WEB/LIMA-1CN-USB-CC-30W-B_FRONT.webp" },
+      { ...category("Tiras LED", "tiras-led"), image: "https://d1zltvqju4u8ql.cloudfront.net/fit-in/250x250/filters:format(png)/MACROLED/1000/0742832556316a.png", badge: "Nuevo" }
     ],
     monaco: [
       { ...category("Armadas", "monaco-armadas"), image: "https://s3.coresagroup.com/MACROLED/250/milan.png" },
@@ -39,13 +39,13 @@
       { ...category("Luz de pasillo", "monaco-luz-pasillo"), image: "https://d1zltvqju4u8ql.cloudfront.net/fit-in/2000x2000/MACROLED/WEB/portada_luz_pasillo.webp" }
     ],
     exterior: [
-      { ...category("Reflectores", "reflectores"), image: "https://d1zltvqju4u8ql.cloudfront.net/fit-in/2000x2000/MACROLED/WEB/PFL-400W-060D-857-CW_PERS.webp" },
-      { ...category("Solar", "solar"), image: "https://s3.coresagroup.com/MACROLED/1000/7428325578388a.png" },
-      { ...category("Tortugas", "tortugas"), image: "https://s3.coresagroup.com/MACROLED/1000/7428325571648a.png" },
-      { ...category("Estacas", "estacas"), image: "https://s3.coresagroup.com/MACROLED/1000/7428325575684a.png" }
+      { ...category("Reflectores", "reflectores"), image: "https://d1zltvqju4u8ql.cloudfront.net/fit-in/250x250/MACROLED/WEB/PFL-400W-060D-857-CW_PERS.webp" },
+      { ...category("Solar", "solar"), image: "https://d1zltvqju4u8ql.cloudfront.net/fit-in/250x250/filters:format(png)/MACROLED/1000/7428325578388a.png" },
+      { ...category("Tortugas", "tortugas"), image: "https://d1zltvqju4u8ql.cloudfront.net/fit-in/250x250/filters:format(png)/MACROLED/1000/7428325571648a.png" },
+      { ...category("Estacas", "estacas"), image: "https://d1zltvqju4u8ql.cloudfront.net/fit-in/250x250/filters:format(png)/MACROLED/1000/7428325575684a.png" }
     ],
     proyectos: [
-      { ...category("Luz de calle", "proyectos-01"), image: "https://d1zltvqju4u8ql.cloudfront.net/fit-in/1000x1000/MACROLED/WEB/SLG2-100W-757-CW_FRONT.webp", badge: "Nuevo" },
+      { ...category("Luz de calle", "proyectos-01"), image: "https://d1zltvqju4u8ql.cloudfront.net/fit-in/250x250/MACROLED/WEB/SLG2-100W-757-CW_FRONT.webp", badge: "Nuevo" },
       { ...category("Lumax", "proyectos-02"), image: "https://s3.coresagroup.com/MACROLED/250/lumax.png", badge: "Nuevo" },
       { ...category("Highbay Classic", "proyectos-03"), image: "https://s3.coresagroup.com/MACROLED/250/galponeras-eco.webp" },
       { ...category("Highbay Pro", "proyectos-04"), image: "https://s3.coresagroup.com/MACROLED/250/PHB-200W-90D-857-CW.png" }
@@ -224,11 +224,11 @@
     const candidates=[...rawSpecs(doc).filter(isTemperatureSpec).map(spec=>spec.value),doc.rango_temperatura,doc.temperatura_filtro];
     const variant=variantSpec(doc);if(variant&&isTemperatureSpec(variant))candidates.unshift(variant.value);
     const matches=candidates.flatMap(source=>String(source||"").match(/\d{4}\s*K/gi)||[]);
-    const tones=[...new Set(matches.map(value=>value.replace(/\s+/g,"").toUpperCase()).filter(value=>CCT_DOT[value]))].sort((a,b)=>parseInt(a,10)-parseInt(b,10));
+    const tones=[...new Set(matches.map(value=>value.replace(/\s+/g,"").toUpperCase()))].sort((a,b)=>parseInt(a,10)-parseInt(b,10));
     if(!tones.length)return "";
     const label=tones.length===1?tones[0]:`${tones[0]}–${tones[tones.length-1]}`;
     const colors=[...new Set(tones.map(tempCategoryColor))];
-    const background=colors.length===1?colors[0]:`linear-gradient(to bottom, ${colors.map((color,index)=>{const step=100/colors.length;return `${color} ${index*step}%, ${color} ${(index+1)*step}%`}).join(", ")})`;
+    const background=colors.length===1?colors[0]:`linear-gradient(to right, ${colors.map((color,index)=>{const step=100/colors.length;return `${color} ${index*step}%, ${color} ${(index+1)*step}%`}).join(", ")})`;
     return `<span class="ml-product-temp-badge">${escapeHTML(label)}<span class="ml-product-badge-dot${colors.length>1?" is-split":""}" style="background:${background}"></span></span>`;
   }
   function buildVariantBadge(doc){
@@ -358,13 +358,15 @@
       dragStartX = event.clientX;
       dragStartScroll = track.scrollLeft;
       dragged = false;
-      track.classList.add("is-dragging");
       track.setPointerCapture(event.pointerId);
     };
     track.onpointermove = event => {
       if (!track.hasPointerCapture(event.pointerId)) return;
       const distance = event.clientX - dragStartX;
-      if (Math.abs(distance) > 4) dragged = true;
+      if (Math.abs(distance) > 4 && !dragged) {
+        dragged = true;
+        track.classList.add("is-dragging");
+      }
       track.scrollLeft = dragStartScroll - distance;
     };
     const stopDragging = event => {

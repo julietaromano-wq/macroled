@@ -483,12 +483,12 @@ function buildTempBadge(doc){
     sources.unshift(doc[ATTR_VARIANTES_FIELD]);
   }
 
-  // Limpiamos y dejamos solo los tonos que están en nuestro mapa de colores
-  // conocidos (evita que un valor raro/typo rompa el badge)
+  // Aceptamos cualquier temperatura Kelvin válida. El color se calcula por
+  // categoría, así que no hace falta que cada valor exista en CCT_DOT.
   const tones = [...new Set(
     sources.flatMap(source => String(source || "").match(/\d{4}\s*K/gi) || [])
       .map(t => t.replace(/\s+/g, "").toUpperCase())
-  )].filter(t => CCT_DOT[t]);
+  )];
 
   if(!tones.length) return "";
 
