@@ -140,8 +140,8 @@
         title: "Expo Construir",
         description: "Presentamos nuestros últimos lanzamientos: las líneas Mónaco, Lima, Macroled ARQ, Skyline, Kyo, Taö y Höshi, pensadas para proyectos arquitectónicos.",
         href: "/novedades/expo-construir",
-        image: "https://s3.coresagroup.com/NUEVO_MACROLED/expo2.jpg",
-        hoverImage: "https://s3.coresagroup.com/NUEVO_MACROLED/expo_hover.jpg",
+        image: "https://s3.coresagroup.com/MACROLED/WEB/HOME/expo.jpg",
+        hoverImage: "https://s3.coresagroup.com/MACROLED/WEB/HOME/expo_hover.jpg",
         zoomDefaultImage: true
       },
       {
@@ -149,7 +149,7 @@
         description: "Durante cuatro días presentamos nuevas tecnologías, lanzamientos y demostraciones técnicas, con asesoramiento personalizado para distribuidores, instaladores y profesionales del sector.",
         href: "/novedades/biel-light-2025",
         image: "https://cdn.prod.website-files.com/690a24d6bf8e2592b2f29d1f/69bc53bc8148c948726225fa_691b4529bb6b28848a915f53_015.coresa-p-2600-p-2000.webp",
-        hoverImage: "https://s3.coresagroup.com/NUEVO_MACROLED/biel_hover.jpg"
+        hoverImage: "https://s3.coresagroup.com/MACROLED/WEB/HOME/biel_hover.jpg"
       }
     ],
     faq: [
@@ -453,24 +453,24 @@
       title: "Luz de calle Standard",
       subtitle: "Para proyectos, vías, parques y espacios públicos.",
       badge: "Nueva línea",
-      productImage: "assets/images/project-street-product-source.png",
-      ambientImage: "assets/images/project-street-ambient-dark.png",
+      productImage: "https://s3.coresagroup.com/MACROLED/WEB/HOME/streetlight.png",
+      ambientImage: "https://s3.coresagroup.com/MACROLED/WEB/HOME/streetlight_ambient.png",
       href: "#ml-section-proyectos"
     },
     {
       id: "invictus",
       title: "Invictus",
       subtitle: "Para grandes áreas, fachadas y espacios deportivos.",
-      productImage: "assets/images/project-invictus-product.png",
-      ambientImage: "assets/images/project-invictus-ambient.png",
+      productImage: "https://s3.coresagroup.com/MACROLED/WEB/HOME/invictus.png",
+      ambientImage: "https://s3.coresagroup.com/MACROLED/WEB/HOME/invictus_ambient.png",
       href: "#ml-section-proyectos"
     },
     {
       id: "highbay",
       title: "Highbay PRO",
       subtitle: "Para naves industriales y espacios de gran altura.",
-      productImage: "assets/images/project-highbay-product-source.webp",
-      ambientImage: "assets/images/project-highbay-ambient.png",
+      productImage: "https://d1zltvqju4u8ql.cloudfront.net/fit-in/1000x1000/MACROLED/WEB/PHB-100W-90D-857-CW_FRONT.webp",
+      ambientImage: "https://s3.coresagroup.com/MACROLED/WEB/HOME/highbay_ambient.png",
       href: "#ml-section-proyectos"
     }
   ];

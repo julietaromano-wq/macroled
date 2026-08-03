@@ -7,24 +7,24 @@
       title: "Luz de calle Standard",
       subtitle: "Para proyectos, vías, parques y espacios públicos.",
       badge: "Nueva línea",
-      productImage: "assets/images/project-street-product-source.png",
-      ambientImage: "assets/images/project-street-ambient-dark.png",
+      productImage: "https://s3.coresagroup.com/MACROLED/WEB/HOME/streetlight.png",
+      ambientImage: "https://s3.coresagroup.com/MACROLED/WEB/HOME/streetlight_ambient.png",
       href: "#ml-section-proyectos"
     },
     {
       id: "invictus",
       title: "Invictus",
       subtitle: "Para grandes áreas, fachadas y espacios deportivos.",
-      productImage: "assets/images/project-invictus-product.png",
-      ambientImage: "assets/images/project-invictus-ambient.png",
+      productImage: "https://s3.coresagroup.com/MACROLED/WEB/HOME/invictus.png",
+      ambientImage: "https://s3.coresagroup.com/MACROLED/WEB/HOME/invictus_ambient.png",
       href: "#ml-section-proyectos"
     },
     {
       id: "highbay",
       title: "Highbay PRO",
       subtitle: "Para naves industriales y espacios de gran altura.",
-      productImage: "assets/images/project-highbay-product-source.webp",
-      ambientImage: "assets/images/project-highbay-ambient.png",
+      productImage: "https://d1zltvqju4u8ql.cloudfront.net/fit-in/1000x1000/MACROLED/WEB/PHB-100W-90D-857-CW_FRONT.webp",
+      ambientImage: "https://s3.coresagroup.com/MACROLED/WEB/HOME/highbay_ambient.png",
       href: "#ml-section-proyectos"
     }
   ];

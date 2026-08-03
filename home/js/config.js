@@ -137,8 +137,8 @@
         title: "Expo Construir",
         description: "Presentamos nuestros últimos lanzamientos: las líneas Mónaco, Lima, Macroled ARQ, Skyline, Kyo, Taö y Höshi, pensadas para proyectos arquitectónicos.",
         href: "/novedades/expo-construir",
-        image: "https://s3.coresagroup.com/NUEVO_MACROLED/expo2.jpg",
-        hoverImage: "https://s3.coresagroup.com/NUEVO_MACROLED/expo_hover.jpg",
+        image: "https://s3.coresagroup.com/MACROLED/WEB/HOME/expo.jpg",
+        hoverImage: "https://s3.coresagroup.com/MACROLED/WEB/HOME/expo_hover.jpg",
         zoomDefaultImage: true
       },
       {
@@ -146,7 +146,7 @@
         description: "Durante cuatro días presentamos nuevas tecnologías, lanzamientos y demostraciones técnicas, con asesoramiento personalizado para distribuidores, instaladores y profesionales del sector.",
         href: "/novedades/biel-light-2025",
         image: "https://cdn.prod.website-files.com/690a24d6bf8e2592b2f29d1f/69bc53bc8148c948726225fa_691b4529bb6b28848a915f53_015.coresa-p-2600-p-2000.webp",
-        hoverImage: "https://s3.coresagroup.com/NUEVO_MACROLED/biel_hover.jpg"
+        hoverImage: "https://s3.coresagroup.com/MACROLED/WEB/HOME/biel_hover.jpg"
       }
     ],
     faq: [
