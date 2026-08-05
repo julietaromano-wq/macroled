@@ -12,27 +12,39 @@
 
   /* Webflow re-renderiza embeds: NUNCA cachear section/track al inicio. */
   function resolveRelatedTargets() {
-    const sections = Array.prototype.slice.call(
-      document.querySelectorAll("#productos-relacionados")
+    const roots = Array.prototype.slice.call(
+      document.querySelectorAll(
+        "#productos-relacionados, .ml-related-products, [data-related-viewport]"
+      )
     );
-    const targets = sections
-      .map((section) => ({
-        section,
-        viewport: section.querySelector("[data-related-viewport]"),
-        track: section.querySelector("[data-related-track]"),
-      }))
-      .filter(
-        (t) =>
-          t.section.isConnected &&
-          t.viewport &&
-          t.track &&
-          t.track.isConnected
-      );
+    const seen = new Set();
+    const targets = [];
+
+    roots.forEach((node) => {
+      const viewport = node.matches?.("[data-related-viewport]")
+        ? node
+        : node.querySelector?.("[data-related-viewport]");
+      const track =
+        (viewport && viewport.querySelector("[data-related-track]")) ||
+        node.querySelector?.("[data-related-track]");
+      if (!viewport || !track || !track.isConnected) return;
+
+      const section =
+        track.closest("#productos-relacionados, .ml-related-products") ||
+        viewport.closest("#productos-relacionados, .ml-related-products") ||
+        viewport;
+
+      if (seen.has(section)) return;
+      seen.add(section);
+      if (!section.isConnected) return;
+      targets.push({ section, viewport, track });
+    });
+
     if (targets.length > 1) {
       console.warn(
         "[relacionados] hay",
         targets.length,
-        "bloques #productos-relacionados. Dejá solo uno (borrá el duplicado del embed 2b si ya está en 2-EMBED-FICHA)."
+        "bloques de relacionados. Dejá solo uno."
       );
     }
     return targets;
@@ -448,13 +460,17 @@
   }
 
   function hideSection(section) {
-    if (section) section.hidden = true;
+    if (!section) return;
+    section.hidden = true;
+    section.setAttribute("hidden", "");
+    section.style.display = "none";
   }
 
   function showSection(section) {
     if (!section) return;
     section.hidden = false;
     section.removeAttribute("hidden");
+    section.style.display = "";
     section.classList.add("is-in");
     section.style.opacity = "1";
     section.style.transform = "none";
@@ -497,7 +513,12 @@
     if (!targets.length) {
       isLoading = false;
       console.warn(
-        "[relacionados] aún no está #productos-relacionados en el DOM."
+        "[relacionados] no hay markup de relacionados en el DOM. Pegá 2b-EMBED-RELACIONADOS.html completo (HTML + script) en un Embed de esta plantilla.",
+        {
+          porId: !!document.getElementById("productos-relacionados"),
+          porViewport: !!document.querySelector("[data-related-viewport]"),
+          porTrack: !!document.querySelector("[data-related-track]"),
+        }
       );
       return;
     }
