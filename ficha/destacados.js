@@ -335,7 +335,17 @@
   }
 
   function readCurrentSku() {
-    return document.getElementById("ficha-sku")?.textContent.trim() || "";
+    const fromDom = document.getElementById("ficha-sku")?.textContent.trim() || "";
+    const fromCms =
+      document.querySelector(".cms-product-item[data-sku]")?.getAttribute("data-sku")?.trim() ||
+      "";
+    /* Preferí el SKU ya hidratado en #ficha-sku; si sigue el placeholder y hay CMS, usá CMS */
+    if (fromDom && fromCms && fromDom !== fromCms) {
+      /* Si el CMS ya está y el texto aún no matchea, priorizar CMS (boot race) */
+      const heroSynced = document.getElementById("stageImg")?.getAttribute("src");
+      if (!heroSynced) return fromCms;
+    }
+    return fromDom || fromCms;
   }
 
   function fb(value) {
@@ -374,7 +384,10 @@
     section.hidden = true;
   }
 
+  let loadToken = 0;
+
   async function loadRelatedProducts() {
+    const token = ++loadToken;
     const sku = readCurrentSku();
     console.log("[relacionados] SKU leído de la ficha:", JSON.stringify(sku));
 
@@ -392,6 +405,7 @@
 
     try {
       const self = await findSelf(sku);
+      if (token !== loadToken) return;
       console.log("[relacionados] documento propio encontrado en Typesense:", self);
 
       if (!self) {
@@ -426,6 +440,7 @@
       for (const level of levels) {
         const filterBy = `${level.field}:="${fb(level.value)}" && ${exclude}`;
         data = await searchProducts(filterBy, RELATED_COUNT);
+        if (token !== loadToken) return;
         console.log(
           `[relacionados] nivel "${level.field}"="${level.value}" -> found:`,
           data.found,
@@ -451,21 +466,43 @@
       track.scrollLeft = 0;
       setupTrackControls();
     } catch (error) {
+      if (token !== loadToken) return;
       console.error("[relacionados] Error cargando productos relacionados:", error);
       hideSection();
     } finally {
-      track.setAttribute("aria-busy", "false");
+      if (token === loadToken) track.setAttribute("aria-busy", "false");
     }
   }
 
-  // Espera a que script.js actualice el SKU desde CMS/variantes si aplica.
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", () => {
-      requestAnimationFrame(loadRelatedProducts);
-    });
-  } else {
-    requestAnimationFrame(loadRelatedProducts);
+  /* Esperar CMS + SKU hidratado (mismo race que script.js en Webflow). */
+  function waitAndLoadRelated() {
+    let tries = 0;
+    const maxTries = 50;
+    const tick = () => {
+      const hasCms = !!document.querySelector(".cms-product-item[data-sku]");
+      const sku = readCurrentSku();
+      const heroReady = !!document.getElementById("stageImg")?.getAttribute("src");
+      if ((hasCms && (heroReady || tries > 15) && sku) || tries >= maxTries) {
+        loadRelatedProducts();
+        return;
+      }
+      tries += 1;
+      setTimeout(tick, 100);
+    };
+    tick();
   }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", waitAndLoadRelated);
+  } else {
+    waitAndLoadRelated();
+  }
+
+  window.addEventListener("ml-product-changed", (event) => {
+    const sku = event?.detail?.sku || readCurrentSku();
+    if (!sku) return;
+    loadRelatedProducts();
+  });
 
   window.MacroledRelatedProducts = { reload: loadRelatedProducts };
 })();
