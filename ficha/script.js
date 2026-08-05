@@ -276,11 +276,16 @@
         { key: "Material de tapa", tip: "Material de la tapa o cubierta." },
         { key: "Material del lente", tip: "Material del difusor u óptica." },
         { key: "Conector", tip: "Tipo de conector eléctrico o de instalación." },
+        { key: "Conexión", tip: "Tipo de conexión del accesorio o luminaria." },
+        { key: "Compatibilidad", tip: "Líneas o productos con los que es compatible." },
         { key: "Color del cuerpo", tip: "Color de la carcasa / cuerpo del producto." },
         { key: "Color de carcasa", tip: "Color exterior de la carcasa." },
         { key: "Panel táctil", tip: "Indica si el producto incluye panel táctil de control." },
         { key: "Largo del cable", tip: "Longitud del cable incluido." },
         { key: "Dimensiones del cable", tip: "Sección o medidas del cable incluido." },
+        { key: "Largo del rollo", tip: "Longitud total del rollo de tira." },
+        { key: "Distancia corte", tip: "Distancia entre puntos de corte de la tira." },
+        { key: "Cantidad de luces", tip: "Cantidad de LEDs o puntos de luz." },
         { key: "Tipo de montaje", tip: "Forma de instalación (sobreponer, empotrar, pie, etc.)." },
         { key: "Temperatura de operación", tip: "Rango de temperatura ambiente de uso." },
         { key: "Protección IP", tip: "Grado de protección contra polvo y agua." },
@@ -292,6 +297,7 @@
       icon: ICON_WIFI,
       rows: [
         { key: "Modo de conectividad", tip: "Protocolo o medio de conexión (Wi‑Fi, RF, Bluetooth, etc.)." },
+        { key: "Conectividad", tip: "Tipo de conectividad del producto." },
         { key: "Frecuencia de operación", tip: "Frecuencia de radio o red en la que opera." },
         { key: "Chip", tip: "Chipset de conectividad integrado." },
         { key: "Tipo de red", tip: "Tipo de red compatible (2.4 GHz, Zigbee, etc.)." },
@@ -301,6 +307,7 @@
         { key: "Compatible con asistentes", tip: "Asistentes de voz o ecosistemas compatibles." },
         { key: "Funciones", tip: "Funciones inteligentes o de control disponibles." },
         { key: "APP", tip: "Aplicación móvil asociada al producto." },
+        { key: "Conductores", tip: "Cantidad o tipo de conductores del cable." },
       ],
     },
     {
@@ -801,8 +808,12 @@
 
     /* 1) data-specs JSON opcional (legacy / fallback) */
     try {
-      const rawJson = el.getAttribute("data-specs");
+      let rawJson = el.getAttribute("data-specs");
       if (rawJson) {
+        /* Webflow a veces deja espacios/newlines; limpiar comas colgantes leves */
+        rawJson = String(rawJson)
+          .replace(/,\s*([}\]])/g, "$1")
+          .trim();
         const parsed = JSON.parse(rawJson) || {};
         Object.keys(parsed).forEach((k) => {
           if (!hasSpecValue(parsed[k])) return;
@@ -1416,10 +1427,8 @@
     if (e.key === "Escape" && !shareMenu.hidden) closeShareMenu();
   });
 
-  initVariants();
-
   /* Scroll / entrance reveals */
-  (function initReveals() {
+  function initReveals() {
     const nodes = Array.prototype.slice.call(document.querySelectorAll("[data-reveal]"));
     if (!nodes.length) return;
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
@@ -1441,5 +1450,36 @@
       { rootMargin: "0px 0px -8% 0px", threshold: 0.12 }
     );
     nodes.forEach((el) => io.observe(el));
-  })();
+  }
+
+  /**
+   * En Webflow el Custom Code a veces corre ANTES del Embed CMS.
+   * Esperamos a que exista .cms-product-item (o al DOM listo) y reintentamos.
+   */
+  function bootFicha() {
+    initVariants();
+    initReveals();
+  }
+
+  function waitForCmsAndBoot() {
+    let tries = 0;
+    const maxTries = 40; /* ~4s */
+    const tick = () => {
+      const hasCms = !!document.querySelector(".cms-product-item");
+      if (hasCms || tries >= maxTries) {
+        bootFicha();
+        return;
+      }
+      tries += 1;
+      setTimeout(tick, 100);
+    };
+
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", tick);
+    } else {
+      tick();
+    }
+  }
+
+  waitForCmsAndBoot();
 })();
