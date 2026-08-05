@@ -470,10 +470,11 @@
     if (!section) return;
     section.hidden = false;
     section.removeAttribute("hidden");
-    section.style.display = "";
-    section.classList.add("is-in");
-    section.style.opacity = "1";
+    section.style.setProperty("display", "block", "important");
+    section.style.setProperty("visibility", "visible", "important");
+    section.style.setProperty("opacity", "1", "important");
     section.style.transform = "none";
+    section.classList.add("is-in");
   }
 
   function paintCards(targets, html) {
@@ -503,10 +504,15 @@
     window.clearTimeout(reloadTimer);
     reloadTimer = window.setTimeout(() => {
       loadRelatedProducts();
-    }, 250);
+    }, 400);
   }
 
+  let paintedOk = false;
+
   async function loadRelatedProducts() {
+    if (paintedOk && resolveRelatedTargets().some(({ track }) => track.querySelector(".ml-product-card"))) {
+      return;
+    }
     const token = ++loadToken;
     isLoading = true;
     const targets = resolveRelatedTargets();
@@ -580,12 +586,14 @@
         console.warn(
           "[relacionados] el bloque HTML desapareció durante la carga; reintento."
         );
+        isLoading = false;
         scheduleReload("dom perdido tras fetch");
         return;
       }
 
       const html = data.hits.map((hit) => cardTemplate(hit.document)).join("");
       const cardCount = paintCards(liveTargets, html);
+      paintedOk = cardCount > 0;
       console.log(
         "[relacionados] cards inyectadas:",
         cardCount,
@@ -593,6 +601,16 @@
         liveTargets.length,
         "bloque(s)"
       );
+      const first = liveTargets[0]?.track?.querySelector(".ml-product-card");
+      if (first) {
+        const r = first.getBoundingClientRect();
+        console.log("[relacionados] primera card rect:", {
+          w: Math.round(r.width),
+          h: Math.round(r.height),
+          top: Math.round(r.top),
+          sectionDisplay: getComputedStyle(liveTargets[0].section).display,
+        });
+      }
     } catch (error) {
       if (token !== loadToken) return;
       console.error("[relacionados] Error cargando productos relacionados:", error);
@@ -640,25 +658,9 @@
     waitAndLoadRelated();
   }
 
-  const domWatcher = new MutationObserver(() => {
-    const targets = resolveRelatedTargets();
-    if (!targets.length) return;
-    const needsPaint = targets.some(
-      ({ track }) =>
-        !track.querySelector(".ml-product-card") &&
-        !!track.querySelector(".ml-related-products__state")
-    );
-    const ctx = readCmsContext();
-    if (needsPaint && ctx && (ctx.familia || ctx.macrofamilia)) {
-      scheduleReload("embed re-render / track vacío");
-    }
-  });
-  domWatcher.observe(document.documentElement, {
-    childList: true,
-    subtree: true,
-  });
-
+  /* Sin MutationObserver: en Webflow re-disparaba carga y borraba las cards. */
   window.addEventListener("ml-product-changed", () => {
+    paintedOk = false;
     scheduleReload("ml-product-changed");
   });
 
