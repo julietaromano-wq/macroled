@@ -466,6 +466,33 @@
     section.style.display = "none";
   }
 
+  function forceLayoutVisible(el) {
+    let node = el;
+    const chain = [];
+    while (node && node !== document.documentElement) {
+      chain.push(node);
+      node = node.parentElement;
+    }
+    chain.forEach((n) => {
+      const cs = getComputedStyle(n);
+      if (cs.display === "none") {
+        n.style.setProperty("display", "block", "important");
+      }
+      if (cs.visibility === "hidden" || cs.visibility === "collapse") {
+        n.style.setProperty("visibility", "visible", "important");
+      }
+      if (cs.opacity === "0") {
+        n.style.setProperty("opacity", "1", "important");
+      }
+      if (n.classList?.contains("w-embed") || n.classList?.contains("w-dyn-bind-empty")) {
+        n.style.setProperty("display", "block", "important");
+        n.style.setProperty("height", "auto", "important");
+        n.style.setProperty("min-height", "360px", "important");
+        n.style.setProperty("overflow", "visible", "important");
+      }
+    });
+  }
+
   function showSection(section) {
     if (!section) return;
     section.hidden = false;
@@ -473,8 +500,11 @@
     section.style.setProperty("display", "block", "important");
     section.style.setProperty("visibility", "visible", "important");
     section.style.setProperty("opacity", "1", "important");
+    section.style.setProperty("height", "auto", "important");
+    section.style.setProperty("min-height", "360px", "important");
     section.style.transform = "none";
     section.classList.add("is-in");
+    forceLayoutVisible(section);
   }
 
   function paintCards(targets, html) {
@@ -482,6 +512,20 @@
     targets.forEach(({ section, viewport, track }) => {
       if (!track.isConnected || !section.isConnected) return;
       track.innerHTML = html;
+      track.style.setProperty("display", "flex", "important");
+      track.style.setProperty("min-height", "280px", "important");
+      track.style.setProperty("width", "100%", "important");
+      track.querySelectorAll(".ml-product-card").forEach((card) => {
+        card.style.setProperty("flex", "0 0 240px", "important");
+        card.style.setProperty("min-width", "220px", "important");
+        card.style.setProperty("min-height", "260px", "important");
+        card.style.setProperty("display", "flex", "important");
+      });
+      if (viewport) {
+        viewport.style.setProperty("display", "block", "important");
+        viewport.style.setProperty("min-height", "280px", "important");
+        viewport.style.setProperty("width", "100%", "important");
+      }
       cardCount = Math.max(
         cardCount,
         track.querySelectorAll(".ml-product-card").length
