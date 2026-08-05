@@ -1,0 +1,68 @@
+<!--
+  Reutiliza el embed CMS que ya tienen en Webflow (data-specs JSON).
+  Solo se listan campos base + specs. Vacío en CMS = "" en JSON = no se muestra.
+-->
+<div class="cms-product-item"
+     data-id="{{wf:SKU|Dynamo}}"
+     data-sku="{{wf:SKU|Dynamo}}"
+     data-name="{{wf:NOMBRE|Dynamo}}"
+     data-image="{{wf:Imagen|Dynamo}}"
+     data-family="{{wf:Familia|Dynamo}}"
+     data-macrofamilia="{{wf:Macrofamilia|Dynamo}}"
+     data-nuevo="{{wf:Nuevo|Dynamo}}"
+     data-link="{{wf:Slug|Dynamo}}"
+     data-ficha="{{wf:FICHA TECNICA|Dynamo}}"
+     data-catalogo="{{wf:CATÁLOGO|Dynamo}}"
+     data-manual="{{wf:Manuales|Dynamo}}"
+     data-ies=""
+     data-fotometria=""
+     data-garantia="{{wf:GARANTIA LINK|Dynamo}}"
+     data-descripcion="{{wf:DESCRIPCIÓN|Dynamo}}"
+     data-multiimage="{{wf:Multiimage|Dynamo}}"
+     data-variantes-sku="{{wf:Variantes del producto SKU|Dynamo}}"
+     data-nombre-attr-variantes="{{wf:Nombre ATTR_Variantes|Dynamo}}"
+     data-ean13="{{wf:EAN13|Dynamo}}"
+     data-product-url="/{{wf:Slug|Dynamo}}"
+     data-smart=""
+     data-specs='{
+       "Ángulo de apertura": "{{wf:ANGULO DE APERTURA|Dynamo}}",
+       "Autonomía": "{{wf:AUTONOMÍA|Dynamo}}",
+       "Cantidad de luces": "{{wf:CANTIDAD DE LUCES|Dynamo}}",
+       "Clase": "{{wf:CLASE|Dynamo}}",
+       "Compatibilidad": "{{wf:COMPATIBILIDAD|Dynamo}}",
+       "Conductores": "{{wf:CONDUCTORES|Dynamo}}",
+       "Conectividad": "{{wf:CONECTIVIDAD|Dynamo}}",
+       "Conector": "{{wf:CONECTOR|Dynamo}}",
+       "Conexión": "{{wf:CONEXIÓN|Dynamo}}",
+       "Control remoto": "{{wf:CONTROL REMOTO|Dynamo}}",
+       "Color del cuerpo": "{{wf:COLOR|Dynamo}}",
+       "Corriente": "{{wf:CORRIENTE|Dynamo}}",
+       "Cri": "{{wf:CRI|Dynamo}}",
+       "Dimerizable": "{{wf:DIMERIZABLE|Dynamo}}",
+       "Dimensiones": "{{wf:DIMENSIONES|Dynamo}}",
+       "Dimensiones control remoto": "{{wf:DIMENSIONES CONTROL REMOTO|Dynamo}}",
+       "Distancia corte": "{{wf:DISTANCIA CORTE|Dynamo}}",
+       "Funciones": "{{wf:FUNCIONES|Dynamo}}",
+       "Flujo luminoso": "{{wf:FLUJO LUMINOSO|Dynamo}}",
+       "Frecuencia": "{{wf:FRECUENCIA|Dynamo}}",
+       "Protección IP": "{{wf:IP|Dynamo}}",
+       "Largo del cable": "{{wf:LARGO DEL CABLE|Dynamo}}",
+       "Largo del rollo": "{{wf:LARGO DEL ROLLO|Dynamo}}",
+       "Lúmenes/W": "{{wf:LUMENES/W|Dynamo}}",
+       "LM80": "{{wf:LM80|Dynamo}}",
+       "Material del cuerpo": "{{wf:MATERIAL CUERPO|Dynamo}}",
+       "On/Off Switch": "{{wf:ON / OFF switch|Dynamo}}",
+       "Panel táctil": "{{wf:PANEL TACTIL|Dynamo}}",
+       "Peso": "{{wf:PESO|Dynamo}}",
+       "Potencia": "{{wf:POTENCIA|Dynamo}}",
+       "Sdcm": "{{wf:Sdcm|Dynamo}}",
+       "Tipo de luz": "{{wf:TIPO DE LUZ|Dynamo}}",
+       "Temperatura del color": "{{wf:TEMPERATURA COLOR|Dynamo}}",
+       "Temperatura de operación": "{{wf:TEMPERATURA DE OPERACION|Dynamo}}",
+       "Tensión": "{{wf:TENSIÓN|Dynamo}}",
+       "Tipo de carga": "{{wf:TIPO DE CARGA|Dynamo}}",
+       "Tiempo de carga": "{{wf:TIEMPO DE CARGA|Dynamo}}",
+       "Tipo de LED": "{{wf:TIPO DE LED|Dynamo}}",
+       "Garantía": "{{wf:GARANTIA TIEMPO|Dynamo}}"
+     }'>
+</div>
