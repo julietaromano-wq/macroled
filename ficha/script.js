@@ -717,7 +717,14 @@
     root.querySelectorAll(".qspec").forEach((block) => {
       const key = normalizeSpecKey(block.getAttribute("data-spec-key"));
       const valEl = block.querySelector("[data-spec-val]");
-      const val = lookupSpec(specs, key);
+      let val = lookupSpec(specs, key);
+      /* En "Luz" mostramos la categoría (Cálido/Neutro/Frío/RGB): el Kelvin exacto
+         ya aparece en el chip de variante y en la tabla de especificaciones. */
+      if (key === "Temperatura del color") {
+        const tipo = lookupSpec(specs, "Tipo de luz");
+        const cat = tempCategory(tipo) || tempCategory(val);
+        val = (cat && TEMP_LABELS[cat]) || tipo || val;
+      }
       if (valEl) valEl.textContent = val || "";
       const on = hasSpecValue(val);
       block.hidden = !on;
@@ -850,6 +857,50 @@
       .toLowerCase()
       .normalize("NFD")
       .replace(/[\u0300-\u036f]/g, "");
+  }
+
+  /* Specs que describen el color de la luz (no el del cuerpo del artefacto). */
+  const TEMP_SPEC_KEYS = new Set(["Temperatura del color", "Tipo de luz"]);
+
+  const TEMP_LABELS = {
+    calido: "Cálido",
+    neutro: "Neutro",
+    frio: "Frío",
+    cct: "CCT",
+    rgb: "RGB",
+    rgbw: "RGB+W",
+  };
+
+  /* Mismos tonos que los badges de las cards (destacados.js). */
+  const RGB_WHEEL = "#ff3b30,#ffcc00,#34c759,#00bcd4,#5856d6,#ff2d55,#ff3b30";
+  const TEMP_SWATCH = {
+    calido: "#fff79b",
+    neutro: "#d9d9d9",
+    frio: "#bce4fa",
+    cct: "linear-gradient(90deg,#fff79b,#d9d9d9,#bce4fa)",
+    rgb: `conic-gradient(${RGB_WHEEL})`,
+    rgbw: `conic-gradient(#ffffff 0 25%,${RGB_WHEEL})`,
+  };
+
+  /**
+   * "2700K" → calido, "6500K" → frio, "RGB+W" → rgbw,
+   * "2700K a 6500K" → cct (sintonizable, no es un tono fijo).
+   */
+  function tempCategory(value) {
+    const v = normKey(value);
+    if (!v) return null;
+    if (v.indexOf("rgb") !== -1) return /rgb\s*\+?\s*w|rgbw/.test(v) ? "rgbw" : "rgb";
+    if (/calid|warm/.test(v)) return "calido";
+    if (/neutr/.test(v)) return "neutro";
+    if (/frio|cool/.test(v)) return "frio";
+
+    const kelvins = v.match(/\d{4}/g);
+    if (!kelvins) return null;
+    if (kelvins.length > 1) return "cct";
+    const k = parseInt(kelvins[0], 10);
+    if (k <= 3500) return "calido";
+    if (k <= 5000) return "neutro";
+    return "frio";
   }
 
   const variantsTarget = document.getElementById("product-variants") || document.querySelector(".container_variants");
@@ -1045,9 +1096,8 @@
     entries.forEach((entry) => {
       const isActive = entry.value === activeValue;
       const inputId = groupName + "--" + slugify(entry.value);
-      const color = entry.swatch ? COLOR_SWATCH[normKey(entry.value)] : "";
-      const swatch = color
-        ? `<span class="variant-swatch" style="background:${color}" aria-hidden="true"></span>`
+      const swatch = entry.swatch
+        ? `<span class="variant-swatch" style="background:${entry.swatch}" aria-hidden="true"></span>`
         : "";
       html +=
         `<label for="${inputId}" class="variant-chip${isActive ? " active" : ""}">` +
@@ -1084,7 +1134,7 @@
       .map((el, i) => ({
         sku: skus[i],
         value: (useName ? names[i] : shortSkus[i]) || skus[i],
-        swatch: false,
+        swatch: "",
       }))
       .sort((a, b) => variantSort(a.value, b.value));
   }
@@ -1098,11 +1148,18 @@
       dimensionKeys.forEach((key) => {
         const values = [...specValues(siblings, key)].sort(variantSort);
         if (values.length <= 1) return;
-        const isColorDim = normKey(key).indexOf("color") !== -1;
+        /* "Temperatura del color" contiene "color", así que se chequea primero. */
+        const isTempDim = TEMP_SPEC_KEYS.has(key);
+        const isBodyColorDim = !isTempDim && normKey(key).indexOf("color") !== -1;
+        const swatchFor = (value) => {
+          if (isTempDim) return TEMP_SWATCH[tempCategory(value)] || "";
+          if (isBodyColorDim) return COLOR_SWATCH[normKey(value)] || "";
+          return "";
+        };
         html += renderChipGroup(
           CHIP_LABELS[key] || key,
           "variant-" + slugify(key),
-          values.map((value) => ({ value, dim: key, swatch: isColorDim })),
+          values.map((value) => ({ value, dim: key, swatch: swatchFor(value) })),
           (currentSpecs[key] || "").trim()
         );
       });
