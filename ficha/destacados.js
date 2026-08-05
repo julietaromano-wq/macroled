@@ -339,17 +339,50 @@
     const fromCms =
       document.querySelector(".cms-product-item[data-sku]")?.getAttribute("data-sku")?.trim() ||
       "";
-    /* Preferí el SKU ya hidratado en #ficha-sku; si sigue el placeholder y hay CMS, usá CMS */
     if (fromDom && fromCms && fromDom !== fromCms) {
-      /* Si el CMS ya está y el texto aún no matchea, priorizar CMS (boot race) */
       const heroSynced = document.getElementById("stageImg")?.getAttribute("src");
       if (!heroSynced) return fromCms;
     }
     return fromDom || fromCms;
   }
 
+  function readCmsContext() {
+    const el = document.querySelector(".cms-product-item[data-sku]");
+    if (!el) return null;
+    return {
+      sku: (el.getAttribute("data-sku") || "").trim(),
+      nombre: (el.getAttribute("data-name") || "").trim(),
+      familia: (el.getAttribute("data-family") || "").trim(),
+      macrofamilia: (el.getAttribute("data-macrofamilia") || "").trim(),
+      subfamilia: (el.getAttribute("data-subfamilia") || "").trim(),
+    };
+  }
+
   function fb(value) {
     return String(value).replace(/`/g, "").replace(/"/g, '\\"');
+  }
+
+  function skuInVariantsField(doc, sku) {
+    const target = String(sku || "").trim().toLowerCase();
+    if (!target) return false;
+    if (Array.isArray(doc.variantes_sku)) {
+      if (doc.variantes_sku.some((v) => String(v).trim().toLowerCase() === target)) {
+        return true;
+      }
+    }
+    const blob = [
+      doc.variantes_del_producto_sku,
+      doc.variantes_sku,
+      doc.attr_variantes,
+    ]
+      .filter(Boolean)
+      .map((v) => String(v))
+      .join(" ; ");
+    return blob
+      .split(/[;|,]/)
+      .map((s) => s.trim().toLowerCase())
+      .filter(Boolean)
+      .includes(target);
   }
 
   async function searchProducts(filterBy, perPage) {
@@ -372,12 +405,86 @@
     return response.json();
   }
 
+  async function searchByQuery(q, queryBy, perPage) {
+    const params = new URLSearchParams({
+      q: String(q || "*"),
+      query_by: queryBy || "sku,nombre",
+      per_page: String(perPage || 10),
+      page: "1",
+      num_typos: "1",
+    });
+    const url = `${TYPESENSE.host}/collections/${encodeURIComponent(
+      TYPESENSE.collection
+    )}/documents/search?${params}`;
+    const response = await fetch(url, {
+      headers: { "X-TYPESENSE-API-KEY": TYPESENSE.apiKey },
+    });
+    if (!response.ok) {
+      throw new Error(`Typesense ${response.status}: ${await response.text()}`);
+    }
+    return response.json();
+  }
+
   async function findSelf(sku) {
-    const data = await searchProducts(
-      `sku:="${fb(sku)}" || variantes_sku:="${fb(sku)}"`,
-      1
-    );
-    return data?.hits?.[0]?.document || null;
+    /* 1) Match exacto por sku / variantes_sku (array facet) */
+    try {
+      const data = await searchProducts(
+        `sku:="${fb(sku)}" || variantes_sku:="${fb(sku)}"`,
+        5
+      );
+      const hit = data?.hits?.[0]?.document;
+      if (hit) return hit;
+    } catch (e) {
+      console.warn("[relacionados] filter exacto falló:", e);
+    }
+
+    /* 2) Busqueda textual: variantes suelen vivir solo en el SKU "padre" (ej. NW) */
+    try {
+      const data = await searchByQuery(sku, "sku,nombre", 10);
+      const docs = (data?.hits || []).map((h) => h.document);
+      const exact = docs.find((d) => String(d.sku || "").trim() === sku);
+      if (exact) return exact;
+      const viaVariants = docs.find((d) => skuInVariantsField(d, sku));
+      if (viaVariants) return viaVariants;
+    } catch (e) {
+      console.warn("[relacionados] search by query falló:", e);
+    }
+
+    /* 3) Prefijos del SKU (NEON-...-WW → NEON-...-IP65 → …) */
+    const parts = String(sku).split("-").filter(Boolean);
+    for (let i = parts.length - 1; i >= 2; i -= 1) {
+      const prefix = parts.slice(0, i).join("-");
+      try {
+        const data = await searchByQuery(prefix, "sku", 10);
+        const docs = (data?.hits || []).map((h) => h.document);
+        const viaVariants = docs.find((d) => skuInVariantsField(d, sku));
+        if (viaVariants) return viaVariants;
+        const starts = docs.find((d) =>
+          String(d.sku || "").toUpperCase().startsWith(prefix.toUpperCase())
+        );
+        if (starts) return starts;
+      } catch (_) {
+        /* continue */
+      }
+    }
+
+    /* 4) Fallback CMS: armar un "self" sintético para la cascada familia/macro */
+    const cms = readCmsContext();
+    if (cms && (cms.familia || cms.macrofamilia || cms.subfamilia)) {
+      console.warn(
+        "[relacionados] SKU no está como documento en Typesense; uso familia/macro del CMS.",
+        cms
+      );
+      return {
+        sku: cms.sku || sku,
+        nombre: cms.nombre,
+        familia: cms.familia,
+        macrofamilia: cms.macrofamilia,
+        subfamilia: cms.subfamilia,
+      };
+    }
+
+    return null;
   }
 
   function hideSection() {
@@ -416,8 +523,9 @@
         return;
       }
 
-      const exclude = `sku:!="${fb(self.sku)}" && variantes_sku:!="${fb(
-        self.sku
+      const excludeSku = self.sku || sku;
+      const exclude = `sku:!="${fb(excludeSku)}" && variantes_sku:!="${fb(
+        excludeSku
       )}"`;
 
       const levels = [
