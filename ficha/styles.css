@@ -326,7 +326,8 @@ img{max-width:100%;display:block;}
 .variant-chip.active .variant-swatch{
   box-shadow:inset 0 0 0 1px rgba(0,189,255,.25),0 0 0 2px rgba(0,189,255,.12);
 }
-.cms-product-source{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);}
+.cms-product-source,
+.cms-variants-source{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);}
 
 .chars-block{
   margin:0 0 clamp(20px,3vw,28px);

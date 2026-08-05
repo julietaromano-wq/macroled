@@ -769,30 +769,88 @@
   /* —— Compatible (reemplazado por destacados.js / Typesense) —— */
 
   /* —— Variants (CMS siblings) —— */
-  const ALLOWED_DIM_KEYS = [
+
+  /**
+   * "Nombre ATTR_Variantes" del CMS → claves de spec que pueden contener ese valor.
+   * Las claves del objeto van normalizadas (sin acentos, minúsculas) porque el CMS
+   * trae variaciones como "Ángulo ", "angulo" o "Temperatura de color".
+   */
+  const DIM_LABEL_CANDIDATES = {
+    color: ["Color del cuerpo", "Color"],
+    "color del cuerpo": ["Color del cuerpo", "Color"],
+    luz: ["Temperatura del color", "Tipo de luz"],
+    "tipo de luz": ["Tipo de luz", "Temperatura del color"],
+    temperatura: ["Temperatura del color", "Tipo de luz"],
+    "temperatura de color": ["Temperatura del color", "Tipo de luz"],
+    "temperatura del color": ["Temperatura del color", "Tipo de luz"],
+    cct: ["Temperatura del color", "Tipo de luz"],
+    angulo: ["Ángulo de apertura"],
+    "angulo de apertura": ["Ángulo de apertura"],
+    apertura: ["Ángulo de apertura"],
+    potencia: ["Potencia"],
+    conector: ["Conector", "Conexión"],
+    conexion: ["Conexión", "Conector"],
+    ip: ["Protección IP"],
+    "proteccion ip": ["Protección IP"],
+    medida: ["Dimensiones"],
+    medidas: ["Dimensiones"],
+    dimensiones: ["Dimensiones"],
+    tension: ["Tensión"],
+    material: ["Material del cuerpo"],
+    "material del cuerpo": ["Material del cuerpo"],
+    "flujo luminoso": ["Flujo luminoso"],
+    "cantidad de luces": ["Cantidad de luces"],
+  };
+
+  /* Identificadores y datos comerciales: nunca son el eje de una variante. */
+  const NON_DIM_KEYS = new Set([
+    "SKU",
+    "EAN13",
+    "Familia",
+    "Macrofamilia",
+    "Subfamilia",
+    "Garantía",
+  ]);
+
+  /* Orden de preferencia cuando el CMS no declara "Nombre ATTR_Variantes". */
+  const DIM_AUTODETECT_PRIORITY = [
     "Color del cuerpo",
-    "Ángulo de apertura",
-    "Tipo de luz",
-    "Protección IP",
-    "Potencia",
     "Temperatura del color",
+    "Tipo de luz",
+    "Ángulo de apertura",
+    "Potencia",
+    "Conector",
+    "Conexión",
+    "Protección IP",
+    "Dimensiones",
   ];
-  const DIM_ALIASES = {
-    Ángulo: "Ángulo de apertura",
-    Color: "Color del cuerpo",
-    Temperatura: "Tipo de luz",
-    Luz: "Tipo de luz",
-    Potencia: "Potencia",
-    IP: "Protección IP",
-  };
+
   const COLOR_SWATCH = {
-    Blanco: "#f4f4f4",
-    Negro: "#1a1a1a",
-    Rojo: "#c62828",
-    Verde: "#2e7d32",
-    Bronce: "#b08d57",
-    Cobre: "#b87333",
+    blanco: "#f4f4f4",
+    negro: "#1a1a1a",
+    rojo: "#c62828",
+    verde: "#2e7d32",
+    azul: "#1565c0",
+    amarillo: "#f9a825",
+    gris: "#9e9e9e",
+    bronce: "#b08d57",
+    cobre: "#b87333",
+    dorado: "#c9a227",
+    plata: "#c0c0c0",
+    plateado: "#c0c0c0",
+    platil: "#c0c0c0",
+    cromo: "#cfd4d8",
+    niquel: "#b6b6b6",
+    madera: "#a97142",
   };
+
+  function normKey(value) {
+    return String(value || "")
+      .trim()
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "");
+  }
 
   const variantsTarget = document.getElementById("product-variants") || document.querySelector(".container_variants");
 
@@ -844,9 +902,9 @@
   }
 
   function variantSort(a, b) {
-    const colorOrder = ["Blanco", "Negro", "Rojo", "Verde", "Bronce", "Cobre"];
-    const ia = colorOrder.indexOf(a);
-    const ib = colorOrder.indexOf(b);
+    const colorOrder = ["blanco", "negro", "gris", "plata", "platil", "rojo", "verde", "azul", "bronce", "cobre"];
+    const ia = colorOrder.indexOf(normKey(a));
+    const ib = colorOrder.indexOf(normKey(b));
     if (ia !== -1 || ib !== -1) {
       if (ia === -1) return 1;
       if (ib === -1) return -1;
@@ -901,84 +959,177 @@
   let siblings = [];
   let dimensionKeys = [];
 
+  /**
+   * Las hermanas salen de la Collection List atada a Variantes_Multireference:
+   * todo lo que esa lista renderiza ES una variante del producto actual, así que
+   * alcanza con marcarlas con data-variant-item. El campo de texto
+   * data-variantes-sku queda solo como fallback para el mock local.
+   */
   function collectSiblings(current) {
     const currentSku = (current.getAttribute("data-sku") || "").trim();
-    let allItems = Array.prototype.slice.call(document.querySelectorAll(".cms-product-item"));
-    const seenSku = new Set();
-    allItems = allItems.filter((el) => {
+    const bySku = new Map();
+    const push = (el) => {
       const sku = (el.getAttribute("data-sku") || "").trim();
-      if (!sku || seenSku.has(sku)) return false;
-      seenSku.add(sku);
-      return true;
-    });
+      if (!sku || bySku.has(sku)) return;
+      bySku.set(sku, el);
+    };
 
-    const selfVariantesSku = parseList(current.getAttribute("data-variantes-sku"));
-    const siblingSkuSet = new Set(selfVariantesSku);
-    siblingSkuSet.add(currentSku);
-    allItems.forEach((el) => {
-      const sku = (el.getAttribute("data-sku") || "").trim();
-      const vs = parseList(el.getAttribute("data-variantes-sku"));
-      if (vs.indexOf(currentSku) !== -1) siblingSkuSet.add(sku);
-    });
+    /* El héroe primero: si el multi-reference se incluye a sí mismo, gana el embed
+       del héroe, que es el que trae la ficha completa. */
+    push(current);
+    document.querySelectorAll(".cms-product-item[data-variant-item]").forEach(push);
 
-    return allItems.filter((el) => siblingSkuSet.has((el.getAttribute("data-sku") || "").trim()));
+    if (bySku.size <= 1) {
+      const wanted = new Set(parseList(current.getAttribute("data-variantes-sku")));
+      document.querySelectorAll(".cms-product-item").forEach((el) => {
+        const sku = (el.getAttribute("data-sku") || "").trim();
+        if (wanted.has(sku) || parseList(el.getAttribute("data-variantes-sku")).indexOf(currentSku) !== -1) {
+          push(el);
+        }
+      });
+    }
+
+    return Array.from(bySku.values());
   }
 
-  function resolveDimensions(current, sibs) {
-    const declaredDimRaw = (current.getAttribute("data-nombre-attr-variantes") || "").trim();
-    const declaredDim = DIM_ALIASES[declaredDimRaw] || declaredDimRaw;
-    const keys = [];
-    ALLOWED_DIM_KEYS.forEach((key) => {
-      const values = new Set(sibs.map((el) => (parseSpecs(el)[key] || "").trim()));
-      values.delete("");
-      if (values.size > 1) keys.push(key);
+  function specValues(sibs, key) {
+    const values = new Set();
+    sibs.forEach((el) => {
+      const value = (parseSpecs(el)[key] || "").trim();
+      if (value) values.add(value);
     });
-    if (declaredDim && ALLOWED_DIM_KEYS.indexOf(declaredDim) !== -1 && keys.indexOf(declaredDim) === -1) {
-      keys.unshift(declaredDim);
+    return values;
+  }
+
+  function allSpecKeys(sibs) {
+    const keys = new Set();
+    sibs.forEach((el) => Object.keys(parseSpecs(el)).forEach((key) => keys.add(key)));
+    return Array.from(keys);
+  }
+
+  /**
+   * Devuelve la clave de spec que diferencia a las variantes, o [] si ninguna lo
+   * hace (en ese caso los chips se etiquetan por nombre/SKU).
+   */
+  function resolveDimensions(current, sibs) {
+    const declaredRaw = (current.getAttribute("data-nombre-attr-variantes") || "").trim();
+    const declared = normKey(declaredRaw);
+    const differs = (key) => !NON_DIM_KEYS.has(key) && specValues(sibs, key).size > 1;
+
+    if (declared) {
+      const candidates = (DIM_LABEL_CANDIDATES[declared] || []).concat(
+        allSpecKeys(sibs).filter((key) => normKey(key) === declared)
+      );
+      const hit = candidates.find(differs);
+      if (hit) return [hit];
+      console.warn(
+        `[variantes] el CMS declara "${declaredRaw}" pero ningún campo con ese valor difiere entre las variantes. Autodetectando…`
+      );
     }
-    keys.sort((a, b) => (a === declaredDim ? -1 : b === declaredDim ? 1 : 0));
-    return keys;
+
+    const auto = DIM_AUTODETECT_PRIORITY.find(differs) || allSpecKeys(sibs).find(differs);
+    return auto ? [auto] : [];
+  }
+
+  const CHIP_LABELS = {
+    "Color del cuerpo": "Color",
+    "Temperatura del color": "Temperatura",
+    "Ángulo de apertura": "Ángulo",
+    "Protección IP": "Protección",
+  };
+
+  function renderChipGroup(label, groupName, entries, activeValue) {
+    let html =
+      `<div class="variant-group"><span class="variant-label">${escapeHtml(label)}</span>` +
+      `<div class="variant-chips" role="radiogroup" aria-label="${escapeHtml(label)}">`;
+    entries.forEach((entry) => {
+      const isActive = entry.value === activeValue;
+      const inputId = groupName + "--" + slugify(entry.value);
+      const color = entry.swatch ? COLOR_SWATCH[normKey(entry.value)] : "";
+      const swatch = color
+        ? `<span class="variant-swatch" style="background:${color}" aria-hidden="true"></span>`
+        : "";
+      html +=
+        `<label for="${inputId}" class="variant-chip${isActive ? " active" : ""}">` +
+        `<input type="radio" class="variant-chip-radio" id="${inputId}" name="${groupName}"` +
+        ` data-dim="${escapeHtml(entry.dim || "")}" data-val="${escapeHtml(entry.value)}"` +
+        (entry.sku ? ` data-sku="${escapeHtml(entry.sku)}"` : "") +
+        (isActive ? " checked" : "") +
+        `>` +
+        swatch +
+        escapeHtml(entry.value) +
+        `</label>`;
+    });
+    return html + "</div></div>";
+  }
+
+  /* "PAR16-AL-6.5W-DIM-12D-WW" → "12D-WW": se recorta el tramo que comparten todos. */
+  function stripCommonSkuPrefix(skus) {
+    if (skus.length < 2) return skus.slice();
+    const parts = skus.map((sku) => sku.split("-"));
+    const min = Math.min(...parts.map((p) => p.length));
+    let common = 0;
+    while (common < min - 1 && parts.every((p) => p[common] === parts[0][common])) common += 1;
+    const short = parts.map((p) => p.slice(common).join("-"));
+    return new Set(short).size === skus.length ? short : skus.slice();
+  }
+
+  /* Sin spec que las distinga, se etiqueta por nombre; si los nombres se repiten, por SKU. */
+  function fallbackChipEntries(sibs) {
+    const skus = sibs.map((el) => (el.getAttribute("data-sku") || "").trim());
+    const names = sibs.map((el) => (el.getAttribute("data-name") || "").trim());
+    const useName = new Set(names.filter(Boolean)).size === sibs.length;
+    const shortSkus = stripCommonSkuPrefix(skus);
+    return sibs
+      .map((el, i) => ({
+        sku: skus[i],
+        value: (useName ? names[i] : shortSkus[i]) || skus[i],
+        swatch: false,
+      }))
+      .sort((a, b) => variantSort(a.value, b.value));
   }
 
   function buildChipsHtml() {
     if (!variantsTarget || !heroItem) return "";
     const currentSpecs = parseSpecs(heroItem);
     let html = "";
-    dimensionKeys.forEach((key) => {
-      const values = [
-        ...new Set(
-          siblings
-            .map((el) => (parseSpecs(el)[key] || "").trim())
-            .filter(Boolean)
-        ),
-      ].sort(variantSort);
-      if (values.length <= 1) return;
 
-      const curVal = (currentSpecs[key] || "").trim();
-      const groupName = "variant-" + slugify(key);
-      const label = key === "Color del cuerpo" ? "Color" : key;
-      html += `<div class="variant-group"><span class="variant-label">${escapeHtml(label)}</span><div class="variant-chips" role="radiogroup" aria-label="${escapeHtml(label)}">`;
-      values.forEach((v) => {
-        const isActive = v === curVal;
-        const inputId = groupName + "--" + slugify(v);
-        const swatch = COLOR_SWATCH[v]
-          ? `<span class="variant-swatch" style="background:${COLOR_SWATCH[v]}" aria-hidden="true"></span>`
-          : "";
-        html +=
-          `<label for="${inputId}" class="variant-chip${isActive ? " active" : ""}">` +
-          `<input type="radio" class="variant-chip-radio" id="${inputId}" name="${groupName}"` +
-          ` data-dim="${escapeHtml(key)}" data-val="${escapeHtml(v)}"` +
-          (isActive ? " checked" : "") +
-          `>` +
-          swatch +
-          escapeHtml(v) +
-          `</label>`;
+    if (dimensionKeys.length) {
+      dimensionKeys.forEach((key) => {
+        const values = [...specValues(siblings, key)].sort(variantSort);
+        if (values.length <= 1) return;
+        const isColorDim = normKey(key).indexOf("color") !== -1;
+        html += renderChipGroup(
+          CHIP_LABELS[key] || key,
+          "variant-" + slugify(key),
+          values.map((value) => ({ value, dim: key, swatch: isColorDim })),
+          (currentSpecs[key] || "").trim()
+        );
       });
-      html += "</div></div>";
-    });
+    } else if (siblings.length > 1) {
+      const declared = (heroItem.getAttribute("data-nombre-attr-variantes") || "").trim();
+      const heroSku = (heroItem.getAttribute("data-sku") || "").trim();
+      const entries = fallbackChipEntries(siblings);
+      const active = entries.find((entry) => entry.sku === heroSku);
+      html += renderChipGroup(
+        declared || "Variante",
+        "variant-fallback",
+        entries,
+        active ? active.value : ""
+      );
+    }
+
     variantsTarget.hidden = !html;
     variantsTarget.style.display = html ? "flex" : "none";
     return html;
+  }
+
+  function findMatchForInput(input) {
+    const sku = (input.getAttribute("data-sku") || "").trim();
+    if (sku) {
+      return siblings.find((el) => (el.getAttribute("data-sku") || "").trim() === sku) || null;
+    }
+    return findBestMatch(input.getAttribute("data-dim"), input.getAttribute("data-val"));
   }
 
   function findBestMatch(desiredKey, desiredVal) {
@@ -1155,21 +1306,44 @@
     window.dispatchEvent(new CustomEvent("ml-product-changed", { detail: { sku } }));
   }
 
+  /**
+   * El embed del héroe y los de la Collection List de variantes se montan en
+   * cualquier orden, así que no alcanza con tomar el primero del DOM.
+   */
+  function pickHeroItem() {
+    const all = Array.prototype.slice.call(document.querySelectorAll(".cms-product-item"));
+    if (!all.length) return null;
+
+    const explicit = all.find((el) => el.hasAttribute("data-hero"));
+    if (explicit) return explicit;
+
+    const nonVariant = all.filter((el) => !el.hasAttribute("data-variant-item"));
+    if (nonVariant.length === 1) return nonVariant[0];
+
+    const initialSku = (document.getElementById("ficha-sku")?.textContent || "").trim();
+    const bySku = (list) => list.find((el) => (el.getAttribute("data-sku") || "").trim() === initialSku);
+    return (initialSku && (bySku(nonVariant) || bySku(all))) || nonVariant[0] || all[0];
+  }
+
+  let variantsBound = false;
+  let lastVariantSignature = "";
+  let userPickedVariant = false;
+
   function initVariants() {
     if (!variantsTarget) return;
 
-    const initialSku = (document.getElementById("ficha-sku")?.textContent || "").trim();
-    const all = Array.prototype.slice.call(document.querySelectorAll(".cms-product-item"));
-    heroItem =
-      all.find((el) => (el.getAttribute("data-sku") || "").trim() === initialSku) ||
-      all[0] ||
-      null;
+    heroItem = pickHeroItem();
     if (!heroItem) {
       variantsTarget.hidden = true;
+      console.warn("[variantes] no hay ningún .cms-product-item en el DOM.");
       return;
     }
 
     siblings = collectSiblings(heroItem);
+    const signature = siblings.map((el) => (el.getAttribute("data-sku") || "").trim()).join("|");
+    if (lastVariantSignature && signature === lastVariantSignature) return;
+    lastVariantSignature = signature;
+
     siblings.forEach((el) => {
       parseList(el.getAttribute("data-multiimage")).forEach((src) => {
         if (!src) return;
@@ -1180,19 +1354,37 @@
 
     dimensionKeys = resolveDimensions(heroItem, siblings);
 
+    console.log("[variantes]", {
+      hero: (heroItem.getAttribute("data-sku") || "").trim(),
+      hermanas: siblings.length,
+      skus: siblings.map((el) => (el.getAttribute("data-sku") || "").trim()),
+      atributoDeclarado: (heroItem.getAttribute("data-nombre-attr-variantes") || "").trim() || "(vacío)",
+      dimension: dimensionKeys[0] || "(fallback por nombre/SKU)",
+    });
+
     if (siblings.length <= 1) {
       variantsTarget.hidden = true;
+      console.warn(
+        "[variantes] solo se encontró el producto actual. Falta la Collection List atada a " +
+          "Variantes_Multireference: cada item tiene que imprimir un .cms-product-item con data-variant-item. " +
+          "Ver variantes-embed.html."
+      );
       applyProduct(heroItem, { skipHistory: true });
       return;
     }
 
     applyProduct(heroItem, { skipHistory: true });
 
+    if (variantsBound) return;
+    variantsBound = true;
+
     variantsTarget.addEventListener("change", (e) => {
       const input = e.target;
       if (!input.classList || !input.classList.contains("variant-chip-radio")) return;
-      const match = findBestMatch(input.getAttribute("data-dim"), input.getAttribute("data-val"));
-      if (match) applyProduct(match);
+      const match = findMatchForInput(input);
+      if (!match) return;
+      userPickedVariant = true;
+      applyProduct(match);
     });
 
     window.addEventListener("popstate", () => {
@@ -1456,8 +1648,29 @@
    * En Webflow el Custom Code a veces corre ANTES del Embed CMS.
    * Esperamos a que exista .cms-product-item (o al DOM listo) y reintentamos.
    */
+  /**
+   * La Collection List de variantes puede montarse después del embed del héroe,
+   * así que seguimos mirando si aparecen más .cms-product-item.
+   */
+  function watchForLateVariants() {
+    let lastCount = document.querySelectorAll(".cms-product-item").length;
+    let checks = 0;
+    const tick = () => {
+      if (userPickedVariant) return;
+      const count = document.querySelectorAll(".cms-product-item").length;
+      if (count !== lastCount) {
+        lastCount = count;
+        initVariants();
+      }
+      checks += 1;
+      if (checks < 50) setTimeout(tick, 200); /* ~10s */
+    };
+    setTimeout(tick, 200);
+  }
+
   function bootFicha() {
     initVariants();
+    watchForLateVariants();
     initReveals();
   }
 
