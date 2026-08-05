@@ -886,6 +886,10 @@
    * "2700K" → calido, "6500K" → frio, "RGB+W" → rgbw,
    * "2700K a 6500K" → cct (sintonizable, no es un tono fijo).
    */
+  function kelvinsIn(value) {
+    return normKey(value).match(/\d{4}/g) || [];
+  }
+
   function tempCategory(value) {
     const v = normKey(value);
     if (!v) return null;
@@ -894,13 +898,38 @@
     if (/neutr/.test(v)) return "neutro";
     if (/frio|cool/.test(v)) return "frio";
 
-    const kelvins = v.match(/\d{4}/g);
-    if (!kelvins) return null;
+    const kelvins = kelvinsIn(value);
+    if (!kelvins.length) return null;
     if (kelvins.length > 1) return "cct";
     const k = parseInt(kelvins[0], 10);
     if (k <= 3500) return "calido";
     if (k <= 5000) return "neutro";
     return "frio";
+  }
+
+  /* Cálido → neutro → frío → CCT → RGB → RGB+W, y dentro del blanco por Kelvin. */
+  function tempSort(a, b) {
+    const TIER = { cct: 2, rgb: 3, rgbw: 4 };
+    const catA = tempCategory(a);
+    const catB = tempCategory(b);
+    const tierA = TIER[catA] || 1;
+    const tierB = TIER[catB] || 1;
+    if (tierA !== tierB) return tierA - tierB;
+
+    if (tierA === 1) {
+      const ka = kelvinsIn(a);
+      const kb = kelvinsIn(b);
+      if (ka.length === 1 && kb.length === 1) {
+        const diff = parseInt(ka[0], 10) - parseInt(kb[0], 10);
+        if (diff) return diff;
+      }
+      const BLANCOS = ["calido", "neutro", "frio"];
+      const ia = BLANCOS.indexOf(catA);
+      const ib = BLANCOS.indexOf(catB);
+      if (ia !== ib) return ia - ib;
+    }
+
+    return String(a).localeCompare(String(b), "es");
   }
 
   const variantsTarget = document.getElementById("product-variants") || document.querySelector(".container_variants");
@@ -1146,11 +1175,11 @@
 
     if (dimensionKeys.length) {
       dimensionKeys.forEach((key) => {
-        const values = [...specValues(siblings, key)].sort(variantSort);
-        if (values.length <= 1) return;
         /* "Temperatura del color" contiene "color", así que se chequea primero. */
         const isTempDim = TEMP_SPEC_KEYS.has(key);
         const isBodyColorDim = !isTempDim && normKey(key).indexOf("color") !== -1;
+        const values = [...specValues(siblings, key)].sort(isTempDim ? tempSort : variantSort);
+        if (values.length <= 1) return;
         const swatchFor = (value) => {
           if (isTempDim) return TEMP_SWATCH[tempCategory(value)] || "";
           if (isBodyColorDim) return COLOR_SWATCH[normKey(value)] || "";
