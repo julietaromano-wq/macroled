@@ -13,10 +13,9 @@
 <body>
   <div id="macroled-home" class="ml-home">
     <div class="ml-hero" aria-labelledby="ml-hero-title">
-      <video class="ml-hero__video" autoplay muted loop playsinline preload="metadata" poster="assets/images/hero-poster.webp" aria-hidden="true">
-        <source src="https://s3.coresagroup.com/MACROLED/video/HOMEMOBILE2.mp4" type="video/mp4" media="(max-width: 640px)">
-        <source src="https://s3.coresagroup.com/MACROLED/video/HOMEDESKTOP10.mp4" type="video/mp4">
-      </video>
+      <video class="ml-hero__video" autoplay muted playsinline preload="metadata" poster="assets/images/hero-poster.webp" aria-hidden="true"
+        data-src-mobile="https://s3.coresagroup.com/MACROLED/video/HOMEMOBILE2.mp4"
+        data-src-desktop="https://s3.coresagroup.com/MACROLED/video/HOMEDESKTOP10.mp4"></video>
       <div class="ml-hero__fallback" aria-hidden="true"></div>
       <div class="ml-hero__overlay"></div>
       <div class="ml-hero__content">
@@ -149,6 +148,6 @@
   <script src="js/products.js"></script>
   <script src="js/featured.js"></script>
   <script src="js/project-lines-concept.js"></script>
-  <script src="js/home.js?v=20260730-3"></script>
+  <script src="js/home.js?v=20260805-1"></script>
 </body>
 </html>
