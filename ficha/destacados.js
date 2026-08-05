@@ -10,20 +10,32 @@
   const RELATED_COUNT = 8;
   const MIN_RESULTS_BEFORE_FALLBACK = 4;
 
-  const section = document.getElementById("productos-relacionados");
-  if (!section) {
-    console.warn(
-      "[relacionados] falta #productos-relacionados en el HTML (pegá el bloque de 2-EMBED-FICHA)."
+  /* Webflow re-renderiza embeds: NUNCA cachear section/track al inicio. */
+  function resolveRelatedTargets() {
+    const sections = Array.prototype.slice.call(
+      document.querySelectorAll("#productos-relacionados")
     );
-    return;
-  }
-  const viewport = section.querySelector("[data-related-viewport]");
-  const track = section.querySelector("[data-related-track]");
-  if (!viewport || !track) {
-    console.warn(
-      "[relacionados] falta data-related-viewport / data-related-track dentro de #productos-relacionados. Sin ese nodo no se pueden pintar las cards."
-    );
-    return;
+    const targets = sections
+      .map((section) => ({
+        section,
+        viewport: section.querySelector("[data-related-viewport]"),
+        track: section.querySelector("[data-related-track]"),
+      }))
+      .filter(
+        (t) =>
+          t.section.isConnected &&
+          t.viewport &&
+          t.track &&
+          t.track.isConnected
+      );
+    if (targets.length > 1) {
+      console.warn(
+        "[relacionados] hay",
+        targets.length,
+        "bloques #productos-relacionados. Dejá solo uno (borrá el duplicado del embed 2b si ya está en 2-EMBED-FICHA)."
+      );
+    }
+    return targets;
   }
 
   const escapeHTML = (value) =>
@@ -234,7 +246,7 @@
     )}</div><div class="ml-product-card__attrs">${attrs}</div></${tag}>`;
   }
 
-  function setupTrackControls() {
+  function setupTrackControls(section, viewport, track) {
     const controls = section.querySelector(".ml-related-products__controls");
     const progressBar = section.querySelector(".ml-related-products__progress");
     const progress = section.querySelector("[data-related-progress]");
@@ -248,6 +260,7 @@
     const cards = [...track.querySelectorAll(".ml-product-card")];
 
     const update = () => {
+      if (!track.isConnected) return;
       const needsScroll = track.scrollWidth > track.clientWidth + 4;
       controls.hidden = !needsScroll;
       arrows.hidden = !needsScroll;
@@ -498,14 +511,61 @@
     return null;
   }
 
-  function hideSection() {
-    section.hidden = true;
+  function hideSection(section) {
+    if (section) section.hidden = true;
+  }
+
+  function showSection(section) {
+    if (!section) return;
+    section.hidden = false;
+    section.removeAttribute("hidden");
+    section.classList.add("is-in");
+    section.style.opacity = "1";
+    section.style.transform = "none";
+  }
+
+  function paintCards(targets, html) {
+    let cardCount = 0;
+    targets.forEach(({ section, viewport, track }) => {
+      if (!track.isConnected || !section.isConnected) return;
+      track.innerHTML = html;
+      cardCount = Math.max(
+        cardCount,
+        track.querySelectorAll(".ml-product-card").length
+      );
+      showSection(section);
+      track.scrollLeft = 0;
+      track.setAttribute("aria-busy", "false");
+      setupTrackControls(section, viewport, track);
+    });
+    return cardCount;
   }
 
   let loadToken = 0;
+  let reloadTimer = 0;
+  let isLoading = false;
+
+  function scheduleReload(reason) {
+    if (isLoading) return;
+    if (reason) console.log("[relacionados] reintento:", reason);
+    window.clearTimeout(reloadTimer);
+    reloadTimer = window.setTimeout(() => {
+      loadRelatedProducts();
+    }, 250);
+  }
 
   async function loadRelatedProducts() {
     const token = ++loadToken;
+    isLoading = true;
+    const targets = resolveRelatedTargets();
+    if (!targets.length) {
+      isLoading = false;
+      console.warn(
+        "[relacionados] aún no está #productos-relacionados en el DOM."
+      );
+      return;
+    }
+
     const sku = readCurrentSku();
     console.log("[relacionados] SKU leído de la ficha:", JSON.stringify(sku));
 
@@ -513,13 +573,16 @@
       console.warn(
         "[relacionados] falta el sku en la ficha, no se puede identificar el producto."
       );
-      hideSection();
+      targets.forEach(({ section }) => hideSection(section));
+      isLoading = false;
       return;
     }
 
-    track.setAttribute("aria-busy", "true");
-    track.innerHTML =
-      '<div class="ml-related-products__state">Cargando productos relacionados…</div>';
+    targets.forEach(({ track }) => {
+      track.setAttribute("aria-busy", "true");
+      track.innerHTML =
+        '<div class="ml-related-products__state">Cargando productos relacionados…</div>';
+    });
 
     try {
       const self = await findSelf(sku);
@@ -530,7 +593,7 @@
         console.warn(
           `[relacionados] no se encontró ningún documento en Typesense para el sku "${sku}".`
         );
-        hideSection();
+        resolveRelatedTargets().forEach(({ section }) => hideSection(section));
         return;
       }
 
@@ -551,7 +614,7 @@
         console.warn(
           "[relacionados] el documento propio no tiene subfamilia/familia/macrofamilia cargada."
         );
-        hideSection();
+        resolveRelatedTargets().forEach(({ section }) => hideSection(section));
         return;
       }
 
@@ -573,26 +636,29 @@
         console.warn(
           "[relacionados] ningún nivel de la cascada trajo resultados."
         );
-        hideSection();
+        resolveRelatedTargets().forEach(({ section }) => hideSection(section));
+        return;
+      }
+
+      /* Re-resolver por si Webflow reemplazó el embed durante el fetch. */
+      const liveTargets = resolveRelatedTargets();
+      if (!liveTargets.length) {
+        console.warn(
+          "[relacionados] el bloque HTML desapareció durante la carga; reintento."
+        );
+        scheduleReload("dom perdido tras fetch");
         return;
       }
 
       const html = data.hits.map((hit) => cardTemplate(hit.document)).join("");
-      track.innerHTML = html;
-      const cardCount = track.querySelectorAll(".ml-product-card").length;
+      const cardCount = paintCards(liveTargets, html);
       console.log(
         "[relacionados] cards inyectadas:",
         cardCount,
         "en",
-        track
+        liveTargets.length,
+        "bloque(s)"
       );
-      section.hidden = false;
-      section.removeAttribute("hidden");
-      section.classList.add("is-in");
-      section.style.opacity = "1";
-      section.style.transform = "none";
-      track.scrollLeft = 0;
-      setupTrackControls();
       if (!cardCount) {
         console.warn(
           "[relacionados] Typesense trajo hits pero no se generó ningún .ml-product-card."
@@ -601,21 +667,42 @@
     } catch (error) {
       if (token !== loadToken) return;
       console.error("[relacionados] Error cargando productos relacionados:", error);
-      hideSection();
+      resolveRelatedTargets().forEach(({ section }) => hideSection(section));
     } finally {
-      if (token === loadToken) track.setAttribute("aria-busy", "false");
+      if (token === loadToken) {
+        isLoading = false;
+        resolveRelatedTargets().forEach(({ track }) =>
+          track.setAttribute("aria-busy", "false")
+        );
+      }
     }
   }
 
-  /* Esperar CMS + SKU hidratado (mismo race que script.js en Webflow). */
+  /* Esperar sección + CMS + SKU (Webflow monta embeds tarde). */
   function waitAndLoadRelated() {
     let tries = 0;
-    const maxTries = 50;
+    const maxTries = 80;
     const tick = () => {
+      const targets = resolveRelatedTargets();
       const hasCms = !!document.querySelector(".cms-product-item[data-sku]");
       const sku = readCurrentSku();
-      const heroReady = !!document.getElementById("stageImg")?.getAttribute("src");
-      if ((hasCms && (heroReady || tries > 15) && sku) || tries >= maxTries) {
+      const heroReady = !!document
+        .getElementById("stageImg")
+        ?.getAttribute("src");
+      if (
+        (targets.length &&
+          hasCms &&
+          (heroReady || tries > 15) &&
+          sku) ||
+        (targets.length && sku && tries > 25) ||
+        tries >= maxTries
+      ) {
+        if (!targets.length) {
+          console.warn(
+            "[relacionados] timeout: no apareció #productos-relacionados. Pegá 2-EMBED-FICHA o 2b-EMBED-RELACIONADOS."
+          );
+          return;
+        }
         loadRelatedProducts();
         return;
       }
@@ -631,10 +718,28 @@
     waitAndLoadRelated();
   }
 
+  /* Si Webflow re-renderiza el embed y vuelve a "Cargando…", recargar. */
+  const domWatcher = new MutationObserver(() => {
+    const targets = resolveRelatedTargets();
+    if (!targets.length) return;
+    const needsPaint = targets.some(
+      ({ track }) =>
+        !track.querySelector(".ml-product-card") &&
+        !!track.querySelector(".ml-related-products__state")
+    );
+    if (needsPaint && readCurrentSku()) {
+      scheduleReload("embed re-render / track vacío");
+    }
+  });
+  domWatcher.observe(document.documentElement, {
+    childList: true,
+    subtree: true,
+  });
+
   window.addEventListener("ml-product-changed", (event) => {
     const sku = event?.detail?.sku || readCurrentSku();
     if (!sku) return;
-    loadRelatedProducts();
+    scheduleReload("ml-product-changed");
   });
 
   window.MacroledRelatedProducts = { reload: loadRelatedProducts };
