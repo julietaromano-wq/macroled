@@ -11,9 +11,20 @@
   const MIN_RESULTS_BEFORE_FALLBACK = 4;
 
   const section = document.getElementById("productos-relacionados");
-  const viewport = document.querySelector("[data-related-viewport]");
-  const track = document.querySelector("[data-related-track]");
-  if (!section || !viewport || !track) return;
+  if (!section) {
+    console.warn(
+      "[relacionados] falta #productos-relacionados en el HTML (pegá el bloque de 2-EMBED-FICHA)."
+    );
+    return;
+  }
+  const viewport = section.querySelector("[data-related-viewport]");
+  const track = section.querySelector("[data-related-track]");
+  if (!viewport || !track) {
+    console.warn(
+      "[relacionados] falta data-related-viewport / data-related-track dentro de #productos-relacionados. Sin ese nodo no se pueden pintar las cards."
+    );
+    return;
+  }
 
   const escapeHTML = (value) =>
     String(value ?? "").replace(
@@ -523,10 +534,10 @@
         return;
       }
 
-      const excludeSku = self.sku || sku;
-      const exclude = `sku:!="${fb(excludeSku)}" && variantes_sku:!="${fb(
-        excludeSku
-      )}"`;
+      const excludeSkus = [...new Set([self.sku, sku].filter(Boolean))];
+      const exclude = excludeSkus
+        .flatMap((s) => [`sku:!="${fb(s)}"`, `variantes_sku:!="${fb(s)}"`])
+        .join(" && ");
 
       const levels = [
         self.subfamilia && { field: "subfamilia", value: self.subfamilia },
@@ -566,13 +577,27 @@
         return;
       }
 
-      track.innerHTML = data.hits
-        .map((hit) => cardTemplate(hit.document))
-        .join("");
+      const html = data.hits.map((hit) => cardTemplate(hit.document)).join("");
+      track.innerHTML = html;
+      const cardCount = track.querySelectorAll(".ml-product-card").length;
+      console.log(
+        "[relacionados] cards inyectadas:",
+        cardCount,
+        "en",
+        track
+      );
       section.hidden = false;
+      section.removeAttribute("hidden");
       section.classList.add("is-in");
+      section.style.opacity = "1";
+      section.style.transform = "none";
       track.scrollLeft = 0;
       setupTrackControls();
+      if (!cardCount) {
+        console.warn(
+          "[relacionados] Typesense trajo hits pero no se generó ningún .ml-product-card."
+        );
+      }
     } catch (error) {
       if (token !== loadToken) return;
       console.error("[relacionados] Error cargando productos relacionados:", error);

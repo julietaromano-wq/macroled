@@ -811,6 +811,7 @@ body.has-compare-bar .ai-launch{
 .ml-related-products__track::-webkit-scrollbar{display:none;}
 .ml-related-products__track .ml-product-card{
   flex:0 0 calc((100% - 3rem) / 4);
+  min-width:min(240px, 78vw);
   background:#fff;
   box-shadow:2px 3px 20px 2px rgba(0,17,33,.04);
   scroll-snap-align:start;
