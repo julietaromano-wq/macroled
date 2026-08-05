@@ -8,7 +8,7 @@
     queryBy: "nombre,descripcion",
   };
   const RELATED_COUNT = 8;
-  const MIN_RESULTS_BEFORE_FALLBACK = 4;
+  const RELATED_FALLBACK_POOL = 50;
 
   /* Webflow re-renderiza embeds: NUNCA cachear section/track al inicio. */
   function resolveRelatedTargets() {
@@ -383,7 +383,9 @@
   }
 
   function readCmsContext() {
-    const el = document.querySelector(".cms-product-item[data-sku]");
+    const el =
+      document.querySelector(".cms-product-item[data-hero][data-sku]") ||
+      document.querySelector(".cms-product-item[data-sku]");
     if (!el) return null;
     return {
       sku: (el.getAttribute("data-sku") || "").trim(),
@@ -398,9 +400,56 @@
     return String(value).replace(/`/g, "").replace(/"/g, '\\"');
   }
 
-  async function searchProducts(filterBy, perPage) {
+  function nameTokens(value) {
+    const ignored = new Set(["de", "del", "la", "las", "el", "los", "y", "para", "con"]);
+    return String(value || "")
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .toLocaleLowerCase("es")
+      .replace(/[^a-z0-9]+/g, " ")
+      .trim()
+      .split(/\s+/)
+      .filter((token) => token && !ignored.has(token));
+  }
+
+  /* Typesense prioriza coincidencias con el nombre. Este ranking local mantiene
+     el orden estable y también ordena el fallback q="*" por parecido. */
+  function nameSimilarity(reference, candidate) {
+    const ref = nameTokens(reference);
+    const other = nameTokens(candidate);
+    if (!ref.length || !other.length) return 0;
+
+    const refSet = new Set(ref);
+    const otherSet = new Set(other);
+    let shared = 0;
+    refSet.forEach((token) => {
+      if (otherSet.has(token)) shared += 1;
+    });
+
+    const union = new Set([...refSet, ...otherSet]).size || 1;
+    const tokenScore = shared / union;
+    let prefix = 0;
+    while (prefix < ref.length && prefix < other.length && ref[prefix] === other[prefix]) {
+      prefix += 1;
+    }
+    const prefixScore = prefix / Math.max(ref.length, other.length);
+    return tokenScore * 4 + prefixScore;
+  }
+
+  function sortByNameSimilarity(docs, currentName) {
+    return docs.sort((a, b) => {
+      const score = nameSimilarity(currentName, b.nombre) - nameSimilarity(currentName, a.nombre);
+      if (score) return score;
+      return String(a.nombre || "").localeCompare(String(b.nombre || ""), "es", {
+        numeric: true,
+        sensitivity: "base",
+      });
+    });
+  }
+
+  async function searchProducts(filterBy, perPage, query = "*") {
     const params = new URLSearchParams({
-      q: "*",
+      q: query || "*",
       query_by: TYPESENSE.queryBy,
       filter_by: filterBy,
       per_page: String(perPage),
@@ -418,7 +467,8 @@
     return response.json();
   }
 
-  /* Relacionados = misma familia + macrofamilia (CMS) vía Typesense. Sin findSelf. */
+  /* Prioridad: misma familia dentro de la misma macrofamilia; luego completar
+     solo con productos de esa macrofamilia. */
   function buildRelatedFilters(ctx, sku) {
     const excludeParts = [];
     if (sku) {
@@ -428,33 +478,51 @@
     const exclude = excludeParts.join(" && ");
     const familia = ctx.familia;
     const macro = ctx.macrofamilia;
+    const nombre = ctx.nombre || "";
     const filters = [];
 
     if (familia && macro) {
+      if (nombre) {
+        filters.push({
+          label: "familia+macrofamilia por nombre",
+          query: nombre,
+          perPage: RELATED_COUNT,
+          filterBy: `familia:="${fb(familia)}" && macrofamilia:="${fb(macro)}"${
+            exclude ? ` && ${exclude}` : ""
+          }`,
+        });
+      }
       filters.push({
         label: "familia+macrofamilia",
+        query: "*",
+        perPage: RELATED_COUNT,
         filterBy: `familia:="${fb(familia)}" && macrofamilia:="${fb(macro)}"${
           exclude ? ` && ${exclude}` : ""
         }`,
       });
     }
-    if (familia) {
-      filters.push({
-        label: "familia",
-        filterBy: `familia:="${fb(familia)}"${exclude ? ` && ${exclude}` : ""}`,
-      });
-    }
     if (macro) {
+      if (nombre) {
+        filters.push({
+          label: "macrofamilia por nombre",
+          query: nombre,
+          perPage: RELATED_COUNT,
+          filterBy: `macrofamilia:="${fb(macro)}"${exclude ? ` && ${exclude}` : ""}`,
+        });
+      }
       filters.push({
         label: "macrofamilia",
+        query: "*",
+        perPage: RELATED_FALLBACK_POOL,
         filterBy: `macrofamilia:="${fb(macro)}"${exclude ? ` && ${exclude}` : ""}`,
       });
     }
-    /* Deduplicar filterBy idénticos */
+    /* La misma familia puede consultarse por nombre y como fallback general. */
     const seen = new Set();
     return filters.filter((f) => {
-      if (seen.has(f.filterBy)) return false;
-      seen.add(f.filterBy);
+      const signature = `${f.query}|${f.filterBy}`;
+      if (seen.has(signature)) return false;
+      seen.add(signature);
       return true;
     });
   }
@@ -575,11 +643,13 @@
 
     const ctx = readCmsContext() || {};
     const sku = readCurrentSku() || ctx.sku || "";
+    const nombre = ctx.nombre || "";
     const familia = ctx.familia || "";
     const macrofamilia = ctx.macrofamilia || "";
 
     console.log("[relacionados] contexto CMS:", {
       sku,
+      nombre,
       familia,
       macrofamilia,
     });
@@ -601,25 +671,44 @@
 
     try {
       const filters = buildRelatedFilters(
-        { familia, macrofamilia },
+        { nombre, familia, macrofamilia },
         sku
       );
       console.log("[relacionados] filtros Typesense a probar:", filters);
 
-      let data = null;
+      /* Acumulamos de lo mas especifico a lo mas general hasta llenar el
+         carrusel. Antes se elegia un solo nivel, asi que una familia chica
+         (ej. Highbay PRO tiene 3 SKU) dejaba 2 cards y nunca completaba. */
+      const skuKey = String(sku || "").trim().toUpperCase();
+      const picked = new Map();
+
       for (const step of filters) {
-        data = await searchProducts(step.filterBy, RELATED_COUNT);
+        const data = await searchProducts(step.filterBy, step.perPage, step.query);
         if (token !== loadToken) return;
-        console.log(
-          `[relacionados] ${step.label} -> found:`,
-          data.found,
-          "filter_by:",
-          step.filterBy
+
+        let added = 0;
+        const ranked = sortByNameSimilarity(
+          (data.hits || []).map((hit) => hit.document || {}),
+          nombre
         );
-        if (data.found >= MIN_RESULTS_BEFORE_FALLBACK) break;
+        ranked.forEach((doc) => {
+          const key = String(doc.sku || "").trim().toUpperCase();
+          if (!key || key === skuKey || picked.has(key)) return;
+          picked.set(key, doc);
+          added += 1;
+        });
+
+        console.log(
+          `[relacionados] ${step.label} -> found: ${data.found}, nuevos: ${added}, acumulado: ${picked.size}`,
+          "q:",
+          step.query
+        );
+        if (picked.size >= RELATED_COUNT) break;
       }
 
-      if (!data?.hits?.length) {
+      const docs = Array.from(picked.values()).slice(0, RELATED_COUNT);
+
+      if (!docs.length) {
         console.warn("[relacionados] Typesense no trajo productos relacionados.");
         resolveRelatedTargets().forEach(({ section }) => hideSection(section));
         return;
@@ -635,7 +724,7 @@
         return;
       }
 
-      const html = data.hits.map((hit) => cardTemplate(hit.document)).join("");
+      const html = docs.map((doc) => cardTemplate(doc)).join("");
       const cardCount = paintCards(liveTargets, html);
       paintedOk = cardCount > 0;
       console.log(

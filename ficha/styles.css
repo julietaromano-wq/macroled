@@ -45,6 +45,10 @@
   --space-section:clamp(36px,5vw,64px);
   --space-hero:clamp(16px,2.5vw,20px) 0 clamp(32px,5vw,48px);
   --space-block:clamp(16px,2vw,22px);
+  /* Proporcion de las columnas del hero. Bajar --hero-gallery angosta la card
+     de la imagen y le pasa el ancho sobrante a la columna de texto. */
+  --hero-gallery:1.05fr;
+  --hero-info:1fr;
   --gap-hero:clamp(28px,4.5vw,48px);
 }
 
@@ -109,7 +113,7 @@ img{max-width:100%;display:block;}
 /* —— Product hero —— */
 .hero{
   display:grid;
-  grid-template-columns:minmax(0,1.12fr) minmax(0,.88fr);
+  grid-template-columns:minmax(0,var(--hero-gallery)) minmax(0,var(--hero-info));
   gap:var(--gap-hero);
   padding:var(--space-hero);
   align-items:start;
@@ -1653,11 +1657,17 @@ body.has-compare-bar .ai-launch{
 .hero,
 .detail,
 .compare-bar,
-.ai-panel,
-.ai-launch{
+.ai-panel{
   font-family:var(--font);
   color:var(--ink);
   font-weight:400;
+  -webkit-font-smoothing:antialiased;
+}
+/* Dark-background controls keep their own color. */
+.ai-launch{
+  font-family:var(--font);
+  color:#fff;
+  font-weight:600;
   -webkit-font-smoothing:antialiased;
 }
 .wrap *,

@@ -1754,7 +1754,35 @@
     setTimeout(tick, 200);
   }
 
+  /* En Webflow el bloque de CTA se arma en el Designer y no siempre trae el
+     contenedor .cta-utility, asi que comparar y el boton del asistente quedan
+     apilados. Los agrupamos para que el layout coincida con el local. */
+  function normalizeCtaUtility() {
+    const compare = document.querySelector(".compare-row");
+    const ask = document.querySelector(".btn-ai");
+    if (!compare || !ask) return;
+
+    const parent = compare.parentElement;
+    if (parent && parent === ask.parentElement && parent.classList.contains("cta-utility")) return;
+
+    const anchor = document.querySelector(".cta-stack");
+    if (!anchor) return;
+
+    const oldWrap = compare.closest(".compare-wrap");
+    const msg = document.getElementById("compareMsg");
+
+    const row = document.createElement("div");
+    row.className = "cta-utility";
+    /* El orden importa: comparar a la izquierda, preguntar a la derecha. */
+    row.appendChild(compare);
+    row.appendChild(ask);
+    anchor.appendChild(row);
+    if (msg) anchor.appendChild(msg);
+    if (oldWrap && !oldWrap.children.length) oldWrap.remove();
+  }
+
   function bootFicha() {
+    normalizeCtaUtility();
     initVariants();
     watchForLateVariants();
     initReveals();
