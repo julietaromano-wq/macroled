@@ -386,29 +386,6 @@
     return String(value).replace(/`/g, "").replace(/"/g, '\\"');
   }
 
-  function skuInVariantsField(doc, sku) {
-    const target = String(sku || "").trim().toLowerCase();
-    if (!target) return false;
-    if (Array.isArray(doc.variantes_sku)) {
-      if (doc.variantes_sku.some((v) => String(v).trim().toLowerCase() === target)) {
-        return true;
-      }
-    }
-    const blob = [
-      doc.variantes_del_producto_sku,
-      doc.variantes_sku,
-      doc.attr_variantes,
-    ]
-      .filter(Boolean)
-      .map((v) => String(v))
-      .join(" ; ");
-    return blob
-      .split(/[;|,]/)
-      .map((s) => s.trim().toLowerCase())
-      .filter(Boolean)
-      .includes(target);
-  }
-
   async function searchProducts(filterBy, perPage) {
     const params = new URLSearchParams({
       q: "*",
@@ -429,105 +406,45 @@
     return response.json();
   }
 
-  async function searchByQuery(q, queryBy, perPage) {
-    const params = new URLSearchParams({
-      q: String(q || "*"),
-      query_by: queryBy || "sku,nombre",
-      per_page: String(perPage || 10),
-      page: "1",
-      num_typos: "1",
+  /* Relacionados = misma familia + macrofamilia (CMS) vía Typesense. Sin findSelf. */
+  function buildRelatedFilters(ctx, sku) {
+    const excludeParts = [];
+    if (sku) {
+      excludeParts.push(`sku:!="${fb(sku)}"`);
+      excludeParts.push(`variantes_sku:!="${fb(sku)}"`);
+    }
+    const exclude = excludeParts.join(" && ");
+    const familia = ctx.familia;
+    const macro = ctx.macrofamilia;
+    const filters = [];
+
+    if (familia && macro) {
+      filters.push({
+        label: "familia+macrofamilia",
+        filterBy: `familia:="${fb(familia)}" && macrofamilia:="${fb(macro)}"${
+          exclude ? ` && ${exclude}` : ""
+        }`,
+      });
+    }
+    if (familia) {
+      filters.push({
+        label: "familia",
+        filterBy: `familia:="${fb(familia)}"${exclude ? ` && ${exclude}` : ""}`,
+      });
+    }
+    if (macro) {
+      filters.push({
+        label: "macrofamilia",
+        filterBy: `macrofamilia:="${fb(macro)}"${exclude ? ` && ${exclude}` : ""}`,
+      });
+    }
+    /* Deduplicar filterBy idénticos */
+    const seen = new Set();
+    return filters.filter((f) => {
+      if (seen.has(f.filterBy)) return false;
+      seen.add(f.filterBy);
+      return true;
     });
-    const url = `${TYPESENSE.host}/collections/${encodeURIComponent(
-      TYPESENSE.collection
-    )}/documents/search?${params}`;
-    const response = await fetch(url, {
-      headers: { "X-TYPESENSE-API-KEY": TYPESENSE.apiKey },
-    });
-    if (!response.ok) {
-      throw new Error(`Typesense ${response.status}: ${await response.text()}`);
-    }
-    return response.json();
-  }
-
-  async function findSelf(sku) {
-    /* 1) Match exacto por sku / variantes_sku (array facet) */
-    try {
-      const data = await searchProducts(
-        `sku:="${fb(sku)}" || variantes_sku:="${fb(sku)}"`,
-        5
-      );
-      const hit = data?.hits?.[0]?.document;
-      if (hit) return hit;
-    } catch (e) {
-      console.warn("[relacionados] filter exacto falló:", e);
-    }
-
-    /* 2) Búsqueda textual: incluye variantes_del_producto_sku si está indexado */
-    try {
-      const data = await searchByQuery(
-        sku,
-        "sku,nombre,variantes_del_producto_sku",
-        10
-      );
-      const docs = (data?.hits || []).map((h) => h.document);
-      const exact = docs.find((d) => String(d.sku || "").trim() === sku);
-      if (exact) return exact;
-      const viaVariants = docs.find((d) => skuInVariantsField(d, sku));
-      if (viaVariants) return viaVariants;
-    } catch (e) {
-      console.warn("[relacionados] search by query (con variantes) falló:", e);
-      try {
-        const data = await searchByQuery(sku, "sku,nombre", 10);
-        const docs = (data?.hits || []).map((h) => h.document);
-        const exact = docs.find((d) => String(d.sku || "").trim() === sku);
-        if (exact) return exact;
-        const viaVariants = docs.find((d) => skuInVariantsField(d, sku));
-        if (viaVariants) return viaVariants;
-      } catch (e2) {
-        console.warn("[relacionados] search by query falló:", e2);
-      }
-    }
-
-    /* 3) Prefijos del SKU (NEON-...-WW → NEON-...-IP65 → …) */
-    const parts = String(sku).split("-").filter(Boolean);
-    for (let i = parts.length - 1; i >= 2; i -= 1) {
-      const prefix = parts.slice(0, i).join("-");
-      try {
-        let data;
-        try {
-          data = await searchByQuery(prefix, "sku,variantes_del_producto_sku", 10);
-        } catch (_) {
-          data = await searchByQuery(prefix, "sku", 10);
-        }
-        const docs = (data?.hits || []).map((h) => h.document);
-        const viaVariants = docs.find((d) => skuInVariantsField(d, sku));
-        if (viaVariants) return viaVariants;
-        const starts = docs.find((d) =>
-          String(d.sku || "").toUpperCase().startsWith(prefix.toUpperCase())
-        );
-        if (starts) return starts;
-      } catch (_) {
-        /* continue */
-      }
-    }
-
-    /* 4) Fallback CMS: armar un "self" sintético para la cascada familia/macro */
-    const cms = readCmsContext();
-    if (cms && (cms.familia || cms.macrofamilia || cms.subfamilia)) {
-      console.warn(
-        "[relacionados] SKU no está como documento en Typesense; uso familia/macro del CMS.",
-        cms
-      );
-      return {
-        sku: cms.sku || sku,
-        nombre: cms.nombre,
-        familia: cms.familia,
-        macrofamilia: cms.macrofamilia,
-        subfamilia: cms.subfamilia,
-      };
-    }
-
-    return null;
   }
 
   function hideSection(section) {
@@ -585,12 +502,20 @@
       return;
     }
 
-    const sku = readCurrentSku();
-    console.log("[relacionados] SKU leído de la ficha:", JSON.stringify(sku));
+    const ctx = readCmsContext() || {};
+    const sku = readCurrentSku() || ctx.sku || "";
+    const familia = ctx.familia || "";
+    const macrofamilia = ctx.macrofamilia || "";
 
-    if (!sku) {
+    console.log("[relacionados] contexto CMS:", {
+      sku,
+      familia,
+      macrofamilia,
+    });
+
+    if (!familia && !macrofamilia) {
       console.warn(
-        "[relacionados] falta el sku en la ficha, no se puede identificar el producto."
+        "[relacionados] faltan data-family / data-macrofamilia en .cms-product-item."
       );
       targets.forEach(({ section }) => hideSection(section));
       isLoading = false;
@@ -604,62 +529,31 @@
     });
 
     try {
-      const self = await findSelf(sku);
-      if (token !== loadToken) return;
-      console.log("[relacionados] documento propio encontrado en Typesense:", self);
-
-      if (!self) {
-        console.warn(
-          `[relacionados] no se encontró ningún documento en Typesense para el sku "${sku}".`
-        );
-        resolveRelatedTargets().forEach(({ section }) => hideSection(section));
-        return;
-      }
-
-      const excludeSkus = [...new Set([self.sku, sku].filter(Boolean))];
-      const exclude = excludeSkus
-        .flatMap((s) => [`sku:!="${fb(s)}"`, `variantes_sku:!="${fb(s)}"`])
-        .join(" && ");
-
-      const levels = [
-        self.subfamilia && { field: "subfamilia", value: self.subfamilia },
-        self.familia && { field: "familia", value: self.familia },
-        self.macrofamilia && { field: "macrofamilia", value: self.macrofamilia },
-      ].filter(Boolean);
-
-      console.log("[relacionados] niveles a probar:", levels);
-
-      if (!levels.length) {
-        console.warn(
-          "[relacionados] el documento propio no tiene subfamilia/familia/macrofamilia cargada."
-        );
-        resolveRelatedTargets().forEach(({ section }) => hideSection(section));
-        return;
-      }
+      const filters = buildRelatedFilters(
+        { familia, macrofamilia },
+        sku
+      );
+      console.log("[relacionados] filtros Typesense a probar:", filters);
 
       let data = null;
-      for (const level of levels) {
-        const filterBy = `${level.field}:="${fb(level.value)}" && ${exclude}`;
-        data = await searchProducts(filterBy, RELATED_COUNT);
+      for (const step of filters) {
+        data = await searchProducts(step.filterBy, RELATED_COUNT);
         if (token !== loadToken) return;
         console.log(
-          `[relacionados] nivel "${level.field}"="${level.value}" -> found:`,
+          `[relacionados] ${step.label} -> found:`,
           data.found,
           "filter_by:",
-          filterBy
+          step.filterBy
         );
         if (data.found >= MIN_RESULTS_BEFORE_FALLBACK) break;
       }
 
       if (!data?.hits?.length) {
-        console.warn(
-          "[relacionados] ningún nivel de la cascada trajo resultados."
-        );
+        console.warn("[relacionados] Typesense no trajo productos relacionados.");
         resolveRelatedTargets().forEach(({ section }) => hideSection(section));
         return;
       }
 
-      /* Re-resolver por si Webflow reemplazó el embed durante el fetch. */
       const liveTargets = resolveRelatedTargets();
       if (!liveTargets.length) {
         console.warn(
@@ -678,11 +572,6 @@
         liveTargets.length,
         "bloque(s)"
       );
-      if (!cardCount) {
-        console.warn(
-          "[relacionados] Typesense trajo hits pero no se generó ningún .ml-product-card."
-        );
-      }
     } catch (error) {
       if (token !== loadToken) return;
       console.error("[relacionados] Error cargando productos relacionados:", error);
@@ -697,23 +586,16 @@
     }
   }
 
-  /* Esperar sección + CMS + SKU (Webflow monta embeds tarde). */
+  /* Esperar sección + familia/macro del CMS (Webflow monta embeds tarde). */
   function waitAndLoadRelated() {
     let tries = 0;
     const maxTries = 80;
     const tick = () => {
       const targets = resolveRelatedTargets();
-      const hasCms = !!document.querySelector(".cms-product-item[data-sku]");
-      const sku = readCurrentSku();
-      const heroReady = !!document
-        .getElementById("stageImg")
-        ?.getAttribute("src");
+      const ctx = readCmsContext();
+      const hasTaxonomy = !!(ctx && (ctx.familia || ctx.macrofamilia));
       if (
-        (targets.length &&
-          hasCms &&
-          (heroReady || tries > 15) &&
-          sku) ||
-        (targets.length && sku && tries > 25) ||
+        (targets.length && hasTaxonomy) ||
         tries >= maxTries
       ) {
         if (!targets.length) {
@@ -737,7 +619,6 @@
     waitAndLoadRelated();
   }
 
-  /* Si Webflow re-renderiza el embed y vuelve a "Cargando…", recargar. */
   const domWatcher = new MutationObserver(() => {
     const targets = resolveRelatedTargets();
     if (!targets.length) return;
@@ -746,7 +627,8 @@
         !track.querySelector(".ml-product-card") &&
         !!track.querySelector(".ml-related-products__state")
     );
-    if (needsPaint && readCurrentSku()) {
+    const ctx = readCmsContext();
+    if (needsPaint && ctx && (ctx.familia || ctx.macrofamilia)) {
       scheduleReload("embed re-render / track vacío");
     }
   });
@@ -755,9 +637,7 @@
     subtree: true,
   });
 
-  window.addEventListener("ml-product-changed", (event) => {
-    const sku = event?.detail?.sku || readCurrentSku();
-    if (!sku) return;
+  window.addEventListener("ml-product-changed", () => {
     scheduleReload("ml-product-changed");
   });
 
