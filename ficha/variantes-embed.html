@@ -1,0 +1,112 @@
+<!--
+  ===========================================================================
+  VARIANTES — Collection List atada a Variantes_Multireference
+  ===========================================================================
+
+  POR QUÉ HACE FALTA
+  Un campo multi-reference NO se puede imprimir como texto dentro de un Embed:
+  el selector de campos del Embed solo ofrece texto plano, número, link, switch,
+  opción, etc. La única forma de sacarlo al HTML es con una Collection List
+  conectada al campo.
+
+  script.js arma los chips leyendo un .cms-product-item por cada variante. Si en
+  la página solo existe el del producto actual, el bloque se oculta solo. Esto es
+  lo que faltaba.
+
+  ---------------------------------------------------------------------------
+  PASOS EN EL DESIGNER (plantilla de producto)
+  ---------------------------------------------------------------------------
+  1. Agregá un Collection List Wrapper en cualquier parte de la plantilla
+     (conviene abajo de todo, al lado del embed del héroe).
+  2. En Settings del wrapper → Source: elegí "Variantes_Multireference".
+     OJO: elegí el CAMPO, no la colección Productos. Si conectás la colección
+     te trae los 100 productos en vez de las variantes de este item.
+  3. Ponele al wrapper la clase  cms-variants-source  (styles.css ya la oculta).
+  4. Adentro del Collection Item, agregá un Embed y pegá el bloque de abajo.
+  5. Reemplazá cada  ((CAMPO))  usando el botón "+ Add Field" del Embed. No
+     copies tokens a mano: adentro de la lista el picker apunta a los campos de
+     la VARIANTE, que es justo lo que necesitamos.
+  6. En el embed del héroe (cms-source-embed.html) agregá el atributo data-hero.
+     Sirve para que el script sepa cuál de todos los .cms-product-item es el
+     producto de la página, sin depender del orden de montaje.
+
+  ---------------------------------------------------------------------------
+  QUÉ MIRAR DESPUÉS DE PUBLICAR
+  ---------------------------------------------------------------------------
+  Abrí la consola del navegador. script.js loguea:
+
+    [variantes] { hero, hermanas, skus, atributoDeclarado, dimension }
+
+  - hermanas: 1  → la Collection List no está renderizando (revisá el paso 2).
+  - dimension: "(fallback por nombre/SKU)" → las variantes se encontraron pero
+    ningún campo de specs las diferencia. Los chips igual aparecen, etiquetados
+    por nombre. Para que digan "Blanco / Negro / Platil" hay que cargar el campo
+    correspondiente (COLOR, TEMPERATURA COLOR, ANGULO DE APERTURA, etc.) en cada
+    variante del CMS.
+
+  LÍMITES: hasta 100 items por lista anidada y 10 listas anidadas por página.
+  Alcanza de sobra: el grupo más grande del catálogo tiene 4 variantes.
+-->
+
+<div class="cms-product-item"
+     data-variant-item
+     data-sku="((SKU))"
+     data-name="((NOMBRE))"
+     data-image="((Imagen))"
+     data-family="((Familia))"
+     data-macrofamilia="((Macrofamilia))"
+     data-nuevo="((Nuevo))"
+     data-link="((Slug))"
+     data-product-url="/((Slug))"
+     data-ficha="((FICHA TECNICA))"
+     data-catalogo="((CATÁLOGO))"
+     data-manual="((Manuales))"
+     data-ies=""
+     data-garantia="((GARANTIA LINK))"
+     data-descripcion="((DESCRIPCIÓN))"
+     data-multiimage="((Multiimage))"
+     data-nombre-attr-variantes="((Nombre ATTR_Variantes))"
+     data-ean13="((EAN13))"
+     data-smart=""
+     data-specs='{
+       "Ángulo de apertura": "((ANGULO DE APERTURA))",
+       "Autonomía": "((AUTONOMÍA))",
+       "Cantidad de luces": "((CANTIDAD DE LUCES))",
+       "Clase": "((CLASE))",
+       "Compatibilidad": "((COMPATIBILIDAD))",
+       "Conductores": "((CONDUCTORES))",
+       "Conectividad": "((CONECTIVIDAD))",
+       "Conector": "((CONECTOR))",
+       "Conexión": "((CONEXIÓN))",
+       "Control remoto": "((CONTROL REMOTO))",
+       "Color del cuerpo": "((COLOR))",
+       "Corriente": "((CORRIENTE))",
+       "Cri": "((CRI))",
+       "Dimerizable": "((DIMERIZABLE))",
+       "Dimensiones": "((DIMENSIONES))",
+       "Dimensiones control remoto": "((DIMENSIONES CONTROL REMOTO))",
+       "Distancia corte": "((DISTANCIA CORTE))",
+       "Funciones": "((FUNCIONES))",
+       "Flujo luminoso": "((FLUJO LUMINOSO))",
+       "Frecuencia": "((FRECUENCIA))",
+       "Protección IP": "((IP))",
+       "Largo del cable": "((LARGO DEL CABLE))",
+       "Largo del rollo": "((LARGO DEL ROLLO))",
+       "Lúmenes/W": "((LUMENES/W))",
+       "LM80": "((LM80))",
+       "Material del cuerpo": "((MATERIAL CUERPO))",
+       "On/Off Switch": "((ON / OFF switch))",
+       "Panel táctil": "((PANEL TACTIL))",
+       "Peso": "((PESO))",
+       "Potencia": "((POTENCIA))",
+       "Sdcm": "((Sdcm))",
+       "Tipo de luz": "((TIPO DE LUZ))",
+       "Temperatura del color": "((TEMPERATURA COLOR))",
+       "Temperatura de operación": "((TEMPERATURA DE OPERACION))",
+       "Tensión": "((TENSIÓN))",
+       "Tipo de carga": "((TIPO DE CARGA))",
+       "Tiempo de carga": "((TIEMPO DE CARGA))",
+       "Tipo de LED": "((TIPO DE LED))",
+       "Garantía": "((GARANTIA TIEMPO))"
+     }'>
+</div>

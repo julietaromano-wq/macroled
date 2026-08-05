@@ -110,6 +110,11 @@
           </div>
         </div>
 
+        <!--
+          CTA STACK — jerarquía nueva:
+          1) Fila principal: Descargar ficha técnica (fuerte, más ancho) + Catálogo (secundario)
+          2) Fila utilitaria: Agregar a comparación (pill) + Preguntá por este producto (link, terciario)
+        -->
         <div class="cta-stack">
           <div class="actions">
             <a class="btn btn-primary" id="btn-ficha" href="https://s3.coresagroup.com/MACROLED/DS/SPACE-B.pdf" target="_blank" rel="noopener">
@@ -121,24 +126,25 @@
               Catálogo
             </a>
           </div>
-          <button type="button" class="btn-ai" id="openAssistantFromCta">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 3a7 7 0 0 0-4 12.7V19l4-2 4 2v-3.3A7 7 0 0 0 12 3z"/><path d="M9.5 10h.01M14.5 10h.01"/></svg>
-            Preguntá por este producto
-          </button>
-        </div>
 
-        <div class="compare-wrap">
-          <label class="compare-row" id="compareRow">
-            <span class="cb-wrap">
-              <input type="checkbox" class="compare-checkbox" id="compareCheck"
-                     data-sku="" data-nombre="" data-img=""
-                     disabled aria-label="Agregar a comparación">
-              <span class="cb" aria-hidden="true">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 7"/></svg>
+          <div class="cta-utility">
+            <label class="compare-row" id="compareRow">
+              <span class="cb-wrap">
+                <input type="checkbox" class="compare-checkbox" id="compareCheck"
+                       data-sku="" data-nombre="" data-img=""
+                       disabled aria-label="Agregar a comparación">
+                <span class="cb" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 7"/></svg>
+                </span>
               </span>
-            </span>
-            Agregar a comparación
-          </label>
+              Agregar a comparación
+            </label>
+
+            <button type="button" class="btn-ai" id="openAssistantFromCta">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 3a7 7 0 0 0-4 12.7V19l4-2 4 2v-3.3A7 7 0 0 0 12 3z"/><path d="M9.5 10h.01M14.5 10h.01"/></svg>
+              Preguntá por este producto
+            </button>
+          </div>
           <p class="compare-msg" id="compareMsg" role="status"></p>
         </div>
 
