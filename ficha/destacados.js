@@ -462,16 +462,30 @@
       console.warn("[relacionados] filter exacto falló:", e);
     }
 
-    /* 2) Busqueda textual: variantes suelen vivir solo en el SKU "padre" (ej. NW) */
+    /* 2) Búsqueda textual: incluye variantes_del_producto_sku si está indexado */
     try {
-      const data = await searchByQuery(sku, "sku,nombre", 10);
+      const data = await searchByQuery(
+        sku,
+        "sku,nombre,variantes_del_producto_sku",
+        10
+      );
       const docs = (data?.hits || []).map((h) => h.document);
       const exact = docs.find((d) => String(d.sku || "").trim() === sku);
       if (exact) return exact;
       const viaVariants = docs.find((d) => skuInVariantsField(d, sku));
       if (viaVariants) return viaVariants;
     } catch (e) {
-      console.warn("[relacionados] search by query falló:", e);
+      console.warn("[relacionados] search by query (con variantes) falló:", e);
+      try {
+        const data = await searchByQuery(sku, "sku,nombre", 10);
+        const docs = (data?.hits || []).map((h) => h.document);
+        const exact = docs.find((d) => String(d.sku || "").trim() === sku);
+        if (exact) return exact;
+        const viaVariants = docs.find((d) => skuInVariantsField(d, sku));
+        if (viaVariants) return viaVariants;
+      } catch (e2) {
+        console.warn("[relacionados] search by query falló:", e2);
+      }
     }
 
     /* 3) Prefijos del SKU (NEON-...-WW → NEON-...-IP65 → …) */
@@ -479,7 +493,12 @@
     for (let i = parts.length - 1; i >= 2; i -= 1) {
       const prefix = parts.slice(0, i).join("-");
       try {
-        const data = await searchByQuery(prefix, "sku", 10);
+        let data;
+        try {
+          data = await searchByQuery(prefix, "sku,variantes_del_producto_sku", 10);
+        } catch (_) {
+          data = await searchByQuery(prefix, "sku", 10);
+        }
         const docs = (data?.hits || []).map((h) => h.document);
         const viaVariants = docs.find((d) => skuInVariantsField(d, sku));
         if (viaVariants) return viaVariants;
@@ -699,7 +718,7 @@
       ) {
         if (!targets.length) {
           console.warn(
-            "[relacionados] timeout: no apareció #productos-relacionados. Pegá 2-EMBED-FICHA o 2b-EMBED-RELACIONADOS."
+            "[relacionados] timeout: no apareció #productos-relacionados. Pegá 2b-EMBED-RELACIONADOS."
           );
           return;
         }
