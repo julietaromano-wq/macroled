@@ -777,30 +777,34 @@
 
   function handleVideo() {
     const video = root.querySelector(".ml-hero__video");
-    if (!video) return;
+    const revealHome = () => root.classList.remove("is-video-loading");
+    if (!video) {
+      revealHome();
+      return;
+    }
     const reducedMotion = matchMedia("(prefers-reduced-motion: reduce)");
-    const mobileViewport = matchMedia("(max-width: 1024px)");
 
     if (reducedMotion.matches) {
       video.pause();
       video.hidden = true;
+      revealHome();
       return;
     }
 
-    const updateVideoSource = () => {
-      const nextSrc = mobileViewport.matches
-        ? video.dataset.srcMobile
-        : video.dataset.srcDesktop;
-
-      if (!nextSrc || video.getAttribute("src") === nextSrc) return;
-      video.src = nextSrc;
-      video.hidden = false;
-      video.load();
-      video.play().catch(() => { video.hidden = true; });
+    let revealTimer;
+    const revealVideo = () => {
+      clearTimeout(revealTimer);
+      video.removeEventListener("canplay", revealVideo);
+      video.removeEventListener("error", revealVideo);
+      revealHome();
     };
 
-    updateVideoSource();
-    mobileViewport.addEventListener("change", updateVideoSource);
+    video.addEventListener("canplay", revealVideo, { once: true });
+    video.addEventListener("error", revealVideo, { once: true });
+    revealTimer = setTimeout(revealVideo, 8000);
+
+    if (video.readyState >= HTMLMediaElement.HAVE_FUTURE_DATA) revealVideo();
+    video.play().catch(revealVideo);
   }
 
   function animateHeroTitle() {

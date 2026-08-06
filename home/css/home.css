@@ -122,8 +122,13 @@ body {
 }
 .ml-hero__fallback {
   z-index: -2;
-  background: #193046 url("../assets/images/hero-poster.webp") center/cover
-    no-repeat;
+  background: #193046;
+}
+.ml-home.is-video-loading .ml-hero__content {
+  opacity: 0;
+}
+.ml-hero__content {
+  transition: opacity 0.35s ease;
 }
 .ml-hero__overlay {
   z-index: -1;
