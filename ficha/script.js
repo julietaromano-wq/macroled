@@ -2023,7 +2023,7 @@
     ask(q);
   });
 
-  addMsg("bot", `Hola. Soy el asistente de <b>${PRODUCT_CTX.name}</b>. Preguntame por specs, IP o descargas.`);
+  addMsg("bot", `Hola, soy el asistente de <b>productos Macroled</b>. Estoy para ayudarte con la información técnica de este producto. Preguntame por especificaciones, IP, medidas, descargas y más.`);
   renderSuggestions();
 
   document.addEventListener("keydown", (e) => {
