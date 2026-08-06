@@ -768,12 +768,29 @@
   function handleVideo() {
     const video = root.querySelector(".ml-hero__video");
     if (!video) return;
-    if (matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    const reducedMotion = matchMedia("(prefers-reduced-motion: reduce)");
+    const mobileViewport = matchMedia("(max-width: 1024px)");
+
+    if (reducedMotion.matches) {
       video.pause();
       video.hidden = true;
       return;
     }
-    video.play().catch(() => { video.hidden = true; });
+
+    const updateVideoSource = () => {
+      const nextSrc = mobileViewport.matches
+        ? video.dataset.srcMobile
+        : video.dataset.srcDesktop;
+
+      if (!nextSrc || video.getAttribute("src") === nextSrc) return;
+      video.src = nextSrc;
+      video.hidden = false;
+      video.load();
+      video.play().catch(() => { video.hidden = true; });
+    };
+
+    updateVideoSource();
+    mobileViewport.addEventListener("change", updateVideoSource);
   }
 
   function animateHeroTitle() {

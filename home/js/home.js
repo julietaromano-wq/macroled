@@ -254,7 +254,7 @@
     const video = root.querySelector(".ml-hero__video");
     if (!video) return;
     const reducedMotion = matchMedia("(prefers-reduced-motion: reduce)");
-    const mobileViewport = matchMedia("(max-width: 640px)");
+    const mobileViewport = matchMedia("(max-width: 1024px)");
 
     if (reducedMotion.matches) {
       video.pause();
