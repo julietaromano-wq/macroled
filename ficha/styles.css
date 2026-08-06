@@ -312,7 +312,7 @@ img{max-width:100%;display:block;}
 .variant-chip{
   display:inline-flex;align-items:center;justify-content:center;gap:8px;
   min-width:56px;min-height:44px;padding:10px 14px;
-  border:1.5px solid var(--line-strong);border-radius:var(--radius-sm);
+  border:1.5px solid #d6d6d6;border-radius:100px;
   background:var(--white);color:var(--ink);
   font-size:var(--fs-base);font-weight:500;cursor:pointer;
   transition:border-color .15s,background .15s,color .15s;
@@ -421,16 +421,29 @@ img{max-width:100%;display:block;}
 }
 .btn svg{flex:none;}
 
-/* Fila utilitaria: comparar (pill) a la izquierda, preguntá (link) a la derecha */
+/* Fila utilitaria: comparar (pill) a la izquierda, preguntá (link) a la derecha.
+   !important: Webflow pisa button/label con width:100% / display:block y los apila. */
 .cta-utility{
-  display:flex;align-items:center;justify-content:space-between;
-  flex-wrap:wrap;gap:10px;
+  display:flex !important;
+  flex-direction:row !important;
+  flex-wrap:nowrap !important;
+  align-items:center !important;
+  justify-content:space-between !important;
+  gap:10px;
+  width:100%;
+}
+.cta-utility > .compare-row,
+.cta-utility > .btn-ai{
+  flex:0 1 auto;
+  width:auto !important;
+  max-width:100%;
+  box-sizing:border-box;
 }
 
 /* Preguntá por este producto — bajado a link terciario, ya no compite con los botones */
 .btn-ai{
-  width:auto;margin:0;
-  display:inline-flex;align-items:center;justify-content:center;gap:7px;
+  width:auto !important;margin:0 !important;
+  display:inline-flex !important;align-items:center;justify-content:center;gap:7px;
   min-height:auto;padding:6px 0;border:none;border-radius:0;
   background:transparent;
   font-size:var(--fs-sm);font-weight:600;color:var(--btn-blue);cursor:pointer;
@@ -488,7 +501,8 @@ img{max-width:100%;display:block;}
 /* —— Agregar a comparación: pill clickeable, consistente con variant-chip —— */
 .compare-wrap{display:flex;flex-direction:column;align-items:flex-start;gap:6px;}
 .compare-row{
-  display:inline-flex;align-items:center;gap:9px;
+  display:inline-flex !important;align-items:center;gap:9px;
+  width:auto !important;
   min-height:40px;padding:9px 12px;
   margin-left:-12px; /* compensa el padding para alinear con el borde de los botones de arriba */
   border:none;
@@ -1541,11 +1555,26 @@ body.has-compare-bar .ai-launch{
   .actions{flex-direction:column;}
   .btn,.btn-primary,.btn-ghost{width:100%;flex-basis:auto;flex:none;}
 
+  /* Mantener comparar + preguntá en la misma fila (Webflow no debe apilarlos) */
   .cta-utility{
-    flex-direction:column;align-items:stretch;gap:10px;
+    flex-direction:row !important;
+    flex-wrap:nowrap !important;
+    align-items:center !important;
+    justify-content:space-between !important;
+    gap:8px;
   }
-  .compare-row{justify-content:center;width:100%;margin-left:0;}
-  .btn-ai{justify-content:center;width:100%;padding:10px 0;}
+  .compare-row{
+    justify-content:flex-start;
+    width:auto !important;
+    margin-left:-8px;
+    padding:8px 10px;
+  }
+  .btn-ai{
+    justify-content:flex-end;
+    width:auto !important;
+    padding:8px 0;
+    white-space:nowrap;
+  }
 
   .trust{
     grid-template-columns:repeat(4,minmax(0,1fr));
@@ -1731,4 +1760,19 @@ body.has-compare-bar .ai-launch{
 .dl-card,
 .ai-chip{
   font-family:var(--font);
+}
+
+/* Layout crítico vs Webflow globals (va al final para ganar cascada) */
+.cta-utility{
+  display:flex !important;
+  flex-direction:row !important;
+  flex-wrap:nowrap !important;
+  align-items:center !important;
+  justify-content:space-between !important;
+}
+.cta-utility .compare-row,
+.cta-utility .btn-ai{
+  display:inline-flex !important;
+  width:auto !important;
+  flex:0 1 auto;
 }
