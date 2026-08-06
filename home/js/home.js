@@ -1,9 +1,19 @@
 (function (window) {
   "use strict";
 
-  const config = window.MACROLED_HOME_CONFIG;
-  const root = document.getElementById("macroled-home");
-  if (!config || !root) return;
+  const initializedRoots = new WeakSet();
+
+  function initializeHome() {
+    const config = window.MACROLED_HOME_CONFIG;
+    const root = document.getElementById("macroled-home");
+    if (!config || !root || initializedRoots.has(root)) return false;
+
+    initializedRoots.add(root);
+    bootHome(root, config);
+    return true;
+  }
+
+  function bootHome(root, config) {
 
   const esc = value => String(value ?? "").replace(/[&<>'"]/g, character => ({
     "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", '"': "&quot;"
@@ -497,4 +507,19 @@
   animateHeroTitle();
   animateCategoriesTitle();
   initSectionMotion();
+  }
+
+  if (initializeHome()) return;
+
+  const observer = new MutationObserver(() => {
+    if (!initializeHome()) return;
+    observer.disconnect();
+  });
+
+  observer.observe(document.documentElement, { childList: true, subtree: true });
+
+  window.addEventListener("DOMContentLoaded", () => {
+    if (!initializeHome()) return;
+    observer.disconnect();
+  }, { once: true });
 })(window);
