@@ -1,6 +1,13 @@
 (function () {
   "use strict";
 
+  /* Salvavidas por si este mismo archivo queda incluido dos veces en la
+     página (dos <script src> apuntando al mismo bundle). Esto NO soluciona
+     el caso de tener el script VIEJO todavía pegado en otro lado — para eso
+     hay que sacarlo a mano de Webflow (Page Settings / Embeds). */
+  if (window.__mlFichaScriptLoaded) return;
+  window.__mlFichaScriptLoaded = true;
+
   /* —— Gallery —— */
   let GALLERY = [];
   let activeIndex = 0;
@@ -1377,6 +1384,20 @@
     PRODUCT_CTX.warranty = garVal;
     PRODUCT_CTX.ficha = fichaUrl;
     PRODUCT_CTX.manual = manualUrl || garantiaUrl;
+    /* —— Capa 1 / Capa 2: contexto ampliado para el asistente ——
+       Se suman SKU/EAN/Familia/Macrofamilia al mapa de specs para que la
+       búsqueda genérica (genericSpecMatch) también los pueda encontrar. */
+    PRODUCT_CTX.specs = Object.assign({}, specs, {
+      SKU: sku,
+      EAN13: ean13,
+      Familia: family,
+      Macrofamilia: macro,
+    });
+    PRODUCT_CTX.ean13 = ean13;
+    PRODUCT_CTX.family = family;
+    PRODUCT_CTX.macro = macro;
+    PRODUCT_CTX.description = description;
+    PRODUCT_CTX.contactoUrl = CONTACTO_URL;
 
     heroItem = el;
     if (variantsTarget) variantsTarget.innerHTML = buildChipsHtml();
@@ -1485,7 +1506,9 @@
     });
   }
 
-  /* —— AI assistant (demo) —— */
+  /* —— AI assistant —— */
+  const CONTACTO_URL = "https://macroled.com.ar/contacto"; // TODO: reemplazar por la URL real de contacto
+
   const PRODUCT_CTX = (window.__mlProductCtx = {
     name: "Space Blanca",
     sku: "SPACE-B",
@@ -1494,8 +1517,272 @@
     warranty: "1 año",
     ficha: "https://s3.coresagroup.com/MACROLED/DS/SPACE-B.pdf",
     manual: "https://s3.coresagroup.com/MACROLED/Garantias/SPACE-B.pdf",
-    compatible: ["Tower", "Umbrella", "Bell", "Fungus"],
+    specs: {},
+    contactoUrl: CONTACTO_URL,
   });
+
+  /**
+   * Capa 1 — reglas locales. Cada regla intenta resolver la pregunta con
+   * datos que YA están cargados en la página (PRODUCT_CTX.specs), sin
+   * llamar a la IA. Se evalúan en orden; gana la primera que matchea Y
+   * tiene dato disponible para este SKU.
+   *
+   * key      -> nombre exacto del spec en PRODUCT_CTX.specs
+   * tpl(v)   -> cómo redactar la respuesta con ese valor
+   * special  -> casos que no son un spec simple (ficha, sku, precio, etc.)
+   */
+  /* Qué significa cada código IP habitual en iluminación (para enriquecer
+     la respuesta sin inventar datos que no están en la ficha). */
+  const IP_MEANINGS = {
+    ip20: "uso en interiores, sin protección contra líquidos",
+    ip44: "resistente a salpicaduras, apto para exteriores protegidos",
+    ip54: "protegido contra polvo y salpicaduras de agua",
+    ip65: "protegido contra chorros de agua, apto para exteriores",
+    ip66: "protegido contra chorros de agua potentes",
+    ip67: "resistente a inmersión temporal en agua",
+    ip68: "resistente a inmersión prolongada en agua",
+  };
+
+  const REGLAS_LOCALES = [
+    { test: /autonom[ií]a|dura la bater[ií]a|cu[aá]ntas horas/i, key: "Autonomía",
+      tpl: (v) => `La autonomía es de <b>${v}</b>.` },
+
+    { test: /tiempo de carga|cu[aá]nto tarda en cargar/i, key: "Tiempo de carga",
+      tpl: (v) => `Se carga por completo en <b>${v}</b>.` },
+
+    { test: /\bip\d{0,2}\b|resiste el? agua|humedad|exterior|lluvia|intemperie/i, key: "Protección IP",
+      tpl: (v) => {
+        const meaning = IP_MEANINGS[normKey(v).replace(/\s+/g, "")];
+        return meaning
+          ? `Sí, tiene protección <b>${v}</b>: ${meaning}.`
+          : `Sí, tiene protección <b>${v}</b>.`;
+      } },
+
+    { test: /\bik\d{0,2}\b|resiste golpes|impacto/i, key: "Protección IK",
+      tpl: (v) => `Tiene protección contra impactos <b>${v}</b>.` },
+
+    { test: /potenc|watt|consumo/i, key: "Potencia",
+      tpl: (v, specs) => {
+        const volt = (specs["Tensión"] || "").trim();
+        return volt
+          ? `La potencia es de <b>${v}</b>, con alimentación <b>${volt}</b>.`
+          : `La potencia es de <b>${v}</b>.`;
+      } },
+
+    { test: /tensi[oó]n|voltaje|alimentaci[oó]n|220v|12v|24v/i, key: "Tensión",
+      tpl: (v) => `Funciona con <b>${v}</b>.` },
+
+    { test: /garant[ií]a/i, key: "Garantía",
+      tpl: (v) => `La garantía oficial es de <b>${v}</b>.` },
+
+    { test: /lumen|flujo lumin/i, key: "Flujo luminoso",
+      tpl: (v) => `El flujo luminoso es de <b>${v}</b>.` },
+
+    { test: /temperatura.*color|kelvin|c[aá]lid[oa]|neutr[oa]|fr[ií]a|\bcct\b/i, key: "Temperatura del color",
+      tpl: (v) => `La temperatura de color es <b>${v}</b>.` },
+
+    { test: /\bcri\b|fidelidad de color/i, key: "CRI",
+      tpl: (v) => `El CRI es <b>${v}</b>.` },
+
+    { test: /dimeriz|dimmable|regular la intensidad/i, key: "Dimerizable",
+      tpl: (v) => isTruthyFlag(v)
+        ? `Sí, este modelo es <b>dimerizable</b>.`
+        : `No, este modelo no es dimerizable.` },
+
+    { test: /[aá]ngulo|apertura del haz/i, key: "Ángulo de apertura",
+      tpl: (v) => `El ángulo de apertura es de <b>${v}</b>.` },
+
+    { test: /material|de qu[eé] est[aá] hecho|cuerpo/i, key: "Material del cuerpo",
+      tpl: (v) => `El cuerpo es de <b>${v}</b>.` },
+
+    { test: /dimension|medida|tama[ñn]o|mide/i, key: "Dimensiones",
+      tpl: (v) => `Las dimensiones son <b>${v}</b>.` },
+
+    { test: /\bpeso\b|cu[aá]nto pesa/i, key: "Peso",
+      tpl: (v) => `El peso es <b>${v}</b>.` },
+
+    { test: /\bsmart\b|app|control por celular/i, key: "Smart",
+      tpl: (v) => isTruthyFlag(v)
+        ? `Sí, tiene función <b>Smart</b> (control por app).`
+        : `No tiene función Smart.` },
+
+    { test: /control remoto|viene con remoto/i, key: "Control remoto",
+      tpl: () => `Sí, este modelo incluye <b>control remoto</b>.` },
+
+    { test: /panel t[aá]ctil|t[aá]ctil/i, key: "Panel táctil",
+      tpl: () => `Sí, cuenta con <b>panel táctil</b>.` },
+
+    { test: /vida [uú]til|horas de vida|cu[aá]nto dura el led/i, key: "Vida útil",
+      tpl: (v) => `La vida útil estimada es de <b>${v}</b>.` },
+
+    { test: /cantidad de luces|cu[aá]ntas luces/i, key: "Cantidad de luces",
+      tpl: (v) => `Tiene <b>${v}</b>.` },
+
+    /* —— Casos especiales (no son un spec directo) —— */
+    { test: /ficha t[eé]cnica|\bpdf\b|descargar la ficha|datasheet/i, special: "ficha" },
+    { test: /manual|instalaci[oó]n|c[oó]mo se instala|montaje/i, special: "manual" },
+    { test: /\bsku\b|c[oó]digo de producto|referencia/i, special: "sku" },
+    { test: /\bean\b|c[oó]digo de barras/i, special: "ean" },
+    { test: /precio|costo|cu[aá]nto sale|cu[aá]nto cuesta|vale/i, special: "precio" },
+    { test: /stock|disponibilidad|hay|tienen|queda/i, special: "stock" },
+    { test: /colore?s?\b|variante|viene en otro color/i, special: "variantes" },
+    { test: /compatible|se puede usar con|anda con/i, special: "compatible" },
+  ];
+
+  function specialAnswer(kind) {
+    const ctx = window.__mlProductCtx || PRODUCT_CTX;
+    switch (kind) {
+      case "ficha":
+        return ctx.ficha
+          ? `Podés descargar la <a href="${ctx.ficha}" target="_blank" rel="noopener">ficha técnica (PDF)</a> desde esta misma página.`
+          : null;
+      case "manual":
+        return ctx.manual
+          ? `Acá tenés el <a href="${ctx.manual}" target="_blank" rel="noopener">manual / guía de instalación</a>.`
+          : null;
+      case "sku":
+        return ctx.sku ? `El SKU de este producto es <b>${ctx.sku}</b>.` : null;
+      case "ean":
+        return ctx.ean13 ? `El código EAN-13 es <b>${ctx.ean13}</b>.` : null;
+      case "precio":
+      case "stock":
+        return `Para precio y disponibilidad te recomiendo escribirnos desde <a href="${CONTACTO_URL}" target="_blank" rel="noopener">nuestro formulario de contacto</a>, así te asesoran con el dato actualizado.`;
+      case "variantes": {
+        // Usa lo que ya tenés armado en variantsTarget (chips de color/temperatura/etc)
+        const chips = document.querySelectorAll(".variant-chip");
+        if (!chips.length) return null;
+        const valores = Array.from(chips).map((c) => c.textContent.trim());
+        return `Este modelo tiene estas opciones disponibles: <b>${valores.join(", ")}</b>. Podés cambiarlas arriba, en la ficha.`;
+      }
+      case "compatible":
+        return null; // sin dato local confiable -> que lo resuelva la Capa 2
+      default:
+        return null;
+    }
+  }
+
+  /* —— Búsqueda genérica sobre TODOS los specs cargados en la ficha ——
+     Cuando ninguna regla curada matchea (o matchea pero no hay dato),
+     probamos encontrar el spec correcto por superposición de palabras
+     clave, en vez de rendirnos directo a "no tengo esa info". */
+  const SPEC_STOPWORDS = new Set([
+    "el", "la", "los", "las", "de", "del", "que", "es", "son", "tiene",
+    "tienen", "cual", "cuales", "como", "con", "para", "por", "este",
+    "esta", "estos", "estas", "producto", "modelo", "me", "podes", "podés",
+    "decime", "dato", "datos", "info", "informacion", "información", "un",
+    "una", "unos", "unas", "y", "o", "en", "se", "puede", "pueden", "sabes",
+    "sabés", "vos", "cuánto", "cuanto", "cuánta", "cuanta", "qué", "que",
+  ]);
+
+  function normalizeForSearch(s) {
+    return normKey(s).replace(/[^a-z0-9\s]/g, " ").trim();
+  }
+
+  function questionTokens(q) {
+    return normalizeForSearch(q)
+      .split(/\s+/)
+      .filter((t) => t.length > 2 && !SPEC_STOPWORDS.has(t));
+  }
+
+  function genericSpecMatch(question) {
+    const ctx = window.__mlProductCtx || PRODUCT_CTX;
+    const specs = ctx.specs || {};
+    const qTokens = questionTokens(question);
+    if (!qTokens.length) return null;
+
+    let best = null;
+    let bestScore = 0;
+
+    Object.keys(specs).forEach((key) => {
+      const val = (specs[key] || "").trim();
+      if (!hasSpecValue(val)) return;
+      const keyTokens = normalizeForSearch(key).split(/\s+/).filter(Boolean);
+      let score = 0;
+      qTokens.forEach((qt) => {
+        if (keyTokens.some((kt) => kt === qt || kt.startsWith(qt) || qt.startsWith(kt))) score++;
+      });
+      if (score > bestScore) {
+        bestScore = score;
+        best = { key, val };
+      }
+    });
+
+    return best ? `<b>${best.key}</b>: ${best.val}.` : null;
+  }
+
+  /**
+   * Intenta responder SOLO con datos locales. Devuelve HTML de respuesta,
+   * o null si no encontramos nada (ni en las reglas curadas ni en la
+   * búsqueda genérica), así el flujo principal sabe que tiene que ir a
+   * la Capa 2.
+   */
+  function localAnswer(question) {
+    const ctx = window.__mlProductCtx || PRODUCT_CTX;
+    const specs = ctx.specs || {};
+
+    for (const regla of REGLAS_LOCALES) {
+      if (!regla.test.test(question)) continue;
+
+      if (regla.special) {
+        const resp = specialAnswer(regla.special);
+        if (resp) return resp;
+        continue; // esta regla matcheó pero no hay dato -> seguir probando otras
+      }
+
+      const val = (specs[regla.key] || "").trim();
+      if (hasSpecValue(val)) return regla.tpl(val, specs);
+      // matcheó la intención pero no hay dato cargado para este SKU -> seguir
+    }
+
+    // Ninguna regla curada respondió: buscamos en TODOS los specs de la
+    // ficha antes de rendirnos y pasar a la Capa 2.
+    return genericSpecMatch(question);
+  }
+
+  /* —— Capa 2: agente con IA sobre el catálogo completo (n8n) —— */
+  const N8N_WEBHOOK_URL = "https://n8n.coresagroup.com/webhook/asistente-macroled-producto"; // TODO: URL real una vez migrado el workflow
+  const AI_TIMEOUT_MS = 12000;
+
+  function contactFallbackMsg() {
+    return `No pude encontrar esa información en este momento. Podés escribirnos desde <a href="${CONTACTO_URL}" target="_blank" rel="noopener">nuestro formulario de contacto</a> y te ayudamos.`;
+  }
+
+  async function askAI(question) {
+    const ctx = window.__mlProductCtx || PRODUCT_CTX;
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), AI_TIMEOUT_MS);
+
+    try {
+      const res = await fetch(N8N_WEBHOOK_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        signal: controller.signal,
+        body: JSON.stringify({
+          pregunta: question,
+          sku: ctx.sku || "",
+          nombre: ctx.name || "",
+          macrofamilia: ctx.macro || "",
+          familia: ctx.family || "",
+        }),
+      });
+      clearTimeout(timeoutId);
+
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+      const data = await res.json();
+      // Ajustar esta línea según cómo responda el "Respond to Webhook" real
+      // (por ej. { respuesta: "..." } o { output: "..." })
+      const texto = data.respuesta || data.output || data.answer;
+      if (!texto) throw new Error("Respuesta vacía del agente");
+
+      // El \n del agente -> <br> para que se vea bien en el chat
+      return String(texto).replace(/\n/g, "<br>");
+    } catch (err) {
+      clearTimeout(timeoutId);
+      console.warn("[asistente] error consultando IA:", err);
+      return contactFallbackMsg();
+    }
+  }
 
   const SUGGESTIONS = [
     "¿Cuál es la autonomía?",
@@ -1549,36 +1836,17 @@
     aiMessages.scrollTop = aiMessages.scrollHeight;
   }
 
-  function mockAnswer(q) {
-    const t = q.toLowerCase();
-    const ctx = window.__mlProductCtx || PRODUCT_CTX;
-    if (/autonom|bater|hs|hora/.test(t)) {
-      return `La autonomía máxima de <b>${ctx.name}</b> es de <b>8hs</b> (según uso). Carga por USB-C en aprox. 4hs.`;
-    }
-    if (/ip|agua|exterior/.test(t)) {
-      return `Sí. Este modelo tiene <b>IP44</b>: resistente a salpicaduras, apto uso en exteriores protegidos.`;
-    }
-    if (/ficha|pdf|manual|descarg/.test(t)) {
-      return `Podés descargar la <a href="${ctx.ficha}" target="_blank" rel="noopener">ficha técnica (PDF)</a> desde esta misma página.`;
-    }
-    if (/potenc|watt|1\.6/.test(t)) {
-      return `La potencia es <b>${ctx.power}</b>, alimentación ${ctx.voltage}.`;
-    }
-    if (/garanti/.test(t)) {
-      return `La garantía oficial es de <b>${ctx.warranty}</b>.`;
-    }
-    if (/color|variante|rojo|verde|negro|blanco/.test(t)) {
-      return `Space viene en 4 colores de cuerpo: Blanco, Negro, Rojo y Verde. Cambiá el chip de Color arriba para ver cada SKU.`;
-    }
-    return `Sobre <b>${ctx.sku}</b> puedo ayudarte con autonomía, IP, potencia o descargas. Probá una de las sugerencias.<br><br><span style="color:#6a7380;font-size:12px">Demo local: sin API todavía.</span>`;
-  }
-
   function renderSuggestions() {
     aiSuggestions.innerHTML = SUGGESTIONS.map(
       (s) => `<button type="button" class="ai-chip">${s}</button>`
     ).join("");
   }
 
+  /**
+   * Flujo principal: Capa 1 (reglas locales, gratis e instantánea) primero;
+   * si no hay dato local para lo que preguntaron, recién ahí se llama a la
+   * Capa 2 (agente con IA sobre el catálogo completo).
+   */
   async function ask(question) {
     const q = question.trim();
     if (!q || aiBusy) return;
@@ -1587,9 +1855,20 @@
     addMsg("user", q.replace(/</g, "&lt;"));
     aiTyping.classList.add("is-on");
     aiForm.querySelector(".ai-send").disabled = true;
-    await new Promise((r) => setTimeout(r, 550 + Math.random() * 400));
+
+    let respuesta = localAnswer(q);
+
+    if (respuesta) {
+      // Capa 1: gratis e instantánea, pero dejamos un pequeño delay
+      // para que no se sienta robótico / demasiado abrupto.
+      await new Promise((r) => setTimeout(r, 300 + Math.random() * 250));
+    } else {
+      // Capa 2: agente con IA sobre el catálogo completo
+      respuesta = await askAI(q);
+    }
+
     aiTyping.classList.remove("is-on");
-    addMsg("bot", mockAnswer(q));
+    addMsg("bot", respuesta);
     renderSuggestions();
     aiForm.querySelector(".ai-send").disabled = false;
     aiBusy = false;
@@ -1754,35 +2033,7 @@
     setTimeout(tick, 200);
   }
 
-  /* En Webflow el bloque de CTA se arma en el Designer y no siempre trae el
-     contenedor .cta-utility, asi que comparar y el boton del asistente quedan
-     apilados. Los agrupamos para que el layout coincida con el local. */
-  function normalizeCtaUtility() {
-    const compare = document.querySelector(".compare-row");
-    const ask = document.querySelector(".btn-ai");
-    if (!compare || !ask) return;
-
-    const parent = compare.parentElement;
-    if (parent && parent === ask.parentElement && parent.classList.contains("cta-utility")) return;
-
-    const anchor = document.querySelector(".cta-stack");
-    if (!anchor) return;
-
-    const oldWrap = compare.closest(".compare-wrap");
-    const msg = document.getElementById("compareMsg");
-
-    const row = document.createElement("div");
-    row.className = "cta-utility";
-    /* El orden importa: comparar a la izquierda, preguntar a la derecha. */
-    row.appendChild(compare);
-    row.appendChild(ask);
-    anchor.appendChild(row);
-    if (msg) anchor.appendChild(msg);
-    if (oldWrap && !oldWrap.children.length) oldWrap.remove();
-  }
-
   function bootFicha() {
-    normalizeCtaUtility();
     initVariants();
     watchForLateVariants();
     initReveals();
