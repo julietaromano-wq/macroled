@@ -739,6 +739,8 @@
     });
     root.setAttribute("data-count", String(visible));
     root.hidden = visible === 0;
+    const charsBlock = root.closest(".chars-block");
+    if (charsBlock) charsBlock.hidden = visible === 0;
   }
 
   function syncCommercialTable(specs, extra) {
@@ -1966,6 +1968,40 @@
   document.getElementById("aiClose").addEventListener("click", closeAssistant);
   aiBackdrop.addEventListener("click", closeAssistant);
 
+  /* Webflow pisa button/label con width:100% / display:block; forzamos la fila en runtime. */
+  function hardenCtaUtility() {
+    const row = document.querySelector(".cta-utility");
+    if (!row) return;
+    row.style.setProperty("display", "grid", "important");
+    row.style.setProperty("grid-template-columns", "minmax(0,1fr) auto", "important");
+    row.style.setProperty("align-items", "center", "important");
+    row.style.setProperty("width", "100%", "important");
+    row.style.setProperty("column-gap", "12px", "important");
+    const compare = row.querySelector(".compare-row");
+    const ask = row.querySelector(".btn-ai");
+    if (compare) {
+      compare.style.setProperty("display", "inline-flex", "important");
+      compare.style.setProperty("width", "auto", "important");
+      compare.style.setProperty("justify-self", "start", "important");
+      compare.style.setProperty("float", "none", "important");
+    }
+    if (ask) {
+      ask.style.setProperty("display", "inline-flex", "important");
+      ask.style.setProperty("width", "auto", "important");
+      ask.style.setProperty("justify-self", "end", "important");
+      ask.style.setProperty("margin", "0", "important");
+      ask.style.setProperty("border", "none", "important");
+      ask.style.setProperty("background", "transparent", "important");
+      ask.style.setProperty("white-space", "nowrap", "important");
+      ask.style.setProperty("float", "none", "important");
+    }
+  }
+  hardenCtaUtility();
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", hardenCtaUtility);
+  }
+  window.addEventListener("load", hardenCtaUtility);
+
   function addMsg(role, html) {
     const el = document.createElement("div");
     el.className = `ai-msg ${role}`;
@@ -2023,7 +2059,7 @@
     ask(q);
   });
 
-  addMsg("bot", `Hola, soy el asistente de <b>productos Macroled</b>. Estoy para ayudarte con la información técnica de este producto. Preguntame por especificaciones, IP, medidas, descargas y más.`);
+  addMsg("bot", `Hola, soy el asistente de <b>productos Macroled</b>. Estoy para ayudarte con la información técnica de este producto.`);
   renderSuggestions();
 
   document.addEventListener("keydown", (e) => {
@@ -2172,6 +2208,7 @@
   }
 
   function bootFicha() {
+    hardenCtaUtility();
     initVariants();
     watchForLateVariants();
     initReveals();

@@ -312,7 +312,7 @@ img{max-width:100%;display:block;}
 .variant-chip{
   display:inline-flex;align-items:center;justify-content:center;gap:8px;
   min-width:56px;min-height:44px;padding:10px 14px;
-  border:1.5px solid #d6d6d6;border-radius:100px;
+  border:1.5px solid #e1e0e0;border-radius:100px;
   background:var(--white);color:var(--ink);
   font-size:var(--fs-base);font-weight:500;cursor:pointer;
   transition:border-color .15s,background .15s,color .15s;
@@ -341,6 +341,9 @@ img{max-width:100%;display:block;}
   padding-top:clamp(20px,2.5vw,28px);
   border-top:1px solid var(--line);
 }
+.chars-block[hidden]{display:none !important;}
+.chars-block:has(.quick-specs[hidden]),
+.chars-block:has(.quick-specs[data-count="0"]){display:none !important;}
 .quick-specs{
   display:inline-grid;
   width:fit-content;
@@ -421,31 +424,37 @@ img{max-width:100%;display:block;}
 }
 .btn svg{flex:none;}
 
-/* Fila utilitaria: comparar (pill) a la izquierda, preguntá (link) a la derecha.
-   !important: Webflow pisa button/label con width:100% / display:block y los apila. */
+/* Fila utilitaria: comparar izq + preguntá der.
+   Grid + !important: Webflow suele forzar button/label a block/100% y los apila. */
 .cta-utility{
-  display:flex !important;
-  flex-direction:row !important;
-  flex-wrap:nowrap !important;
+  display:grid !important;
+  grid-template-columns:minmax(0,1fr) auto !important;
   align-items:center !important;
-  justify-content:space-between !important;
-  gap:10px;
+  justify-items:stretch;
+  column-gap:12px;
+  row-gap:0;
   width:100%;
 }
-.cta-utility > .compare-row,
-.cta-utility > .btn-ai{
-  flex:0 1 auto;
+.cta-utility > .compare-row{
+  grid-column:1;
+  justify-self:start;
   width:auto !important;
   max-width:100%;
-  box-sizing:border-box;
+}
+.cta-utility > .btn-ai{
+  grid-column:2;
+  justify-self:end;
+  width:auto !important;
+  max-width:100%;
+  white-space:nowrap;
 }
 
 /* Preguntá por este producto — bajado a link terciario, ya no compite con los botones */
 .btn-ai{
   width:auto !important;margin:0 !important;
   display:inline-flex !important;align-items:center;justify-content:center;gap:7px;
-  min-height:auto;padding:6px 0;border:none;border-radius:0;
-  background:transparent;
+  min-height:auto;padding:6px 0;border:none !important;border-radius:0;
+  background:transparent !important;
   font-size:var(--fs-sm);font-weight:600;color:var(--btn-blue);cursor:pointer;
   text-decoration:underline;text-decoration-color:transparent;
   text-underline-offset:3px;
@@ -1557,11 +1566,10 @@ body.has-compare-bar .ai-launch{
 
   /* Mantener comparar + preguntá en la misma fila (Webflow no debe apilarlos) */
   .cta-utility{
-    flex-direction:row !important;
-    flex-wrap:nowrap !important;
+    display:grid !important;
+    grid-template-columns:minmax(0,1fr) auto !important;
     align-items:center !important;
-    justify-content:space-between !important;
-    gap:8px;
+    column-gap:8px;
   }
   .compare-row{
     justify-content:flex-start;
@@ -1656,7 +1664,8 @@ body.has-compare-bar .ai-launch{
   .qspec{padding:0 4px;}
   .compat-grid{gap:10px;}
   .pcard h3{font-size:13px;}
-  .btn,.btn-ai{font-size:12px;padding:11px 12px;}
+  .btn{font-size:12px;padding:11px 12px;}
+  .btn-ai{font-size:12px;padding:6px 0;}
   .meta{font-size:12px;}
   .crumb{font-size:12px;}
   .tab{padding:12px 4px;font-size:11.5px;}
@@ -1764,15 +1773,22 @@ body.has-compare-bar .ai-launch{
 
 /* Layout crítico vs Webflow globals (va al final para ganar cascada) */
 .cta-utility{
-  display:flex !important;
-  flex-direction:row !important;
-  flex-wrap:nowrap !important;
+  display:grid !important;
+  grid-template-columns:minmax(0,1fr) auto !important;
   align-items:center !important;
-  justify-content:space-between !important;
 }
 .cta-utility .compare-row,
 .cta-utility .btn-ai{
   display:inline-flex !important;
   width:auto !important;
-  flex:0 1 auto;
+  max-width:100%;
+  float:none !important;
+  clear:none !important;
+}
+.cta-utility .compare-row{justify-self:start;}
+.cta-utility .btn-ai{
+  justify-self:end;
+  white-space:nowrap;
+  border:none !important;
+  background:transparent !important;
 }
