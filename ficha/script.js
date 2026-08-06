@@ -1399,6 +1399,8 @@
     PRODUCT_CTX.description = description;
     PRODUCT_CTX.contactoUrl = CONTACTO_URL;
 
+    if (typeof renderSuggestions === "function") renderSuggestions();
+
     heroItem = el;
     if (variantsTarget) variantsTarget.innerHTML = buildChipsHtml();
     refreshOpenAccordions();
@@ -1627,6 +1629,7 @@
     { test: /\bstock\b|\bdisponibilidad\b|\bdisponibles?\b|\bqueda(n)? (alguno|unidades|stock)\b/i, special: "stock" },
     { test: /colore?s?\b|variante|viene en otro color/i, special: "variantes" },
     { test: /compatible|se puede usar con|anda con/i, special: "compatible" },
+    { test: /qu[eé] (tipo de )?protecci[oó]n (tiene|posee|ofrece)|nivel de protecci[oó]n/i, special: "proteccion" },
   ];
 
   function specialAnswer(kind, question) {
@@ -1670,6 +1673,22 @@
       }
       case "compatible":
         return null; // sin dato local confiable -> que lo resuelva la Capa 2
+      case "proteccion": {
+        // Pregunta genérica ("¿qué protección tiene?"): combina IP e IK si
+        // el producto tiene los dos cargados, no solo uno. Las preguntas
+        // puntuales ("¿es IP44?" / "¿resiste golpes?") siguen matcheando
+        // las reglas de arriba y responden solo lo que preguntaron.
+        const ip = (ctx.specs["Protección IP"] || "").trim();
+        const ik = (ctx.specs["Protección IK"] || "").trim();
+        const partes = [];
+        if (hasSpecValue(ip)) {
+          const meaning = IP_MEANINGS[normKey(ip).replace(/\s+/g, "")];
+          partes.push(`protección <b>${ip}</b>${meaning ? ` (${meaning})` : ""}`);
+        }
+        if (hasSpecValue(ik)) partes.push(`protección contra impactos <b>${ik}</b>`);
+        if (!partes.length) return null;
+        return `Este producto tiene ${partes.join(" y ")}.`;
+      }
       default:
         return null;
     }
@@ -1862,12 +1881,53 @@
     }
   }
 
-  const SUGGESTIONS = [
-    "¿Cuál es la autonomía?",
-    "¿Es IP44?",
-    "¿Dónde bajo la ficha técnica?",
-    "¿Qué potencia tiene?",
+  /* —— Sugerencias dinámicas ——
+     Antes eran 4 fijas para todos los productos (autonomía, IP44, ficha,
+     potencia), así que en un producto sin batería o sin datos eléctricos
+     sugerían preguntas que no tenían respuesta. Ahora se arman según los
+     specs que el producto actual realmente tiene cargados. */
+  const SUGGESTION_CANDIDATES = [
+    { key: "Autonomía", q: "¿Cuál es la autonomía?" },
+    { key: "Potencia", q: "¿Qué potencia tiene?" },
+    { key: "Tensión", q: "¿Con qué tensión funciona?" },
+    { key: "Flujo luminoso", q: "¿Cuántos lúmenes tiene?" },
+    { key: "Temperatura del color", q: "¿Qué temperatura de color tiene?" },
+    { key: "Dimerizable", q: "¿Es dimerizable?" },
+    { key: "Tiempo de carga", q: "¿Cuánto tarda en cargar?" },
+    { key: "Ángulo de apertura", q: "¿Cuál es el ángulo de apertura?" },
+    { key: "Material del cuerpo", q: "¿De qué material es?" },
+    { key: "Garantía", q: "¿Cuánto dura la garantía?" },
   ];
+
+  const UNIVERSAL_SUGGESTIONS = [
+    "¿Dónde bajo la ficha técnica?",
+    "¿En qué colores viene?",
+  ];
+
+  function buildSuggestions() {
+    const ctx = window.__mlProductCtx || PRODUCT_CTX;
+    const specs = ctx.specs || {};
+    const picks = [];
+
+    // La protección (IP/IK) va primero y como pregunta genérica, no atada
+    // a un código puntual como "IP44" (que puede no aplicar a otro SKU).
+    if (hasSpecValue(specs["Protección IP"]) || hasSpecValue(specs["Protección IK"])) {
+      picks.push("¿Qué protección tiene?");
+    }
+
+    SUGGESTION_CANDIDATES.forEach((c) => {
+      if (picks.length >= 4) return;
+      if (hasSpecValue(specs[c.key])) picks.push(c.q);
+    });
+
+    let i = 0;
+    while (picks.length < 4 && i < UNIVERSAL_SUGGESTIONS.length) {
+      if (picks.indexOf(UNIVERSAL_SUGGESTIONS[i]) === -1) picks.push(UNIVERSAL_SUGGESTIONS[i]);
+      i++;
+    }
+
+    return picks.slice(0, 4);
+  }
 
   const aiPanel = document.getElementById("aiPanel");
   const aiBackdrop = document.getElementById("aiBackdrop");
@@ -1915,7 +1975,7 @@
   }
 
   function renderSuggestions() {
-    aiSuggestions.innerHTML = SUGGESTIONS.map(
+    aiSuggestions.innerHTML = buildSuggestions().map(
       (s) => `<button type="button" class="ai-chip">${s}</button>`
     ).join("");
   }
