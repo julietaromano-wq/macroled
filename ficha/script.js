@@ -1661,6 +1661,38 @@
     }
   }
 
+  /* —— "No aplica para este tipo de producto" ——
+     Antes de rendirnos con genericSpecMatch, chequeamos si la pregunta
+     apunta a una CATEGORÍA completa de specs (eléctricas, lumínicas,
+     conectividad) que este producto ni siquiera tiene cargada — típico
+     de accesorios (artefactos para lámparas, portalámparas) o sensores,
+     que no tienen ficha eléctrica/lumínica propia. En ese caso avisamos
+     que no aplica, en vez de sonar como que nos falta el dato.
+     Se apoya en SPEC_GROUPS, que ya define esas categorías más arriba. */
+  const GROUP_INTENT_TESTS = [
+    { test: /el[eé]ctric|voltaje|tensi[oó]n|potenc|watt|amper|driver|corriente|frecuencia\b/i,
+      groupTitle: "Características eléctricas" },
+    { test: /lumin|lumen|\bluz\b|kelvin|\bcri\b|\bled\b|apertura|[aá]ngulo|vida [uú]til/i,
+      groupTitle: "Características lumínicas" },
+    { test: /conectividad|wifi|wi-fi|bluetooth|zigbee|\brf\b|\bapp\b|\bsmart\b|asistente de voz/i,
+      groupTitle: "Características de conectividad" },
+  ];
+
+  function groupHasAnyValue(groupTitle, specs) {
+    const group = SPEC_GROUPS.find((g) => g.title === groupTitle);
+    if (!group) return true; // si no reconocemos el grupo, no bloqueamos la respuesta
+    return group.rows.some((row) => hasSpecValue(lookupSpec(specs, row.key)));
+  }
+
+  function categoryFallback(question, specs) {
+    for (const g of GROUP_INTENT_TESTS) {
+      if (!g.test.test(question)) continue;
+      if (groupHasAnyValue(g.groupTitle, specs)) continue; // sí tiene datos de esa categoría, no es esto
+      return noDataFallbackMsg();
+    }
+    return null;
+  }
+
   /* —— Búsqueda genérica sobre TODOS los specs cargados en la ficha ——
      Cuando ninguna regla curada matchea (o matchea pero no hay dato),
      probamos encontrar el spec correcto por superposición de palabras
@@ -1734,17 +1766,34 @@
       // matcheó la intención pero no hay dato cargado para este SKU -> seguir
     }
 
+    // Antes de rendirnos: ¿la pregunta apunta a una categoría entera
+    // (eléctricas / lumínicas / conectividad) que este producto no tiene?
+    const categoria = categoryFallback(question, specs);
+    if (categoria) return categoria;
+
     // Ninguna regla curada respondió: buscamos en TODOS los specs de la
     // ficha antes de rendirnos y pasar a la Capa 2.
     return genericSpecMatch(question);
   }
 
   /* —— Capa 2: agente con IA sobre el catálogo completo (n8n) —— */
-  const N8N_WEBHOOK_URL = "https://n8n.coresagroup.com/webhook/asistente-macroled-producto"; // TODO: URL real una vez migrado el workflow
+  const N8N_WEBHOOK_URL = "https://n8n.coresagroup.com/webhook/macroled-ia";
   const AI_TIMEOUT_MS = 12000;
 
-  function contactFallbackMsg() {
-    return `No pude encontrar esa información en este momento. Podés escribirnos desde <a href="${CONTACTO_URL}" target="_blank" rel="noopener">nuestro formulario de contacto</a> y te ayudamos.`;
+  /**
+   * Se usa SOLO cuando la Capa 2 no pudo responder por un problema técnico
+   * (timeout, red caída, webhook no disponible todavía) — no es un "no sé
+   * la respuesta". Por eso invita a revisar la ficha técnica en vez de
+   * mandar directo a contacto: ese salto a contacto queda reservado para
+   * precio/stock, o para lo que el propio agente de la Capa 2 decida
+   * cuando esté conectado de verdad.
+   */
+  function noDataFallbackMsg() {
+    const ctx = window.__mlProductCtx || PRODUCT_CTX;
+    if (ctx.ficha) {
+      return `No pude encontrar información sobre esa característica para este producto. Te recomendamos revisar la <a href="${ctx.ficha}" target="_blank" rel="noopener">ficha técnica (PDF)</a>, donde puede estar especificada con mayor detalle.`;
+    }
+    return `No pude encontrar información sobre esa característica para este producto.`;
   }
 
   async function askAI(question) {
@@ -1770,9 +1819,11 @@
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
 
       const data = await res.json();
-      // Ajustar esta línea según cómo responda el "Respond to Webhook" real
-      // (por ej. { respuesta: "..." } o { output: "..." })
-      const texto = data.respuesta || data.output || data.answer;
+      // El n8n "Respond to Webhook" a veces envuelve el resultado en un
+      // array de 1 item ([{ respuesta: "..." }]) y a veces manda el
+      // objeto suelto ({ respuesta: "..." }) — aceptamos las dos formas.
+      const item = Array.isArray(data) ? data[0] : data;
+      const texto = item && (item.respuesta || item.output || item.answer);
       if (!texto) throw new Error("Respuesta vacía del agente");
 
       // El \n del agente -> <br> para que se vea bien en el chat
@@ -1780,7 +1831,7 @@
     } catch (err) {
       clearTimeout(timeoutId);
       console.warn("[asistente] error consultando IA:", err);
-      return contactFallbackMsg();
+      return noDataFallbackMsg();
     }
   }
 
