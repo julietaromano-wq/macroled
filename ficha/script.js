@@ -535,6 +535,13 @@
     return el;
   }
 
+  /** True si el producto tiene al menos un dato del grupo "Características lumínicas". */
+  function hasLuminousSpecs(specs) {
+    const group = SPEC_GROUPS.find((g) => g.title === "Características lumínicas");
+    if (!group || !specs) return false;
+    return group.rows.some((row) => hasSpecValue(lookupSpec(specs, row.key)));
+  }
+
   function lookupSpec(map, key) {
     if (hasSpecValue(map[key])) return String(map[key]).trim();
     for (const [alias, canonical] of Object.entries(SPEC_KEY_ALIASES)) {
@@ -1334,9 +1341,9 @@
     if (trustGarEl) trustGarEl.textContent = garVal;
     setTrustEligible("garantia", !!garVal);
 
-    /* Sellos fijos de marca: siempre visibles (si entran en el top 4) */
+    /* Sellos fijos de marca: certificado siempre; eficiencia solo si hay datos lumínicos */
     setTrustEligible("certificado", true);
-    setTrustEligible("ahorro", true);
+    setTrustEligible("ahorro", hasLuminousSpecs(specs));
 
     const potVal = (specs["Potencia"] || "").trim();
     const tenVal = (specs["Tensión"] || "").trim();

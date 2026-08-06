@@ -529,7 +529,8 @@ main{padding:clamp(12px,2vw,24px) clamp(12px,2vw,24px) 0;}
   color:var(--ink);cursor:pointer;user-select:none;margin-bottom:0;
 }
 .compare-row:hover{
-  background:var(--tint);color:var(--tint-text);
+  background:transparent;
+  color:var(--tint-text);
 }
 .compare-row:has(input:checked){
   background:transparent;color:var(--tint-text);font-weight:700;
