@@ -1624,12 +1624,12 @@
     { test: /\bsku\b|c[oó]digo de producto|referencia/i, special: "sku" },
     { test: /\bean\b|c[oó]digo de barras/i, special: "ean" },
     { test: /precio|costo|cu[aá]nto sale|cu[aá]nto cuesta|vale/i, special: "precio" },
-    { test: /stock|disponibilidad|hay|tienen|queda/i, special: "stock" },
+    { test: /\bstock\b|\bdisponibilidad\b|\bdisponibles?\b|\bqueda(n)? (alguno|unidades|stock)\b/i, special: "stock" },
     { test: /colore?s?\b|variante|viene en otro color/i, special: "variantes" },
     { test: /compatible|se puede usar con|anda con/i, special: "compatible" },
   ];
 
-  function specialAnswer(kind) {
+  function specialAnswer(kind, question) {
     const ctx = window.__mlProductCtx || PRODUCT_CTX;
     switch (kind) {
       case "ficha":
@@ -1648,11 +1648,25 @@
       case "stock":
         return `Para precio y disponibilidad te recomiendo escribirnos desde <a href="${CONTACTO_URL}" target="_blank" rel="noopener">nuestro formulario de contacto</a>, así te asesoran con el dato actualizado.`;
       case "variantes": {
-        // Usa lo que ya tenés armado en variantsTarget (chips de color/temperatura/etc)
-        const chips = document.querySelectorAll(".variant-chip");
+        // Antes agarraba TODOS los .variant-chip de la página sin filtrar,
+        // así que si el producto tenía variantes de Color Y de Temperatura
+        // las mezclaba en una sola lista (ej: "Azul, 2200K, 2700K..."). Ahora
+        // apuntamos al grupo de variante correcto según lo que preguntaron.
+        const groups = Array.from(document.querySelectorAll(".variant-group"));
+        if (!groups.length) return null;
+
+        const wantsColor = /color/i.test(question);
+        let target = groups[0];
+        if (wantsColor) {
+          const colorGroup = groups.find((g) => /color/i.test(g.querySelector(".variant-label")?.textContent || ""));
+          if (colorGroup) target = colorGroup;
+        }
+
+        const chips = target.querySelectorAll(".variant-chip");
         if (!chips.length) return null;
         const valores = Array.from(chips).map((c) => c.textContent.trim());
-        return `Este modelo tiene estas opciones disponibles: <b>${valores.join(", ")}</b>. Podés cambiarlas arriba, en la ficha.`;
+        const labelText = (target.querySelector(".variant-label")?.textContent || "Variante").trim();
+        return `Este modelo tiene estas opciones de ${labelText.toLowerCase()} disponibles: <b>${valores.join(", ")}</b>. Podés cambiarlas arriba, en la ficha.`;
       }
       case "compatible":
         return null; // sin dato local confiable -> que lo resuelva la Capa 2
@@ -1704,16 +1718,28 @@
     "decime", "dato", "datos", "info", "informacion", "información", "un",
     "una", "unos", "unas", "y", "o", "en", "se", "puede", "pueden", "sabes",
     "sabés", "vos", "cuánto", "cuanto", "cuánta", "cuanta", "qué", "que",
+    /* Conectores que aparecen en decenas de nombres de spec ("Tipo de X",
+       "Color de X") y por sí solos no distinguen nada — si los dejamos,
+       cualquier pregunta con "tipo" matchea el primer spec que empiece
+       con "Tipo de ...", aunque no tenga relación real con la pregunta. */
+    "tipo", "tipos", "usa", "usan", "usás", "usas", "utiliza", "utilizan",
+    "viene", "vienen", "trae", "incluye", "incluyen",
   ]);
 
   function normalizeForSearch(s) {
     return normKey(s).replace(/[^a-z0-9\s]/g, " ").trim();
   }
 
-  function questionTokens(q) {
-    return normalizeForSearch(q)
+  /* Misma limpieza para la pregunta Y para el nombre del spec, así "tipo"
+     o "de" no cuentan como coincidencia real en ninguno de los dos lados. */
+  function meaningfulTokens(s) {
+    return normalizeForSearch(s)
       .split(/\s+/)
       .filter((t) => t.length > 2 && !SPEC_STOPWORDS.has(t));
+  }
+
+  function questionTokens(q) {
+    return meaningfulTokens(q);
   }
 
   function genericSpecMatch(question) {
@@ -1728,7 +1754,8 @@
     Object.keys(specs).forEach((key) => {
       const val = (specs[key] || "").trim();
       if (!hasSpecValue(val)) return;
-      const keyTokens = normalizeForSearch(key).split(/\s+/).filter(Boolean);
+      const keyTokens = meaningfulTokens(key);
+      if (!keyTokens.length) return; // la key quedó vacía tras sacar conectores -> no comparable
       let score = 0;
       qTokens.forEach((qt) => {
         if (keyTokens.some((kt) => kt === qt || kt.startsWith(qt) || qt.startsWith(kt))) score++;
@@ -1756,7 +1783,7 @@
       if (!regla.test.test(question)) continue;
 
       if (regla.special) {
-        const resp = specialAnswer(regla.special);
+        const resp = specialAnswer(regla.special, question);
         if (resp) return resp;
         continue; // esta regla matcheó pero no hay dato -> seguir probando otras
       }
