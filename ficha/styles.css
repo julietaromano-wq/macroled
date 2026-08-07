@@ -1779,10 +1779,10 @@ body.assistant-open .ai-launch{
 
   .ai-panel{width:100%;}
   .ai-form{padding:12px 14px max(14px,env(safe-area-inset-bottom));}
-  /* 16px evita zoom automático de iOS al enfocar el input */
+  /* Chat 14px; el input debe quedar en 16px o iOS hace zoom al enfocar */
   .ai-form input{font-size:16px;}
-  .ai-msg{font-size:16px;line-height:1.45;}
-  .ai-chip{font-size:14px;}
+  .ai-msg{font-size:14px;line-height:1.45;}
+  .ai-chip{font-size:12px;}
 }
 
 /* Small phones */
