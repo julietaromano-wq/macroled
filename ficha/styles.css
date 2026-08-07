@@ -985,6 +985,8 @@ body.assistant-open .ai-launch{
   scrollbar-width:none;
   cursor:grab;
   user-select:none;
+  -webkit-overflow-scrolling:touch;
+  touch-action:pan-x;
 }
 .ml-related-products__track.is-dragging{
   cursor:grabbing;
@@ -1213,12 +1215,18 @@ body.assistant-open .ai-launch{
   .ml-related-products{
     --related-arrow-space:0px;
   }
+  .ml-related-products > .wrap{
+    padding-bottom:30px;
+  }
   .ml-related-products__track{
     width:100%;
     margin:0;
     padding:1.25rem 0 1rem;
-    scroll-snap-type:x mandatory;
+    scroll-snap-type:x proximity;
+    scroll-behavior:auto;
     scroll-padding-inline:0;
+    touch-action:pan-x;
+    -webkit-overflow-scrolling:touch;
   }
   .ml-related-products__track .ml-product-card{
     max-width:100%;
@@ -1681,12 +1689,12 @@ body.assistant-open .ai-launch{
   .actions{flex-direction:column;}
   .btn,.btn-primary,.btn-ghost{width:100%;flex-basis:auto;flex:none;}
 
-  /* Mantener comparar + preguntá en la misma fila (Webflow no debe apilarlos) */
+  /* Mobile: solo comparar; el launch flotante alcanza para preguntar */
   .cta-utility{
-    display:grid !important;
-    grid-template-columns:minmax(0,1fr) auto !important;
+    display:flex !important;
+    grid-template-columns:none !important;
     align-items:center !important;
-    column-gap:8px;
+    justify-content:flex-start;
   }
   .compare-row{
     justify-content:flex-start;
@@ -1695,11 +1703,9 @@ body.assistant-open .ai-launch{
     padding:8px 10px;
     font-size:12px;
   }
-  .btn-ai{
-    justify-content:flex-end;
-    width:auto !important;
-    padding:8px 0;
-    white-space:nowrap;
+  .cta-utility .btn-ai,
+  #openAssistantFromCta{
+    display:none !important;
   }
 
   .trust{
@@ -1929,4 +1935,12 @@ body.assistant-open .ai-launch{
 
 @media (max-width:640px){
   .compare-row{font-size:12px;}
+  .cta-utility{
+    display:flex !important;
+    grid-template-columns:none !important;
+  }
+  .cta-utility .btn-ai,
+  #openAssistantFromCta{
+    display:none !important;
+  }
 }
