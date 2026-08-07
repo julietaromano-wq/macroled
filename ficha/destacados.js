@@ -582,10 +582,7 @@
       track.innerHTML = html;
       track.style.setProperty("display", "flex", "important");
       track.style.setProperty("min-height", "280px", "important");
-      track.style.setProperty("width", "100%", "important");
       track.querySelectorAll(".ml-product-card").forEach((card) => {
-        card.style.setProperty("flex", "0 0 240px", "important");
-        card.style.setProperty("min-width", "220px", "important");
         card.style.setProperty("min-height", "260px", "important");
         card.style.setProperty("display", "flex", "important");
       });

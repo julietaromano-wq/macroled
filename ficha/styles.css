@@ -920,14 +920,13 @@ body.assistant-open .ai-launch{
   --ml-light-blue-700: #0086b5;
   --ml-light-blue-800: #00688c;
   --related-arrow-space: 3.25rem;
-  padding: 0 0 clamp(12px,2vw,24px);
+  padding: 0;
   background: transparent;
   overflow: hidden;
 }
 .ml-related-products[hidden]{display:none !important;}
 .ml-related-products > .wrap{
-  padding-top:clamp(18px,2.2vw,28px);
-  padding-bottom:clamp(18px,2.2vw,28px);
+  padding-top: 30px;
 }
 .ml-related-products__head{
   display:flex;align-items:end;justify-content:space-between;gap:16px;
@@ -1776,6 +1775,10 @@ body.assistant-open .ai-launch{
 
   .ai-panel{width:100%;}
   .ai-form{padding:12px 14px max(14px,env(safe-area-inset-bottom));}
+  /* 16px evita zoom automático de iOS al enfocar el input */
+  .ai-form input{font-size:16px;}
+  .ai-msg{font-size:16px;line-height:1.45;}
+  .ai-chip{font-size:14px;}
 }
 
 /* Small phones */
