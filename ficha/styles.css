@@ -1238,7 +1238,9 @@ body.assistant-open .ai-launch{
     inset:auto;
     display:flex;
     order:1;
-    justify-content:space-between;
+    justify-content:center;
+    align-items:center;
+    gap:.75rem;
     width:100%;
     pointer-events:auto;
   }
@@ -1701,15 +1703,17 @@ body.assistant-open .ai-launch{
   }
 
   .trust{
-    grid-template-columns:repeat(4,minmax(0,1fr));
-    gap:12px 8px;
-    padding:14px 10px;
+    display:block;
+    grid-template-columns:none;
+    gap:0;
+    padding:clamp(14px,2.5vw,20px) 0 0;
+    margin-top:clamp(14px,2.5vw,20px);
+    border-top:1px solid var(--line-soft);
+    background:transparent;
+    min-height:0;
   }
-  .trust-item{
-    align-items:center;
-    text-align:center;
-  }
-  .trust-lines{align-items:center;}
+  .trust-item{display:none !important;}
+  .trust-lines{display:none !important;}
 
   .tabs{
     gap:0;
