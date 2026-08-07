@@ -15,9 +15,64 @@
   const stageWrap = document.getElementById("stageWrap");
   const stageEl = document.getElementById("stage");
   const stageImg = document.getElementById("stageImg");
+  const stageVideo = document.getElementById("stageVideo");
+  const stagePlay = document.getElementById("stagePlay");
   const zoomLens = document.getElementById("zoomLens");
   const zoomPane = document.getElementById("zoomPane");
+  const openLightboxBtn = document.getElementById("openLightboxBtn");
   const canHoverZoom = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
+  const THUMB_PLAY = `<span class="thumb-play" aria-hidden="true"><svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></span>`;
+
+  /* Portada de video por línea (fallback si no hay data-video-poster) */
+  const LINE_VIDEO_POSTERS = {
+    ECO: "eco_line-portada.png",
+    POWER: "power_line-portada.png",
+    PRO: "pro_line-portada.png",
+    "PRO COMPACT": "pro_line-portada.png",
+    UNI: "uni_line-portada.png",
+  };
+  const LINE_POSTER_BASE = "https://s3.coresagroup.com/MACROLED/WEB/luces-auto/";
+
+  function normalizeLinea(value) {
+    return String(value || "")
+      .trim()
+      .replace(/\s+/g, " ")
+      .toUpperCase();
+  }
+
+  function posterFromLinea(linea) {
+    const key = normalizeLinea(linea);
+    if (!key) return "";
+    const file = LINE_VIDEO_POSTERS[key] || LINE_VIDEO_POSTERS[key.replace(/_/g, " ")];
+    return file ? LINE_POSTER_BASE + file : "";
+  }
+
+  function lineaFromVideoUrl(url) {
+    const u = String(url || "");
+    const file = (u.split("/").pop() || "").replace(/\.[a-z0-9]+$/i, "");
+    const fromFile = normalizeLinea(file.replace(/[_-]+/g, " "));
+    if (LINE_VIDEO_POSTERS[fromFile]) return fromFile;
+    if (LINE_VIDEO_POSTERS[fromFile.split(" ")[0]]) return fromFile.split(" ")[0];
+    const parts = u.split("/").map(normalizeLinea);
+    for (let i = parts.length - 1; i >= 0; i -= 1) {
+      if (LINE_VIDEO_POSTERS[parts[i]]) return parts[i];
+    }
+    return "";
+  }
+
+  function resolveVideoPoster(el, videos, imageFallback) {
+    const explicit = (el.getAttribute("data-video-poster") || "").trim();
+    if (explicit) return explicit;
+    const fromLine = posterFromLinea(
+      el.getAttribute("data-linea") || el.getAttribute("data-line") || ""
+    );
+    if (fromLine) return fromLine;
+    for (const v of videos || []) {
+      const inferred = posterFromLinea(lineaFromVideoUrl(v));
+      if (inferred) return inferred;
+    }
+    return (imageFallback || "").trim();
+  }
 
   const FANCY_OPTS = {
     Images: { zoom: true, wheel: "zoom" },
@@ -30,37 +85,99 @@
     },
   };
 
-  function urlsToGallery(urls, altBase) {
+  function youtubeId(url) {
+    const m = String(url || "").match(
+      /(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/)|youtu\.be\/)([\w-]{11})/i
+    );
+    return m ? m[1] : null;
+  }
+
+  function detectMediaType(url) {
+    const u = String(url || "").trim();
+    if (!u) return "image";
+    if (youtubeId(u) || /youtube\.com|youtu\.be/i.test(u)) return "youtube";
+    if (/vimeo\.com/i.test(u)) return "vimeo";
+    if (/\.(mp4|webm|ogg|mov)(\?|#|$)/i.test(u)) return "html5video";
+    return "image";
+  }
+
+  function isVideoType(type) {
+    return type === "html5video" || type === "youtube" || type === "vimeo";
+  }
+
+  function mediaThumb(url, type, poster) {
+    if (type === "youtube") {
+      const id = youtubeId(url);
+      if (id) return `https://img.youtube.com/vi/${id}/hqdefault.jpg`;
+    }
+    if (isVideoType(type)) return poster || "";
+    return url;
+  }
+
+  function urlsToGallery(urls, altBase, poster) {
     const seen = new Set();
+    let imageCount = 0;
+    let videoCount = 0;
     return (urls || [])
       .map((u) => String(u || "").trim())
       .filter((u) => {
         if (!u || u.length < 5) return false;
-        if (/\/(250|1000)\//.test(u)) return false;
+        const type = detectMediaType(u);
+        if (type === "image" && /\/(250|1000)\//.test(u)) return false;
         if (seen.has(u)) return false;
         seen.add(u);
         return true;
       })
-      .map((url, i) => ({
-        alt: altBase ? `${altBase} — vista ${i + 1}` : `Vista ${i + 1}`,
-        thumb: url,
-        display: url,
-        full: url,
-      }));
+      .map((url) => {
+        const type = detectMediaType(url);
+        const isVideo = isVideoType(type);
+        if (isVideo) videoCount += 1;
+        else imageCount += 1;
+        const n = isVideo ? videoCount : imageCount;
+        const label = isVideo ? `video ${n}` : `vista ${n}`;
+        const thumb = mediaThumb(url, type, poster);
+        return {
+          type,
+          alt: altBase ? `${altBase} — ${label}` : label,
+          thumb,
+          display: url,
+          full: url,
+          poster: poster || (type === "youtube" ? thumb : "") || "",
+        };
+      });
+  }
+
+  function stopStageVideo() {
+    if (!stageVideo) return;
+    try {
+      stageVideo.pause();
+      stageVideo.removeAttribute("src");
+      stageVideo.load();
+    } catch (_) {}
+    stageVideo.hidden = true;
   }
 
   function renderThumbs() {
     if (!thumbsEl) return;
     thumbsEl.hidden = GALLERY.length <= 1;
-    thumbsEl.innerHTML = GALLERY.map((g, i) => `
-      <button type="button" class="thumb${i === activeIndex ? " is-active" : ""}" role="option" data-index="${i}" aria-label="${g.alt}" aria-selected="${i === activeIndex}">
-        <img src="${g.thumb}" alt="" loading="lazy">
-      </button>`).join("");
+    thumbsEl.innerHTML = GALLERY.map((g, i) => {
+      const videoClass = isVideoType(g.type) ? " is-video" : "";
+      const activeClass = i === activeIndex ? " is-active" : "";
+      const img = g.thumb
+        ? `<img src="${g.thumb}" alt="" loading="lazy">`
+        : `<span class="thumb-fallback" aria-hidden="true"></span>`;
+      return `<button type="button" class="thumb${activeClass}${videoClass}" role="option" data-index="${i}" aria-label="${g.alt}" aria-selected="${i === activeIndex}">
+        ${img}${isVideoType(g.type) ? THUMB_PLAY : ""}
+      </button>`;
+    }).join("");
   }
 
   function syncZoomBg() {
     const g = GALLERY[activeIndex];
-    if (!g || !zoomPane) return;
+    if (!g || !zoomPane || isVideoType(g.type)) {
+      if (zoomPane) zoomPane.style.backgroundImage = "";
+      return;
+    }
     zoomPane.style.backgroundImage = `url("${g.full}")`;
   }
 
@@ -68,38 +185,96 @@
     if (!GALLERY.length || !stageImg) return;
     activeIndex = (i + GALLERY.length) % GALLERY.length;
     const g = GALLERY[activeIndex];
-    stageImg.src = g.display;
-    stageImg.alt = g.alt;
+    const video = isVideoType(g.type);
+    stopZoom();
+    stopStageVideo();
+
+    stageEl.classList.toggle("is-video", video);
+    if (openLightboxBtn) {
+      openLightboxBtn.setAttribute("aria-label", video ? "Ampliar video" : "Ampliar imagen");
+    }
+
+    if (g.type === "html5video" && stageVideo) {
+      stageImg.hidden = true;
+      stageVideo.hidden = false;
+      if (stagePlay) stagePlay.hidden = true;
+      stageVideo.poster = g.poster || g.thumb || "";
+      stageVideo.src = g.display;
+      stageVideo.load();
+    } else {
+      if (stageVideo) stageVideo.hidden = true;
+      stageImg.hidden = false;
+      stageImg.src = video ? g.thumb || g.poster || g.display : g.display;
+      stageImg.alt = g.alt;
+      if (stagePlay) stagePlay.hidden = !(video && (g.type === "youtube" || g.type === "vimeo"));
+    }
+
     syncZoomBg();
     renderThumbs();
   }
 
-  function setGallery(urls, altBase) {
-    GALLERY = urlsToGallery(urls, altBase);
+  function setGallery(urls, altBase, opts) {
+    opts = opts || {};
+    GALLERY = urlsToGallery(urls, altBase, opts.poster || "");
     if (!GALLERY.length) {
       const fallback = document.querySelector(".cms-product-item")?.getAttribute("data-image");
-      if (fallback) GALLERY = urlsToGallery([fallback], altBase);
+      if (fallback) GALLERY = urlsToGallery([fallback], altBase, opts.poster || "");
     }
     activeIndex = 0;
     setActive(0);
     const aiImg = document.getElementById("aiProductImg");
-    if (aiImg && GALLERY[0]) aiImg.src = GALLERY[0].thumb;
+    if (aiImg && GALLERY[0]) aiImg.src = GALLERY[0].thumb || GALLERY[0].display;
+  }
+
+  function fancyItem(g) {
+    if (g.type === "html5video") {
+      return {
+        src: g.full,
+        type: "html5video",
+        caption: g.alt,
+        preload: false,
+        thumb: g.thumb || g.poster || undefined,
+        poster: g.poster || g.thumb || undefined,
+      };
+    }
+    if (g.type === "youtube") {
+      return { src: g.full, type: "youtube", caption: g.alt, thumb: g.thumb || undefined };
+    }
+    if (g.type === "vimeo") {
+      return { src: g.full, type: "vimeo", caption: g.alt, thumb: g.thumb || undefined };
+    }
+    /* Sin type forzado: Fancybox detecta la imagen por la URL */
+    return { src: g.full, caption: g.alt };
   }
 
   function openFancy(index) {
     if (!GALLERY.length || typeof Fancybox === "undefined") return;
-    Fancybox.show(
-      GALLERY.map((g) => ({ src: g.full, type: "image", caption: g.alt })),
-      { ...FANCY_OPTS, startIndex: index }
-    );
+    const startIndex = Math.max(0, Math.min(index || 0, GALLERY.length - 1));
+    try {
+      Fancybox.show(GALLERY.map(fancyItem), { ...FANCY_OPTS, startIndex });
+    } catch (err) {
+      console.warn("[lightbox]", err);
+      try {
+        Fancybox.show(
+          GALLERY.filter((g) => !isVideoType(g.type)).map((g) => ({ src: g.full, caption: g.alt })),
+          { ...FANCY_OPTS, startIndex: 0 }
+        );
+      } catch (err2) {
+        console.warn("[lightbox:fallback]", err2);
+      }
+    }
   }
 
   function stopZoom() {
     stageWrap.classList.remove("is-zooming");
   }
 
+  function activeIsImage() {
+    return GALLERY[activeIndex] && !isVideoType(GALLERY[activeIndex].type);
+  }
+
   function updateZoom(e) {
-    if (!canHoverZoom) return;
+    if (!canHoverZoom || !activeIsImage()) return;
     const rect = stageEl.getBoundingClientRect();
     const viewportMargin = 24;
     const spaceRight = window.innerWidth - rect.right - 14 - viewportMargin;
@@ -154,13 +329,14 @@
   if (canHoverZoom) {
     stageEl.addEventListener("mouseenter", (e) => {
       if (e.target.closest(".zoom-btn")) return;
+      if (!activeIsImage()) return;
       syncZoomBg();
       stageWrap.classList.add("is-zooming");
       updateZoom(e);
     });
     stageEl.addEventListener("mousemove", (e) => {
       if (!stageWrap.classList.contains("is-zooming")) return;
-      if (e.target.closest(".zoom-btn")) {
+      if (!activeIsImage() || e.target.closest(".zoom-btn")) {
         stopZoom();
         return;
       }
@@ -177,9 +353,11 @@
   }
   stageEl.addEventListener("click", (e) => {
     if (e.target.closest(".zoom-btn")) return;
+    // Controles nativos del video visible: no abrir lightbox
+    if (e.target.closest("video") && stageVideo && !stageVideo.hidden) return;
     onOpenGallery(e);
   });
-  document.getElementById("openLightboxBtn").addEventListener("click", onOpenGallery);
+  if (openLightboxBtn) openLightboxBtn.addEventListener("click", onOpenGallery);
 
   window.MacroledFicha = { setGallery, setActive, getGallery: () => GALLERY };
 
@@ -1030,6 +1208,69 @@
     if (el && url) el.href = url;
   }
 
+  function isValidFileUrl(url) {
+    const u = String(url || "").trim();
+    return !!(u && u !== "#" && !/^javascript:/i.test(u));
+  }
+
+  function setDownloadBtnLabel(btn, label) {
+    if (!btn) return;
+    const svg = btn.querySelector("svg");
+    btn.textContent = "";
+    if (svg) btn.appendChild(svg);
+    btn.appendChild(document.createTextNode(" " + label));
+  }
+
+  /**
+   * Botones de descarga del hero (arriba de comparar):
+   * primario = ficha → si no hay, catálogo → si no hay, manual.
+   * secundario = el siguiente disponible de esa misma prioridad.
+   */
+  function syncActionDownloads(fichaUrl, catalogoUrl, manualUrl) {
+    const docs = [
+      {
+        key: "ficha",
+        url: fichaUrl,
+        primaryLabel: "Descargar ficha técnica",
+        secondaryLabel: "Ficha técnica",
+      },
+      {
+        key: "catalogo",
+        url: catalogoUrl,
+        primaryLabel: "Descargar catálogo",
+        secondaryLabel: "Catálogo",
+      },
+      {
+        key: "manual",
+        url: manualUrl,
+        primaryLabel: "Descargar manual",
+        secondaryLabel: "Manual",
+      },
+    ].filter((d) => isValidFileUrl(d.url));
+
+    const btnPrimary = document.getElementById("btn-ficha");
+    const btnSecondary = document.getElementById("btn-catalogo");
+    const actions = document.querySelector(".cta-stack .actions");
+
+    const apply = (btn, doc, isPrimary) => {
+      if (!btn) return;
+      if (!doc) {
+        btn.hidden = true;
+        btn.removeAttribute("href");
+        return;
+      }
+      btn.hidden = false;
+      btn.href = doc.url;
+      btn.target = "_blank";
+      btn.rel = "noopener";
+      setDownloadBtnLabel(btn, isPrimary ? doc.primaryLabel : doc.secondaryLabel);
+    };
+
+    apply(btnPrimary, docs[0] || null, true);
+    apply(btnSecondary, docs[1] || null, false);
+    if (actions) actions.hidden = docs.length === 0;
+  }
+
   function syncFileCards(files) {
     const map = {
       ficha: files && files.ficha,
@@ -1267,6 +1508,12 @@
     const ean13 = (el.getAttribute("data-ean13") || "").trim();
     const multiimage = parseList(el.getAttribute("data-multiimage"));
     const image = (el.getAttribute("data-image") || "").trim();
+    const videoRaw =
+      el.getAttribute("data-video") ||
+      el.getAttribute("data-videos") ||
+      "";
+    const videos = parseList(videoRaw);
+    const videoPoster = resolveVideoPoster(el, videos, image);
     const description = (el.getAttribute("data-descripcion") || "").trim();
     const family = (el.getAttribute("data-family") || "").trim();
     const macro = (el.getAttribute("data-macrofamilia") || "").trim();
@@ -1291,7 +1538,18 @@
 
     document.title = `${name} — MACROLED`;
 
-    setGallery(multiimage.length ? multiimage : [image], name);
+    const images = multiimage.length ? multiimage.slice() : image ? [image] : [];
+    const media = [];
+    images.forEach((u) => {
+      if (u && !media.includes(u)) media.push(u);
+    });
+    videos.forEach((v) => {
+      if (v && !media.includes(v)) media.push(v);
+    });
+    setGallery(media, name, { poster: videoPoster });
+    if (videos.length && !GALLERY.some((g) => isVideoType(g.type))) {
+      console.warn("[galeria] data-video presente pero no entró a la galería", videos);
+    }
 
     const nuevoRaw = (el.getAttribute("data-nuevo") || "").trim().toLowerCase();
     const isNuevo = ["true", "1", "si", "sí", "yes"].includes(nuevoRaw);
@@ -1301,7 +1559,7 @@
       stageBadge.hidden = !isNuevo;
     }
 
-    setHref("#btn-ficha", fichaUrl);
+    syncActionDownloads(fichaUrl, catalogoUrl, manualUrl);
     syncFileCards({
       ficha: fichaUrl,
       garantia: garantiaUrl,
@@ -1309,11 +1567,6 @@
       catalogo: catalogoUrl,
       ies: iesUrl,
     });
-    const btnCat = document.getElementById("btn-catalogo");
-    if (btnCat) {
-      const second = manualUrl || catalogoUrl;
-      if (second) btnCat.href = second;
-    }
 
     updateSpecVals(specs, {
       SKU: sku,
@@ -1463,11 +1716,27 @@
     lastVariantSignature = signature;
 
     siblings.forEach((el) => {
-      parseList(el.getAttribute("data-multiimage")).forEach((src) => {
-        if (!src) return;
+      const videos = parseList(
+        el.getAttribute("data-videos") || el.getAttribute("data-video")
+      );
+      const poster = resolveVideoPoster(
+        el,
+        videos,
+        el.getAttribute("data-image") || ""
+      );
+      const media = [
+        ...parseList(el.getAttribute("data-multiimage")),
+        ...videos,
+      ];
+      media.forEach((src) => {
+        if (!src || detectMediaType(src) !== "image") return;
         const img = new Image();
         img.src = src;
       });
+      if (poster) {
+        const img = new Image();
+        img.src = poster;
+      }
     });
 
     dimensionKeys = resolveDimensions(heroItem, siblings);
@@ -1957,12 +2226,14 @@
       aiBackdrop.classList.add("is-open");
     });
     document.body.classList.add("assistant-open");
+    window.dispatchEvent(new CustomEvent("macroled-assistant-toggle", { detail: { open: true } }));
     aiInput.focus();
   }
   function closeAssistant() {
     aiPanel.classList.remove("is-open");
     aiBackdrop.classList.remove("is-open");
     document.body.classList.remove("assistant-open");
+    window.dispatchEvent(new CustomEvent("macroled-assistant-toggle", { detail: { open: false } }));
     setTimeout(() => {
       aiPanel.hidden = true;
       aiBackdrop.hidden = true;

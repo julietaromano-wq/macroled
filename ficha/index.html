@@ -10,7 +10,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0/dist/fancybox/fancybox.css">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/julietaromano-wq/macroled@c5c4da6/ficha/styles.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/julietaromano-wq/macroled@c981dd7/ficha/styles.css">
   (Usá el hash del commit para saltar cache del CDN)
 -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -18,7 +18,7 @@
 <link rel="preconnect" href="https://d1zltvqju4u8ql.cloudfront.net" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0/dist/fancybox/fancybox.css">
-<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="styles.css?v=dl-priority1">
 </head>
 <body>
 
@@ -38,8 +38,12 @@
             <div class="stage" id="stage">
               <span class="stage-badge" id="stage-badge" hidden>Nuevo</span>
               <img class="stage-img" id="stageImg" alt="Space Blanca" draggable="false" fetchpriority="high">
+              <video class="stage-video" id="stageVideo" playsinline controls preload="metadata" hidden></video>
+              <span class="stage-play" id="stagePlay" hidden aria-hidden="true">
+                <svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>
+              </span>
               <div class="zoom-lens" id="zoomLens" aria-hidden="true"></div>
-              <button type="button" class="zoom-btn" id="openLightboxBtn" aria-label="Ampliar imagen">
+              <button type="button" class="zoom-btn" id="openLightboxBtn" aria-label="Ampliar">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
                 Ampliar
               </button>
@@ -376,26 +380,28 @@
   </div>
 
   <section class="ml-related-products" id="productos-relacionados" data-reveal hidden>
-    <div class="wrap ml-related-products__head">
-      <h2 id="ml-related-products-title">También te puede interesar</h2>
-      <a class="link-more" href="index.html">Ver catálogo <span aria-hidden="true">→</span></a>
-    </div>
-    <div class="ml-related-products__viewport" data-related-viewport>
-      <div class="ml-related-products__track" data-related-track aria-live="polite">
-        <div class="ml-related-products__state">Cargando productos relacionados…</div>
+    <div class="wrap">
+      <div class="ml-related-products__head">
+        <h2 id="ml-related-products-title">También te puede interesar</h2>
+        <a class="link-more" href="index.html">Ver catálogo <span aria-hidden="true">→</span></a>
       </div>
-      <div class="ml-related-products__arrows" hidden>
-        <button class="ml-related-products__nav" type="button" data-related-prev aria-label="Producto anterior">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 12H5m6-6-6 6 6 6"/></svg>
-        </button>
-        <button class="ml-related-products__nav" type="button" data-related-next aria-label="Producto siguiente">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6"/></svg>
-        </button>
+      <div class="ml-related-products__viewport" data-related-viewport>
+        <div class="ml-related-products__track" data-related-track aria-live="polite">
+          <div class="ml-related-products__state">Cargando productos relacionados…</div>
+        </div>
+        <div class="ml-related-products__arrows" hidden>
+          <button class="ml-related-products__nav" type="button" data-related-prev aria-label="Producto anterior">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 12H5m6-6-6 6 6 6"/></svg>
+          </button>
+          <button class="ml-related-products__nav" type="button" data-related-next aria-label="Producto siguiente">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6"/></svg>
+          </button>
+        </div>
       </div>
-    </div>
-    <div class="ml-related-products__controls wrap" hidden>
-      <div class="ml-related-products__progress" aria-hidden="true">
-        <span data-related-progress></span>
+      <div class="ml-related-products__controls" hidden>
+        <div class="ml-related-products__progress" aria-hidden="true">
+          <span data-related-progress></span>
+        </div>
       </div>
     </div>
   </section>
@@ -434,6 +440,9 @@
        data-garantia="https://s3.coresagroup.com/MACROLED/Garantias/SPACE-B.pdf"
        data-descripcion="Velador a batería Space Macroled, dimerizable, color blanco, DC 5V, 2700K, IP44, 160lm, incluye cable USB-C"
        data-multiimage="https://s3.coresagroup.com/MACROLED/2000/7428325595880a.png;https://s3.coresagroup.com/MACROLED/2000/7428325595880b.png"
+       data-video="https://s3.coresagroup.com/MACROLED/video/AUTO/POWER.mp4"
+       data-video-poster="https://s3.coresagroup.com/MACROLED/WEB/luces-auto/power_line-portada.png"
+       data-linea="POWER"
        data-variantes-sku="SPACE-R ; SPACE-V ; SPACE-N"
        data-nombre-attr-variantes="Color"
        data-ean13="7428325595880"
@@ -479,6 +488,8 @@
        data-garantia="https://s3.coresagroup.com/MACROLED/Garantias/SPACE-N.pdf"
        data-descripcion="Velador a batería Space Macroled, dimerizable, color negro, DC 5V, 2700K, IP44, 160lm, incluye cable USB-C"
        data-multiimage="https://s3.coresagroup.com/MACROLED/2000/7428325595897a.png;https://s3.coresagroup.com/MACROLED/2000/7428325595897b.png"
+       data-video=""
+       data-video-poster=""
        data-variantes-sku="SPACE-R ; SPACE-V ; SPACE-B"
        data-nombre-attr-variantes="Color"
        data-ean13="7428325595897"
@@ -524,6 +535,8 @@
        data-garantia="https://s3.coresagroup.com/MACROLED/Garantias/SPACE-R.pdf"
        data-descripcion="Velador a batería Space Macroled, dimerizable, color rojo, DC 5V, 2700K, IP44, 160lm, incluye cable USB-C"
        data-multiimage="https://s3.coresagroup.com/MACROLED/2000/7428325595903a.png;https://s3.coresagroup.com/MACROLED/2000/7428325595903b.png"
+       data-video=""
+       data-video-poster=""
        data-variantes-sku="SPACE-V ; SPACE-B ; SPACE-N"
        data-nombre-attr-variantes="Color"
        data-ean13="7428325595903"
@@ -569,6 +582,8 @@
        data-garantia="https://s3.coresagroup.com/MACROLED/Garantias/SPACE-V.pdf"
        data-descripcion="Velador a batería Space Macroled, dimerizable, color verde, DC 5V, 2700K, IP44, 160lm, incluye cable USB-C"
        data-multiimage="https://s3.coresagroup.com/MACROLED/2000/7428325595910a.png;https://s3.coresagroup.com/MACROLED/2000/7428325595910b.png"
+       data-video=""
+       data-video-poster=""
        data-variantes-sku="SPACE-R ; SPACE-B ; SPACE-N"
        data-nombre-attr-variantes="Color"
        data-ean13="7428325595910"
@@ -640,18 +655,18 @@
 
 
 <!--
-  WEBFLOW — Custom Code → Before </body> (copiar):
+  WEBFLOW — Custom Code → Before body close (copiar):
   <script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0/dist/fancybox/fancybox.umd.js"></script>
-  <script src="https://cdn.jsdelivr.net/gh/julietaromano-wq/macroled@c5c4da6/ficha/comparar.js"></script>
-  <script src="https://cdn.jsdelivr.net/gh/julietaromano-wq/macroled@c5c4da6/ficha/script.js"></script>
-  <script src="https://cdn.jsdelivr.net/gh/julietaromano-wq/macroled@c5c4da6/ficha/destacados.js"></script>
-  <script src="https://cdn.jsdelivr.net/gh/julietaromano-wq/macroled@c5c4da6/ficha/comparar-ficha.js"></script>
-  (Hash c5c4da6 = commit actual; cambiá el hash tras cada push para evitar cache)
+  <script src="https://cdn.jsdelivr.net/gh/julietaromano-wq/macroled@HASH/ficha/comparar.js"></script>
+  <script src="https://cdn.jsdelivr.net/gh/julietaromano-wq/macroled@HASH/ficha/script.js"></script>
+  <script src="https://cdn.jsdelivr.net/gh/julietaromano-wq/macroled@HASH/ficha/destacados.js"></script>
+  <script src="https://cdn.jsdelivr.net/gh/julietaromano-wq/macroled@HASH/ficha/comparar-ficha.js"></script>
+  (Reemplazá HASH por el commit actual para saltar cache del CDN)
 -->
 <script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0/dist/fancybox/fancybox.umd.js"></script>
 <script src="comparar.js"></script>
-<script src="script.js"></script>
-<script src="destacados.js"></script>
+<script src="script.js?v=dl-priority1"></script>
+<script src="destacados.js?v=dl-priority1"></script>
 <script src="comparar-ficha.js"></script>
 
 </body>

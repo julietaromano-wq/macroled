@@ -19,8 +19,12 @@
             <div class="stage" id="stage">
               <span class="stage-badge" id="stage-badge" hidden>Nuevo</span>
               <img class="stage-img" id="stageImg" alt="Space Blanca" draggable="false" fetchpriority="high">
+              <video class="stage-video" id="stageVideo" playsinline controls preload="metadata" hidden></video>
+              <span class="stage-play" id="stagePlay" hidden aria-hidden="true">
+                <svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>
+              </span>
               <div class="zoom-lens" id="zoomLens" aria-hidden="true"></div>
-              <button type="button" class="zoom-btn" id="openLightboxBtn" aria-label="Ampliar imagen">
+              <button type="button" class="zoom-btn" id="openLightboxBtn" aria-label="Ampliar">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
                 Ampliar
               </button>

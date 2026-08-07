@@ -249,6 +249,10 @@
       renderCompareBar();
       syncCompareCheckboxes();
     });
+    window.addEventListener("macroled-assistant-toggle", () => {
+      requestAnimationFrame(updateComparePadding);
+      setTimeout(updateComparePadding, 320);
+    });
     window.addEventListener("storage", (e) => {
       if (e.key === "macroled_compare") {
         renderCompareBar();
