@@ -1737,6 +1737,12 @@ body.assistant-open .ai-launch{
     grid-template-columns:1fr;
     gap:4px;
     padding:12px 14px;
+    font-size:14px;
+  }
+  .spec-row .k,
+  .spec-row .v,
+  .spec-row .spec-tip{
+    font-size:14px;
   }
   .spec-row .v{text-align:left;font-weight:600;}
   .spec-group-head{padding:12px 14px;}

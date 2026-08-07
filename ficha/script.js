@@ -398,12 +398,22 @@
       icon: ICON_BOLT,
       rows: [
         { key: "Tensión", tip: "Voltaje de alimentación del producto (AC o DC)." },
+        { key: "Tensión nominal", tip: "Voltaje nominal de trabajo del producto (por ejemplo 12 V)." },
+        { key: "Rango de tensión", tip: "Rango de voltaje de entrada aceptado por el producto (mínimo / máximo)." },
+        { key: "Entrada", tip: "Datos de alimentación de entrada: tensión, frecuencia y corriente." },
         { key: "Tipo de energía", tip: "Fuente de energía con la que opera (red, batería, USB, etc.)." },
         { key: "Frecuencia", tip: "Frecuencia de la red eléctrica, en hertz (Hz)." },
         { key: "Corriente", tip: "Corriente eléctrica que consume o entrega el producto." },
         { key: "Corriente entrada", tip: "Corriente de entrada nominal del equipo." },
+        { key: "Corriente de entrada Iin (A)", tip: "Corriente de entrada (Iin) que consume el producto, en amperios (A)." },
+        { key: "Corriente de salida Iout (A)", tip: "Corriente de salida (Iout) entregada a la lámpara, en amperios (A)." },
         { key: "Potencia", tip: "Consumo eléctrico, en vatios (W)." },
+        { key: "Potencia nominal por lámpara", tip: "Potencia nominal declarada por cada lámpara, en vatios (W)." },
+        { key: "Potencia de entrada por lámpara", tip: "Potencia de entrada consumida por cada lámpara (puede variar entre altas y bajas)." },
+        { key: "Potencia estable por lámpara", tip: "Potencia de trabajo estable por lámpara en régimen continuo (altas / bajas)." },
+        { key: "Driver", tip: "Tipo de driver o fuente que alimenta el LED (integrado, externo, etc.)." },
         { key: "Tipo de driver", tip: "Tipo de fuente/driver que alimenta el LED." },
+        { key: "CANBUS", tip: "Compatibilidad con sistema CANBUS del vehículo (evita errores de lámpara fundida)." },
         { key: "Compatible con sensor", tip: "Indica si admite sensores externos (movimiento, luz, etc.)." },
         { key: "Sensor incluido", tip: "Si el producto trae sensor de fábrica." },
         { key: "Factor de Potencia (FP)", tip: "Qué tan eficiente es el uso de la energía. Más cerca de 1 es mejor." },
@@ -419,16 +429,19 @@
         { key: "Anti-High-Volt", tip: "Protección contra picos de tensión en la red eléctrica." },
         { key: "ON-OFF Switch", tip: "Interruptor de encendido/apagado o ciclos On-Off soportados." },
         { key: "Protector SPD", tip: "Protección contra sobretensiones (Surge Protection Device)." },
+        { key: "SPD", tip: "Protección contra sobretensiones (Surge Protection Device)." },
         { key: "No Flicker - sin parpadeo", tip: "Diseño sin parpadeo perceptible (flicker-free)." },
         { key: "Corriente de Irrupción (Inrush)", tip: "Pico de corriente al encender el equipo." },
         { key: "Tiempo de irrupción Th50", tip: "Duración del pico de irrupción hasta el 50%." },
         { key: "Clase de protección", tip: "Clase de aislamiento eléctrico (I, II, III)." },
+        { key: "Clase eléctrica", tip: "Clase de aislamiento eléctrico del producto (I, II o III)." },
         { key: "Max. n° de lum. freno de circuito B16 A", tip: "Máximo de luminarias por breaker tipo B 16 A." },
         { key: "Max. n° de lum. freno de circuito C10 A", tip: "Máximo de luminarias por breaker tipo C 10 A." },
         { key: "Max. n° de lum. freno de circuito C16 A", tip: "Máximo de luminarias por breaker tipo C 16 A." },
         { key: "Tipo de carga", tip: "Método de carga de la batería (USB-C, magnética, etc.)." },
         { key: "Tiempo de carga", tip: "Tiempo aproximado para cargar la batería al completo." },
         { key: "Autonomía", tip: "Tiempo de uso con batería, según intensidad." },
+        { key: "Temperatura de trabajo", tip: "Rango de temperatura ambiente de operación del producto." },
       ],
     },
     {
@@ -437,17 +450,24 @@
       rows: [
         { key: "Lúmenes/W", tip: "Eficiencia lumínica: lúmenes por cada vatio consumido." },
         { key: "Flujo luminoso", tip: "Cantidad total de luz emitida, en lúmenes (lm)." },
+        { key: "Flujo luminoso nominal total", tip: "Flujo luminoso nominal total del producto, en lúmenes (lm)." },
+        { key: "Flujo luminoso inicial total", tip: "Flujo luminoso al encender (inicial), total del sistema. Puede variar entre altas y bajas." },
+        { key: "Flujo luminoso estable total", tip: "Flujo luminoso en régimen estable, total del sistema, en lúmenes (lm)." },
         { key: "Temperatura del color", tip: "Tono de la luz en Kelvin: más bajo es más cálida, más alto es más fría." },
         { key: "Tipo de luz", tip: "Clasificación del tono (cálido, neutro, frío) o modo de luz." },
+        { key: "Tipo de blanco", tip: "Tipo de blanco de la luz (cálido, neutro o frío)." },
         { key: "Ángulo de apertura", tip: "Ángulo en el que se distribuye la luz." },
         { key: "CRI", tip: "Fidelidad de color bajo esta luz, en una escala de 0 a 100." },
         { key: "Tipo de LED", tip: "Tecnología o encapsulado del LED utilizado." },
+        { key: "Tipo de chip LED", tip: "Modelo o referencia del chip LED utilizado en el producto." },
         { key: "Tiempo de arranque", tip: "Tiempo hasta alcanzar el flujo luminoso nominal." },
         { key: "Vida útil", tip: "Vida estimada del LED en horas de uso." },
         { key: "UGR", tip: "Nivel de deslumbramiento molesto que puede causar la luminaria." },
         { key: "LM80", tip: "Ensayo que certifica cuánto se deprecia la luz del LED con el tiempo." },
         { key: "Desviación estándar de igualación de colores", tip: "Consistencia de color entre unidades (relacionado con SDCM)." },
+        { key: "Desviación estándar", tip: "Consistencia de color entre unidades (relacionado con SDCM)." },
         { key: "Grupo de seguridad fotobiológica acc. EN62778", tip: "Clasificación de riesgo fotobiológico según normativa EN62778." },
+        { key: "EN62778", tip: "Cumplimiento de seguridad fotobiológica según norma EN62778." },
       ],
     },
     {
@@ -468,13 +488,20 @@
         { key: "Panel táctil", tip: "Indica si el producto incluye panel táctil de control." },
         { key: "Largo del cable", tip: "Longitud del cable incluido." },
         { key: "Dimensiones del cable", tip: "Sección o medidas del cable incluido." },
+        { key: "Tipo de cable", tip: "Tipo o especificación del cable incluido." },
         { key: "Largo del rollo", tip: "Longitud total del rollo de tira." },
         { key: "Distancia corte", tip: "Distancia entre puntos de corte de la tira." },
         { key: "Cantidad de luces", tip: "Cantidad de LEDs o puntos de luz." },
         { key: "Tipo de montaje", tip: "Forma de instalación (sobreponer, empotrar, pie, etc.)." },
+        { key: "Tipo de instalación", tip: "Forma de instalación o montaje del producto." },
         { key: "Temperatura de operación", tip: "Rango de temperatura ambiente de uso." },
         { key: "Protección IP", tip: "Grado de protección contra polvo y agua." },
         { key: "Protección IK", tip: "Grado de protección contra impactos mecánicos." },
+        { key: "Protección", tip: "Grados de protección del producto (IP / IK)." },
+        { key: "Protección estanca", tip: "Nivel de estanqueidad / sellado frente a polvo y agua." },
+        { key: "RPM del cooler", tip: "Velocidad de giro del ventilador de refrigeración, en revoluciones por minuto." },
+        { key: "Cooler outer diameter", tip: "Diámetro exterior del cooler / ventilador." },
+        { key: "Filamentos de cobre", tip: "Cantidad de filamentos o heatpipes de cobre del disipador." },
       ],
     },
     {
@@ -534,6 +561,44 @@
   const SPEC_KEY_ALIASES = {
     Tension: "Tensión",
     Tensión: "Tensión",
+    "Tension nominal": "Tensión nominal",
+    "Tensión nominal": "Tensión nominal",
+    "TENSION NOMINAL": "Tensión nominal",
+    "Rango de tension": "Rango de tensión",
+    "Rango de tensión": "Rango de tensión",
+    "RANGO DE TENSION": "Rango de tensión",
+    "RANGO DE TENSIÓN": "Rango de tensión",
+    "Potencia nominal por lampara": "Potencia nominal por lámpara",
+    "Potencia nominal por lámpara": "Potencia nominal por lámpara",
+    "POTENCIA NOMINAL POR LAMPARA": "Potencia nominal por lámpara",
+    "POTENCIA NOMINAL POR LÁMPARA": "Potencia nominal por lámpara",
+    "Potencia de entrada por lampara": "Potencia de entrada por lámpara",
+    "Potencia de entrada por lámpara": "Potencia de entrada por lámpara",
+    "POTENCIA DE ENTRADA POR LAMPARA": "Potencia de entrada por lámpara",
+    "POTENCIA DE ENTRADA POR LÁMPARA": "Potencia de entrada por lámpara",
+    "Potencia estable por lampara": "Potencia estable por lámpara",
+    "Potencia estable por lámpara": "Potencia estable por lámpara",
+    "POTENCIA ESTABLE POR LAMPARA": "Potencia estable por lámpara",
+    "POTENCIA ESTABLE POR LÁMPARA": "Potencia estable por lámpara",
+    "Corriente de entrada lin (A)": "Corriente de entrada Iin (A)",
+    "Corriente de entrada Iin (A)": "Corriente de entrada Iin (A)",
+    "Corriente de entrada Lin (A)": "Corriente de entrada Iin (A)",
+    "CORRIENTE DE ENTRADA IIN (A)": "Corriente de entrada Iin (A)",
+    "CORRIENTE DE ENTRADA LIN (A)": "Corriente de entrada Iin (A)",
+    "Corriente de salida lout (A)": "Corriente de salida Iout (A)",
+    "Corriente de salida Iout (A)": "Corriente de salida Iout (A)",
+    "Corriente de salida Lout (A)": "Corriente de salida Iout (A)",
+    "CORRIENTE DE SALIDA IOUT (A)": "Corriente de salida Iout (A)",
+    "CORRIENTE DE SALIDA LOUT (A)": "Corriente de salida Iout (A)",
+    "Tipo de chip LED": "Tipo de chip LED",
+    "TIPO DE CHIP LED": "Tipo de chip LED",
+    "Tipo de Chip LED": "Tipo de chip LED",
+    "Flujo luminoso nominal total": "Flujo luminoso nominal total",
+    "FLUJO LUMINOSO NOMINAL TOTAL": "Flujo luminoso nominal total",
+    "Flujo luminoso inicial total": "Flujo luminoso inicial total",
+    "FLUJO LUMINOSO INICIAL TOTAL": "Flujo luminoso inicial total",
+    "Flujo luminoso estable total": "Flujo luminoso estable total",
+    "FLUJO LUMINOSO ESTABLE TOTAL": "Flujo luminoso estable total",
     "Tipo de Energia": "Tipo de energía",
     "Tipo de Energía": "Tipo de energía",
     Dimeable: "Dimerizable",
@@ -612,9 +677,57 @@
     "Factor de potencia": "Factor de Potencia (FP)",
     "Anti high volt": "Anti-High-Volt",
     "Anti High Volt": "Anti-High-Volt",
+    "Anti-high-volt": "Anti-High-Volt",
     "On-Off": "ON-OFF Switch",
     "On/Off Switch": "ON-OFF Switch",
     "ON / OFF switch": "ON-OFF Switch",
+    Entrada: "Entrada",
+    ENTRADA: "Entrada",
+    Driver: "Driver",
+    DRIVER: "Driver",
+    CANBUS: "CANBUS",
+    Canbus: "CANBUS",
+    "Clase electrica": "Clase eléctrica",
+    "Clase eléctrica": "Clase eléctrica",
+    "Clase Eléctrica": "Clase eléctrica",
+    "CLASE ELECTRICA": "Clase eléctrica",
+    "Temperatura de Trabajo": "Temperatura de trabajo",
+    "Temperatura de trabajo": "Temperatura de trabajo",
+    "TEMPERATURA DE TRABAJO": "Temperatura de trabajo",
+    SPD: "SPD",
+    "Protector SPD": "Protector SPD",
+    "Corriente Irrupción": "Corriente de Irrupción (Inrush)",
+    "Corriente de irrupción": "Corriente de Irrupción (Inrush)",
+    "Corriente de Irrupción": "Corriente de Irrupción (Inrush)",
+    "Tipo de Blanco": "Tipo de blanco",
+    "Tipo de blanco": "Tipo de blanco",
+    "TIPO DE BLANCO": "Tipo de blanco",
+    EN62778: "EN62778",
+    "Desviacion estandar": "Desviación estándar",
+    "Desviación estándar": "Desviación estándar",
+    "Desviación Estándar": "Desviación estándar",
+    "Color cuerpo": "Color del cuerpo",
+    "Material del Lente": "Material del lente",
+    "Material del lente": "Material del lente",
+    "Tipo de instalacion": "Tipo de instalación",
+    "Tipo de instalación": "Tipo de instalación",
+    "TIPO DE INSTALACION": "Tipo de instalación",
+    "Tipo de montaje": "Tipo de montaje",
+    Proteccion: "Protección",
+    Protección: "Protección",
+    "Proteccion estanca": "Protección estanca",
+    "Protección estanca": "Protección estanca",
+    "PROTECCION ESTANCA": "Protección estanca",
+    "Tipo de cable": "Tipo de cable",
+    "TIPO DE CABLE": "Tipo de cable",
+    "RPM del cooler": "RPM del cooler",
+    "RPM DEL COOLER": "RPM del cooler",
+    "Cooler outer diameter": "Cooler outer diameter",
+    "Filamentos de cobre": "Filamentos de cobre",
+    "FILAMENTOS DE COBRE": "Filamentos de cobre",
+    UGR: "UGR",
+    EMC: "EMC",
+    THD: "THD",
   };
 
   /**
@@ -631,6 +744,10 @@
     "data-dimensiones": "Dimensiones",
     "data-funciones": "Funciones",
     "data-flujo-luminoso": "Flujo luminoso",
+    "data-flujo-luminoso-nominal-total": "Flujo luminoso nominal total",
+    "data-flujo-luminoso-inicial-total": "Flujo luminoso inicial total",
+    "data-flujo-luminoso-estable-total": "Flujo luminoso estable total",
+    "data-tipo-de-chip-led": "Tipo de chip LED",
     "data-frecuencia": "Frecuencia",
     "data-garantia-tiempo": "Garantía",
     "data-ip": "Protección IP",
@@ -642,6 +759,13 @@
     "data-temperatura-color": "Temperatura del color",
     "data-temperatura-de-operacion": "Temperatura de operación",
     "data-tension": "Tensión",
+    "data-tension-nominal": "Tensión nominal",
+    "data-rango-de-tension": "Rango de tensión",
+    "data-potencia-nominal-por-lampara": "Potencia nominal por lámpara",
+    "data-potencia-de-entrada-por-lampara": "Potencia de entrada por lámpara",
+    "data-potencia-estable-por-lampara": "Potencia estable por lámpara",
+    "data-corriente-de-entrada-iin": "Corriente de entrada Iin (A)",
+    "data-corriente-de-salida-iout": "Corriente de salida Iout (A)",
     "data-tiempo-de-carga": "Tiempo de carga",
     "data-tipo-de-carga": "Tipo de carga",
     "data-tipo-de-led": "Tipo de LED",
@@ -649,6 +773,29 @@
     "data-dimerizable": "Dimerizable",
     "data-smart": "Smart",
     "data-control-remoto": "Control remoto",
+    "data-entrada": "Entrada",
+    "data-driver": "Driver",
+    "data-canbus": "CANBUS",
+    "data-clase-electrica": "Clase eléctrica",
+    "data-temperatura-de-trabajo": "Temperatura de trabajo",
+    "data-spd": "SPD",
+    "data-tipo-de-blanco": "Tipo de blanco",
+    "data-en62778": "EN62778",
+    "data-desviacion-estandar": "Desviación estándar",
+    "data-tipo-de-instalacion": "Tipo de instalación",
+    "data-proteccion": "Protección",
+    "data-proteccion-estanca": "Protección estanca",
+    "data-tipo-de-cable": "Tipo de cable",
+    "data-rpm-del-cooler": "RPM del cooler",
+    "data-cooler-outer-diameter": "Cooler outer diameter",
+    "data-filamentos-de-cobre": "Filamentos de cobre",
+    "data-material-del-lente": "Material del lente",
+    "data-ugr": "UGR",
+    "data-emc": "EMC",
+    "data-thd": "THD",
+    "data-vida-util": "Vida útil",
+    "data-tiempo-de-arranque": "Tiempo de arranque",
+    "data-largo-del-cable": "Largo del cable",
   };
 
   function normalizeSpecKey(key) {
@@ -1661,6 +1808,7 @@
     PRODUCT_CTX.description = description;
     PRODUCT_CTX.contactoUrl = CONTACTO_URL;
 
+    if (typeof resetSuggestionsState === "function") resetSuggestionsState();
     if (typeof renderSuggestions === "function") renderSuggestions();
 
     heroItem = el;
@@ -2186,6 +2334,7 @@
     const ctx = window.__mlProductCtx || PRODUCT_CTX;
     const specs = ctx.specs || {};
     const picks = [];
+    const max = window.matchMedia("(max-width: 640px)").matches ? 2 : 4;
 
     // La protección (IP/IK) va primero y como pregunta genérica, no atada
     // a un código puntual como "IP44" (que puede no aplicar a otro SKU).
@@ -2194,17 +2343,19 @@
     }
 
     SUGGESTION_CANDIDATES.forEach((c) => {
-      if (picks.length >= 4) return;
+      if (picks.length >= max) return;
       if (hasSpecValue(specs[c.key])) picks.push(c.q);
     });
 
     let i = 0;
-    while (picks.length < 4 && i < UNIVERSAL_SUGGESTIONS.length) {
+    while (picks.length < max && i < UNIVERSAL_SUGGESTIONS.length) {
       if (picks.indexOf(UNIVERSAL_SUGGESTIONS[i]) === -1) picks.push(UNIVERSAL_SUGGESTIONS[i]);
       i++;
     }
 
-    return picks.slice(0, 4);
+    return picks
+      .filter((q) => !usedSuggestions.has(q))
+      .slice(0, max);
   }
 
   const aiPanel = document.getElementById("aiPanel");
@@ -2216,6 +2367,13 @@
   const aiInput = document.getElementById("aiInput");
   let aiBusy = false;
   let aiLastTrigger = null;
+  const usedSuggestions = new Set();
+  let hideAllSuggestions = false;
+
+  function resetSuggestionsState() {
+    usedSuggestions.clear();
+    hideAllSuggestions = false;
+  }
 
   function openAssistant(trigger) {
     aiLastTrigger = trigger || document.activeElement;
@@ -2289,9 +2447,17 @@
   }
 
   function renderSuggestions() {
-    aiSuggestions.innerHTML = buildSuggestions().map(
-      (s) => `<button type="button" class="ai-chip">${s}</button>`
-    ).join("");
+    if (!aiSuggestions) return;
+    if (hideAllSuggestions) {
+      aiSuggestions.innerHTML = "";
+      aiSuggestions.hidden = true;
+      return;
+    }
+    const list = buildSuggestions();
+    aiSuggestions.hidden = list.length === 0;
+    aiSuggestions.innerHTML = list
+      .map((s) => `<button type="button" class="ai-chip">${s}</button>`)
+      .join("");
   }
 
   /**
@@ -2328,7 +2494,17 @@
 
   aiSuggestions.addEventListener("click", (e) => {
     const chip = e.target.closest(".ai-chip");
-    if (chip) ask(chip.textContent);
+    if (!chip) return;
+    const text = chip.textContent.trim();
+    if (window.matchMedia("(max-width: 640px)").matches) {
+      /* Mobile: al elegir una, se ocultan todas (molestan mucho en pantalla chica) */
+      hideAllSuggestions = true;
+      aiSuggestions.innerHTML = "";
+      aiSuggestions.hidden = true;
+    } else {
+      usedSuggestions.add(text);
+    }
+    ask(text);
   });
   aiForm.addEventListener("submit", (e) => {
     e.preventDefault();
