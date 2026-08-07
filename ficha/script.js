@@ -2385,7 +2385,15 @@
     });
     document.body.classList.add("assistant-open");
     window.dispatchEvent(new CustomEvent("macroled-assistant-toggle", { detail: { open: true } }));
-    aiInput.focus();
+    /* En mobile el focus automático dispara zoom de iOS; el usuario toca el input. */
+    const isTouchUi =
+      window.matchMedia("(max-width: 640px)").matches ||
+      window.matchMedia("(hover: none) and (pointer: coarse)").matches;
+    if (isTouchUi) {
+      aiInput.blur();
+    } else {
+      aiInput.focus();
+    }
   }
   function closeAssistant() {
     aiPanel.classList.remove("is-open");

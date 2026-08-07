@@ -1779,8 +1779,12 @@ body.assistant-open .ai-launch{
 
   .ai-panel{width:100%;}
   .ai-form{padding:12px 14px max(14px,env(safe-area-inset-bottom));}
-  /* Chat 14px; el input debe quedar en 16px o iOS hace zoom al enfocar */
-  .ai-form input{font-size:16px;}
+  /* iOS zooms if focused control is <16px — force on #aiInput against Webflow resets */
+  #aiInput,
+  .ai-form input,
+  .ai-form input:focus{
+    font-size:16px !important;
+  }
   .ai-msg{font-size:14px;line-height:1.45;}
   .ai-chip{font-size:12px;}
 }
