@@ -51,7 +51,7 @@
   .layout{
     display:grid;
     grid-template-columns:300px minmax(0,1fr);
-    grid-template-rows:auto auto;
+    grid-template-rows:auto auto auto;
     column-gap:50px;
     row-gap:0;
     padding:24px 40px 60px;
@@ -60,14 +60,27 @@
     align-items:start;
     transition:grid-template-columns .32s ease,column-gap .32s ease;
   }
+  .category-heading{
+    grid-column:1 / -1;
+    grid-row:1;
+    margin:0 0 20px;padding:0;max-width:none;
+    min-width:0;
+  }
+  .category-heading h1{
+    font-size:26px;font-weight:800;color:var(--dark-blue--700);margin:0 0 4px;letter-spacing:-.2px;line-height:1.15;
+    overflow-wrap:anywhere;word-break:break-word;
+  }
+  .category-heading .count{font-size:13px;color:var(--ink-soft);}
+  .category-heading[hidden],
+  .category-heading:empty{display:none !important;margin:0;}
   .results-head{
     grid-column:2;
-    grid-row:1;
+    grid-row:2;
     min-width:0;
   }
   .filters-rail{
     grid-column:1;
-    grid-row:1 / span 2;
+    grid-row:2 / span 2;
     width:300px;
     max-width:300px;
     box-sizing:border-box;
@@ -81,16 +94,6 @@
     transition:max-width .32s ease,width .32s ease,opacity .28s ease;
   }
   .filters-desktop-only{display:block;}
-  .category-heading{
-    margin:0 0 35px;padding:0;max-width:none;
-  }
-  .category-heading h1{
-    font-size:26px;font-weight:800;color:var(--dark-blue--700);margin:0 0 4px;letter-spacing:-.2px;line-height:1.15;
-    overflow-wrap:anywhere;word-break:break-word;
-  }
-  .category-heading .count{font-size:13px;color:var(--ink-soft);}
-  .category-heading[hidden],
-  .category-heading:empty{display:none !important;margin:0;}
   /* Drawer mobile: oculto en desktop */
   aside.filters{
     display:none;
@@ -130,7 +133,7 @@
   .count-row-left{display:flex;align-items:center;gap:12px;min-width:0;flex-wrap:wrap;}
   .results-body{
     grid-column:2;
-    grid-row:2;
+    grid-row:3;
     min-width:0;
   }
   @media (min-width:901px){
@@ -861,21 +864,16 @@
       gap:20px;
       padding:16px 16px 40px;
     }
-    .results-head,.results-body,.filters-rail{width:100%;}
-    .filters-rail{
-      order:-1;
-      position:static;
-      max-height:none;
-      width:100%;
-      max-width:none;
-      overflow:visible !important;
-      opacity:1 !important;
-      pointer-events:auto !important;
-      transform:none !important;
-    }
+    .results-head,.results-body{width:100%;}
+    .filters-rail{display:none !important;}
     .filters-desktop-only{display:none !important;}
-    .category-heading{padding:0;margin:0 0 8px;}
-    .category-heading h1{font-size:24px;}
+    .category-heading{
+      order:-1;
+      width:100%;
+      padding:0;
+      margin:0 0 8px;
+    }
+    .category-heading h1{font-size:28px;}
     .category-heading .count{display:none !important;}
     .crumb{padding:14px 16px 0;font-size:13px;}
     .grid{grid-template-columns:repeat(2,minmax(0,1fr)) !important;gap:12px;}
@@ -1008,9 +1006,6 @@
       box-sizing:border-box;
     }
     aside.filters.open{transform:translateY(0);}
-    .layout.filters-collapsed .filters-rail{
-      width:100%;max-width:none;opacity:1;pointer-events:auto;overflow:visible;
-    }
 
     .filters-mobile-header{
       display:flex;align-items:center;justify-content:space-between;
@@ -1107,7 +1102,7 @@
   @media (max-width:640px){
     .layout{padding:16px 16px 40px;gap:16px;}
     .crumb{padding:12px 16px 0;font-size:13px;}
-    .category-heading h1{font-size:22px;}
+    .category-heading h1{font-size:26px;}
     .category-banner{min-height:140px;border-radius:12px;}
     .category-banner__body{padding:16px;}
     .category-banner__title{font-size:18px;}
@@ -1436,6 +1431,9 @@ body.assistant-open .ai-launch{
   .crumb{
     animation:ml-fade-up .55s var(--ease) .04s both;
   }
+  .category-heading{
+    animation:ml-fade-up .55s var(--ease) .08s both;
+  }
   .filters-rail{
     animation:ml-fade-up .55s var(--ease) .1s both;
   }
@@ -1448,6 +1446,7 @@ body.assistant-open .ai-launch{
 }
 @media (prefers-reduced-motion:reduce){
   .crumb,
+  .category-heading,
   .filters-rail,
   .results-head,
   .ai-launch,
