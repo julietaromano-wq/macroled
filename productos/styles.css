@@ -51,7 +51,7 @@
   .layout{
     display:grid;
     grid-template-columns:300px minmax(0,1fr);
-    grid-template-rows:auto auto auto;
+    grid-template-rows:auto auto;
     column-gap:50px;
     row-gap:0;
     padding:24px 40px 60px;
@@ -61,10 +61,11 @@
     transition:grid-template-columns .32s ease,column-gap .32s ease;
   }
   .category-heading{
-    grid-column:1 / -1;
+    grid-column:1;
     grid-row:1;
-    margin:0 0 16px;padding:0;max-width:none;
+    margin:0;padding:0;max-width:none;
     min-width:0;
+    align-self:center;
   }
   .category-heading h1{
     font-size:26px;font-weight:800;color:var(--dark-blue--700);margin:0;letter-spacing:-.2px;line-height:1.15;
@@ -75,12 +76,12 @@
   .category-heading:empty{display:none !important;margin:0;}
   .results-head{
     grid-column:2;
-    grid-row:2;
+    grid-row:1;
     min-width:0;
   }
   .filters-rail{
     grid-column:1;
-    grid-row:3;
+    grid-row:2;
     width:300px;
     max-width:300px;
     box-sizing:border-box;
@@ -133,18 +134,31 @@
   .count-row-left{display:flex;align-items:center;gap:12px;min-width:0;flex-wrap:wrap;}
   .results-body{
     grid-column:2;
-    grid-row:3;
+    grid-row:2;
     min-width:0;
   }
   @media (min-width:901px){
     .layout.filters-collapsed{
-      grid-template-columns:0 minmax(0,1fr);
+      grid-template-columns:minmax(0,1fr);
+      grid-template-rows:auto auto auto;
       column-gap:0;
     }
     .layout.filters-collapsed .filters-rail{
-      width:0;max-width:0;
-      opacity:0;
-      pointer-events:none;overflow:hidden;
+      display:none;
+    }
+    .layout.filters-collapsed .category-heading{
+      grid-column:1;
+      grid-row:1;
+      margin:0 0 12px;
+    }
+    .layout.filters-collapsed .results-head{
+      grid-column:1;
+      grid-row:2;
+      padding-top:0;
+    }
+    .layout.filters-collapsed .results-body{
+      grid-column:1;
+      grid-row:3;
     }
     .layout.filters-collapsed .filters-expand-btn{display:inline-flex;}
     .layout.filters-collapsed .grid{grid-template-columns:repeat(4,1fr);}
@@ -1549,19 +1563,20 @@ body.filters-open button.ai-launch{
   font-family:inherit !important;
 }
 
-/* Layout + título (no se pierde al colapsar filtros) */
+/* Layout + título en celda izq (arriba de filtros) */
 #macroled-productos .layout{
   display:grid !important;
   grid-template-columns:300px minmax(0,1fr) !important;
-  grid-template-rows:auto auto auto !important;
+  grid-template-rows:auto auto !important;
   column-gap:50px !important;
   align-items:start !important;
 }
 #macroled-productos .category-heading{
-  grid-column:1 / -1 !important;
+  grid-column:1 !important;
   grid-row:1 !important;
-  margin:0 0 16px !important;
+  margin:0 !important;
   min-width:0 !important;
+  align-self:center !important;
 }
 #macroled-productos .category-heading h1{
   font-family:var(--font) !important;
@@ -1577,29 +1592,39 @@ body.filters-open button.ai-launch{
 }
 #macroled-productos .filters-rail{
   grid-column:1 !important;
-  grid-row:3 !important;
+  grid-row:2 !important;
 }
 #macroled-productos .results-head{
   grid-column:2 !important;
-  grid-row:2 !important;
+  grid-row:1 !important;
   min-width:0 !important;
 }
 #macroled-productos .results-body{
   grid-column:2 !important;
-  grid-row:3 !important;
+  grid-row:2 !important;
   min-width:0 !important;
 }
 @media (min-width:901px){
   #macroled-productos .layout.filters-collapsed{
-    grid-template-columns:0 minmax(0,1fr) !important;
+    grid-template-columns:minmax(0,1fr) !important;
+    grid-template-rows:auto auto auto !important;
     column-gap:0 !important;
   }
   #macroled-productos .layout.filters-collapsed .filters-rail{
-    width:0 !important;
-    max-width:0 !important;
-    opacity:0 !important;
-    pointer-events:none !important;
-    overflow:hidden !important;
+    display:none !important;
+  }
+  #macroled-productos .layout.filters-collapsed .category-heading{
+    grid-column:1 !important;
+    grid-row:1 !important;
+    margin:0 0 12px !important;
+  }
+  #macroled-productos .layout.filters-collapsed .results-head{
+    grid-column:1 !important;
+    grid-row:2 !important;
+  }
+  #macroled-productos .layout.filters-collapsed .results-body{
+    grid-column:1 !important;
+    grid-row:3 !important;
   }
   #macroled-productos .layout.filters-collapsed .filters-expand-btn{
     display:inline-flex !important;
