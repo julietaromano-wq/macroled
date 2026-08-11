@@ -25,11 +25,7 @@
       <h1>Productos</h1>
       <div class="count">Cargando…</div>
     </div>
-    <aside class="filters" id="filtersAside">
-      <div class="filters-mobile-header">
-        <span>Filtros</span>
-        <button class="filters-close" id="filtersClose" aria-label="Cerrar filtros">×</button>
-      </div>
+    <div class="filters-desktop-only">
       <div class="filters-desktop-heading">
         <span class="filters-desktop-title">Filtros</span>
         <button type="button" class="filters-collapse-btn" id="filtersCollapseBtn" title="Ocultar filtros" aria-label="Ocultar filtros">
@@ -37,22 +33,7 @@
         </button>
       </div>
       <div id="filtersPanel"></div>
-      <div class="filters-mobile-nav" id="filtersMobileNav">
-        <div class="fmn-screen fmn-list active" id="fmnList"></div>
-        <div class="fmn-screen fmn-detail" id="fmnDetail">
-        <div class="fmn-detail-header">
-            <button class="fmn-back" id="fmnBack" aria-label="Volver">
-              <span class="fmn-back-icon">‹</span>
-              <span class="fmn-detail-title" id="fmnDetailTitle"></span>
-            </button>
-          </div>
-          <div class="fmn-detail-body" id="fmnDetailBody"></div>
-        </div>
-      </div>
-      <div class="filters-mobile-footer">
-        <button class="filters-apply" id="filtersApply">Ver resultados</button>
-      </div>
-    </aside>
+    </div>
   </div>
 
   <main class="results-head">
@@ -68,7 +49,7 @@
         <div class="showing" id="showingLabel">Cargando productos…</div>
       </div>
       <div class="toolbar-right">
-        <button class="filters-toggle" id="filtersToggle" title="Filtros">
+        <button class="filters-toggle" id="filtersToggle" type="button" title="Filtros">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="6" x2="20" y2="6"/><circle cx="9" cy="6" r="2.2" fill="#fff"/><line x1="4" y1="12" x2="20" y2="12"/><circle cx="16" cy="12" r="2.2" fill="#fff"/><line x1="4" y1="18" x2="20" y2="18"/><circle cx="11" cy="18" r="2.2" fill="#fff"/></svg>
           Filtros
         </button>
@@ -98,6 +79,28 @@
     <div class="pagination" id="pagination"></div>
   </div>
 </div>
+
+<aside class="filters" id="filtersAside" aria-hidden="true">
+  <div class="filters-mobile-header">
+    <span>Filtros</span>
+    <button class="filters-close" id="filtersClose" aria-label="Cerrar filtros">×</button>
+  </div>
+  <div class="filters-mobile-nav" id="filtersMobileNav">
+    <div class="fmn-screen fmn-list active" id="fmnList"></div>
+    <div class="fmn-screen fmn-detail" id="fmnDetail">
+      <div class="fmn-detail-header">
+        <button class="fmn-back" id="fmnBack" aria-label="Volver">
+          <span class="fmn-back-icon">‹</span>
+          <span class="fmn-detail-title" id="fmnDetailTitle"></span>
+        </button>
+      </div>
+      <div class="fmn-detail-body" id="fmnDetailBody"></div>
+    </div>
+  </div>
+  <div class="filters-mobile-footer">
+    <button class="filters-apply" id="filtersApply">Ver resultados</button>
+  </div>
+</aside>
 
 <div class="compare-bar" id="compareBar" style="display:none;">
   <div class="compare-bar-inner">
@@ -146,4 +149,3 @@
 <script src="script.js"></script>
 </body>
 </html>
-

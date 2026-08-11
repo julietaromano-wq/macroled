@@ -1895,6 +1895,7 @@ function initFiltersCollapsed(){
 function openFiltersDrawer(){
   syncPendingFromCommitted();
   filtersAside.classList.add("open");
+  filtersAside.setAttribute("aria-hidden", "false");
   filtersBackdrop.classList.add("open");
   document.body.style.overflow = "hidden";
   goToListScreen();
@@ -1903,6 +1904,7 @@ function openFiltersDrawer(){
 }
 function closeFiltersDrawer(){
   filtersAside.classList.remove("open");
+  filtersAside.setAttribute("aria-hidden", "true");
   filtersBackdrop.classList.remove("open");
   document.body.style.overflow = "";
 }
