@@ -2076,21 +2076,38 @@ body.filters-open button.ai-launch{
   }
   #macroled-productos .badge{
     font-size:13px !important;
-    padding:4px 8px !important;
+    padding:5px 9px !important;
   }
   #macroled-productos .card-title{
-    font-size:16px !important;
+    font-size:15px !important;
+  }
+  #macroled-productos .spec .spec-label,
+  #macroled-productos .spec b{
+    font-size:13px !important;
   }
   #macroled-productos .spec .val{
     font-size:14px !important;
   }
+  #macroled-productos .compare-row{
+    font-size:15px !important;
+  }
+  #macroled-productos .showing{
+    font-size:15px !important;
+  }
+  #macroled-productos .filters-toggle{
+    font-size:15px !important;
+    padding:11px 16px !important;
+  }
   #macroled-productos .grid.list .card-title{
     font-size:16px !important;
+  }
+  #macroled-productos .grid{
+    gap:15px !important;
   }
 }
 @media (max-width:640px){
   #macroled-productos .category-heading h1{
-    font-size:26px !important;
+    font-size:28px !important;
   }
 }
 
