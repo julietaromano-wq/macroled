@@ -856,7 +856,7 @@
       width:calc(100% - 1.3rem);
     }
     .badge{
-      top:.4rem;right:.3rem;font-size:.7rem;max-width:55%;
+      top:.4rem;right:.3rem;font-size:.7rem;font-weight:500;max-width:55%;
       overflow:hidden;text-overflow:ellipsis;
       padding:5px 10px;
     }
@@ -1124,7 +1124,7 @@
     .card-overlays{top:.55rem;left:.55rem;width:calc(100% - 1.1rem);}
     .card-body{padding-bottom: 10px;}
     .card-title{font-size:.92rem;margin:0 0 5px;}
-    .badge{font-size:.65rem;top:.4rem;right:.3rem;padding:4px 8px;}
+    .badge{font-size:.65rem;font-weight:500;top:.4rem;right:.3rem;padding:4px 8px;}
     .badge svg{display:none !important;}
     .count-badge{font-size:.78rem;}
     .smart-badge{padding:.3rem .45rem;font-size:.58rem;}
