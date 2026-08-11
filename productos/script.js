@@ -1780,23 +1780,23 @@ function renderCategoryHeading(found){
 
   if(state.query){
     holder.hidden = false;
-    holder.innerHTML = `<h1>Resultados para "${state.query}"</h1><div class="count">${found} resultados</div>`;
+    holder.innerHTML = `<h1>Resultados para "${state.query}"</h1>`;
     return;
   }
 
   if(activeFamilia){
     holder.hidden = false;
-    holder.innerHTML = `<h1>${activeFamilia}</h1><div class="count">${found} resultados</div>`;
+    holder.innerHTML = `<h1>${activeFamilia}</h1>`;
     return;
   }
 
   if(!active){
     holder.hidden = false;
-    holder.innerHTML = `<h1>Productos</h1><div class="count">${found} productos</div>`;
+    holder.innerHTML = `<h1>Productos</h1>`;
     return;
   }
   holder.hidden = false;
-  holder.innerHTML = `<h1>${active}</h1><div class="count">${found} resultados</div>`;
+  holder.innerHTML = `<h1>${active}</h1>`;
 }
 
 /* =========================================================

@@ -63,14 +63,14 @@
   .category-heading{
     grid-column:1 / -1;
     grid-row:1;
-    margin:0 0 20px;padding:0;max-width:none;
+    margin:0 0 16px;padding:0;max-width:none;
     min-width:0;
   }
   .category-heading h1{
-    font-size:26px;font-weight:800;color:var(--dark-blue--700);margin:0 0 4px;letter-spacing:-.2px;line-height:1.15;
+    font-size:26px;font-weight:800;color:var(--dark-blue--700);margin:0;letter-spacing:-.2px;line-height:1.15;
     overflow-wrap:anywhere;word-break:break-word;
   }
-  .category-heading .count{font-size:13px;color:var(--ink-soft);}
+  .category-heading .count{display:none !important;}
   .category-heading[hidden],
   .category-heading:empty{display:none !important;margin:0;}
   .results-head{
@@ -80,7 +80,7 @@
   }
   .filters-rail{
     grid-column:1;
-    grid-row:2 / span 2;
+    grid-row:3;
     width:300px;
     max-width:300px;
     box-sizing:border-box;
@@ -874,7 +874,6 @@
       margin:0 0 8px;
     }
     .category-heading h1{font-size:28px;}
-    .category-heading .count{display:none !important;}
     .crumb{padding:14px 16px 0;font-size:13px;}
     .grid{grid-template-columns:repeat(2,minmax(0,1fr)) !important;gap:12px;}
     .subfam-card{width:120px;}
@@ -1544,7 +1543,7 @@ body.filters-open button.ai-launch{
 #macroled-productos .category-heading{
   grid-column:1 / -1 !important;
   grid-row:1 !important;
-  margin:0 0 20px !important;
+  margin:0 0 16px !important;
   min-width:0 !important;
 }
 #macroled-productos .category-heading h1{
@@ -1554,11 +1553,14 @@ body.filters-open button.ai-launch{
   line-height:1.15 !important;
   letter-spacing:-.2px !important;
   color:var(--dark-blue--700) !important;
-  margin:0 0 4px !important;
+  margin:0 !important;
+}
+#macroled-productos .category-heading .count{
+  display:none !important;
 }
 #macroled-productos .filters-rail{
   grid-column:1 !important;
-  grid-row:2 / span 2 !important;
+  grid-row:3 !important;
 }
 #macroled-productos .results-head{
   grid-column:2 !important;
@@ -1775,9 +1777,6 @@ body.filters-open button.ai-launch{
   }
   #macroled-productos .category-heading h1{
     font-size:28px !important;
-  }
-  #macroled-productos .category-heading .count{
-    display:none !important;
   }
   #macroled-productos .filters-expand-btn{
     display:none !important;
