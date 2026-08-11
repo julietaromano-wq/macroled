@@ -153,6 +153,7 @@
     }
     .layout.filters-collapsed .filters-expand-btn{display:inline-flex;}
     .layout.filters-collapsed .grid{grid-template-columns:repeat(4,1fr);}
+    .layout.filters-collapsed .grid.list{grid-template-columns:repeat(3,minmax(0,1fr));}
   }
   @media (min-width:901px) and (max-width:1200px){
     .layout{
@@ -162,6 +163,7 @@
     }
     .filters-rail{width:260px;max-width:260px;}
     .layout.filters-collapsed .grid{grid-template-columns:repeat(3,1fr);}
+    .layout.filters-collapsed .grid.list{grid-template-columns:repeat(3,minmax(0,1fr));}
     .grid{grid-template-columns:repeat(2,1fr);}
   }
 
