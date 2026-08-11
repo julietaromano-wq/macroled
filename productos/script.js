@@ -1914,6 +1914,7 @@ function openFiltersDrawer(){
   filtersAside.classList.add("open");
   filtersAside.setAttribute("aria-hidden", "false");
   filtersBackdrop.classList.add("open");
+  document.body.classList.add("filters-open");
   document.body.style.overflow = "hidden";
   goToListScreen();
   renderMobileFilters(lastFacetCounts);
@@ -1923,6 +1924,7 @@ function closeFiltersDrawer(){
   filtersAside.classList.remove("open");
   filtersAside.setAttribute("aria-hidden", "true");
   filtersBackdrop.classList.remove("open");
+  document.body.classList.remove("filters-open");
   document.body.style.overflow = "";
 }
 filtersToggle.addEventListener("click", openFiltersDrawer);
@@ -2032,7 +2034,7 @@ function renderMobileFilters(facetCounts){
   listEl.innerHTML = rows.map(r => `
     <div class="fmn-row" data-field="${r.field}">
       <span>${r.label}</span>
-      <span class="fmn-row-meta">${r.summary ? `<span>${r.summary}</span>` : ""}<span>›</span></span>
+      <span class="fmn-row-meta">${r.summary ? `<span>${r.summary}</span>` : ""}<span class="fmn-chev" aria-hidden="true">${ICON_FACET_CHEV}</span></span>
     </div>
   `).join("");
 

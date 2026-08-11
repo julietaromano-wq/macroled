@@ -1,7 +1,7 @@
 ﻿:root{
     --brand:#00bdff;
     --brand-dark:#0090c7;
-    --ink:#00152b;
+    --ink:#16294f;
     --ink-soft:#5b6472;
     --muted:#4f5a68;
     --line:#e6e6e6;
@@ -12,7 +12,7 @@
     --white:#fff;
     --radius:12px;
     --radius-sm:8px;
-    --dark-blue--700:#00152B;
+    --dark-blue--700:#16294f;
     --dark-blue-600:#012a4a;
     --navy:#00152B;
     --colortext:#5D5C5C;
@@ -43,7 +43,7 @@
     max-width:1400px;margin:0 auto;box-sizing:border-box;
     line-height:1.5;overflow-wrap:anywhere;
   }
-  .crumb b{color:var(--ink);}
+  .crumb b{color:var(--brand-dark);}
   .crumb a{cursor:pointer;}
   .crumb a:hover{text-decoration:underline;color:var(--dark-blue--700);}
   .crumb .crumb-active{color:var(--brand-dark);font-weight:700;}
@@ -686,7 +686,7 @@
     font-weight: 600;
     line-height: 2;
     letter-spacing: 0;
-    color: #00152b;
+    color: #16294f;
     margin: 0 0 8px;
 }
   .specs{
@@ -1039,6 +1039,11 @@
     }
     .fmn-row-meta{display:flex;align-items:center;gap:8px;font-weight:400;color:var(--ink-soft);font-size:13px;min-width:0;}
     .fmn-row-meta span:first-child{max-width:min(160px,42vw);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+    .fmn-chev{
+      display:inline-flex;align-items:center;justify-content:center;
+      color:#868686;line-height:0;flex:none;
+    }
+    .fmn-chev svg{display:block;}
 
     .fmn-detail-header{
       padding:14px 0;
@@ -1051,7 +1056,11 @@
     .fmn-back-icon{
       width:26px;height:26px;border-radius:50%;background:var(--bg-card);
       display:flex;align-items:center;justify-content:center;
-      font-size:17px;line-height:1;color:var(--ink);flex:none;
+      color:#868686;flex:none;line-height:0;
+    }
+    .fmn-back-icon svg{
+      display:block;
+      transform:rotate(180deg);
     }
     .fmn-detail-title{font-size:16px;font-weight:800;color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
     .fmn-detail-body{padding:6px 0 20px;}
@@ -1090,7 +1099,7 @@
       padding:14px 0 max(16px,env(safe-area-inset-bottom));border-top:1px solid var(--line);
     }
     .filters-apply{
-      width:100%;background:var(--dark-blue--700);color:#fff;border:none;border-radius:var(--radius-sm);
+      width:100%;background:#0077a8;color:#fff;border:none;border-radius:var(--radius-sm);
       padding:14px;font-size:14px;font-weight:700;cursor:pointer;
     }
 
@@ -1497,4 +1506,11 @@ button.ai-launch svg,
 .ai-panel{z-index:10070 !important;}
 .compare-bar{z-index:10020 !important;}
 .filters-backdrop{z-index:10040 !important;}
+aside.filters{z-index:10045;}
+aside.filters.open{z-index:10045 !important;}
+/* Con filtros abiertos en mobile, el asistente queda detrás del drawer */
+body.filters-open .ai-launch,
+body.filters-open button.ai-launch{
+  z-index:10030 !important;
+}
 
