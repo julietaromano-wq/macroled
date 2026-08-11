@@ -513,7 +513,7 @@
     padding:0;min-width:0;
   }
   .grid.list .card-title{
-    font-size:14px;line-height:1.3;margin:0;
+    font-size:16px;line-height:1.3;margin:0;
     display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;
   }
   .grid.list .specs{
