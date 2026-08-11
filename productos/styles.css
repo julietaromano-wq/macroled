@@ -1508,35 +1508,182 @@ body.filters-open button.ai-launch{
   z-index:10030 !important;
 }
 
-/* Webflow isolation: cards */
-.card,
-.card *{
-  box-sizing:border-box;
+/* =========================================================
+   Webflow isolation — gana a estilos globales del sitio
+   ========================================================= */
+#macroled-productos,
+#macroled-productos *,
+#macroled-productos *::before,
+#macroled-productos *::after{
+  box-sizing:border-box !important;
 }
-.card-title{
+#macroled-productos{
   font-family:var(--font) !important;
-  font-size:1.1rem !important;
-  font-weight:600 !important;
-  line-height:1.35 !important;
-  margin:0 0 10px !important;
-  color:#16294f !important;
+  color:var(--ink) !important;
+  -webkit-font-smoothing:antialiased;
 }
-.card .specs{
-  margin-top:0 !important;
-  grid-template-columns:repeat(2,minmax(0,max-content)) !important;
-  justify-content:start !important;
-  column-gap:28px !important;
+#macroled-productos img{
+  max-width:none !important;
+  border:0 !important;
 }
-.card-overlays{
+#macroled-productos button,
+#macroled-productos input,
+#macroled-productos select,
+#macroled-productos label{
+  font-family:inherit !important;
+}
+
+/* Layout + título (no se pierde al colapsar filtros) */
+#macroled-productos .layout{
+  display:grid !important;
+  grid-template-columns:300px minmax(0,1fr) !important;
+  grid-template-rows:auto auto auto !important;
+  column-gap:50px !important;
+  align-items:start !important;
+}
+#macroled-productos .category-heading{
+  grid-column:1 / -1 !important;
+  grid-row:1 !important;
+  margin:0 0 20px !important;
+  min-width:0 !important;
+}
+#macroled-productos .category-heading h1{
+  font-family:var(--font) !important;
+  font-size:26px !important;
+  font-weight:800 !important;
+  line-height:1.15 !important;
+  letter-spacing:-.2px !important;
+  color:var(--dark-blue--700) !important;
+  margin:0 0 4px !important;
+}
+#macroled-productos .filters-rail{
+  grid-column:1 !important;
+  grid-row:2 / span 2 !important;
+}
+#macroled-productos .results-head{
+  grid-column:2 !important;
+  grid-row:2 !important;
+  min-width:0 !important;
+}
+#macroled-productos .results-body{
+  grid-column:2 !important;
+  grid-row:3 !important;
+  min-width:0 !important;
+}
+@media (min-width:901px){
+  #macroled-productos .layout.filters-collapsed{
+    grid-template-columns:0 minmax(0,1fr) !important;
+    column-gap:0 !important;
+  }
+  #macroled-productos .layout.filters-collapsed .filters-rail{
+    width:0 !important;
+    max-width:0 !important;
+    opacity:0 !important;
+    pointer-events:none !important;
+    overflow:hidden !important;
+  }
+  #macroled-productos .layout.filters-collapsed .filters-expand-btn{
+    display:inline-flex !important;
+  }
+  #macroled-productos .layout.filters-collapsed .grid{
+    grid-template-columns:repeat(4,1fr) !important;
+  }
+  #macroled-productos .layout.filters-collapsed .grid.list{
+    grid-template-columns:repeat(3,minmax(0,1fr)) !important;
+  }
+}
+@media (min-width:901px) and (max-width:1200px){
+  #macroled-productos .layout{
+    grid-template-columns:260px minmax(0,1fr) !important;
+    column-gap:32px !important;
+  }
+  #macroled-productos .layout.filters-collapsed .grid{
+    grid-template-columns:repeat(3,1fr) !important;
+  }
+}
+
+/* Cards */
+#macroled-productos .grid{
+  display:grid !important;
+}
+#macroled-productos .card{
+  display:flex !important;
+  flex-direction:column !important;
+  gap:.55rem !important;
+  padding:.8rem !important;
+  position:relative !important;
+  background:#fff !important;
+  border:solid 1px #f1f1f1 !important;
+  border-radius:1rem !important;
+  box-shadow:2px 3px 20px 2px rgba(0,17,33,.04) !important;
+  overflow:visible !important;
+}
+#macroled-productos .card-content{
+  display:flex !important;
+  flex-direction:column !important;
+  flex:1 1 auto !important;
+  min-width:0 !important;
+  gap:0 !important;
+  position:relative !important;
+}
+#macroled-productos .card .media{
+  position:relative !important;
+  aspect-ratio:1 / 1 !important;
+  width:100% !important;
+  border-radius:.75rem !important;
+  background:#f6f6f6 !important;
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  overflow:hidden !important;
+  margin:0 !important;
+  min-height:0 !important;
+  flex:none !important;
+}
+#macroled-productos .card .media-frame{
   position:absolute !important;
   inset:0 !important;
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  margin:0 !important;
+  padding:0 !important;
   width:auto !important;
   height:auto !important;
+}
+#macroled-productos .card .media img{
+  width:62% !important;
+  height:62% !important;
+  max-width:none !important;
+  max-height:none !important;
+  object-fit:contain !important;
+  position:relative !important;
+  margin:0 !important;
+}
+#macroled-productos .card-overlays{
+  position:absolute !important;
+  inset:0 !important;
+  z-index:3 !important;
+  width:auto !important;
+  height:auto !important;
+  max-width:none !important;
   aspect-ratio:auto !important;
   margin:0 !important;
   padding:0 !important;
+  pointer-events:none !important;
+  display:block !important;
 }
-.badge{
+#macroled-productos .card-overlays .badge,
+#macroled-productos .card-overlays .temp-dots{
+  pointer-events:auto !important;
+}
+#macroled-productos .badge{
+  position:absolute !important;
+  top:.4rem !important;
+  right:.3rem !important;
+  left:auto !important;
+  bottom:auto !important;
+  z-index:3 !important;
   background:#f9fdff !important;
   border:solid #d3e4ec 1px !important;
   border-radius:8px !important;
@@ -1545,5 +1692,103 @@ body.filters-open button.ai-launch{
   font-weight:600 !important;
   color:#00688c !important;
   line-height:1.15 !important;
+  display:flex !important;
+  align-items:center !important;
+  white-space:nowrap !important;
+  margin:0 !important;
+}
+#macroled-productos .temp-dots{
+  position:absolute !important;
+  bottom:8px !important;
+  right:8px !important;
+  top:auto !important;
+  left:auto !important;
+  z-index:2 !important;
+  display:flex !important;
+  flex-direction:row !important;
+  align-items:center !important;
+  gap:8px !important;
+  background:#fff !important;
+  border:1px solid var(--line) !important;
+  border-radius:20px !important;
+  padding:5px 8px !important;
+  margin:0 !important;
+  max-width:calc(100% - 16px) !important;
+  overflow:hidden !important;
+  box-shadow:0 1px 3px rgba(20,24,33,.06) !important;
+  float:none !important;
+}
+#macroled-productos .temp-dots .luz-dot{
+  width:10px !important;
+  height:10px !important;
+  border-radius:50% !important;
+  display:inline-block !important;
+  flex:none !important;
+}
+#macroled-productos .card-title{
+  font-family:var(--font) !important;
+  font-size:1.1rem !important;
+  font-weight:600 !important;
+  line-height:1.35 !important;
+  margin:0 0 10px !important;
+  color:#16294f !important;
+}
+#macroled-productos .card .specs{
+  display:grid !important;
+  margin:0 !important;
+  margin-top:0 !important;
+  grid-template-columns:repeat(2,minmax(0,max-content)) !important;
+  justify-content:start !important;
+  column-gap:28px !important;
+  row-gap:.5rem !important;
+}
+#macroled-productos .compare-row{
+  display:flex !important;
+  align-items:center !important;
+  justify-content:flex-start !important;
+  gap:8px !important;
+  position:relative !important;
+  z-index:2 !important;
+  margin:auto -.8rem -.8rem !important;
+  width:calc(100% + 1.6rem) !important;
+  padding:12px .8rem 14px !important;
+  border-top:1px solid #edeff2 !important;
+  background:transparent !important;
+}
+#macroled-productos .compare-row .temp-dots{
+  display:none !important; /* nunca en el footer */
+}
+
+@media (max-width:900px){
+  #macroled-productos .layout{
+    display:flex !important;
+    flex-direction:column !important;
+    gap:20px !important;
+  }
+  #macroled-productos .filters-rail{
+    display:none !important;
+  }
+  #macroled-productos .category-heading{
+    order:-1 !important;
+    width:100% !important;
+    margin:0 0 8px !important;
+  }
+  #macroled-productos .category-heading h1{
+    font-size:28px !important;
+  }
+  #macroled-productos .category-heading .count{
+    display:none !important;
+  }
+  #macroled-productos .filters-expand-btn{
+    display:none !important;
+  }
+  #macroled-productos .grid{
+    grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+  }
+}
+@media (max-width:640px){
+  #macroled-productos .category-heading h1{
+    font-size:26px !important;
+  }
 }
 
