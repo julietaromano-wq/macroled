@@ -892,7 +892,7 @@ loadAllDescargables();
 
   try {
     window.MacroledAssistant.init({
-      greeting: `Hola, soy el asistente de <b>Macroled</b>. Puedo ayudarte con información técnica sobre productos y su documentación.`,
+      greeting: `Hola, soy el asistente de <b>descargas Macroled</b>. Podés consultarme sobre documentación técnica, fichas y manuales de nuestros productos.`,
       suggestions: buildSuggestions,
       getPayload,
       fallbackHtml: () =>
