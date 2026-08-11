@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Descargas - Macroled</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<div class="crumb">Inicio &nbsp;›&nbsp; <b class="crumb-active">Descargas</b></div>
+
+<div class="mobile-category-heading" id="mobileCategoryHeading"></div>
+
+<div class="filters-backdrop" id="filtersBackdrop"></div>
+
+<div class="layout" id="layout">
+  <div class="filters-rail">
+    <div class="category-heading" id="categoryHeading">
+      <h1>Descargas</h1>
+      <p class="lead">Accedé a toda la documentación técnica.</p>
+    </div>
+    <div class="filters-desktop-only">
+      <div class="filters-desktop-heading">
+        <span class="filters-desktop-title">Filtros</span>
+        <button type="button" class="filters-collapse-btn" id="filtersCollapseBtn" title="Ocultar filtros" aria-label="Ocultar filtros">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="4" y1="6" x2="20" y2="6"/><circle cx="9" cy="6" r="2.2" fill="#fff"/><line x1="4" y1="12" x2="20" y2="12"/><circle cx="16" cy="12" r="2.2" fill="#fff"/><line x1="4" y1="18" x2="20" y2="18"/><circle cx="11" cy="18" r="2.2" fill="#fff"/></svg>
+        </button>
+      </div>
+      <div id="filtersPanel"></div>
+    </div>
+  </div>
+
+  <main class="results">
+    <div class="results-search">
+      <div class="search-bar">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" id="searchInput" placeholder="Buscar por nombre, SKU o descripción...">
+      </div>
+      <button class="filters-toggle" id="filtersToggle" type="button" title="Filtros">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="6" x2="20" y2="6"/><circle cx="9" cy="6" r="2.2" fill="#fff"/><line x1="4" y1="12" x2="20" y2="12"/><circle cx="16" cy="12" r="2.2" fill="#fff"/><line x1="4" y1="18" x2="20" y2="18"/><circle cx="11" cy="18" r="2.2" fill="#fff"/></svg>
+        Filtros
+      </button>
+    </div>
+
+    <div class="toolbar-top" id="chipsBar"></div>
+
+    <div class="count-row">
+      <div class="count-row-left">
+        <button type="button" class="filters-expand-btn" id="filtersExpandBtn" title="Mostrar filtros">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="4" y1="6" x2="20" y2="6"/><circle cx="9" cy="6" r="2.2" fill="#fff"/><line x1="4" y1="12" x2="20" y2="12"/><circle cx="16" cy="12" r="2.2" fill="#fff"/><line x1="4" y1="18" x2="20" y2="18"/><circle cx="11" cy="18" r="2.2" fill="#fff"/></svg>
+          Filtros
+        </button>
+        <div class="showing" id="showingLabel">Cargando…</div>
+      </div>
+      <div class="toolbar-right">
+        <select class="sort" id="sortSelect">
+          <option value="">Ordenar por</option>
+          <option value="nuevo">Novedades primero</option>
+        </select>
+        <div class="view-toggle">
+          <button id="btnGrid" class="active" title="Vista grilla">▦</button>
+          <button id="btnList" title="Vista lista">☰</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid" id="grid"></div>
+    <div class="pagination" id="pagination"></div>
+  </main>
+</div>
+
+<aside class="filters" id="filtersAside" aria-hidden="true">
+  <div class="filters-mobile-header">
+    <span>Filtros</span>
+    <button class="filters-close" id="filtersClose" aria-label="Cerrar filtros">×</button>
+  </div>
+  <div class="filters-mobile-nav" id="filtersMobileNav">
+    <div class="fmn-screen fmn-list active" id="fmnList"></div>
+    <div class="fmn-screen fmn-detail" id="fmnDetail">
+      <div class="fmn-detail-header">
+        <button class="fmn-back" id="fmnBack" aria-label="Volver">
+          <span class="fmn-back-icon">‹</span>
+          <span class="fmn-detail-title" id="fmnDetailTitle"></span>
+        </button>
+      </div>
+      <div class="fmn-detail-body" id="fmnDetailBody"></div>
+    </div>
+  </div>
+  <div class="filters-mobile-footer">
+    <button class="filters-apply" id="filtersApply">Ver resultados</button>
+  </div>
+</aside>
+
+<button type="button" class="ai-launch" id="aiLaunch" aria-haspopup="dialog" aria-controls="aiPanel" onclick="if(window.MacroledAssistantOpen){window.MacroledAssistantOpen(this);return false;}">
+  <span class="ai-launch-dot" aria-hidden="true"></span>
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 3a7 7 0 0 0-4 12.7V19l4-2 4 2v-3.3A7 7 0 0 0 12 3z"/><path d="M9.5 10h.01M14.5 10h.01"/></svg>
+  <span>Asistente</span>
+</button>
+
+<div class="ai-backdrop" id="aiBackdrop" hidden></div>
+<aside class="ai-panel" id="aiPanel" role="dialog" aria-modal="true" aria-labelledby="aiTitle" hidden>
+  <div class="ai-head">
+    <div class="ai-head-copy">
+      <h2 id="aiTitle">Asistente de descargas</h2>
+      <p>Consultá dudas técnicas sobre la documentación de los productos.</p>
+      <span class="ai-proto">Beta</span>
+    </div>
+    <button type="button" class="ai-close" id="aiClose" aria-label="Cerrar asistente">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+    </button>
+  </div>
+  <div class="ai-messages" id="aiMessages" aria-live="polite"></div>
+  <div class="ai-typing" id="aiTyping" aria-hidden="true"><span></span><span></span><span></span></div>
+  <div class="ai-suggestions" id="aiSuggestions"></div>
+  <form class="ai-form" id="aiForm">
+    <input type="text" id="aiInput" placeholder="Escribí tu pregunta…" autocomplete="off" aria-label="Pregunta">
+    <button type="submit" class="ai-send" aria-label="Enviar">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+    </button>
+  </form>
+</aside>
+<script src="app.js"></script>
+</body>
+</html>
