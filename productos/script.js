@@ -1365,7 +1365,7 @@ function buildLuzMediaDots(doc){
     return `<span class="temp-dots-row"><span class="temp-dots-label">${label}</span><span class="dot luz-dot" style="background:${color}" title="${label}" aria-label="${label}"></span></span>`;
   }).join("");
 
-  return `<span class="temp-dots${collapsed}" tabindex="0" aria-label="Temperatura de luz">${rows}</span>`;
+  return `<span class="temp-dots${collapsed}" tabindex="0" aria-label="Temperatura de luz"><span class="temp-dots-icon" aria-hidden="true">${ICON_BULB}</span>${rows}</span>`;
 }
 
 function cardTemplate(doc){
