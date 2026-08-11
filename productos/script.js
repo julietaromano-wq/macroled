@@ -1662,6 +1662,19 @@ function renderCards(hits, found){
     return;
   }
   grid.innerHTML = hits.map(h => cardTemplate(h.document)).join("");
+  const cards = grid.querySelectorAll(".card");
+  const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  cards.forEach((card, i) => {
+    if(reduceMotion) return;
+    card.classList.add("is-entering");
+    card.style.setProperty("--stagger", String(Math.min(i, 14)));
+    const clear = () => {
+      card.classList.remove("is-entering");
+      card.style.removeProperty("--stagger");
+      card.removeEventListener("animationend", clear);
+    };
+    card.addEventListener("animationend", clear);
+  });
   wireCarousels();
   wireCardLinks();
   wireCompareCheckboxes();
