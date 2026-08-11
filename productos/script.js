@@ -1400,21 +1400,23 @@ function cardTemplate(doc){
           ${optimizedImgs.length ? `<img src="${optimizedImgs[0]}" alt="${doc.nombre_typesense || ""}" data-idx="0" data-imgs='${JSON.stringify(optimizedImgs)}' loading="lazy" decoding="async">` : `<span style="color:#c3c9d1;font-size:12px">Sin imagen</span>`}
           ${optimizedImgs.length > 1 ? `<div class="nav-arrow prev">${ICON_CHEVRON_LEFT}</div><div class="nav-arrow next">${ICON_CHEVRON_RIGHT}</div>` : ""}
         </div>
+      </div>
+      <div class="card-content">
         ${overlaysHtml ? `<div class="card-overlays">${overlaysHtml}</div>` : ""}
+        <div class="card-body">
+          <div class="card-title">${doc.nombre_typesense || "Producto sin nombre"}</div>
+          ${specsHtml ? `<div class="specs">${specsHtml}</div>` : ""}
+        </div>
+        <label class="compare-row">
+          <span class="cb-wrap">
+            <input type="checkbox" class="compare-checkbox"
+              data-sku="${escAttr(sku)}"
+              data-nombre="${escAttr(doc.nombre_typesense || "Producto sin nombre")}"
+              data-img="${escAttr(optimizeImg(imgs[0], "150x150") || "")}">
+            <span class="box">${ICON_CHECK}</span>
+          </span> Comparar
+        </label>
       </div>
-      <div class="card-body">
-        <div class="card-title">${doc.nombre_typesense || "Producto sin nombre"}</div>
-        ${specsHtml ? `<div class="specs">${specsHtml}</div>` : ""}
-      </div>
-      <label class="compare-row">
-        <span class="cb-wrap">
-          <input type="checkbox" class="compare-checkbox"
-            data-sku="${escAttr(sku)}"
-            data-nombre="${escAttr(doc.nombre_typesense || "Producto sin nombre")}"
-            data-img="${escAttr(optimizeImg(imgs[0], "150x150") || "")}">
-          <span class="box">${ICON_CHECK}</span>
-        </span> Comparar
-      </label>
     </div>
   `;
 }
