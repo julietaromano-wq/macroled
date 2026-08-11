@@ -1495,24 +1495,74 @@
    * Devuelve la clave de spec que diferencia a las variantes, o [] si ninguna lo
    * hace (en ese caso los chips se etiquetan por nombre/SKU).
    */
+  /* Resuelve un término declarado (ej. "temperatura", "Ángulo de apertura") a la
+     clave de spec real que efectivamente difiere entre hermanas, o null si no matchea. */
+  function resolveOneDeclared(term, sibs, differs) {
+    const declared = normKey(term);
+    if (!declared) return null;
+    const candidates = (DIM_LABEL_CANDIDATES[declared] || []).concat(
+      allSpecKeys(sibs).filter((key) => normKey(key) === declared)
+    );
+    return candidates.find(differs) || null;
+  }
+
   function resolveDimensions(current, sibs) {
-    const declaredRaw = (current.getAttribute("data-nombre-attr-variantes") || "").trim();
-    const declared = normKey(declaredRaw);
     const differs = (key) => !NON_DIM_KEYS.has(key) && specValues(sibs, key).size > 1;
 
-    if (declared) {
-      const candidates = (DIM_LABEL_CANDIDATES[declared] || []).concat(
-        allSpecKeys(sibs).filter((key) => normKey(key) === declared)
+    /* Campo nuevo: lista de atributos separados por ; o , — soporta varios ejes
+       de variación a la vez (ej. "Ángulo de apertura;Potencia"). Prioridad sobre
+       el campo viejo de un solo atributo. */
+    const multiRaw = (current.getAttribute("data-attr-variantes") || "").trim();
+    if (multiRaw) {
+      const terms = multiRaw.split(/[;,]/).map((t) => t.trim()).filter(Boolean);
+      const resolved = [];
+      const seen = new Set();
+      terms.forEach((term) => {
+        const hit = resolveOneDeclared(term, sibs, differs);
+        if (hit && !seen.has(normKey(hit))) {
+          seen.add(normKey(hit));
+          resolved.push(hit);
+        } else if (!hit) {
+          console.warn(
+            `[variantes] "${term}" (declarado en Atributos Variantes) no matchea ningún spec que difiera entre hermanas.`
+          );
+        }
+      });
+      if (resolved.length) return resolved;
+      console.warn(
+        `[variantes] "${multiRaw}" no resolvió ningún atributo válido. Autodetectando…`
       );
-      const hit = candidates.find(differs);
+    }
+
+    /* Campo viejo (legacy, un solo atributo): se mantiene para productos que
+       todavía no migraron al campo nuevo. */
+    const declaredRaw = (current.getAttribute("data-nombre-attr-variantes") || "").trim();
+    if (declaredRaw) {
+      const hit = resolveOneDeclared(declaredRaw, sibs, differs);
       if (hit) return [hit];
       console.warn(
         `[variantes] el CMS declara "${declaredRaw}" pero ningún campo con ese valor difiere entre las variantes. Autodetectando…`
       );
     }
 
-    const auto = DIM_AUTODETECT_PRIORITY.find(differs) || allSpecKeys(sibs).find(differs);
-    return auto ? [auto] : [];
+    /* Autodetección: ahora junta TODOS los atributos que difieran (no solo el
+       primero), respetando el orden de prioridad y agregando al final cualquier
+       otro spec fuera de esa lista que también difiera. */
+    const seen = new Set();
+    const auto = [];
+    DIM_AUTODETECT_PRIORITY.forEach((key) => {
+      if (differs(key) && !seen.has(normKey(key))) {
+        seen.add(normKey(key));
+        auto.push(key);
+      }
+    });
+    allSpecKeys(sibs).forEach((key) => {
+      if (differs(key) && !seen.has(normKey(key))) {
+        seen.add(normKey(key));
+        auto.push(key);
+      }
+    });
+    return auto;
   }
 
   const CHIP_LABELS = {
