@@ -1190,6 +1190,9 @@
     cromo: "#cfd4d8",
     niquel: "#b6b6b6",
     madera: "#a97142",
+    aluminio: "#d6d8da",
+    cromado: "#cfd4d8",
+    transparente: "repeating-conic-gradient(#e5e5e5 0% 25%, #ffffff 0% 50%) 50% / 8px 8px",
   };
 
   function normKey(value) {
