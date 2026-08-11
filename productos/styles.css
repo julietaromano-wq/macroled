@@ -1848,7 +1848,7 @@ body.filters-open button.ai-launch{
 }
 #macroled-productos .ml-card-body{
   padding:0 !important;
-  margin:10px 5px 0px !important;
+  margin:10px 5px 14px !important;
   display:flex !important;
   flex-direction:column !important;
   flex:1 1 auto !important;
