@@ -471,9 +471,8 @@
   }
   .grid.list .card:hover{
     transform:none;
-    border-color:var(--brand);
-    background:#f5fbff;
-    box-shadow:0 0 0 2px rgba(0,189,255,.22),2px 8px 24px 2px rgba(0,144,199,.12);
+    border-color:#d7e6ee;
+    box-shadow:2px 8px 28px 2px rgba(0,17,33,.09);
   }
   .grid.list .card .media{
     display:block;
@@ -539,7 +538,7 @@
     border:solid 1px #f1f1f1;
     background:#fff;
     box-shadow:2px 3px 20px 2px rgba(0,17,33,.04);
-    transition:transform .2s ease,box-shadow .2s ease,border-color .2s ease,background-color .2s ease;
+    transition:transform .2s ease,box-shadow .2s ease,border-color .2s ease;
     color:#1c1c1a;
     user-select:none;-webkit-user-select:none;-webkit-tap-highlight-color:transparent;
     position:relative;
@@ -550,15 +549,13 @@
   .card[data-href]{cursor:pointer;}
   .card:hover{
     transform:translateY(-3px);
-    border-color:var(--brand);
-    background:#f5fbff;
-    box-shadow:0 0 0 2px rgba(0,189,255,.22),2px 8px 24px 2px rgba(0,144,199,.12);
+    border-color:#d7e6ee;
+    box-shadow:2px 8px 28px 2px rgba(0,17,33,.09);
   }
   .card:focus-visible{
     outline:none;
-    border-color:var(--brand);
-    background:#f5fbff;
-    box-shadow:var(--focus-ring),2px 8px 24px 2px rgba(0,144,199,.12);
+    border-color:#c5dbe6;
+    box-shadow:var(--focus-ring);
   }
   @media (prefers-reduced-motion:no-preference){
     .card.is-entering{
@@ -920,9 +917,8 @@
     }
     .card:hover{
       transform:none;
-      border-color:var(--brand);
-      background:#f5fbff;
-      box-shadow:0 0 0 2px rgba(0,189,255,.22),2px 6px 18px 2px rgba(0,144,199,.1);
+      border-color:#d7e6ee;
+      box-shadow:2px 6px 22px 2px rgba(0,17,33,.08);
     }
     .card:hover .media img{transform:none;}
     .card .media{border-radius:.65rem;}
@@ -1695,13 +1691,13 @@ body.filters-open button.ai-launch{
   border-radius:1rem !important;
   box-shadow:2px 3px 20px 2px rgba(0,17,33,.04) !important;
   overflow:visible !important;
-  transition:transform .2s ease,box-shadow .2s ease,border-color .2s ease,background-color .2s ease !important;
+  transition:transform .2s ease,box-shadow .2s ease,border-color .2s ease !important;
 }
 #macroled-productos .card:hover,
 #macroled-productos .card:focus-visible{
-  border-color:var(--brand) !important;
-  background:#f5fbff !important;
-  box-shadow:0 0 0 2px rgba(0,189,255,.22),2px 8px 24px 2px rgba(0,144,199,.12) !important;
+  border-color:#d7e6ee !important;
+  background:#fff !important;
+  box-shadow:2px 8px 28px 2px rgba(0,17,33,.09) !important;
 }
 #macroled-productos .card:hover{
   transform:translateY(-3px) !important;
