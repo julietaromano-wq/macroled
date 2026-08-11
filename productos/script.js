@@ -270,6 +270,8 @@ const ICON_CHECK = `<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-wi
 const ICON_COMPARE = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 3 21 3 21 7"/><line x1="21" y1="3" x2="10" y2="14"/><path d="M21 14v5a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h5"/></svg>`;
 const ICON_CHEVRON_LEFT = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>`;
 const ICON_CHEVRON_RIGHT = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>`;
+const ICON_FACET_CHEV = `<svg xmlns="http://www.w3.org/2000/svg" height="10" viewBox="0 -960 960 960" width="14" fill="currentColor" aria-hidden="true"><path d="m321-80-71-71 329-329-329-329 71-71 400 400L321-80Z"/></svg>`;
+const CHEV_HTML = `<span class="chev">${ICON_FACET_CHEV}</span>`;
 const ICON_WIFI = `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/></svg>`;
 const ICON_BULB = `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M12 2a7 7 0 0 0-4 12.7c.6.5 1 1.3 1 2.1V17h6v-.2c0-.8.4-1.6 1-2.1A7 7 0 0 0 12 2z"/></svg>`;
 const ICON_ANGLE = `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 20H3"/><path d="M3 20 15 4"/><path d="M9.5 14.5a6 6 0 0 1 5 5"/></svg>`;
@@ -677,7 +679,7 @@ function appendPotenciaRangeFacet(panel, pending){
   group.className = "facet-group" + (state.collapsed.potencia ? " collapsed" : "");
   group.innerHTML = `
     <div class="facet-title" data-field="potencia">
-      <span class="ft-label">${FACET_ICONS.potencia || ""}<span>Potencia</span></span><span class="chev">⌃</span>
+      <span class="ft-label">${FACET_ICONS.potencia || ""}<span>Potencia</span></span>${CHEV_HTML}
     </div>
     <div class="facet-body">${potenciaRangeHtml(minVal, maxVal)}</div>
   `;
@@ -718,7 +720,7 @@ function renderFacets(facetCounts){
       famGroup.className = "facet-group" + (state.collapsed.familia ? " collapsed" : "");
       famGroup.innerHTML = `
         <div class="facet-title" data-field="${FAMILIA_FIELD}">
-          <span class="ft-label">${FACET_ICONS.macrofamilia}<span>Familia</span></span><span class="chev">⌃</span>
+          <span class="ft-label">${FACET_ICONS.macrofamilia}<span>Familia</span></span>${CHEV_HTML}
         </div>
         <div class="facet-body"></div>
       `;
@@ -748,7 +750,7 @@ function renderFacets(facetCounts){
       subfamGroup.className = "facet-group" + (state.collapsed.subfamilia ? " collapsed" : "");
       subfamGroup.innerHTML = `
         <div class="facet-title" data-field="${SUBFAMILIA_FIELD}">
-          <span class="ft-label">${FACET_ICONS.macrofamilia}<span>Subfamilia</span></span><span class="chev">⌃</span>
+          <span class="ft-label">${FACET_ICONS.macrofamilia}<span>Subfamilia</span></span>${CHEV_HTML}
         </div>
         <div class="facet-body"></div>
       `;
@@ -779,7 +781,7 @@ function renderFacets(facetCounts){
       group.className = "facet-group" + (state.collapsed[field] ? " collapsed" : "");
       group.innerHTML = `
         <div class="facet-title" data-field="${field}">
-          <span class="ft-label">${FACET_ICONS[field] || ""}<span>${FACET_LABELS[field]}</span></span><span class="chev">⌃</span>
+          <span class="ft-label">${FACET_ICONS[field] || ""}<span>${FACET_LABELS[field]}</span></span>${CHEV_HTML}
         </div>
         <div class="facet-body"></div>
       `;
@@ -818,7 +820,7 @@ function renderFacets(facetCounts){
     group.className = "facet-group" + (state.collapsed[field] ? " collapsed" : "");
     group.innerHTML = `
       <div class="facet-title" data-field="${field}">
-        <span class="ft-label">${FACET_ICONS[field] || ""}<span>${FACET_LABELS[field]}</span></span><span class="chev">⌃</span>
+        <span class="ft-label">${FACET_ICONS[field] || ""}<span>${FACET_LABELS[field]}</span></span>${CHEV_HTML}
       </div>
       <div class="facet-body"></div>
     `;
