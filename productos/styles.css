@@ -487,37 +487,12 @@
     justify-content:center;
     gap:0;
   }
-  .grid.list .card-meta{display:none !important;}
-  .grid.list .card-overlays{
-    display:block !important;
-    position:absolute;
-    inset:0;
-    z-index:3;
-    pointer-events:none;
-    margin:0;padding:0;
+  /* Lista: meta arriba del título */
+  .grid.list .card-overlays{display:none !important;}
+  .grid.list .card-meta{
+    display:flex !important;
+    margin:0 0 6px;
   }
-  .grid.list .card-overlays .badge,
-  .grid.list .card-overlays .temp-dots{
-    position:absolute;
-    pointer-events:auto;
-  }
-  .grid.list .card-overlays .badge{
-    top:.35rem;left:.35rem;right:auto;bottom:auto;
-    font-size:.7rem;color:#00688c;
-  }
-  .grid.list .card-overlays .temp-dots{
-    top:.35rem;right:.35rem;bottom:auto;left:auto;
-    margin:0;max-width:calc(100% - 10px);overflow:hidden;
-    gap:5px;padding:4px 6px;
-    background:#fff;border:1px solid var(--line);box-shadow:0 1px 3px rgba(20,24,33,.06);
-  }
-  .grid.list .card-overlays .temp-dots.is-collapsed{
-    gap:4px;overflow:hidden;max-width:calc(100% - 10px);
-  }
-  .grid.list .card-overlays .temp-dots.is-collapsed .temp-dots-label{
-    max-width:0;opacity:0;overflow:hidden;
-  }
-  .grid.list .card-overlays .temp-dots.is-collapsed .temp-dots-row{gap:0;}
   .grid.list .media-frame .smart-badge{
     transform:scale(.82);transform-origin:top left;
   }
@@ -578,25 +553,26 @@
     transition:transform .25s ease, opacity .15s ease;
   }
   .card:hover .media img{transform:scale(1.08);}
-  /* Grilla: variantes + temp arriba del título */
-  .card-overlays{display:none;}
-  .card-meta{
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    gap:8px;
-    width:100%;
-    min-width:0;
-    margin:0 0 8px;
+  /* Mosaico: variantes izq + temp der sobre la imagen */
+  .card-meta{display:none;}
+  .card-overlays{
+    display:block;
+    position:absolute;
+    inset:0;
+    z-index:3;
+    pointer-events:none;
+    margin:0;padding:0;
   }
-  .card-meta:empty{display:none;}
+  .card-overlays:empty{display:none;}
+  .card-overlays .badge,
+  .card-overlays .temp-dots{pointer-events:auto;}
   .badge{
-    position:static;
-    z-index:auto;
+    position:absolute;top:.4rem;left:.35rem;right:auto;z-index:3;
     background:#f9fdff;border:solid #d3e4ec 1px;border-radius:8px;
     padding:5px 10px;font-size:.7rem;font-weight:600;line-height:1.15;
     color:#00688c;display:inline-flex;align-items:center;gap:6px;
-    white-space:nowrap;flex:none;margin:0;
+    white-space:nowrap;margin:0;max-width:58%;
+    overflow:hidden;text-overflow:ellipsis;
   }
   .badge svg{display:none;}
   .media-badges-left{
@@ -617,15 +593,32 @@
     line-height:1.15;white-space:nowrap;
   }
   .temp-dots{
-    position:static;
-    z-index:auto;
+    position:absolute;top:.4rem;right:.35rem;bottom:auto;left:auto;z-index:2;
     display:inline-flex;flex-direction:row;align-items:center;gap:8px;
     background:#fff;border:1px solid var(--line);border-radius:20px;
     padding:5px 8px;box-shadow:0 1px 3px rgba(20,24,33,.06);
-    max-width:min(100%,70%);
+    max-width:calc(100% - 16px);
     overflow:hidden;
-    flex:none;
-    margin-left:auto;
+    margin:0;
+  }
+  /* Lista: fuera de la imagen, arriba del título */
+  .grid.list .card-meta{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:8px;
+    width:100%;
+    min-width:0;
+    margin:0 0 8px;
+    position:static;
+  }
+  .grid.list .card-meta .badge{
+    position:static;top:auto;left:auto;right:auto;bottom:auto;
+    max-width:58%;flex:none;
+  }
+  .grid.list .card-meta .temp-dots{
+    position:static;top:auto;left:auto;right:auto;bottom:auto;
+    margin-left:auto;max-width:min(100%,70%);flex:none;
   }
   .temp-dots-row{
     display:flex;align-items:center;gap:5px;min-width:0;
@@ -898,9 +891,10 @@
     .card:hover .media img{transform:none;}
     .card .media{border-radius:.65rem;}
     .card .media img{width:58%;height:58%;}
-    .card-meta{margin:0 0 6px;gap:6px;}
+    .card-overlays{display:block;}
     .badge{
-      font-size:11px;font-weight:500;max-width:58%;
+      top:.35rem;left:.3rem;right:auto;
+      font-size:11px;font-weight:500;max-width:52%;
       overflow:hidden;text-overflow:ellipsis;
       padding:4px 8px;
     }
@@ -910,8 +904,9 @@
     }
     .media-badges-left{top:.45rem;left:.45rem;max-width:42%;}
     .temp-dots{
+      top:.35rem;right:.3rem;bottom:auto;left:auto;
       padding:4px 7px;gap:5px;
-      max-width:48%;
+      max-width:46%;
       overflow:hidden;
     }
     .temp-dots-icon{display:inline-flex;}
@@ -935,6 +930,12 @@
     .temp-dots.is-collapsed:hover .temp-dots-row,
     .temp-dots.is-collapsed:focus-within .temp-dots-row{
       gap:0;
+    }
+    .grid.list .card-meta{display:flex !important;margin:0 0 6px;gap:6px;}
+    .grid.list .card-overlays{display:none !important;}
+    .grid.list .card-meta .badge,
+    .grid.list .card-meta .temp-dots{
+      position:static;top:auto;left:auto;right:auto;bottom:auto;max-width:48%;
     }
     .card-title{
       font-size:15px !important;line-height:1.3;margin:0 0 8px !important;
@@ -991,10 +992,6 @@
     .grid.list .media-frame img{width:64%;height:64%;}
     .grid.list .specs{margin:4px 0 0;grid-template-columns:1fr;}
     .grid.list .card-title{font-size:16px !important;}
-    .grid.list .card-meta{display:none !important;}
-    .grid.list .card-overlays{display:block !important;}
-    .grid.list .card-overlays .badge{top:.3rem;left:.3rem;font-size:11px;padding:4px 7px;}
-    .grid.list .card-overlays .temp-dots{top:.3rem;right:.3rem;bottom:auto;padding:3px 5px;}
     .grid.list .compare-row{
       margin:0;padding:8px 0 0;width:auto;
       font-size:14px;
@@ -1175,15 +1172,17 @@
     .card{padding:.55rem;gap:.5rem;border-radius:.75rem;}
     .card .media{border-radius:.55rem;}
     .card .media img{width:54%;height:54%;}
-    .card-meta{margin:0 0 5px;gap:4px;}
+    .badge{font-size:10px;font-weight:500;top:.3rem;left:.25rem;padding:3px 7px;max-width:50%;}
+    .badge svg{display:none !important;}
     .ml-card-body{margin:6px 2px 10px;padding-bottom:0;}
     .card-title{font-size:14px !important;margin:0 0 6px !important;}
-    .badge{font-size:10px;font-weight:500;padding:3px 7px;max-width:55%;}
-    .badge svg{display:none !important;}
     .count-badge{font-size:12px;}
     .smart-badge{padding:.3rem .45rem;font-size:10px;}
-    .temp-dots{padding:3px 5px;max-width:45%;}
+    .temp-dots{top:.3rem;right:.25rem;bottom:auto;padding:3px 5px;max-width:44%;}
     .temp-dots .luz-dot{width:7px;height:7px;}
+    .grid.list .card-meta{margin:0 0 5px;gap:4px;}
+    .grid.list .card-meta .badge{font-size:10px;padding:3px 7px;}
+    .grid.list .card-meta .temp-dots{padding:3px 5px;}
     .specs{gap:.35rem 16px;margin:0 0 4px;}
     .spec .spec-label,.spec b{font-size:11px !important;}
     .spec .val{font-size:12px !important;}
@@ -1730,10 +1729,82 @@ body.filters-open button.ai-launch{
   position:relative !important;
   margin:0 !important;
 }
-#macroled-productos .card-overlays{
+/* Mosaico: badges sobre la imagen */
+#macroled-productos .card-meta{
   display:none !important;
 }
-#macroled-productos .card-meta{
+#macroled-productos .card-overlays{
+  display:block !important;
+  position:absolute !important;
+  inset:0 !important;
+  z-index:3 !important;
+  pointer-events:none !important;
+  margin:0 !important;
+  padding:0 !important;
+}
+#macroled-productos .card-overlays:empty{
+  display:none !important;
+}
+#macroled-productos .card-overlays .badge,
+#macroled-productos .card-overlays .temp-dots{
+  pointer-events:auto !important;
+  display:inline-flex !important;
+}
+#macroled-productos .badge{
+  position:absolute !important;
+  top:.4rem !important;
+  left:.35rem !important;
+  right:auto !important;
+  bottom:auto !important;
+  z-index:3 !important;
+  background:#f9fdff !important;
+  border:solid #d3e4ec 1px !important;
+  border-radius:8px !important;
+  padding:5px 10px !important;
+  font-size:.7rem !important;
+  font-weight:600 !important;
+  color:#00688c !important;
+  line-height:1.15 !important;
+  align-items:center !important;
+  white-space:nowrap !important;
+  margin:0 !important;
+  max-width:58% !important;
+  overflow:hidden !important;
+  text-overflow:ellipsis !important;
+}
+#macroled-productos .temp-dots{
+  position:absolute !important;
+  top:.4rem !important;
+  right:.35rem !important;
+  bottom:auto !important;
+  left:auto !important;
+  z-index:2 !important;
+  display:inline-flex !important;
+  flex-direction:row !important;
+  align-items:center !important;
+  gap:8px !important;
+  background:#fff !important;
+  border:1px solid var(--line) !important;
+  border-radius:20px !important;
+  padding:5px 8px !important;
+  margin:0 !important;
+  max-width:calc(100% - 16px) !important;
+  overflow:hidden !important;
+  box-shadow:0 1px 3px rgba(20,24,33,.06) !important;
+  float:none !important;
+}
+#macroled-productos .temp-dots .luz-dot{
+  width:10px !important;
+  height:10px !important;
+  border-radius:50% !important;
+  display:inline-block !important;
+  flex:none !important;
+}
+/* Lista: meta arriba del título (space-between) */
+#macroled-productos .grid.list .card-overlays{
+  display:none !important;
+}
+#macroled-productos .grid.list .card-meta{
   display:flex !important;
   align-items:center !important;
   justify-content:space-between !important;
@@ -1743,98 +1814,25 @@ body.filters-open button.ai-launch{
   margin:0 0 8px !important;
   position:static !important;
 }
-#macroled-productos .card-meta:empty{
-  display:none !important;
-}
-#macroled-productos .card-meta .badge,
-#macroled-productos .badge{
+#macroled-productos .grid.list .card-meta .badge{
   position:static !important;
   top:auto !important;
-  right:auto !important;
   left:auto !important;
+  right:auto !important;
   bottom:auto !important;
-  z-index:auto !important;
-  background:#f9fdff !important;
-  border:solid #d3e4ec 1px !important;
-  border-radius:8px !important;
-  padding:5px 10px !important;
-  font-size:.7rem !important;
-  font-weight:600 !important;
-  color:#00688c !important;
-  line-height:1.15 !important;
-  display:inline-flex !important;
-  align-items:center !important;
-  white-space:nowrap !important;
   margin:0 !important;
-  flex:none !important;
   max-width:58% !important;
-  overflow:hidden !important;
-  text-overflow:ellipsis !important;
+  flex:none !important;
 }
-#macroled-productos .card-meta .temp-dots,
-#macroled-productos .temp-dots{
+#macroled-productos .grid.list .card-meta .temp-dots{
   position:static !important;
   top:auto !important;
-  right:auto !important;
   left:auto !important;
+  right:auto !important;
   bottom:auto !important;
-  z-index:auto !important;
-  display:inline-flex !important;
-  flex-direction:row !important;
-  align-items:center !important;
-  gap:8px !important;
-  background:#fff !important;
-  border:1px solid var(--line) !important;
-  border-radius:20px !important;
-  padding:5px 8px !important;
   margin:0 0 0 auto !important;
   max-width:min(100%,70%) !important;
-  overflow:hidden !important;
-  box-shadow:0 1px 3px rgba(20,24,33,.06) !important;
-  float:none !important;
   flex:none !important;
-}
-#macroled-productos .temp-dots .luz-dot{
-  width:10px !important;
-  height:10px !important;
-  border-radius:50% !important;
-  display:inline-block !important;
-  flex:none !important;
-}
-/* Lista: badges sobre la imagen (izq / der) — después de reglas static */
-#macroled-productos .grid.list .card-meta{
-  display:none !important;
-}
-#macroled-productos .grid.list .card-overlays{
-  display:block !important;
-  position:absolute !important;
-  inset:0 !important;
-  z-index:3 !important;
-  pointer-events:none !important;
-  margin:0 !important;
-  padding:0 !important;
-}
-#macroled-productos .grid.list .card-overlays .badge,
-#macroled-productos .grid.list .card-overlays .temp-dots{
-  position:absolute !important;
-  pointer-events:auto !important;
-  display:inline-flex !important;
-}
-#macroled-productos .grid.list .card-overlays .badge{
-  top:.35rem !important;
-  left:.35rem !important;
-  right:auto !important;
-  bottom:auto !important;
-  margin:0 !important;
-  max-width:58% !important;
-}
-#macroled-productos .grid.list .card-overlays .temp-dots{
-  top:.35rem !important;
-  right:.35rem !important;
-  bottom:auto !important;
-  left:auto !important;
-  margin:0 !important;
-  max-width:calc(100% - 10px) !important;
 }
 #macroled-productos .ml-card-body{
   padding:0 !important;
@@ -1918,17 +1916,27 @@ body.filters-open button.ai-launch{
   #macroled-productos .grid{
     grid-template-columns:repeat(2,minmax(0,1fr)) !important;
   }
-  #macroled-productos .card-meta{
+  #macroled-productos .badge{
+    top:.35rem !important;
+    left:.3rem !important;
+    font-size:11px !important;
+    padding:4px 8px !important;
+    max-width:52% !important;
+  }
+  #macroled-productos .temp-dots{
+    top:.35rem !important;
+    right:.3rem !important;
+    bottom:auto !important;
+    padding:4px 7px !important;
+    max-width:46% !important;
+  }
+  #macroled-productos .grid.list .card-meta{
+    display:flex !important;
     margin:0 0 6px !important;
     gap:6px !important;
   }
-  #macroled-productos .badge{
-    font-size:11px !important;
-    padding:4px 8px !important;
-  }
-  #macroled-productos .temp-dots{
-    padding:4px 7px !important;
-    max-width:48% !important;
+  #macroled-productos .grid.list .card-overlays{
+    display:none !important;
   }
   #macroled-productos .grid.list{
     grid-template-columns:1fr !important;
