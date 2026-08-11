@@ -593,7 +593,7 @@
     line-height:1.15;white-space:nowrap;
   }
   .temp-dots{
-    position:absolute;top:.4rem;right:.35rem;bottom:auto;left:auto;z-index:2;
+    position:absolute;bottom:8px;right:8px;top:auto;left:auto;z-index:2;
     display:inline-flex;flex-direction:row;align-items:center;gap:8px;
     background:#fff;border:1px solid var(--line);border-radius:20px;
     padding:5px 8px;box-shadow:0 1px 3px rgba(20,24,33,.06);
@@ -904,7 +904,7 @@
     }
     .media-badges-left{top:.45rem;left:.45rem;max-width:42%;}
     .temp-dots{
-      top:.35rem;right:.3rem;bottom:auto;left:auto;
+      bottom:6px;right:6px;top:auto;left:auto;
       padding:4px 7px;gap:5px;
       max-width:46%;
       overflow:hidden;
@@ -1178,7 +1178,7 @@
     .card-title{font-size:14px !important;margin:0 0 6px !important;}
     .count-badge{font-size:12px;}
     .smart-badge{padding:.3rem .45rem;font-size:10px;}
-    .temp-dots{top:.3rem;right:.25rem;bottom:auto;padding:3px 5px;max-width:44%;}
+    .temp-dots{bottom:5px;right:5px;top:auto;padding:3px 5px;max-width:44%;}
     .temp-dots .luz-dot{width:7px;height:7px;}
     .grid.list .card-meta{margin:0 0 5px;gap:4px;}
     .grid.list .card-meta .badge{font-size:10px;padding:3px 7px;}
@@ -1708,6 +1708,13 @@ body.filters-open button.ai-launch{
   margin:0 !important;
   min-height:0 !important;
   flex:none !important;
+  transition:background-color .25s ease !important;
+}
+#macroled-productos .card:hover .media{
+  background:#e6f8ff !important;
+}
+#macroled-productos .grid.list .card:hover .media-frame{
+  background:#e6f8ff !important;
 }
 #macroled-productos .card .media-frame{
   position:absolute !important;
@@ -1774,9 +1781,9 @@ body.filters-open button.ai-launch{
 }
 #macroled-productos .temp-dots{
   position:absolute !important;
-  top:.4rem !important;
-  right:.35rem !important;
-  bottom:auto !important;
+  bottom:8px !important;
+  right:8px !important;
+  top:auto !important;
   left:auto !important;
   z-index:2 !important;
   display:inline-flex !important;
@@ -1924,9 +1931,9 @@ body.filters-open button.ai-launch{
     max-width:52% !important;
   }
   #macroled-productos .temp-dots{
-    top:.35rem !important;
-    right:.3rem !important;
-    bottom:auto !important;
+    bottom:6px !important;
+    right:6px !important;
+    top:auto !important;
     padding:4px 7px !important;
     max-width:46% !important;
   }
