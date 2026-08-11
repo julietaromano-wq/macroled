@@ -424,10 +424,10 @@ async function renderModalList(query){
       : `<button class="add-btn" data-sku="${escAttr(sku)}" ${disabledAtLimit ? "disabled" : ""}>+ Agregar</button>`;
     return `
       <div class="modal-item">
-        <div class="thumb">${img ? `<img src="${img}" alt="">` : ""}</div>
-        <div class="info">
-          <div class="name">${doc.nombre_typesense || "Producto sin nombre"}</div>
-          <div class="sku">${sku}</div>
+        <div class="mi-thumb">${img ? `<img src="${img}" alt="">` : ""}</div>
+        <div class="mi-info">
+          <div class="mi-name">${doc.nombre_typesense || "Producto sin nombre"}</div>
+          <div class="mi-sku">${sku}</div>
         </div>
         ${action}
       </div>`;
