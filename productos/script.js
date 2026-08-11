@@ -342,7 +342,7 @@ const state = {
   sortBy: "",
   query: "",
   view: "grid",
-  collapsed: { macrofamilia: true, variante_temperatura_filtro: true, color: true, potencia: false, dimerizable: true, familia: true, subfamilia: true, categoria: true },
+  collapsed: { macrofamilia: false, variante_temperatura_filtro: true, color: true, potencia: false, dimerizable: true, familia: false, subfamilia: true, categoria: true },
   compareCollapsed: false
 };
 window.state = state;
@@ -2558,7 +2558,7 @@ loadAndRender();
 
   try {
     window.MacroledAssistant.init({
-      greeting: `Hola, soy el asistente de <b>productos Macroled</b>. Estoy para ayudarte a encontrar productos y soluciones según tus necesidades de iluminación.`,
+      greeting: `Hola, soy el asistente de <b>productos Macroled</b>. Podés consultarme sobre nuestros productos, características y soluciones de iluminación.`,
       suggestions: buildCatalogSuggestions,
       getPayload: getCatalogPayload,
       fallbackHtml: catalogFallbackHtml,
