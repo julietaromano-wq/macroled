@@ -498,7 +498,7 @@
     transform:scale(.82);transform-origin:top left;
   }
   .grid.list .card .ml-card-body{
-    padding:0 0 12px;min-width:0;margin:0;
+    padding:0 0 16px;min-width:0;margin:0;
   }
   .grid.list .card-title{
     font-size:16px;line-height:1.3;margin:0 0 8px;
@@ -680,7 +680,7 @@
   .nav-arrow:hover{background:var(--brand);color:#fff;box-shadow:0 6px 18px rgba(0,189,255,.4);}
 
   .ml-card-body{
-    padding:0 0 14px;display:flex;flex-direction:column;flex:1;gap:0;min-width:0;
+    padding:0;display:flex;flex-direction:column;flex:1;gap:0;min-width:0;
     margin:10px 5px 18px;font-size:inherit;line-height:inherit;color:inherit;
   }
   .card-title {
@@ -942,7 +942,7 @@
       font-size:15px !important;line-height:1.3;margin:0 0 8px !important;
       display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;
     }
-    .ml-card-body{margin:8px 3px 14px;padding-bottom:12px;}
+    .ml-card-body{margin:8px 3px 14px;}
     .specs{gap:.45rem 20px;margin:0 0 6px;}
     .spec .spec-label,.spec b{font-size:12px !important;margin-bottom:2px;}
     .spec .val{font-size:13px !important;}
@@ -1176,7 +1176,8 @@
     .card .media img{width:54%;height:54%;}
     .badge{font-size:10px;font-weight:500;top:.3rem;left:.25rem;padding:3px 7px;max-width:50%;}
     .badge svg{display:none !important;}
-    .ml-card-body{margin:6px 2px 10px;padding-bottom:10px;}
+    .ml-card-body{margin:6px 2px 10px;padding-bottom:0;}
+    .grid.list .card .ml-card-body{padding-bottom:12px;}
     .card-title{font-size:14px !important;margin:0 0 6px !important;}
     .count-badge{font-size:12px;}
     .smart-badge{padding:.3rem .45rem;font-size:10px;}
@@ -1846,7 +1847,7 @@ body.filters-open button.ai-launch{
   flex:none !important;
 }
 #macroled-productos .ml-card-body{
-  padding:0 0 14px !important;
+  padding:0 !important;
   margin:10px 5px 18px !important;
   display:flex !important;
   flex-direction:column !important;
@@ -1859,22 +1860,25 @@ body.filters-open button.ai-launch{
 }
 #macroled-productos .grid.list .ml-card-body{
   margin:0 !important;
-  padding:0 0 12px !important;
+  padding:0 0 16px !important;
 }
 @media (max-width:900px){
   #macroled-productos .ml-card-body{
     margin:8px 3px 14px !important;
-    padding-bottom:12px !important;
+    padding-bottom:0 !important;
   }
   #macroled-productos .grid.list .ml-card-body{
     margin:0 !important;
-    padding:0 0 10px !important;
+    padding:0 0 14px !important;
   }
 }
 @media (max-width:560px){
   #macroled-productos .ml-card-body{
     margin:6px 2px 10px !important;
-    padding-bottom:10px !important;
+    padding-bottom:0 !important;
+  }
+  #macroled-productos .grid.list .ml-card-body{
+    padding:0 0 12px !important;
   }
 }
 #macroled-productos .card-title{
