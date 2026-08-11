@@ -500,7 +500,8 @@
     position:static;
   }
   .grid.list .card-overlays .badge{
-    font-size:12px;color:#00688c;
+    font-size:.7rem;color:#00688c;
+    position:static;
   }
   .grid.list .card-overlays .temp-dots{
     background:transparent;border:none;box-shadow:none;
@@ -588,13 +589,13 @@
   .card-overlays .badge,
   .card-overlays .temp-dots{pointer-events:auto;}
   .badge{
-    position:absolute;top:.7rem;right:.7rem;z-index:3;
-    background:transparent;border:none;border-radius:999px;
-    padding:0;font-size:.9rem;font-weight:700;line-height:1.15;
+    position:absolute;top:.4rem;right:.3rem;z-index:3;
+    background:#f9fdff;border:solid #d3e4ec 1px;border-radius:8px;
+    padding:5px 10px;font-size:.7rem;font-weight:600;line-height:1.15;
     color:#00688c;display:flex;align-items:center;gap:6px;
     white-space:nowrap;
   }
-  .badge svg{width:14px;height:14px;flex:none;}
+  .badge svg{display:none;}
   .media-badges-left{
     position:absolute;top:.6rem;left:.6rem;z-index:2;
     display:flex;flex-direction:column;align-items:flex-start;gap:6px;
@@ -855,8 +856,9 @@
       width:calc(100% - 1.3rem);
     }
     .badge{
-      top:.5rem;right:.5rem;font-size:.82rem;max-width:55%;
+      top:.4rem;right:.3rem;font-size:.7rem;max-width:55%;
       overflow:hidden;text-overflow:ellipsis;
+      padding:5px 10px;
     }
     .badge svg{display:none !important;}
     .smart-badge{
@@ -1120,10 +1122,10 @@
     .card .media{border-radius:.55rem;}
     .card .media img{width:54%;height:54%;}
     .card-overlays{top:.55rem;left:.55rem;width:calc(100% - 1.1rem);}
-    .card-body{padding:0;}
+    .card-body{padding-bottom: 10px;}
     .card-title{font-size:.92rem;margin:0 0 5px;}
-    .badge{font-size:.78rem;top:.4rem;right:.4rem;}
-    .badge svg{width:12px;height:12px;}
+    .badge{font-size:.65rem;top:.4rem;right:.3rem;padding:4px 8px;}
+    .badge svg{display:none !important;}
     .count-badge{font-size:.78rem;}
     .smart-badge{padding:.3rem .45rem;font-size:.58rem;}
     .temp-dots{bottom:5px;right:5px;padding:3px 5px;}

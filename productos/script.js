@@ -1373,7 +1373,6 @@ function cardTemplate(doc){
   // Todas las imágenes de la card se re-escriben hacia CloudFront/webp
   const optimizedImgs = imgs.map(i => optimizeImg(i, "500x500"));
   const nVariants = Array.isArray(doc.variantes_sku) ? doc.variantes_sku.length : 0;
-  const variantIcon = variantAttrIcon(doc.nombre_attr_variantes);
 
   const specs = buildSpecs(doc);
   const specsHtml = specs.length
@@ -1386,7 +1385,7 @@ function cardTemplate(doc){
   const sku = (doc.sku || doc.id || "").toString();
   const escAttr = (s) => (s || "").toString().replace(/"/g, "&quot;");
   const overlaysHtml = [
-    nVariants > 1 ? `<span class="badge">${variantIcon}${nVariants} variantes</span>` : "",
+    nVariants > 1 ? `<span class="badge">${nVariants} variantes</span>` : "",
     buildLuzMediaDots(doc)
   ].filter(Boolean).join("");
 
