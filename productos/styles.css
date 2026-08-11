@@ -800,7 +800,7 @@
     flex: none;
     overflow: hidden;
     padding: 5px;
-}
+  }
   .compare-chip .thumb img{width:100%;height:100%;object-fit:contain;}
   .compare-chip .info{display:flex;flex-direction:column;align-items:flex-start;text-align:left;gap:2px;min-width:0;flex:1;}
   .compare-chip .name{font-size:13px;font-weight:700;color:var(--ink);line-height:1.3;}
@@ -817,6 +817,39 @@
   .compare-cta:hover{background:var(--btn-blue-dark);color:#fff;}
   .compare-cta.disabled{background:#c3cad6;cursor:not-allowed;pointer-events:none;}
 
+  /* Desktop mediano: 3 chips + CTA en una sola fila */
+  @media (min-width:901px) and (max-width:1400px){
+    .compare-bar-body{
+      flex-wrap:nowrap;
+      gap:12px;
+    }
+    .compare-items{
+      flex-wrap:nowrap;
+      gap:8px;
+      min-width:0;
+    }
+    .compare-chip{
+      min-width:0;
+      max-width:none;
+      flex:1 1 0;
+      gap:8px;
+      padding:6px 32px 6px 6px;
+    }
+    .compare-chip .thumb{
+      width:40px;height:40px;padding:4px;
+    }
+    .compare-chip .name{
+      font-size:12px;
+      display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;
+    }
+    .compare-chip .sku{font-size:10px;}
+    .compare-chip-remove{top:6px;right:6px;width:20px;height:20px;font-size:14px;}
+    .compare-slot-empty{width:48px;height:48px;flex:none;}
+    .compare-cta{
+      padding:11px 14px;font-size:13px;gap:6px;
+      margin-left:0;
+    }
+  }
   @media (max-width:900px){
     .layout{
       display:flex;
