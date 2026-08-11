@@ -1218,6 +1218,11 @@
     calido: "#fff79b",
     neutro: "#d9d9d9",
     frio: "#bce4fa",
+    ambar: "#f9a825",
+    azul: "#1565c0",
+    verde: "#2e7d32",
+    rojo: "#c62828",
+    amarillo: "#f9d923",
     cct: "linear-gradient(90deg,#fff79b,#d9d9d9,#bce4fa)",
     rgb: `conic-gradient(${RGB_WHEEL})`,
     rgbw: `conic-gradient(#ffffff 0 25%,${RGB_WHEEL})`,
@@ -1238,6 +1243,11 @@
     if (/calid|warm/.test(v)) return "calido";
     if (/neutr/.test(v)) return "neutro";
     if (/frio|cool/.test(v)) return "frio";
+    if (/ambar|amber/.test(v)) return "ambar";
+    if (/azul|blue/.test(v)) return "azul";
+    if (/verde|green/.test(v)) return "verde";
+    if (/rojo|red/.test(v)) return "rojo";
+    if (/amarill|yellow/.test(v)) return "amarillo";
 
     const kelvins = kelvinsIn(value);
     if (!kelvins.length) return null;
