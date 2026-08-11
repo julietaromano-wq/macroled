@@ -1386,9 +1386,7 @@ function cardTemplate(doc){
   const escAttr = (s) => (s || "").toString().replace(/"/g, "&quot;");
   const badgeHtml = nVariants > 1 ? `<span class="badge">${nVariants} variantes</span>` : "";
   const tempHtml = buildLuzMediaDots(doc);
-  const metaHtml = (badgeHtml || tempHtml)
-    ? `<div class="card-meta">${badgeHtml}${tempHtml}</div>`
-    : "";
+  const metaInner = `${badgeHtml}${tempHtml}`;
 
   return `
     <div class="card"${productHref ? ` role="link" tabindex="0"` : ""} data-sku="${escAttr(sku)}"${productHref ? ` data-href="${escAttr(productHref)}"` : ""}>
@@ -1400,10 +1398,11 @@ function cardTemplate(doc){
           ${optimizedImgs.length ? `<img src="${optimizedImgs[0]}" alt="${doc.nombre_typesense || ""}" data-idx="0" data-imgs='${JSON.stringify(optimizedImgs)}' loading="lazy" decoding="async">` : `<span style="color:#c3c9d1;font-size:12px">Sin imagen</span>`}
           ${optimizedImgs.length > 1 ? `<div class="nav-arrow prev">${ICON_CHEVRON_LEFT}</div><div class="nav-arrow next">${ICON_CHEVRON_RIGHT}</div>` : ""}
         </div>
+        ${metaInner ? `<div class="card-overlays">${metaInner}</div>` : ""}
       </div>
       <div class="card-content">
         <div class="ml-card-body">
-          ${metaHtml}
+          ${metaInner ? `<div class="card-meta">${metaInner}</div>` : ""}
           <div class="card-title">${doc.nombre_typesense || "Producto sin nombre"}</div>
           ${specsHtml ? `<div class="specs">${specsHtml}</div>` : ""}
         </div>
