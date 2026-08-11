@@ -1399,9 +1399,9 @@ function cardTemplate(doc){
           ${optimizedImgs.length ? `<img src="${optimizedImgs[0]}" alt="${doc.nombre_typesense || ""}" data-idx="0" data-imgs='${JSON.stringify(optimizedImgs)}' loading="lazy" decoding="async">` : `<span style="color:#c3c9d1;font-size:12px">Sin imagen</span>`}
           ${optimizedImgs.length > 1 ? `<div class="nav-arrow prev">${ICON_CHEVRON_LEFT}</div><div class="nav-arrow next">${ICON_CHEVRON_RIGHT}</div>` : ""}
         </div>
+        ${overlaysHtml ? `<div class="card-overlays">${overlaysHtml}</div>` : ""}
       </div>
       <div class="card-content">
-        ${overlaysHtml ? `<div class="card-overlays">${overlaysHtml}</div>` : ""}
         <div class="card-body">
           <div class="card-title">${doc.nombre_typesense || "Producto sin nombre"}</div>
           ${specsHtml ? `<div class="specs">${specsHtml}</div>` : ""}
