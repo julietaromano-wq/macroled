@@ -69,8 +69,22 @@ html.ml-loading body > *:not(#ml-preload) {
   clip-path: inset(0 calc((1 - var(--ml-fill, 0)) * 100%) 0 0);
 }
 
+/* Logo completo: titila mientras espera el render final */
+#ml-preload.is-waiting .ml-preload__logo-wrap {
+  animation: ml-preload-pulse 1.05s ease-in-out infinite;
+}
+
+@keyframes ml-preload-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.42; }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .ml-preload__logo--fill {
     clip-path: inset(0 0 0 0);
+  }
+  #ml-preload.is-waiting .ml-preload__logo-wrap {
+    animation: none;
+    opacity: 1;
   }
 }
