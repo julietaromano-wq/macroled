@@ -1406,15 +1406,18 @@ function cardTemplate(doc){
           <div class="card-title">${doc.nombre_typesense || "Producto sin nombre"}</div>
           ${specsHtml ? `<div class="specs">${specsHtml}</div>` : ""}
         </div>
-        <label class="compare-row">
-          <span class="cb-wrap">
-            <input type="checkbox" class="compare-checkbox"
-              data-sku="${escAttr(sku)}"
-              data-nombre="${escAttr(doc.nombre_typesense || "Producto sin nombre")}"
-              data-img="${escAttr(optimizeImg(imgs[0], "150x150") || "")}">
-            <span class="box">${ICON_CHECK}</span>
-          </span> Comparar
-        </label>
+        <div class="compare-row">
+          <label class="compare-action">
+            <span class="cb-wrap">
+              <input type="checkbox" class="compare-checkbox"
+                data-sku="${escAttr(sku)}"
+                data-nombre="${escAttr(doc.nombre_typesense || "Producto sin nombre")}"
+                data-img="${escAttr(optimizeImg(imgs[0], "150x150") || "")}">
+              <span class="box">${ICON_CHECK}</span>
+            </span>
+            <span class="compare-label">Comparar</span>
+          </label>
+        </div>
       </div>
     </div>
   `;
@@ -1427,8 +1430,8 @@ function wireCardLinks(){
       if(href) window.location.href = href;
     };
     card.addEventListener("click", (e) => {
+      // Franja inferior: nunca abre la ficha (solo Comparar selecciona)
       if(e.target.closest(".compare-row, .nav-arrow, .temp-dots, a, button, input, label")){
-        e.preventDefault();
         e.stopPropagation();
         return;
       }
@@ -1611,9 +1614,15 @@ function syncCompareCheckboxes(){
     cb.checked = isSelected;
     cb.disabled = atLimit && !isSelected;
     const row = cb.closest(".compare-row");
+    const action = cb.closest(".compare-action");
+    const tip = cb.disabled ? `Máximo ${COMPARE_MAX} productos para comparar` : "";
     if(row){
-      row.title = cb.disabled ? `Máximo ${COMPARE_MAX} productos para comparar` : "";
+      row.title = tip;
       row.classList.toggle("row-disabled", cb.disabled);
+    }
+    if(action){
+      action.title = tip;
+      action.classList.toggle("is-disabled", cb.disabled);
     }
   });
 }
@@ -1621,6 +1630,7 @@ function syncCompareCheckboxes(){
 function wireCompareCheckboxes(){
   document.querySelectorAll(".compare-row").forEach(row => {
     const cb = row.querySelector(".compare-checkbox");
+    const action = row.querySelector(".compare-action");
     if(!cb || cb.dataset.wired === "1") return;
     cb.dataset.wired = "1";
 
@@ -1628,7 +1638,7 @@ function wireCompareCheckboxes(){
       const { sku, nombre, img } = cb.dataset;
       if(cb.checked){
         const updated = window.MacroledCompare.addToCompare({ sku, nombre, img });
-        if(!updated.some(p => p.sku === sku)) cb.checked = false; // ya estaba en el máximo
+        if(!updated.some(p => p.sku === sku)) cb.checked = false;
       } else {
         window.MacroledCompare.removeFromCompare(sku);
       }
@@ -1636,14 +1646,22 @@ function wireCompareCheckboxes(){
       syncCompareCheckboxes();
     };
 
-    // Toda la franja inferior de la card selecciona comparar (no navega a la ficha)
+    // El resto de la franja no navega ni selecciona
     row.addEventListener("click", (e) => {
       e.preventDefault();
       e.stopPropagation();
-      if(cb.disabled) return;
-      cb.checked = !cb.checked;
-      applyCompareState();
     });
+
+    // Solo checkbox + texto "Comparar" activan la selección
+    if(action){
+      action.addEventListener("click", (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        if(cb.disabled) return;
+        cb.checked = !cb.checked;
+        applyCompareState();
+      });
+    }
     cb.addEventListener("change", applyCompareState);
   });
 }
