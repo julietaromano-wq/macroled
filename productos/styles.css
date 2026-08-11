@@ -63,7 +63,7 @@
   .category-heading{
     grid-column:1;
     grid-row:1;
-    margin:0;padding:0;max-width:none;
+    margin:0 0 20px;padding:0;max-width:none;
     min-width:0;
     align-self:center;
   }
@@ -149,7 +149,7 @@
     .layout.filters-collapsed .category-heading{
       grid-column:1;
       grid-row:1;
-      margin:0 0 12px;
+      margin:0 0 20px;
     }
     .layout.filters-collapsed .results-head{
       grid-column:1;
@@ -421,7 +421,7 @@
   .filters-mobile-header,.filters-mobile-footer,.filters-mobile-nav{display:none;}
 
   .grid{
-    display:grid;grid-template-columns:repeat(3,1fr);gap:25px;
+    display:grid;grid-template-columns:repeat(3,1fr);gap:20px;
     transition:opacity .2s ease, filter .2s ease;
   }
   .grid-shell{
@@ -459,7 +459,7 @@
   }
   .grid.list{
     grid-template-columns:repeat(2,minmax(0,1fr));
-    gap:15px;
+    gap:20px;
   }
   .grid.list .card{
     display:flex;
@@ -1574,7 +1574,7 @@ body.filters-open button.ai-launch{
 #macroled-productos .category-heading{
   grid-column:1 !important;
   grid-row:1 !important;
-  margin:0 !important;
+  margin:0 0 20px !important;
   min-width:0 !important;
   align-self:center !important;
 }
@@ -1616,7 +1616,7 @@ body.filters-open button.ai-launch{
   #macroled-productos .layout.filters-collapsed .category-heading{
     grid-column:1 !important;
     grid-row:1 !important;
-    margin:0 0 12px !important;
+    margin:0 0 20px !important;
   }
   #macroled-productos .layout.filters-collapsed .results-head{
     grid-column:1 !important;
@@ -1649,6 +1649,7 @@ body.filters-open button.ai-launch{
 /* Cards */
 #macroled-productos .grid{
   display:grid !important;
+  gap:20px !important;
 }
 #macroled-productos .card{
   display:flex !important;
@@ -1665,7 +1666,7 @@ body.filters-open button.ai-launch{
 /* Vista lista: imagen + contenido en fila */
 #macroled-productos .grid.list{
   grid-template-columns:repeat(2,minmax(0,1fr)) !important;
-  gap:15px !important;
+  gap:20px !important;
 }
 #macroled-productos .grid.list .card{
   flex-direction:row !important;
