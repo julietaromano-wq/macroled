@@ -1424,7 +1424,11 @@ function wireCardLinks(){
       if(href) window.location.href = href;
     };
     card.addEventListener("click", (e) => {
-      if(e.target.closest(".compare-row, .nav-arrow, .temp-dots, a, button, input, label")) return;
+      if(e.target.closest(".compare-row, .nav-arrow, .temp-dots, a, button, input, label")){
+        e.preventDefault();
+        e.stopPropagation();
+        return;
+      }
       go();
     });
     card.addEventListener("keydown", (e) => {
@@ -1612,8 +1616,12 @@ function syncCompareCheckboxes(){
 }
 
 function wireCompareCheckboxes(){
-  document.querySelectorAll(".compare-checkbox").forEach(cb => {
-    cb.addEventListener("change", () => {
+  document.querySelectorAll(".compare-row").forEach(row => {
+    const cb = row.querySelector(".compare-checkbox");
+    if(!cb || cb.dataset.wired === "1") return;
+    cb.dataset.wired = "1";
+
+    const applyCompareState = () => {
       const { sku, nombre, img } = cb.dataset;
       if(cb.checked){
         const updated = window.MacroledCompare.addToCompare({ sku, nombre, img });
@@ -1623,7 +1631,17 @@ function wireCompareCheckboxes(){
       }
       renderCompareBar();
       syncCompareCheckboxes();
+    };
+
+    // Toda la franja inferior de la card selecciona comparar (no navega a la ficha)
+    row.addEventListener("click", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      if(cb.disabled) return;
+      cb.checked = !cb.checked;
+      applyCompareState();
     });
+    cb.addEventListener("change", applyCompareState);
   });
 }
 
@@ -1874,7 +1892,10 @@ function closeFiltersDrawer(){
 filtersToggle.addEventListener("click", openFiltersDrawer);
 filtersClose.addEventListener("click", closeFiltersDrawer);
 filtersBackdrop.addEventListener("click", closeFiltersDrawer);
-if(filtersCollapseBtn){
+const filtersDesktopHeading = document.querySelector(".filters-desktop-heading");
+if(filtersDesktopHeading){
+  filtersDesktopHeading.addEventListener("click", () => setFiltersCollapsed(true));
+} else if(filtersCollapseBtn){
   filtersCollapseBtn.addEventListener("click", () => setFiltersCollapsed(true));
 }
 if(filtersExpandBtn){
