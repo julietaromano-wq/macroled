@@ -1402,7 +1402,7 @@ function cardTemplate(doc){
         ${overlaysHtml ? `<div class="card-overlays">${overlaysHtml}</div>` : ""}
       </div>
       <div class="card-content">
-        <div class="card-body">
+        <div class="ml-card-body">
           <div class="card-title">${doc.nombre_typesense || "Producto sin nombre"}</div>
           ${specsHtml ? `<div class="specs">${specsHtml}</div>` : ""}
         </div>
