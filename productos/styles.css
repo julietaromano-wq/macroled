@@ -177,11 +177,11 @@
   .facet-title .chev{
     display:inline-flex;align-items:center;justify-content:center;
     color:#868686;line-height:0;flex:none;
-    transform:rotate(90deg);
+    transform:rotate(-90deg);
     transition:transform .18s ease;
   }
   .facet-title .chev svg{display:block;}
-  .facet-group.collapsed .facet-title .chev{transform:rotate(0deg);}
+  .facet-group.collapsed .facet-title .chev{transform:rotate(90deg);}
   .ft-label{display:flex;align-items:center;gap:9px;}
   .ft-label svg{flex:none;color:var(--dark-blue--700);}
   .facet-body{margin-top:16px;display:flex;flex-direction:column;gap:14px;}
