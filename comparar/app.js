@@ -855,7 +855,7 @@ resolveProductsFromStorage();
 
   try {
     window.MacroledAssistant.init({
-      greeting: `Hola, soy el asistente de <b>productos Macroled</b>. Puedo ayudarte a entender las diferencias entre los productos que estás comparando.`,
+      greeting: `Hola, soy el asistente de <b>productos Macroled</b>. Podés consultarme sobre las diferencias entre los productos que estás comparando.`,
       suggestions: buildCompareSuggestions,
       getPayload: getComparePayload,
       fallbackHtml: compareFallbackHtml,
