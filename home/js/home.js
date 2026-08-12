@@ -56,7 +56,7 @@
 
     const query = content.query || item;
     const filters = Array.isArray(query.typesenseFilters) ? JSON.stringify(query.typesenseFilters) : "";
-    return `<div class="ml-products-block"><div class="ml-product-grid" data-products-field="${esc(query.typesenseField)}" data-products-value="${esc(query.typesenseValue)}" data-products-filters="${esc(filters)}" data-products-count="${Number(query.productCount || 4)}"><div class="ml-product-state">Cargando productos…</div></div>${productControlsTemplate()}</div>`;
+    return `<div class="ml-products-block"><div class="ml-product-grid" data-products-field="${esc(query.typesenseField)}" data-products-value="${esc(query.typesenseValue)}" data-products-filters="${esc(filters)}" data-products-count="${Number(query.productCount || 4)}" data-products-fetch-count="${Number(query.fetchCount || query.productCount || 4)}" data-products-randomize-by="${esc(query.randomizeBy || "")}"><div class="ml-product-state">Cargando productos…</div></div>${productControlsTemplate()}</div>`;
   }
 
   function lineTemplate(item) {

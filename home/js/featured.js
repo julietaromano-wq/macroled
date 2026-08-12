@@ -10,7 +10,7 @@
     const cfg = window.MACROLED_HOME_CONFIG.typesense;
     const params = new URLSearchParams({
       q: "*",
-      query_by: cfg.queryBy || "nombre,descripcion",
+      query_by: cfg.queryBy || "nombre_typesense,descripcion",
       filter_by: space
         ? `${FEATURED_FIELD}:=${space}`
         : `${FEATURED_FIELD}:=[interior,exterior,proyectos]`,

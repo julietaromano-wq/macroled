@@ -59,7 +59,7 @@
       host: "https://typesense.coresagroup.com",
       apiKey: "g0oiNYY8THGuU9jnCsvqIH1X9HtvYRCR",
       collection: "Macroled_Prueba",
-      queryBy: "nombre,descripcion"
+      queryBy: "nombre_typesense,descripcion"
     },
     tabs: {
       interior: {
@@ -79,7 +79,15 @@
             ...line("Reflectores PRO", "La combinación ideal entre rendimiento y practicidad. Reflectores para exterior pensados para iluminar accesos, fachadas, patios y áreas abiertas con una instalación versátil y una luz confiable.", "#16283a", "#e4ebf0", "image-right"),
             image: "https://cdn.prod.website-files.com/65f1fdd7248b6709fdebe904/699cb28af6cdd53e774759f0_FAMILIA%20REFLECTORES%20PRO.webp",
             imageFit: "contain-right",
-            titleEmphasis: "PRO"
+            titleEmphasis: "PRO",
+            content: {
+              mode: "typesense",
+              query: {
+                typesenseField: "familia",
+                typesenseValue: "Reflectores PRO",
+                productCount: 4
+              }
+            }
           },
           {
             ...line("Luminarias Skyline", "Iluminación arquitectónica con rieles magnéticos de 48V que combinan seguridad, versatilidad y estética premium. Luminarias con opciones Smart de blancos dinámicos y automatización.", "#07090c", "#e4ebf0", "image-left"),
@@ -92,10 +100,12 @@
               mode: "typesense",
               query: {
                 typesenseFilters: [
-                  { field: "subfamilia", value: "Luminarias" },
-                  { field: "familia", value: "Skyline" }
+                  { field: "macrofamilia", value: "Rieles Magnéticos" },
+                  { field: "familia", value: "Luminarias" }
                 ],
-                productCount: 4
+                productCount: 4,
+                fetchCount: 100,
+                randomizeBy: "categoria"
               }
             }
           }
@@ -129,7 +139,7 @@
       {
         title: "Casa FOA 2026, Edición Pocito",
         description: "Formamos parte de uno de los eventos de diseño más reconocidos del país, aportando luminarias LED que realzan texturas, colores y ambientes en proyectos de alto nivel estético.",
-        href: "/novedades/casa-foa-2026-edicion-pocito",
+        href: "/novedades/casa-foa-2026-pocito",
         image: "https://www.casafoa.com/landing/wp-content/uploads/2026/04/Espacio-21-Casa-FOA-Juan-Cruz-Paredes-2.webp",
         hoverImage: "https://www.casafoa.com/landing/wp-content/uploads/2026/04/Espacio-17-Casa-FOA-Juan-Cruz-Paredes-4.webp"
       },
