@@ -9,6 +9,8 @@
 <link rel="preconnect" href="https://typesense.coresagroup.com" crossorigin>
 <link rel="dns-prefetch" href="https://typesense.coresagroup.com">
 <link rel="preconnect" href="https://s3.coresagroup.com">
+<link rel="preconnect" href="https://s3.us-east-1.amazonaws.com" crossorigin>
+<link rel="dns-prefetch" href="https://s3.us-east-1.amazonaws.com">
 <link rel="preconnect" href="https://d1zltvqju4u8ql.cloudfront.net" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles.css">
@@ -37,7 +39,6 @@
   </div>
 
   <main class="results-head">
-    <div id="categoryBanner" class="category-banner" hidden></div>
     <div class="toolbar-top" id="chipsBar"></div>
 
     <div class="count-row">
@@ -66,6 +67,7 @@
   </main>
 
   <div class="results-body">
+    <div id="categoryBanner" class="category-banner" hidden></div>
     <div class="grid-shell" id="gridShell">
       <div class="grid" id="grid"></div>
       <div class="grid-loading" id="gridLoading" aria-hidden="true">

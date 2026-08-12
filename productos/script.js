@@ -202,53 +202,164 @@ const SUBFAMILIA_IMAGES = {
 };
 
 /* ---------------------------------------------------------
-   BANNERS DE PORTADA por macrofamilia — reemplaza al slider de
-   subfamilias en la parte de arriba de los resultados. Si una
-   macrofamilia no tiene entrada acá, simplemente no se muestra banner
-   (no rompe nada). Completar con los datos reales cuando estén.
-   "video" es opcional: si no está, se muestra solo "poster" como
-   imagen fija; si tampoco hay poster, no se muestra media (solo texto).
+   BANNERS DE PORTADA — arriba de la grilla de productos.
+   Prioridad: familia > macrofamilia. Sin match = sin banner.
+   "video" opcional; si no hay, usa "poster"; si tampoco, no hay media.
    --------------------------------------------------------- */
 const MACROFAMILIA_BANNERS = {
   // "Tiras LED": {
   //   video: "https://s3.coresagroup.com/MACROLED/videos/tiras-led-banner.mp4",
   //   poster: `${CDN_HOST}/fit-in/1600x500/filters:format(webp)/MACROLED/WEB/banner-tiras-led.jpg`,
-  //   title: "Tiras LED",
-  //   description: "Flexibilidad y luz continua para cualquier proyecto, en la medida exacta que necesites.",
   // },
 };
+
+const FAMILIA_BANNERS = {
+  "Monaco": {
+    video: "https://s3.us-east-1.amazonaws.com/s3.coresagroup.com/VIDEOS/MILAN%20BANNER.mp4",
+    poster: `${CDN_HOST}/fit-in/1600x500/filters:format(webp)/MACROLED/250/milan.png`,
+  },
+  "Highbay PRO 2026": {
+    video: "https://s3.coresagroup.com/MACROLED/video/productos/HIGHBAYPRO_HORIZONTAL_EXPORT.mp4",
+    poster: `${CDN_HOST}/fit-in/1600x500/filters:format(webp)/MACROLED/250/PHB-200W-90D-857-CW.png`,
+  },
+};
+
+const BANNER_ICON_PAUSE = `<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg>`;
+const BANNER_ICON_PLAY = `<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>`;
+let _activeBannerKey = "";
+const _bannerVideoPrefetch = Object.create(null);
+
+function allBannerVideoUrls(){
+  const urls = [];
+  [FAMILIA_BANNERS, MACROFAMILIA_BANNERS].forEach(map => {
+    Object.keys(map).forEach(k => {
+      if(map[k] && map[k].video) urls.push(map[k].video);
+    });
+  });
+  return urls;
+}
+
+/* Calienta caché del navegador para que al filtrar el video arranque más rápido. */
+function prefetchBannerVideo(url){
+  if(!url || _bannerVideoPrefetch[url]) return;
+  _bannerVideoPrefetch[url] = true;
+
+  const link = document.createElement("link");
+  link.rel = "prefetch";
+  link.as = "fetch";
+  link.href = url;
+  link.crossOrigin = "anonymous";
+  document.head.appendChild(link);
+
+  const warm = document.createElement("video");
+  warm.preload = "auto";
+  warm.muted = true;
+  warm.playsInline = true;
+  warm.setAttribute("playsinline", "");
+  warm.src = url;
+  warm.load();
+  _bannerVideoPrefetch[url + ":el"] = warm;
+}
+
+function prefetchAllBannerVideos(){
+  allBannerVideoUrls().forEach(prefetchBannerVideo);
+}
+
+function lookupBannerData(familia, macro){
+  if(familia && FAMILIA_BANNERS[familia]) return FAMILIA_BANNERS[familia];
+  if(macro && MACROFAMILIA_BANNERS[macro]) return MACROFAMILIA_BANNERS[macro];
+  if(familia){
+    const key = Object.keys(FAMILIA_BANNERS).find(k => k.toLowerCase() === String(familia).toLowerCase());
+    if(key) return FAMILIA_BANNERS[key];
+  }
+  return null;
+}
+
+function wireBannerVideoControls(holder){
+  const video = holder.querySelector(".category-banner__media");
+  const playBtn = holder.querySelector(".category-banner__toggle");
+  if(!video || !(video instanceof HTMLVideoElement)) return;
+
+  const syncPlayBtn = () => {
+    if(!playBtn) return;
+    const paused = video.paused;
+    playBtn.setAttribute("aria-label", paused ? "Reproducir video" : "Pausar video");
+    playBtn.title = paused ? "Reproducir" : "Pausar";
+    playBtn.classList.toggle("is-paused", paused);
+    playBtn.innerHTML = paused ? BANNER_ICON_PLAY : BANNER_ICON_PAUSE;
+  };
+
+  const tryPlay = () => {
+    video.play().catch(() => {});
+  };
+
+  if(video.readyState >= 2) tryPlay();
+  else video.addEventListener("canplay", tryPlay, { once: true });
+
+  holder.addEventListener("click", () => {
+    if(video.paused) tryPlay();
+    else video.pause();
+  });
+  video.addEventListener("play", syncPlayBtn);
+  video.addEventListener("pause", syncPlayBtn);
+  syncPlayBtn();
+}
 
 function renderCategoryBanner(){
   const holder = document.getElementById("categoryBanner");
   if(!holder) return;
   const activeMacro = [...state.selected.macrofamilia][0];
-  const data = activeMacro && MACROFAMILIA_BANNERS[activeMacro];
+  const activeFamilia = [...state.selected.familia][0];
+  const data = lookupBannerData(activeFamilia, activeMacro);
+  const bannerKey = data
+    ? `${activeFamilia || ""}|${activeMacro || ""}|${data.video || data.poster || ""}`
+    : "";
 
-  if(!activeMacro || !data){
+  /* Si ya eligió macrofamilia relacionada, anticipar descarga del video. */
+  if(activeMacro === "Interruptores y Tomas") prefetchBannerVideo(FAMILIA_BANNERS.Monaco && FAMILIA_BANNERS.Monaco.video);
+  if(activeMacro === "Luminarias de Proyecto") prefetchBannerVideo(FAMILIA_BANNERS["Highbay PRO 2026"] && FAMILIA_BANNERS["Highbay PRO 2026"].video);
+
+  if(!data){
+    _activeBannerKey = "";
     holder.hidden = true;
     holder.innerHTML = "";
+    holder.classList.remove("has-video", "is-loading");
     return;
   }
 
+  if(bannerKey === _activeBannerKey && !holder.hidden) return;
+  _activeBannerKey = bannerKey;
+
   let mediaHtml = "";
   if(data.video){
+    prefetchBannerVideo(data.video);
     mediaHtml = `
-      <video class="category-banner__media" autoplay muted loop playsinline
+      <video class="category-banner__media" autoplay muted loop playsinline preload="auto"
         ${data.poster ? `poster="${data.poster}"` : ""}>
         <source src="${data.video}" type="video/mp4">
-      </video>`;
+      </video>
+      <button type="button" class="category-banner__toggle" aria-label="Pausar video" title="Pausar">
+        ${BANNER_ICON_PAUSE}
+      </button>`;
   } else if(data.poster){
-    mediaHtml = `<img class="category-banner__media" src="${data.poster}" alt="${data.title || activeMacro}">`;
+    mediaHtml = `<img class="category-banner__media" src="${data.poster}" alt="">`;
   }
 
   holder.hidden = false;
-  holder.innerHTML = `
-    ${mediaHtml}
-    <div class="category-banner__body">
-      <h2 class="category-banner__title">${data.title || activeMacro}</h2>
-      ${data.description ? `<p class="category-banner__desc">${data.description}</p>` : ""}
-    </div>
-  `;
+  holder.classList.toggle("has-video", !!data.video);
+  holder.classList.add("is-loading");
+  holder.innerHTML = mediaHtml;
+  if(data.video){
+    const video = holder.querySelector(".category-banner__media");
+    if(video){
+      const clearLoading = () => holder.classList.remove("is-loading");
+      video.addEventListener("canplay", clearLoading, { once: true });
+      video.addEventListener("playing", clearLoading, { once: true });
+    }
+    wireBannerVideoControls(holder);
+  } else {
+    holder.classList.remove("is-loading");
+  }
 }
 
 const CCT_DOT = {
@@ -342,7 +453,7 @@ const state = {
   sortBy: "",
   query: "",
   view: "grid",
-  collapsed: { macrofamilia: false, variante_temperatura_filtro: true, color: true, potencia: false, dimerizable: true, familia: false, subfamilia: true, categoria: true },
+  collapsed: { macrofamilia: true, variante_temperatura_filtro: true, color: true, potencia: false, dimerizable: true, familia: true, subfamilia: true, categoria: true },
   compareCollapsed: false
 };
 window.state = state;
@@ -1072,7 +1183,7 @@ function buildVariantesBadge(doc){
   return `<span class="count-badge">${num} variantes</span>`;
 }
 
-// Tag "SMART" arriba a la izquierda cuando ATTR 2 dice "Smart"
+// Tag "SMART" arriba a la derecha cuando ATTR 2 dice "Smart"
 function buildSmartBadge(doc){
   const val = (doc.attr2 || "").toString().trim().toLowerCase();
   if(val !== "smart") return "";
@@ -1683,19 +1794,6 @@ function renderCards(hits, found){
     return;
   }
   grid.innerHTML = hits.map(h => cardTemplate(h.document)).join("");
-  const cards = grid.querySelectorAll(".card");
-  const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  cards.forEach((card, i) => {
-    if(reduceMotion) return;
-    card.classList.add("is-entering");
-    card.style.setProperty("--stagger", String(Math.min(i, 14)));
-    const clear = () => {
-      card.classList.remove("is-entering");
-      card.style.removeProperty("--stagger");
-      card.removeEventListener("animationend", clear);
-    };
-    card.addEventListener("animationend", clear);
-  });
   wireCarousels();
   wireCardLinks();
   wireCompareCheckboxes();
@@ -2277,6 +2375,13 @@ loadPotenciaOptions().then(() => {
 });
 loadAndRender();
 
+/* Precarga videos de banners en idle para que no se sientan lentos al filtrar. */
+if(typeof requestIdleCallback === "function"){
+  requestIdleCallback(() => prefetchAllBannerVideos(), { timeout: 2500 });
+} else {
+  setTimeout(prefetchAllBannerVideos, 1200);
+}
+
 /* === Asistente === */
 /**
  * asistente.js — Motor compartido del asistente de producto Macroled.
@@ -2558,7 +2663,7 @@ loadAndRender();
 
   try {
     window.MacroledAssistant.init({
-      greeting: `Hola, soy el asistente de <b>productos Macroled</b>. Podés consultarme sobre nuestros productos, características y soluciones de iluminación.`,
+      greeting: `Hola, soy el asistente de <b>productos Macroled</b>. Estoy para ayudarte a encontrar productos y soluciones según tus necesidades de iluminación.`,
       suggestions: buildCatalogSuggestions,
       getPayload: getCatalogPayload,
       fallbackHtml: catalogFallbackHtml,
