@@ -62,7 +62,7 @@
   function lineTemplate(item) {
     const mode = item.content?.mode || "typesense";
     const lineId = item.id ? ` data-line="${esc(item.id)}"` : "";
-    return `<article class="ml-featured ml-shell"${lineId} data-theme="${esc(item.theme)}" data-visual-theme="${esc(item.visualTheme || "solid")}" data-layout="${esc(item.layout)}" data-image-fit="${esc(item.imageFit || "cover")}" data-description-lines="${Number(item.descriptionLines || 0)}" data-button-tone="${buttonTone(item.textColor)}" data-content-mode="${esc(mode)}" style="--line-bg:${esc(item.theme)};--line-color:${esc(item.textColor)};--title-emphasis-weight:${Number(item.titleEmphasisWeight || 600)}"><div class="ml-featured__story"><div class="ml-featured__media"><img src="${esc(item.image)}" alt="" loading="lazy" width="1600" height="1000"></div><div class="ml-featured__copy"><h3>${emphasize(item.title, item.titleEmphasis)}</h3><p>${emphasize(item.description, item.descriptionEmphasis)}</p><div class="ml-featured__actions"><a class="ml-button ml-button--primary" href="${esc(item.href)}">Ver productos</a><a class="ml-button--tertiary" href="${esc(item.catalogHref || "#")}">Ver catálogo <span aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 12h14m-6-6 6 6-6 6"/></svg></span></a></div></div></div>${lineContentTemplate(item)}</article>`;
+    return `<article class="ml-featured ml-shell"${lineId} data-theme="${esc(item.theme)}" data-visual-theme="${esc(item.visualTheme || "solid")}" data-layout="${esc(item.layout)}" data-image-fit="${esc(item.imageFit || "cover")}" data-description-lines="${Number(item.descriptionLines || 0)}" data-button-tone="${buttonTone(item.textColor)}" data-content-mode="${esc(mode)}" style="--line-bg:${esc(item.theme)};--line-color:${esc(item.textColor)};--title-emphasis-weight:${Number(item.titleEmphasisWeight || 600)}"><div class="ml-featured__story"><div class="ml-featured__media"><img src="${esc(item.image)}" alt="" loading="lazy" width="1600" height="1000"></div><div class="ml-featured__copy"><h3>${emphasize(item.title, item.titleEmphasis)}</h3><p>${emphasize(item.description, item.descriptionEmphasis)}</p><div class="ml-featured__actions"><a class="ml-button ml-button--primary" href="${esc(item.href)}">Ver productos</a><a class="ml-button--tertiary" href="${esc(item.catalogHref || "#")}">Ver catálogo <span aria-hidden="true">→</span></a></div></div></div>${lineContentTemplate(item)}</article>`;
   }
 
   function renderSections() {
@@ -88,40 +88,6 @@
     foa.insertAdjacentElement("beforebegin", featuredProducts);
   }
 
-  function initExpandBanners() {
-    const banners = [...root.querySelectorAll("[data-expand-banner]")];
-    if (!banners.length) return;
-
-    if (matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      banners.forEach(banner => banner.style.setProperty("--ml-expand-progress", "1"));
-      return;
-    }
-
-    let frame = 0;
-    const update = () => {
-      frame = 0;
-      const viewportHeight = window.innerHeight || 1;
-      const start = viewportHeight * 0.88;
-      banners.forEach(banner => {
-        const rect = banner.getBoundingClientRect();
-        const end = banner.matches(".ml-newsletter-banner")
-          ? Math.max(viewportHeight * 0.26, viewportHeight - rect.height)
-          : viewportHeight * 0.26;
-        const raw = (start - rect.top) / Math.max(1, start - end);
-        const clamped = Math.max(0, Math.min(1, raw));
-        const progress = clamped * clamped * (3 - 2 * clamped);
-        banner.style.setProperty("--ml-expand-progress", progress.toFixed(4));
-      });
-    };
-    const requestUpdate = () => {
-      if (!frame) frame = requestAnimationFrame(update);
-    };
-
-    window.addEventListener("scroll", requestUpdate, { passive: true });
-    window.addEventListener("resize", requestUpdate);
-    update();
-  }
-
   function placePrimarySections() {
     /* Categories now live inside solutions banners. */
   }
@@ -141,10 +107,6 @@
       if (!tabs || !grid) return;
 
       const panelId = `ml-categories-test-panel-${sectionIndex}`;
-      const compactCategoryLabels = matchMedia("(max-width: 640px)");
-      const activeLabel = item => compactCategoryLabels.matches && item.labelActiveMobile
-        ? item.labelActiveMobile
-        : item.labelActive;
       grid.id = panelId;
       tabs.innerHTML = entries.map(([key, item], index) => `
       <button class="ml-categories-test__tab ml-featured-products__tab${index === 0 ? " is-active" : ""}"
@@ -154,7 +116,7 @@
         aria-controls="${panelId}"
         aria-selected="${index === 0}"
         tabindex="${index === 0 ? "0" : "-1"}"
-        data-categories-test-tab="${esc(key)}">${esc(index === 0 ? activeLabel(item) : item.labelInactive)}</button>
+        data-categories-test-tab="${esc(key)}">${esc(index === 0 ? item.labelActive : item.labelInactive)}</button>
     `).join("");
 
       const activate = key => {
@@ -173,7 +135,7 @@
           button.classList.toggle("is-active", active);
           button.setAttribute("aria-selected", String(active));
           button.tabIndex = active ? 0 : -1;
-          button.textContent = active ? activeLabel(buttonConfig) : buttonConfig.labelInactive;
+          button.textContent = active ? buttonConfig.labelActive : buttonConfig.labelInactive;
         });
         window.MacroledFeatured?.setupTrackControls(sliderRoot, grid, {
           cardSelector: ".ml-category-card"
@@ -230,26 +192,20 @@
         const background = !line
           ? "#fff"
           : line.dataset.visualTheme === "silver-dark"
-          ? "radial-gradient(circle at 18% 10%, rgba(214, 220, 226, 0.08), transparent 30%), linear-gradient(180deg, #16283a 0%, #0c1218 42%, #07090c 100%)"
+          ? "radial-gradient(circle at 16% 12%, rgba(214, 220, 226, 0.24), transparent 34%), linear-gradient(125deg, #030405 0%, #101318 56%, #3d444b 100%)"
           : line.dataset.theme;
         if (background === activeBackground) return;
-        if (activeBackground) {
-          list.style.background = activeBackground;
-          list.style.setProperty("--ml-panel-underlay", activeBackground);
-        }
         activeBackground = background;
         const previousLayer = activeLayer;
         const layer = document.createElement("div");
         layer.className = "ml-line-theme-layer";
-        if (line && (line.dataset.visualTheme === "silver-dark" || buttonTone(line.dataset.theme) === "dark")) {
-          layer.classList.add("ml-line-theme-layer--dark");
-        }
         layer.setAttribute("aria-hidden", "true");
         layer.style.setProperty("--ml-layer-background", background);
-        list.append(layer);
+        list.prepend(layer);
         activeLayer = layer;
         requestAnimationFrame(() => {
           layer.classList.add("is-visible");
+          previousLayer?.classList.remove("is-visible");
         });
         if (previousLayer) {
           const removePrevious = () => previousLayer.remove();
@@ -278,21 +234,19 @@
       let scrollFrame = 0;
       const updateStoryIntegration = () => {
         scrollFrame = 0;
-        const viewportHeight = window.innerHeight || document.documentElement.clientHeight;
+        const viewportBottom = window.innerHeight || document.documentElement.clientHeight;
         let integratedLine = lines[0];
         lines.forEach(line => {
-          const copy = line.querySelector(".ml-featured__copy");
-          const lineBounds = line.getBoundingClientRect();
-          const copyBounds = copy?.getBoundingClientRect();
-          const isReading = Boolean(
-            copyBounds &&
-            copyBounds.top < viewportHeight * 0.58 &&
-            copyBounds.bottom > viewportHeight * 0.22
+          const story = line.querySelector(".ml-featured__story");
+          if (!story) return;
+          const bounds = story.getBoundingClientRect();
+          const visibleProgress = Math.min(
+            1,
+            Math.max(0, (viewportBottom - bounds.top) / Math.max(bounds.height, 1))
           );
-          line.classList.toggle("is-story-integrated", isReading);
-          /* Keep each line's theme through its cards and bottom padding.
-             Falling back to Monaco here was flashing white between Reflectores and Skyline. */
-          if (lineBounds.top < viewportHeight * 0.78) integratedLine = line;
+          const isIntegrated = visibleProgress >= 0.06;
+          line.classList.toggle("is-story-integrated", isIntegrated);
+          if (isIntegrated) integratedLine = line;
         });
         setBackground(integratedLine);
       };
@@ -317,122 +271,6 @@
     root.querySelectorAll(".ml-faq__trigger").forEach(button => button.addEventListener("click", () => {
       button.setAttribute("aria-expanded", String(button.getAttribute("aria-expanded") !== "true"));
     }));
-  }
-
-  function initHeroLuminariasRise() {
-    const hero = root.querySelector(".ml-hero");
-    const luminarias = root.querySelector(".ml-project-lines-concept");
-    if (!hero || !luminarias) return;
-
-    const reducedMotion = matchMedia("(prefers-reduced-motion: reduce)");
-    let animating = false;
-    let touchStartY = 0;
-
-    const coverThreshold = () => Math.max(48, (hero.offsetHeight || window.innerHeight) * 0.12);
-
-    const isOnCover = () => window.scrollY < coverThreshold();
-
-    const riseTarget = () => {
-      const top = luminarias.getBoundingClientRect().top + window.scrollY;
-      return Math.max(0, Math.round(top));
-    };
-
-    const isReadyToFall = () => {
-      const y = window.scrollY;
-      return y > coverThreshold() && y <= riseTarget() + 64;
-    };
-
-    const animateScrollTo = (toY, duration) => {
-      const fromY = window.scrollY;
-      const distance = toY - fromY;
-      if (Math.abs(distance) < 2) return Promise.resolve();
-
-      const start = performance.now();
-      const easeOutQuart = t => 1 - Math.pow(1 - t, 4);
-
-      return new Promise(resolve => {
-        const step = now => {
-          const t = Math.min(1, (now - start) / duration);
-          window.scrollTo(0, fromY + distance * easeOutQuart(t));
-          if (t < 1) requestAnimationFrame(step);
-          else resolve();
-        };
-        requestAnimationFrame(step);
-      });
-    };
-
-    const goTo = target => {
-      if (animating || reducedMotion.matches) return;
-      if (Math.abs(target - window.scrollY) < 8) return;
-      animating = true;
-      animateScrollTo(target, 880).finally(() => {
-        animating = false;
-      });
-    };
-
-    const rise = () => goTo(riseTarget());
-    const fall = () => goTo(0);
-
-    window.addEventListener("wheel", event => {
-      if (reducedMotion.matches) return;
-      if (animating) {
-        event.preventDefault();
-        return;
-      }
-      if (event.deltaY > 0 && isOnCover()) {
-        event.preventDefault();
-        rise();
-        return;
-      }
-      if (event.deltaY < 0 && isReadyToFall()) {
-        event.preventDefault();
-        fall();
-      }
-    }, { passive: false });
-
-    window.addEventListener("touchstart", event => {
-      touchStartY = event.touches[0]?.clientY || 0;
-    }, { passive: true });
-
-    window.addEventListener("touchmove", event => {
-      if (reducedMotion.matches) return;
-      if (animating) {
-        event.preventDefault();
-        return;
-      }
-      const currentY = event.touches[0]?.clientY || 0;
-      const swipe = touchStartY - currentY;
-      if (swipe > 14 && isOnCover()) {
-        event.preventDefault();
-        rise();
-        return;
-      }
-      if (swipe < -14 && isReadyToFall()) {
-        event.preventDefault();
-        fall();
-      }
-    }, { passive: false });
-
-    window.addEventListener("keydown", event => {
-      if (reducedMotion.matches || event.altKey || event.ctrlKey || event.metaKey) return;
-      if (animating) {
-        if (["ArrowDown", "ArrowUp", "PageDown", "PageUp", " "].includes(event.key)) {
-          event.preventDefault();
-        }
-        return;
-      }
-      const scrollingDown = ["ArrowDown", "PageDown"].includes(event.key) || (event.key === " " && !event.shiftKey);
-      const scrollingUp = ["ArrowUp", "PageUp"].includes(event.key) || (event.key === " " && event.shiftKey);
-      if (scrollingDown && isOnCover()) {
-        event.preventDefault();
-        rise();
-        return;
-      }
-      if (scrollingUp && isReadyToFall()) {
-        event.preventDefault();
-        fall();
-      }
-    });
   }
 
   function handleVideo() {
@@ -465,99 +303,33 @@
 
     if (video.readyState >= HTMLMediaElement.HAVE_FUTURE_DATA) revealVideo();
     video.play().catch(revealVideo);
-
-    const restMs = 10000;
-    const reverseSpeed = 8;
-    let reverseFrame = 0;
-    let restTimer = 0;
-    let lastTick = 0;
-
-    const stopReverse = () => {
-      cancelAnimationFrame(reverseFrame);
-      reverseFrame = 0;
-    };
-
-    const playForward = () => {
-      stopReverse();
-      video.currentTime = 0;
-      video.play().catch(() => {});
-    };
-
-    const playReverse = () => {
-      video.pause();
-      lastTick = performance.now();
-      const step = now => {
-        const elapsed = ((now - lastTick) / 1000) * reverseSpeed;
-        lastTick = now;
-        const nextTime = video.currentTime - elapsed;
-        if (nextTime <= 0.04) {
-          video.currentTime = 0;
-          stopReverse();
-          playForward();
-          return;
-        }
-        video.currentTime = nextTime;
-        reverseFrame = requestAnimationFrame(step);
-      };
-      reverseFrame = requestAnimationFrame(step);
-    };
-
-    video.addEventListener("ended", () => {
-      restTimer = window.setTimeout(playReverse, restMs);
-    });
-
-    reducedMotion.addEventListener("change", event => {
-      if (!event.matches) return;
-      window.clearTimeout(restTimer);
-      stopReverse();
-      video.pause();
-      video.hidden = true;
-    });
   }
 
   function animateHeroTitle() {
     const title = root.querySelector("#ml-hero-title");
     if (!title || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    const ariaText = title.innerText.replace(/\s+/g, " ").trim();
-    title.setAttribute("aria-label", ariaText);
-
-    const chunks = [...title.childNodes].flatMap(node => {
-      if (node.nodeName === "BR") {
-        return [{ type: "br", className: node.className }];
-      }
-      const text = node.textContent;
-      return text ? [{ type: "text", value: text }] : [];
-    });
-
+    const text = title.textContent.trim();
+    title.setAttribute("aria-label", text);
     title.textContent = "";
     let letterIndex = 0;
-    chunks.forEach(chunk => {
-      if (chunk.type === "br") {
-        const br = document.createElement("br");
-        if (chunk.className) br.className = chunk.className;
-        title.appendChild(br);
+    text.split(/(\s+)/).forEach(part => {
+      if (/^\s+$/.test(part)) {
+        title.appendChild(document.createTextNode(" "));
         return;
       }
 
-      chunk.value.split(/(\s+)/).forEach(part => {
-        if (/^\s+$/.test(part)) {
-          title.appendChild(document.createTextNode(" "));
-          return;
-        }
-
-        const word = document.createElement("span");
-        word.className = "ml-hero__word";
-        word.setAttribute("aria-hidden", "true");
-        [...part].forEach(character => {
-          const letter = document.createElement("span");
-          letter.className = "ml-hero__letter";
-          letter.style.setProperty("--letter-delay", `${letterIndex * 52}ms`);
-          letter.textContent = character;
-          word.appendChild(letter);
-          letterIndex += 1;
-        });
-        title.appendChild(word);
+      const word = document.createElement("span");
+      word.className = "ml-hero__word";
+      word.setAttribute("aria-hidden", "true");
+      [...part].forEach(character => {
+        const letter = document.createElement("span");
+        letter.className = "ml-hero__letter";
+        letter.style.setProperty("--letter-delay", `${letterIndex * 28}ms`);
+        letter.textContent = character;
+        word.appendChild(letter);
+        letterIndex += 1;
       });
+      title.appendChild(word);
     });
     requestAnimationFrame(() => title.classList.add("is-illuminating"));
   }
@@ -621,13 +393,8 @@
     const solutionsSection = root.querySelector("[data-solutions-banner]");
     const projectSection = root.querySelector("[data-project-lines-concept]");
     const featuredSection = root.querySelector("#productos-destacados");
-    const newsSection = root.querySelector(".ml-news");
-    const conversionSection = root.querySelector(".ml-conversion");
-    const newsletterSection = root.querySelector("[data-newsletter]");
     const categoriesSections = [...root.querySelectorAll("[data-categories-test]")];
     const featuredTrack = featuredSection?.querySelector("[data-featured-track]");
-    const newsGrid = newsSection?.querySelector("[data-news]");
-    const faqList = conversionSection?.querySelector("[data-faq]");
     const pendingSections = new Set();
     let motionArmed = false;
 
@@ -657,7 +424,7 @@
         section.classList.add("is-motion-visible");
         section._motionSettleTimer = setTimeout(() => {
           section.classList.add("is-motion-settled");
-        }, section === projectSection ? 1800 : 1500);
+        }, 1500);
       });
     };
 
@@ -753,52 +520,12 @@
     }
 
     if (projectSection) {
-      let projectsPending = false;
       projectSection.classList.add("ml-motion-ready");
-      prepareCards(projectSection, ".ml-project-lines-concept__card");
-
-      const showProjects = () => {
-        prepareCards(projectSection, ".ml-project-lines-concept__card");
-        clearTimeout(projectSection._motionSettleTimer);
-        projectSection.classList.remove("is-motion-settled", "is-motion-visible");
-        void projectSection.offsetWidth;
-        requestAnimationFrame(() => {
-          projectSection.classList.add("is-motion-visible");
-          projectSection._motionSettleTimer = setTimeout(() => {
-            projectSection.classList.add("is-motion-settled");
-          }, 2400);
-        });
-      };
-
-      const hideProjects = () => {
-        clearTimeout(projectSection._motionSettleTimer);
-        projectsPending = false;
-        projectSection.classList.remove("is-motion-visible", "is-motion-settled");
-      };
-
-      const armProjects = () => {
-        if (!projectsPending) return;
-        projectsPending = false;
-        showProjects();
-      };
-
-      window.addEventListener("wheel", armProjects, { passive: true });
-      window.addEventListener("touchmove", armProjects, { passive: true });
-      window.addEventListener("keydown", event => {
-        if (["ArrowDown", "ArrowUp", "PageDown", "PageUp", "Home", "End", " "].includes(event.key)) {
-          armProjects();
-        }
-      });
-
       const observer = new IntersectionObserver(entries => {
-        const entry = entries[0];
-        if (!entry) return;
-        if (!entry.isIntersecting) {
-          hideProjects();
-          return;
-        }
-        if (motionArmed) showProjects();
-        else projectsPending = true;
+        if (!entries[0]?.isIntersecting) return;
+        if (motionArmed) reveal(projectSection);
+        else pendingSections.add(projectSection);
+        observer.disconnect();
       }, { threshold: 0.13, rootMargin: "0px 0px -8% 0px" });
       observer.observe(projectSection);
     }
@@ -813,52 +540,14 @@
           ? ".ml-line-content--static"
           : ".ml-product-grid"
       );
-      let linePending = false;
       line.classList.add("ml-content-motion-ready");
       prepareCards(line, cardSelector);
 
-      const showLine = () => {
-        prepareCards(line, cardSelector);
-        clearTimeout(line._motionSettleTimer);
-        line.classList.remove("is-motion-settled", "is-motion-visible");
-        void line.offsetWidth;
-        requestAnimationFrame(() => {
-          line.classList.add("is-motion-visible");
-          line._motionSettleTimer = setTimeout(() => {
-            line.classList.add("is-motion-settled");
-          }, 1800);
-        });
-      };
-
-      const hideLine = () => {
-        clearTimeout(line._motionSettleTimer);
-        linePending = false;
-        line.classList.remove("is-motion-visible", "is-motion-settled");
-      };
-
-      const armLine = () => {
-        if (!linePending) return;
-        linePending = false;
-        showLine();
-      };
-
-      window.addEventListener("wheel", armLine, { passive: true });
-      window.addEventListener("touchmove", armLine, { passive: true });
-      window.addEventListener("keydown", event => {
-        if (["ArrowDown", "ArrowUp", "PageDown", "PageUp", "Home", "End", " "].includes(event.key)) {
-          armLine();
-        }
-      });
-
       const observer = new IntersectionObserver(entries => {
-        const entry = entries[0];
-        if (!entry) return;
-        if (!entry.isIntersecting) {
-          hideLine();
-          return;
-        }
-        if (motionArmed) showLine();
-        else linePending = true;
+        if (!entries[0]?.isIntersecting) return;
+        if (motionArmed) reveal(line);
+        else pendingSections.add(line);
+        observer.disconnect();
       }, { threshold: 0.12, rootMargin: "0px 0px -8% 0px" });
       observer.observe(line);
 
@@ -871,231 +560,6 @@
         }).observe(content, { childList: true });
       }
     });
-
-    /* Featured products: same replayable entrance as soluciones. */
-    if (featuredSection) {
-      let featuredPending = false;
-      featuredSection.classList.add("ml-featured-products-motion-ready");
-      prepareCards(featuredTrack, ".ml-product-card");
-
-      const showFeatured = () => {
-        prepareCards(featuredTrack, ".ml-product-card");
-        clearTimeout(featuredSection._motionSettleTimer);
-        featuredSection.classList.remove("is-motion-settled", "is-motion-visible");
-        void featuredSection.offsetWidth;
-        requestAnimationFrame(() => {
-          featuredSection.classList.add("is-motion-visible");
-          featuredSection._motionSettleTimer = setTimeout(() => {
-            featuredSection.classList.add("is-motion-settled");
-          }, 3600);
-        });
-      };
-
-      const hideFeatured = () => {
-        clearTimeout(featuredSection._motionSettleTimer);
-        featuredPending = false;
-        featuredSection.classList.remove("is-motion-visible", "is-motion-settled");
-      };
-
-      const armFeatured = () => {
-        if (!featuredPending) return;
-        featuredPending = false;
-        showFeatured();
-      };
-
-      window.addEventListener("wheel", armFeatured, { passive: true });
-      window.addEventListener("touchmove", armFeatured, { passive: true });
-      window.addEventListener("keydown", event => {
-        if (["ArrowDown", "ArrowUp", "PageDown", "PageUp", "Home", "End", " "].includes(event.key)) {
-          armFeatured();
-        }
-      });
-
-      const observer = new IntersectionObserver(entries => {
-        const entry = entries[0];
-        if (!entry) return;
-        if (!entry.isIntersecting) {
-          hideFeatured();
-          return;
-        }
-        if (motionArmed) showFeatured();
-        else featuredPending = true;
-      }, { threshold: 0.22, rootMargin: "0px 0px -10% 0px" });
-      observer.observe(featuredSection);
-
-      if (featuredTrack) {
-        new MutationObserver(() => {
-          prepareCards(featuredTrack, ".ml-product-card");
-          if (!featuredSection.classList.contains("is-motion-visible")) return;
-          featuredSection.classList.remove("is-motion-visible");
-          requestAnimationFrame(() => requestAnimationFrame(() => {
-            featuredSection.classList.add("is-motion-visible");
-          }));
-        }).observe(featuredTrack, { childList: true });
-      }
-    }
-
-    if (newsSection) {
-      let newsPending = false;
-      newsSection.classList.add("ml-news-motion-ready");
-      prepareCards(newsGrid, ".ml-news-card");
-
-      const showNews = () => {
-        prepareCards(newsGrid, ".ml-news-card");
-        clearTimeout(newsSection._motionSettleTimer);
-        newsSection.classList.remove("is-motion-settled", "is-motion-visible");
-        void newsSection.offsetWidth;
-        requestAnimationFrame(() => {
-          newsSection.classList.add("is-motion-visible");
-          newsSection._motionSettleTimer = setTimeout(() => {
-            newsSection.classList.add("is-motion-settled");
-          }, 3600);
-        });
-      };
-
-      const hideNews = () => {
-        clearTimeout(newsSection._motionSettleTimer);
-        newsPending = false;
-        newsSection.classList.remove("is-motion-visible", "is-motion-settled");
-      };
-
-      const armNews = () => {
-        if (!newsPending) return;
-        newsPending = false;
-        showNews();
-      };
-
-      window.addEventListener("wheel", armNews, { passive: true });
-      window.addEventListener("touchmove", armNews, { passive: true });
-      window.addEventListener("keydown", event => {
-        if (["ArrowDown", "ArrowUp", "PageDown", "PageUp", "Home", "End", " "].includes(event.key)) {
-          armNews();
-        }
-      });
-
-      const observer = new IntersectionObserver(entries => {
-        const entry = entries[0];
-        if (!entry) return;
-        if (!entry.isIntersecting) {
-          hideNews();
-          return;
-        }
-        if (motionArmed) showNews();
-        else newsPending = true;
-      }, { threshold: 0.22, rootMargin: "0px 0px -10% 0px" });
-      observer.observe(newsSection);
-
-      if (newsGrid) {
-        new MutationObserver(() => {
-          prepareCards(newsGrid, ".ml-news-card");
-          if (!newsSection.classList.contains("is-motion-visible")) return;
-          newsSection.classList.remove("is-motion-visible");
-          requestAnimationFrame(() => requestAnimationFrame(() => {
-            newsSection.classList.add("is-motion-visible");
-          }));
-        }).observe(newsGrid, { childList: true });
-      }
-    }
-
-    if (conversionSection) {
-      let faqPending = false;
-      conversionSection.classList.add("ml-faq-motion-ready");
-      prepareCards(faqList, ".ml-faq__item");
-
-      const showFaq = () => {
-        prepareCards(faqList, ".ml-faq__item");
-        clearTimeout(conversionSection._motionSettleTimer);
-        conversionSection.classList.remove("is-motion-settled", "is-motion-visible");
-        void conversionSection.offsetWidth;
-        requestAnimationFrame(() => {
-          conversionSection.classList.add("is-motion-visible");
-          conversionSection._motionSettleTimer = setTimeout(() => {
-            conversionSection.classList.add("is-motion-settled");
-          }, 3600);
-        });
-      };
-
-      const hideFaq = () => {
-        clearTimeout(conversionSection._motionSettleTimer);
-        faqPending = false;
-        conversionSection.classList.remove("is-motion-visible", "is-motion-settled");
-      };
-
-      const armFaq = () => {
-        if (!faqPending) return;
-        faqPending = false;
-        showFaq();
-      };
-
-      window.addEventListener("wheel", armFaq, { passive: true });
-      window.addEventListener("touchmove", armFaq, { passive: true });
-      window.addEventListener("keydown", event => {
-        if (["ArrowDown", "ArrowUp", "PageDown", "PageUp", "Home", "End", " "].includes(event.key)) {
-          armFaq();
-        }
-      });
-
-      const observer = new IntersectionObserver(entries => {
-        const entry = entries[0];
-        if (!entry) return;
-        if (!entry.isIntersecting) {
-          hideFaq();
-          return;
-        }
-        if (motionArmed) showFaq();
-        else faqPending = true;
-      }, { threshold: 0.18, rootMargin: "0px 0px -8% 0px" });
-      observer.observe(conversionSection);
-    }
-
-    if (newsletterSection) {
-      let newsletterPending = false;
-      newsletterSection.classList.add("ml-newsletter-motion-ready");
-
-      const showNewsletter = () => {
-        clearTimeout(newsletterSection._motionSettleTimer);
-        newsletterSection.classList.remove("is-motion-settled", "is-motion-visible");
-        void newsletterSection.offsetWidth;
-        requestAnimationFrame(() => {
-          newsletterSection.classList.add("is-motion-visible");
-          newsletterSection._motionSettleTimer = setTimeout(() => {
-            newsletterSection.classList.add("is-motion-settled");
-          }, 2200);
-        });
-      };
-
-      const hideNewsletter = () => {
-        clearTimeout(newsletterSection._motionSettleTimer);
-        newsletterPending = false;
-        newsletterSection.classList.remove("is-motion-visible", "is-motion-settled");
-      };
-
-      const armNewsletter = () => {
-        if (!newsletterPending) return;
-        newsletterPending = false;
-        showNewsletter();
-      };
-
-      window.addEventListener("wheel", armNewsletter, { passive: true });
-      window.addEventListener("touchmove", armNewsletter, { passive: true });
-      window.addEventListener("keydown", event => {
-        if (["ArrowDown", "ArrowUp", "PageDown", "PageUp", "Home", "End", " "].includes(event.key)) {
-          armNewsletter();
-        }
-      });
-
-      const observer = new IntersectionObserver(entries => {
-        const entry = entries[0];
-        if (!entry) return;
-        if (!entry.isIntersecting) {
-          hideNewsletter();
-          return;
-        }
-        if (motionArmed) showNewsletter();
-        else newsletterPending = true;
-      }, { threshold: 0.22, rootMargin: "0px 0px -10% 0px" });
-      observer.observe(newsletterSection);
-    }
 
     const refreshDynamicCards = (container, selector) => {
       if (!container) return;
@@ -1112,6 +576,13 @@
         }));
       }).observe(container, { childList: true });
     };
+
+    /* Featured products: only prepare order, no block-rise entrance. */
+    if (featuredTrack) {
+      new MutationObserver(() => {
+        prepareCards(featuredTrack, ".ml-product-card");
+      }).observe(featuredTrack, { childList: true });
+    }
 
     categoriesSections.forEach(section => {
       if (solutionsSection?.contains(section) || section === solutionsSection) return;
@@ -1136,9 +607,7 @@
   handleVideo();
   animateHeroTitle();
   animateCategoriesTitle();
-  initHeroLuminariasRise();
   initSectionMotion();
-  initExpandBanners();
   }
 
   if (initializeHome()) return;

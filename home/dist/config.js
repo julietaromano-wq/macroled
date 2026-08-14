@@ -24,12 +24,14 @@
    */
   const MANUAL_CATEGORIES = {
     interior: [
-      { ...category("Tiras LED", "tiras-led"), image: "https://d1zltvqju4u8ql.cloudfront.net/fit-in/250x250/filters:format(png)/MACROLED/1000/0742832556316a.png", badge: "Nuevo" },
       { ...category("Lámparas", "lamparas"), image: "https://d1zltvqju4u8ql.cloudfront.net/fit-in/250x250/filters:format(png)/MACROLED/1000/7428325565203a.png" },
       { ...category("Artefactos para lámparas", "artefactos-para-lamparas"), image: "https://d1zltvqju4u8ql.cloudfront.net/fit-in/250x250/filters:format(png)/MACROLED/1000/7428325574748a.png" },
       { ...category("Interruptores y tomas", "interruptores-y-tomas"), image: "https://d1zltvqju4u8ql.cloudfront.net/fit-in/250x250/MACROLED/WEB/LIMA-1CN-USB-CC-30W-B_FRONT.webp" },
+      { ...category("Tiras LED", "tiras-led"), image: "https://d1zltvqju4u8ql.cloudfront.net/fit-in/250x250/filters:format(png)/MACROLED/1000/0742832556316a.png", badge: "Nuevo" },
       { ...category("Armadas Monaco", "monaco-armadas"), image: "https://s3.coresagroup.com/MACROLED/250/milan.png" },
-      { ...category("Bastidor + Módulos", "monaco-bastidor-modulos"), image: "https://s3.coresagroup.com/MACROLED/250/milan-bastidores.png" }
+      { ...category("Bastidor + Módulos", "monaco-bastidor-modulos"), image: "https://s3.coresagroup.com/MACROLED/250/milan-bastidores.png" },
+      { ...category("Tapas Monaco", "monaco-tapas"), image: "https://s3.coresagroup.com/MACROLED/250/milan-tapas.png" },
+      { ...category("Luz de pasillo", "monaco-luz-pasillo"), image: "https://d1zltvqju4u8ql.cloudfront.net/fit-in/2000x2000/MACROLED/WEB/portada_luz_pasillo.webp" }
     ],
     monaco: [
       { ...category("Armadas", "monaco-armadas"), image: "https://s3.coresagroup.com/MACROLED/250/milan.png" },
@@ -92,9 +94,7 @@
               query: {
                 typesenseField: "familia",
                 typesenseValue: "Reflectores PRO",
-                productCount: 4,
-                fetchCount: 80,
-                randomizeBy: "nombre_typesense"
+                productCount: 4
               }
             }
           },
@@ -114,7 +114,7 @@
                 ],
                 productCount: 4,
                 fetchCount: 100,
-                randomizeBy: "nombre_typesense"
+                randomizeBy: "categoria"
               }
             }
           }
@@ -138,7 +138,6 @@
       },
       proyectos: {
         labelActive: "Iluminación para proyectos",
-        labelActiveMobile: "Iluminación proyectos",
         labelInactive: "Proyectos",
         color: "#ffffff",
         textColor: "#00152b",

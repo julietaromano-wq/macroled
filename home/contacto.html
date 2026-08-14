@@ -1,0 +1,1127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+
+<style>
+  :root{
+    --mc-navy: #171b26;
+    --mc-navy-soft: #232a3c;
+    --mc-card: #ffffff;
+    --mc-input-bg: #eef0f3;
+    --mc-text: #171b26;
+    --mc-muted: #6f7686;
+    --mc-white: #ffffff;
+    --mc-line: #dde1e8;
+    --mc-radius-pill: 999px;
+    --mc-radius-card: 24px;
+  }
+  * { box-sizing: border-box; }
+  html, body, input, select, textarea, button{
+    font-family: "Noto Sans", -apple-system, "Segoe UI", Helvetica, Arial, sans-serif;
+  }
+  body{
+    margin: 0;
+
+    color: var(--mc-text);
+
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+
+  .mc-shell{
+    position: relative;
+    padding: 48px 44px;
+    max-width: 1300px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1.05fr 0.95fr;
+    border-radius: var(--mc-radius-card);
+    overflow: hidden;
+    box-shadow: 0 32px 64px rgba(0,0,0,0.22);
+    min-height: 680px;
+    background-image: url("https://cdn.prod.website-files.com/66298c6904f627b9b69307c7/68a646f98550165fbbba08bd_CasaFoa2024.35.4.jpeg");
+    background-size: cover;
+    background-position: center;
+  }
+  .mc-shell::before{
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: linear-gradient(105deg, rgb(0 0 0) 0%, rgb(0 0 0 / 79%) 35%, rgba(0, 0, 0, 0.38) 55%, rgba(0, 0, 0, 0.12) 75%, rgba(0, 0, 0, 0.04) 100%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ================= HERO (izquierda) ================= */
+  .mc-hero{
+    position: relative;
+    z-index: 1;
+    color: #fff;
+    padding: 48px 44px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+  .mc-hero-top, .mc-hero-bottom{ position: relative; z-index: 1; }
+
+  .mc-hero-title{
+    font-size: clamp(32px, 3.4vw, 42px);
+    line-height: 1.12;
+    margin: 0 0 18px;
+    font-weight: 600;
+    letter-spacing: -0.3px;
+    color: #fff;
+    -webkit-text-fill-color: #fff;
+    background: none;
+    background-clip: border-box;
+    -webkit-background-clip: border-box;
+  }
+  .mc-hero p.mc-hero-sub{
+    font-size: 14.5px;
+    line-height: 1.65;
+    color: rgba(255,255,255,0.68);
+    max-width: 360px;
+    margin: 0;
+    font-weight: 400;
+  }
+
+  .mc-hero-bottom{
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 28px 20px;
+    margin-top: 48px;
+    padding-top: 32px;
+    border-top: 1px solid rgba(255,255,255,0.12);
+  }
+  .mc-hero-bottom h4{
+    font-size: 10.5px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: rgba(255,255,255,0.48);
+    margin: 0 0 10px;
+    font-weight: 600;
+  }
+  .mc-hero-bottom p, .mc-hero-bottom a{
+    font-size: 13.5px;
+    line-height: 1.65;
+    color: rgba(255,255,255,0.88);
+    margin: 0;
+    text-decoration: none;
+    display: block;
+  }
+  .mc-hero-bottom a:hover{ color: #fff; text-decoration: underline; }
+
+  /* ================= ENTER MOTION ================= */
+  @keyframes mc-enter-left {
+    from { opacity: 0; transform: translate3d(-4.75rem, 0, 0); }
+    to { opacity: 1; transform: none; }
+  }
+  @keyframes mc-enter-right {
+    from { opacity: 0; transform: translate3d(4.75rem, 0, 0); }
+    to { opacity: 1; transform: none; }
+  }
+  .mc-hero{
+    animation: mc-enter-left 1.2s cubic-bezier(0.16, 1, 0.3, 1) 80ms both;
+  }
+  .mc-form-side{
+    animation: mc-enter-right 1.2s cubic-bezier(0.16, 1, 0.3, 1) 160ms both;
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    .mc-hero,
+    .mc-form-side{
+      animation: none;
+    }
+  }
+
+  /* ================= FORM CARD (derecha) ================= */
+  .mc-form-side{
+    position: relative;
+    z-index: 1;
+    background: var(--mc-card);
+    padding: 48px 44px 44px;
+    overflow: visible;
+    display: flex;
+    flex-direction: column;
+    border-radius: var(--mc-radius-card);
+    min-width: 0;
+  }
+
+  .mc-field{
+    margin-bottom: 25px;
+    margin-top: 6px;
+    position: relative;
+    min-width: 0;
+  }
+  .mc-field:has(.mc-select-open){ z-index: 30; }
+  .mc-row{
+    display: flex;
+    gap: 12px;
+    margin-bottom: 28px;
+    margin-top: 6px;
+  }
+  .mc-row > .mc-field{
+    flex: 1;
+    min-width: 0;
+    margin-bottom: 0;
+    margin-top: 0;
+  }
+
+  /* Estilo search-pill con label sobre el borde */
+  .mc-pill{
+    position: relative;
+    display: flex;
+    align-items: center;
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+    border-radius: 8px;
+    padding: 4px;
+    gap: 0;
+    border: solid 1px #cccbcb;
+    background: #fff;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  }
+  .mc-pill:focus-within{
+    border-color: #a8a7a7;
+    box-shadow: 0 0 0 3px rgba(23,27,38,0.06);
+  }
+  .mc-pill.mc-pill-textarea{
+    border-radius: 8px;
+    align-items: stretch;
+    padding-top: 14px;
+  }
+
+  .mc-border-label{
+    position: absolute;
+    top: 0;
+    left: 18px;
+    transform: translateY(-50%);
+    background: #fff;
+    padding: 0 6px;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--mc-text);
+    letter-spacing: 0;
+    text-transform: none;
+    line-height: 1.2;
+    z-index: 2;
+    pointer-events: none;
+  }
+  .mc-border-label span{
+    font-weight: 400;
+    color: var(--mc-muted);
+  }
+
+  .mc-pill input[type="text"],
+  .mc-pill input[type="email"],
+  .mc-pill input[type="tel"],
+  .mc-pill textarea{
+    width: 100%;
+    flex: 1;
+    min-width: 0;
+    max-width: 100%;
+    padding: 12px 16px;
+    border: none;
+    border-radius: var(--mc-radius-pill);
+    background: transparent;
+    font-size: 13.5px;
+    font-family: inherit;
+    color: var(--mc-text);
+  }
+  .mc-select-wrap{
+    position: relative;
+    width: 100%;
+    flex: 1;
+    min-width: 0;
+    max-width: 100%;
+  }
+  .mc-select-native{
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+  }
+  .mc-select-trigger{
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 12px 16px;
+    border: none;
+    border-radius: 8px;
+    background: transparent;
+    font-size: 13.5px;
+    font-family: inherit;
+    color: var(--mc-text);
+    text-align: left;
+    cursor: pointer;
+  }
+  .mc-select-trigger.is-placeholder{ color: #9096a3; }
+  .mc-select-trigger-text{
+    flex: 1;
+    min-width: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .mc-select-chevron{
+    flex: none;
+    width: 0;
+    height: 0;
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-top: 6px solid var(--mc-muted);
+    transition: transform .15s ease;
+  }
+  .mc-select-open .mc-select-chevron{ transform: rotate(180deg); }
+  .mc-select-menu{
+    display: none;
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: calc(100% + 8px);
+    width: 100%;
+    max-width: 100%;
+    max-height: 220px;
+    overflow-x: hidden;
+    overflow-y: auto;
+    background: #fff;
+    border: 1px solid #cccbcb;
+    border-radius: 12px;
+    box-shadow: 0 12px 28px rgba(20,24,33,.14);
+    z-index: 40;
+    padding: 6px;
+  }
+  .mc-select-open .mc-select-menu{ display: block; }
+  .mc-select-option{
+    display: block;
+    width: 100%;
+    border: none;
+    background: transparent;
+    text-align: left;
+    padding: 10px 12px;
+    border-radius: 8px;
+    font-size: 13.5px;
+    font-family: inherit;
+    color: var(--mc-text);
+    cursor: pointer;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .mc-select-option:hover,
+  .mc-select-option.is-active{
+    background: #f2f4f7;
+  }
+  .mc-select-option:disabled{
+    color: #9096a3;
+    cursor: default;
+  }
+  .mc-select-option:disabled:hover{ background: transparent; }
+  .mc-pill textarea{
+    border-radius: 14px;
+    min-height: 100px;
+    resize: vertical;
+    padding: 12px 16px;
+  }
+  .mc-pill input:focus,
+  .mc-pill textarea:focus,
+  .mc-select-trigger:focus{
+    outline: none;
+  }
+  .mc-pill input::placeholder,
+  .mc-pill textarea::placeholder{ color: #9096a3; }
+
+  /* ---- Upload compacto ---- */
+  .mc-upload-wrap{
+    position: relative;
+    margin-top: 6px;
+  }
+  .mc-upload-wrap .mc-border-label{
+    left: 16px;
+    background: #fff;
+  }
+  .mc-upload-field{ display: none; }
+  .mc-upload-field.mc-active{ display: block; }
+  .mc-upload{
+    position: relative;
+    height: 52px;
+    min-height: 52px;
+    max-height: 52px;
+    border: 1px dashed #cccbcb;
+    border-radius: 999px;
+    background: #fff;
+    padding: 0 14px;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    overflow: hidden;
+    transition: border-color .15s, box-shadow .15s;
+  }
+  .mc-upload:hover,
+  .mc-upload.mc-upload-drag{
+    border-color: var(--mc-navy);
+    box-shadow: 0 0 0 3px rgba(23,27,38,0.05);
+  }
+  .mc-upload input[type="file"]{
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    cursor: pointer;
+    width: 100%;
+    height: 100%;
+  }
+  .mc-upload-empty{
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    pointer-events: none;
+  }
+  .mc-upload.mc-has-file .mc-upload-empty{ display: none; }
+  .mc-upload-btn-icon{
+    flex: none;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--mc-input-bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--mc-navy);
+  }
+  .mc-upload-btn-icon svg{ width: 16px; height: 16px; }
+  .mc-upload-btn-text{
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--mc-text);
+  }
+  .mc-upload-formats-inline{
+    margin-left: auto;
+    font-size: 11px;
+    color: #9096a3;
+    white-space: nowrap;
+  }
+  .mc-upload-preview{
+    display: none;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    min-width: 0;
+  }
+  .mc-upload.mc-has-file .mc-upload-preview{ display: flex; }
+  .mc-upload-thumb{
+    width: 34px;
+    height: 34px;
+    border-radius: 8px;
+    object-fit: cover;
+    flex: none;
+    background: var(--mc-input-bg);
+  }
+  .mc-upload-file-icon{
+    width: 34px;
+    height: 34px;
+    border-radius: 8px;
+    background: var(--mc-input-bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: none;
+    color: var(--mc-navy);
+  }
+  .mc-upload-file-icon svg{ width: 16px; height: 16px; }
+  .mc-upload-meta{ flex: 1; min-width: 0; }
+  .mc-upload-name{
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--mc-text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin: 0;
+  }
+  .mc-upload-size{
+    font-size: 11px;
+    color: var(--mc-muted);
+    margin: 1px 0 0;
+  }
+  .mc-upload-remove{
+    flex: none;
+    border: none;
+    background: transparent;
+    color: var(--mc-muted);
+    cursor: pointer;
+    padding: 6px;
+    border-radius: 8px;
+    line-height: 0;
+    transition: color .15s, background .15s;
+  }
+  .mc-upload-remove:hover{
+    color: #c0392b;
+    background: #fdecea;
+  }
+  .mc-upload-remove svg{ width: 15px; height: 15px; }
+
+  /* ---- bloques condicionales ---- */
+  .mc-conditional{
+    display: none;
+    margin-top: 4px;
+    margin-bottom: 12px;
+    padding-top: 4px;
+  }
+  .mc-conditional.mc-active{ display: block; }
+
+  .mc-checkbox-row{
+    display:flex;
+    align-items:flex-start;
+    gap: 10px;
+    margin: 18px 0 22px;
+  }
+  .mc-checkbox-row input{
+    width: 16px;
+    height: 16px;
+    margin-top: 2px;
+    accent-color: var(--mc-navy);
+    flex: none;
+  }
+  .mc-checkbox-row label{
+    font-size: 12.5px;
+    color: var(--mc-muted);
+    line-height: 1.45;
+    cursor: pointer;
+  }
+
+  .mc-submit{
+    width: 100%;
+    background: var(--mc-navy);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 16px 16px;
+    font-size: 14.5px;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    transition: background .15s, transform .12s;
+    margin-top: auto;
+  }
+  .mc-submit:hover{ background: var(--mc-navy-soft); }
+  .mc-submit:active{ transform: scale(0.995); }
+
+  /* ================= RESPONSIVE ================= */
+  @media (max-width: 1024px){
+    body{ padding: 28px 16px; }
+    .mc-shell{
+      padding: 28px 24px;
+      min-height: 620px;
+    }
+    .mc-hero{ padding: 32px 28px; }
+    .mc-form-side{ padding: 36px 32px 32px; }
+    .mc-hero-title{ font-size: clamp(28px, 4vw, 36px); }
+  }
+
+  @media (max-width: 860px){
+    body{
+      padding: 16px 12px;
+      background: #fff;
+    }
+    .mc-shell{
+      grid-template-columns: 1fr;
+      border-radius: 18px;
+      min-height: auto;
+      padding: 0;
+      gap: 0;
+      background-image: none;
+      background-color: #fff;
+      box-shadow: none;
+    }
+    .mc-shell::before{ display: none; }
+    .mc-hero{
+      padding: 28px 24px 12px;
+      min-height: auto;
+      color: var(--mc-text);
+    }
+    .mc-hero-title{
+      font-size: clamp(26px, 7vw, 34px);
+      margin-bottom: 14px;
+      color: var(--mc-text);
+      -webkit-text-fill-color: var(--mc-text);
+    }
+    .mc-hero p.mc-hero-sub{
+      max-width: none;
+      font-size: 14px;
+      color: var(--mc-muted);
+    }
+    .mc-hero-bottom{ display: none; }
+    .mc-form-side{
+      padding: 20px 22px 28px;
+      border-radius: 0;
+      margin-top: 0;
+      box-shadow: none;
+    }
+    .mc-row{
+      flex-direction: column;
+      gap: 0;
+      margin-bottom: 0;
+    }
+    .mc-row > .mc-field{
+      margin-bottom: 25px;
+      margin-top: 6px;
+    }
+    .mc-row > .mc-field:last-child{ margin-bottom: 25px; }
+    .mc-upload{
+      height: 58px;
+      min-height: 58px;
+      max-height: 58px;
+      padding: 0 14px;
+    }
+    .mc-upload-btn-icon{
+      width: 34px;
+      height: 34px;
+    }
+    .mc-upload-btn-icon svg{ width: 18px; height: 18px; }
+    .mc-upload-btn-text{ font-size: 14px; }
+  }
+
+  @media (max-width: 560px){
+    body{ padding: 10px 8px; }
+    .mc-shell{ border-radius: 0; }
+    .mc-hero{
+      padding: 24px 18px 8px;
+      min-height: auto;
+    }
+    .mc-hero-title{
+      font-size: clamp(24px, 8vw, 30px);
+      line-height: 1.15;
+    }
+    .mc-hero p.mc-hero-sub{
+      font-size: 13.5px;
+      line-height: 1.55;
+    }
+    .mc-form-side{
+      padding: 16px 16px 24px;
+      border-radius: 0;
+    }
+    .mc-field{ margin-bottom: 22px; }
+    .mc-row > .mc-field{ margin-bottom: 22px; }
+    .mc-pill input[type="text"],
+    .mc-pill input[type="email"],
+    .mc-pill input[type="tel"],
+    .mc-pill textarea,
+    .mc-select-trigger{
+      font-size: 16px; /* evita zoom automático en iOS */
+      padding: 13px 14px;
+    }
+    .mc-pill textarea{ min-height: 90px; }
+    .mc-border-label{
+      left: 14px;
+      font-size: 11.5px;
+    }
+    .mc-upload{
+      height: 58px;
+      min-height: 58px;
+      max-height: 58px;
+      padding: 0 14px;
+    }
+    .mc-upload-btn-icon{
+      width: 34px;
+      height: 34px;
+    }
+    .mc-upload-btn-icon svg{ width: 18px; height: 18px; }
+    .mc-upload-btn-text{ font-size: 14px; }
+    .mc-upload-formats-inline{ font-size: 11px; }
+    .mc-upload-thumb,
+    .mc-upload-file-icon{
+      width: 38px;
+      height: 38px;
+    }
+    .mc-upload-remove{ padding: 8px; }
+    .mc-checkbox-row{
+      margin: 14px 0 18px;
+    }
+    .mc-checkbox-row label{ font-size: 12px; }
+    .mc-submit{
+      padding: 15px 16px;
+      font-size: 14px;
+    }
+  }
+
+  @media (max-width: 400px){
+    .mc-hero{ padding: 20px 14px 6px; }
+    .mc-form-side{ padding: 14px 14px 20px; }
+    .mc-upload-formats-inline{ display: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="mc-shell">
+
+  <!-- ================= HERO ================= -->
+  <div class="mc-hero">
+    <div class="mc-hero-top">
+      <h1 class="mc-hero-title">Tenés preguntas,<br/>tenemos respuestas</h1>
+      <p class="mc-hero-sub">
+        Asesoramiento técnico y comercial para tu proyecto de iluminación.
+        Contanos qué necesitás y te acompañamos en cada etapa.
+      </p>
+    </div>
+
+    <div class="mc-hero-bottom">
+      
+      <div>
+        <h4>Redes</h4>
+        <a href="#">Instagram</a>
+        <a href="#">LinkedIn</a>
+        <a href="#">Facebook</a>
+      </div>
+     
+      <div>
+        <h4>Contacto</h4>
+        <a href="mailto:info@macroled.com.ar">info@macroled.com.ar</a>
+        <a href="tel:+541100000000">+54 11 0000-0000</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= FORM ================= -->
+  <div class="mc-form-side">
+    <form id="mc-contact-form">
+
+      <div class="mc-field">
+        <div class="mc-pill">
+          <label class="mc-border-label" for="mc-nombre">Nombre completo</label>
+          <input id="mc-nombre" type="text" name="nombre_completo" placeholder="Tu nombre completo" required />
+        </div>
+      </div>
+
+      <div class="mc-field">
+        <div class="mc-pill">
+          <label class="mc-border-label" for="mc-provincia">Provincia</label>
+          <div class="mc-select-wrap">
+            <select id="mc-provincia" name="provincia" required>
+              <option value="" disabled selected>Seleccioná una provincia</option>
+              <option>Buenos Aires</option>
+              <option>Catamarca</option>
+              <option>Chaco</option>
+              <option>Chubut</option>
+              <option>Ciudad Autónoma de Buenos Aires (CABA)</option>
+              <option>Córdoba</option>
+              <option>Corrientes</option>
+              <option>Entre Ríos</option>
+              <option>Formosa</option>
+              <option>Jujuy</option>
+              <option>La Pampa</option>
+              <option>La Rioja</option>
+              <option>Mendoza</option>
+              <option>Misiones</option>
+              <option>Neuquén</option>
+              <option>Río Negro</option>
+              <option>Salta</option>
+              <option>San Juan</option>
+              <option>San Luis</option>
+              <option>Santa Cruz</option>
+              <option>Santa Fe</option>
+              <option>Santiago del Estero</option>
+              <option>Tierra del Fuego</option>
+              <option>Tucumán</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="mc-field">
+        <div class="mc-pill">
+          <label class="mc-border-label" for="mc-ciudad">Ciudad</label>
+          <input id="mc-ciudad" type="text" name="ciudad" placeholder="Tu ciudad" required />
+        </div>
+      </div>
+
+      <div class="mc-row">
+        <div class="mc-field">
+          <div class="mc-pill">
+            <label class="mc-border-label" for="mc-email">Email</label>
+            <input id="mc-email" type="email" name="email" placeholder="tu@email.com" required />
+          </div>
+        </div>
+        <div class="mc-field">
+          <div class="mc-pill">
+            <label class="mc-border-label" for="mc-telefono">Teléfono</label>
+            <input id="mc-telefono" type="tel" name="telefono" placeholder="+54 11 0000-0000" required />
+          </div>
+        </div>
+      </div>
+
+      <div class="mc-field">
+        <div class="mc-pill">
+          <label class="mc-border-label" for="mc-tipo-consulta">Tipo de consulta</label>
+          <div class="mc-select-wrap">
+            <select id="mc-tipo-consulta" name="tipo_consulta" required>
+              <option value="" disabled selected>Seleccioná una opción</option>
+              <option value="tecnica">Técnica</option>
+              <option value="comercial">Comercial</option>
+              <option value="garantia">Proceso de garantía</option>
+              <option value="asesoramiento">Asesoramiento lumínico</option>
+              <option value="trabaja-con-nosotros">Trabajá con nosotros</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- ============ Condicional: Garantía ============ -->
+      <div class="mc-conditional" data-shows-for="garantia">
+        <div class="mc-field">
+          <div class="mc-pill">
+            <label class="mc-border-label" for="mc-comercio">Nombre del comercio</label>
+            <input id="mc-comercio" type="text" name="nombre_comercio" placeholder="Comercio donde adquirió el producto" />
+          </div>
+        </div>
+      </div>
+
+      <!-- ======= Condicional: Asesoramiento lumínico ======= -->
+      <div class="mc-conditional" data-shows-for="asesoramiento">
+        <div class="mc-field">
+          <div class="mc-pill">
+            <label class="mc-border-label" for="mc-tipo-producto">Tipo de producto</label>
+            <div class="mc-select-wrap">
+              <select id="mc-tipo-producto" name="tipo_producto">
+                <option value="" disabled selected>Seleccioná un producto</option>
+                <option>Titán</option>
+                <option>Focus</option>
+                <option>Olimpus</option>
+                <option>Industrial</option>
+                <option>Farolas Pro</option>
+                <option>Galponeras Pro</option>
+                <option>Galponeras Eco</option>
+                <option>Pública</option>
+                <option>Solar</option>
+                <option>Lumax</option>
+                <option>Otra</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="mc-field">
+        <div class="mc-pill mc-pill-textarea">
+          <label class="mc-border-label" for="mc-comentarios">Comentarios</label>
+          <textarea id="mc-comentarios" name="comentarios" placeholder="Contanos más detalles…"></textarea>
+        </div>
+      </div>
+
+      <div class="mc-field mc-upload-field" id="mc-upload-field">
+        <div class="mc-upload-wrap">
+          <span class="mc-border-label" id="mc-upload-label">Ticket o factura</span>
+          <div class="mc-upload" data-upload id="mc-upload-zone">
+            <input type="file" name="archivo_adjunto" id="mc-archivo" accept="image/*,.pdf" />
+            <div class="mc-upload-empty">
+              <span class="mc-upload-btn-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M12 16V4m0 0l-4 4m4-4l4 4"/>
+                  <path d="M4 17v2a2 2 0 002 2h12a2 2 0 002-2v-2"/>
+                </svg>
+              </span>
+              <span class="mc-upload-btn-text">Seleccionar archivo</span>
+              <span class="mc-upload-formats-inline">Máx. 10 MB</span>
+            </div>
+            <div class="mc-upload-preview">
+              <img class="mc-upload-thumb" alt="" hidden />
+              <div class="mc-upload-file-icon" hidden>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
+                  <path d="M14 2v6h6"/>
+                </svg>
+              </div>
+              <div class="mc-upload-meta">
+                <p class="mc-upload-name"></p>
+                <p class="mc-upload-size"></p>
+              </div>
+              <button type="button" class="mc-upload-remove" aria-label="Quitar archivo">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                  <path d="M18 6L6 18M6 6l12 12"/>
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="mc-checkbox-row">
+        <input type="checkbox" id="mc-newsletter" name="quiere_novedades" />
+        <label for="mc-newsletter">Quiero recibir novedades y ofertas exclusivas</label>
+      </div>
+
+      <button type="submit" class="mc-submit">Enviar</button>
+    </form>
+  </div>
+
+</div>
+
+<script>
+  (function(){
+    function initCustomSelect(wrap){
+      const select = wrap.querySelector('select');
+      if(!select || wrap.dataset.enhanced === '1') return;
+      wrap.dataset.enhanced = '1';
+      select.classList.add('mc-select-native');
+
+      const trigger = document.createElement('button');
+      trigger.type = 'button';
+      trigger.className = 'mc-select-trigger';
+      trigger.setAttribute('aria-haspopup', 'listbox');
+      trigger.innerHTML = '<span class="mc-select-trigger-text"></span><span class="mc-select-chevron" aria-hidden="true"></span>';
+
+      const menu = document.createElement('div');
+      menu.className = 'mc-select-menu';
+      menu.setAttribute('role', 'listbox');
+
+      const labelText = trigger.querySelector('.mc-select-trigger-text');
+
+      function syncFromSelect(){
+        const selected = select.options[select.selectedIndex];
+        const isPlaceholder = !selected || selected.disabled || selected.value === '';
+        labelText.textContent = selected ? selected.textContent : '';
+        trigger.classList.toggle('is-placeholder', isPlaceholder);
+        menu.querySelectorAll('.mc-select-option').forEach(function(btn){
+          btn.classList.toggle('is-active', btn.dataset.value === select.value && select.value !== '');
+        });
+      }
+
+      function closeMenu(){
+        wrap.classList.remove('mc-select-open');
+        trigger.setAttribute('aria-expanded', 'false');
+      }
+
+      function openMenu(){
+        document.querySelectorAll('.mc-select-wrap.mc-select-open').forEach(function(other){
+          if(other !== wrap) other.classList.remove('mc-select-open');
+        });
+        wrap.classList.add('mc-select-open');
+        trigger.setAttribute('aria-expanded', 'true');
+      }
+
+      Array.prototype.forEach.call(select.options, function(opt){
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'mc-select-option';
+        btn.textContent = opt.textContent;
+        btn.dataset.value = opt.value;
+        if(opt.disabled) btn.disabled = true;
+        btn.addEventListener('click', function(){
+          if(opt.disabled) return;
+          select.value = opt.value;
+          select.dispatchEvent(new Event('change', { bubbles: true }));
+          syncFromSelect();
+          closeMenu();
+        });
+        menu.appendChild(btn);
+      });
+
+      trigger.addEventListener('click', function(e){
+        e.preventDefault();
+        if(wrap.classList.contains('mc-select-open')) closeMenu();
+        else openMenu();
+      });
+
+      wrap.appendChild(trigger);
+      wrap.appendChild(menu);
+      syncFromSelect();
+      select.addEventListener('change', syncFromSelect);
+    }
+
+    document.querySelectorAll('.mc-select-wrap').forEach(initCustomSelect);
+
+    document.addEventListener('click', function(e){
+      if(!e.target.closest('.mc-select-wrap')){
+        document.querySelectorAll('.mc-select-wrap.mc-select-open').forEach(function(wrap){
+          wrap.classList.remove('mc-select-open');
+        });
+      }
+    });
+
+    document.addEventListener('keydown', function(e){
+      if(e.key === 'Escape'){
+        document.querySelectorAll('.mc-select-wrap.mc-select-open').forEach(function(wrap){
+          wrap.classList.remove('mc-select-open');
+        });
+      }
+    });
+
+    const tipoSelect = document.getElementById('mc-tipo-consulta');
+    const conditionalBlocks = document.querySelectorAll('.mc-conditional');
+    const uploadField = document.getElementById('mc-upload-field');
+    const uploadZone = document.getElementById('mc-upload-zone');
+    const uploadInput = document.getElementById('mc-archivo');
+    const uploadLabel = document.getElementById('mc-upload-label');
+    const MAX_FILE_SIZE = 10 * 1024 * 1024;
+    const uploadTypes = ['garantia', 'asesoramiento', 'trabaja-con-nosotros'];
+
+    const uploadConfig = {
+      garantia: {
+        label: 'Ticket o factura',
+        optional: false,
+        accept: 'image/*,.pdf'
+      },
+      asesoramiento: {
+        label: 'Imagen de referencia',
+        optional: true,
+        accept: 'image/*'
+      },
+      'trabaja-con-nosotros': {
+        label: 'CV',
+        optional: false,
+        accept: '.pdf,.doc,.docx,application/pdf'
+      }
+    };
+
+    function updateUploadConfig(value){
+      const showUpload = uploadTypes.includes(value);
+      uploadField.classList.toggle('mc-active', showUpload);
+      if(!showUpload){
+        resetUploadZone(uploadZone);
+        return;
+      }
+      const config = uploadConfig[value];
+      uploadLabel.innerHTML = config.optional
+        ? config.label + ' <span>(opcional)</span>'
+        : config.label;
+      uploadInput.accept = config.accept;
+    }
+
+    function formatSize(bytes){
+      if(bytes < 1024) return bytes + ' B';
+      if(bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+      return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+    }
+
+    function resetUploadZone(zone){
+      const input = zone.querySelector('input[type="file"]');
+      const preview = zone.querySelector('.mc-upload-preview');
+      const thumb = zone.querySelector('.mc-upload-thumb');
+      const fileIcon = zone.querySelector('.mc-upload-file-icon');
+      input.value = '';
+      zone.classList.remove('mc-has-file');
+      thumb.hidden = true;
+      thumb.removeAttribute('src');
+      fileIcon.hidden = true;
+      preview.querySelector('.mc-upload-name').textContent = '';
+      preview.querySelector('.mc-upload-size').textContent = '';
+    }
+
+    function updateUploadZone(zone, file){
+      const preview = zone.querySelector('.mc-upload-preview');
+      const thumb = zone.querySelector('.mc-upload-thumb');
+      const fileIcon = zone.querySelector('.mc-upload-file-icon');
+      const nameEl = preview.querySelector('.mc-upload-name');
+      const sizeEl = preview.querySelector('.mc-upload-size');
+
+      if(!file){
+        resetUploadZone(zone);
+        return;
+      }
+
+      if(file.size > MAX_FILE_SIZE){
+        alert('El archivo supera el máximo de 10 MB.');
+        resetUploadZone(zone);
+        return;
+      }
+
+      zone.classList.add('mc-has-file');
+      nameEl.textContent = file.name;
+      sizeEl.textContent = formatSize(file.size);
+
+      if(file.type.startsWith('image/')){
+        const reader = new FileReader();
+        reader.onload = function(e){
+          thumb.src = e.target.result;
+          thumb.hidden = false;
+          fileIcon.hidden = true;
+        };
+        reader.readAsDataURL(file);
+      } else {
+        thumb.hidden = true;
+        thumb.removeAttribute('src');
+        fileIcon.hidden = false;
+      }
+    }
+
+    function initUploadZone(zone){
+      const input = zone.querySelector('input[type="file"]');
+      const removeBtn = zone.querySelector('.mc-upload-remove');
+
+      input.addEventListener('change', function(){
+        updateUploadZone(zone, input.files[0] || null);
+      });
+
+      removeBtn.addEventListener('click', function(e){
+        e.preventDefault();
+        e.stopPropagation();
+        resetUploadZone(zone);
+      });
+
+      ['dragenter', 'dragover'].forEach(function(evt){
+        zone.addEventListener(evt, function(e){
+          e.preventDefault();
+          zone.classList.add('mc-upload-drag');
+        });
+      });
+      ['dragleave', 'drop'].forEach(function(evt){
+        zone.addEventListener(evt, function(e){
+          e.preventDefault();
+          zone.classList.remove('mc-upload-drag');
+        });
+      });
+      zone.addEventListener('drop', function(e){
+        const file = e.dataTransfer.files[0];
+        if(!file) return;
+        const dt = new DataTransfer();
+        dt.items.add(file);
+        input.files = dt.files;
+        updateUploadZone(zone, file);
+      });
+    }
+
+    document.querySelectorAll('[data-upload]').forEach(initUploadZone);
+
+    function updateConditionals(value){
+      conditionalBlocks.forEach(function(block){
+        const isActive = block.getAttribute('data-shows-for') === value;
+        block.classList.toggle('mc-active', isActive);
+        if(!isActive){
+          block.querySelectorAll('input:not([type="file"]), select').forEach(function(el){
+            el.value = '';
+          });
+        }
+      });
+      updateUploadConfig(value);
+    }
+
+    updateUploadConfig(tipoSelect.value);
+
+    tipoSelect.addEventListener('change', function(){
+      updateConditionals(tipoSelect.value);
+    });
+
+    document.getElementById('mc-contact-form').addEventListener('submit', function(e){
+      e.preventDefault();
+      if(!tipoSelect.value){
+        alert('Elegí un tipo de consulta antes de enviar.');
+        return;
+      }
+      alert('Estructura OK. Falta conectar el envío real (n8n).');
+    });
+  })();
+</script>
+
+</body>
+
+</html>

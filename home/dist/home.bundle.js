@@ -27,10 +27,12 @@
    */
   const MANUAL_CATEGORIES = {
     interior: [
+      { ...category("Tiras LED", "tiras-led"), image: "https://d1zltvqju4u8ql.cloudfront.net/fit-in/250x250/filters:format(png)/MACROLED/1000/0742832556316a.png", badge: "Nuevo" },
       { ...category("Lámparas", "lamparas"), image: "https://d1zltvqju4u8ql.cloudfront.net/fit-in/250x250/filters:format(png)/MACROLED/1000/7428325565203a.png" },
       { ...category("Artefactos para lámparas", "artefactos-para-lamparas"), image: "https://d1zltvqju4u8ql.cloudfront.net/fit-in/250x250/filters:format(png)/MACROLED/1000/7428325574748a.png" },
       { ...category("Interruptores y tomas", "interruptores-y-tomas"), image: "https://d1zltvqju4u8ql.cloudfront.net/fit-in/250x250/MACROLED/WEB/LIMA-1CN-USB-CC-30W-B_FRONT.webp" },
-      { ...category("Tiras LED", "tiras-led"), image: "https://d1zltvqju4u8ql.cloudfront.net/fit-in/250x250/filters:format(png)/MACROLED/1000/0742832556316a.png", badge: "Nuevo" }
+      { ...category("Armadas Monaco", "monaco-armadas"), image: "https://s3.coresagroup.com/MACROLED/250/milan.png" },
+      { ...category("Bastidor + Módulos", "monaco-bastidor-modulos"), image: "https://s3.coresagroup.com/MACROLED/250/milan-bastidores.png" }
     ],
     monaco: [
       { ...category("Armadas", "monaco-armadas"), image: "https://s3.coresagroup.com/MACROLED/250/milan.png" },
@@ -42,13 +44,17 @@
       { ...category("Reflectores", "reflectores"), image: "https://d1zltvqju4u8ql.cloudfront.net/fit-in/250x250/MACROLED/WEB/PFL-400W-060D-857-CW_PERS.webp" },
       { ...category("Solar", "solar"), image: "https://d1zltvqju4u8ql.cloudfront.net/fit-in/250x250/filters:format(png)/MACROLED/1000/7428325578388a.png" },
       { ...category("Tortugas", "tortugas"), image: "https://d1zltvqju4u8ql.cloudfront.net/fit-in/250x250/filters:format(png)/MACROLED/1000/7428325571648a.png" },
-      { ...category("Estacas", "estacas"), image: "https://d1zltvqju4u8ql.cloudfront.net/fit-in/250x250/filters:format(png)/MACROLED/1000/7428325575684a.png" }
+      { ...category("Estacas", "estacas"), image: "https://d1zltvqju4u8ql.cloudfront.net/fit-in/250x250/filters:format(png)/MACROLED/1000/7428325575684a.png" },
+      { ...category("Wall washers", "wall-washers"), image: "https://d1zltvqju4u8ql.cloudfront.net/fit-in/250x250/MACROLED/WEB/PFL-400W-060D-857-CW_PERS.webp" },
+      { ...category("Campanas LED", "campanas-led"), image: "https://s3.coresagroup.com/MACROLED/250/galponeras-eco.webp" }
     ],
     proyectos: [
       { ...category("Luz de calle", "proyectos-01"), image: "https://d1zltvqju4u8ql.cloudfront.net/fit-in/250x250/MACROLED/WEB/SLG2-100W-757-CW_FRONT.webp", badge: "Nuevo" },
       { ...category("Lumax", "proyectos-02"), image: "https://s3.coresagroup.com/MACROLED/250/lumax.png", badge: "Nuevo" },
       { ...category("Highbay Classic", "proyectos-03"), image: "https://s3.coresagroup.com/MACROLED/250/galponeras-eco.webp" },
-      { ...category("Highbay Pro", "proyectos-04"), image: "https://s3.coresagroup.com/MACROLED/250/PHB-200W-90D-857-CW.png" }
+      { ...category("Highbay Pro", "proyectos-04"), image: "https://s3.coresagroup.com/MACROLED/250/PHB-200W-90D-857-CW.png" },
+      { ...category("Invictus", "proyectos-05"), image: "assets/images/project-invictus-product.png" },
+      { ...category("Street", "proyectos-06"), image: "assets/images/project-street-product-source.png" }
     ].map((item) => ({
       ...item,
       subtitle: "Proyecto lumínico"
@@ -73,6 +79,7 @@
         featuredLines: [
           {
             ...line("Línea Monaco", "Módulos y tomas diseñados con un enfoque en estética, funcionalidad y seguridad. Una propuesta versátil con armadas, conexiones y componentes pensados para adaptarse a instalaciones eléctricas contemporáneas.", "#e9ecef", "#101820", "image-left"),
+            id: "monaco",
             image: "https://cdn.prod.website-files.com/65f1fdd7248b6709fdebe904/69a977bb0fe12ec5b81b7e9b_monaco-cover%20copia.webp",
             imageFit: "contain",
             titleEmphasis: "Monaco",
@@ -88,7 +95,9 @@
               query: {
                 typesenseField: "familia",
                 typesenseValue: "Reflectores PRO",
-                productCount: 4
+                productCount: 4,
+                fetchCount: 80,
+                randomizeBy: "nombre_typesense"
               }
             }
           },
@@ -108,7 +117,7 @@
                 ],
                 productCount: 4,
                 fetchCount: 100,
-                randomizeBy: "categoria"
+                randomizeBy: "nombre_typesense"
               }
             }
           }
@@ -132,6 +141,7 @@
       },
       proyectos: {
         labelActive: "Iluminación para proyectos",
+        labelActiveMobile: "Iluminación proyectos",
         labelInactive: "Proyectos",
         color: "#ffffff",
         textColor: "#00152b",
@@ -194,9 +204,6 @@
 /* Source: home/js/products.js */
 (function (window) {
   "use strict";
-  const ICON_WIFI='<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/></svg>';
-  const ICON_BULB='<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M12 2a7 7 0 0 0-4 12.7c.6.5 1 1.3 1 2.1V17h6v-.2c0-.8.4-1.6 1-2.1A7 7 0 0 0 12 2z"/></svg>';
-  const TEMP_TONES={calido:{color:"#fff79b",label:"Cálido"},neutro:{color:"#d9d9d9",label:"Neutro"},frio:{color:"#bce4fa",label:"Frío"}};
   const cache=new Map();
   const escapeHTML=value=>String(value??"").replace(/[&<>'"]/g,char=>({"&":"&amp;","<":"&lt;",">":"&gt;","'":"&#39;",'"':"&quot;"}[char]));
   const safeUrl=value=>{try{const url=new URL(String(value),window.location.href);return ["http:","https:"].includes(url.protocol)?url.href:""}catch(_){return ""}};
@@ -205,8 +212,7 @@
     const raw=doc.multiimagen;let imgs=[];
     if(Array.isArray(raw)) imgs=raw;
     else if(raw){try{const parsed=JSON.parse(raw);if(Array.isArray(parsed)) imgs=parsed}catch(_){imgs=String(raw).split(/[;,|]/).map(s=>s.trim()).filter(Boolean)}}
-    const firstImage=imgs.map(safeUrl).find(Boolean);
-    return firstImage?[firstImage]:[];
+    return imgs.map(safeUrl).filter(Boolean);
   }
   function mergeVariantValue(doc,nombre,baseValor){
     const base=String(baseValor??"");if(!Array.isArray(doc.atributo_variante)) return base;
@@ -214,13 +220,33 @@
     const extras=doc.atributo_variante.filter(v=>String(v.nombre||"").toLowerCase()===String(nombre||"").toLowerCase()&&v.valor&&!existing.includes(String(v.valor))).map(v=>String(v.valor));
     return extras.length?[base,...extras].filter(Boolean).join(" ; "):base;
   }
-  function buildSpecs(doc){
-    const isLuzLike=label=>/^(luz|temperatura)/i.test(String(label||"").trim());
-    return [{label:doc.nombre_attr1,value:doc.attr1},{label:doc.nombre_attr2,value:doc.attr2}]
-      .filter(attribute=>attribute.label&&attribute.value&&!isLuzLike(attribute.label))
-      .map(attribute=>({label:attribute.label,value:mergeVariantValue(doc,attribute.label,attribute.value)}))
-      .slice(0,2);
+  function rawSpecs(doc){
+    if(Array.isArray(doc.atributos)&&doc.atributos.length){
+      return doc.atributos.map(a=>({label:a.nombre,value:mergeVariantValue(doc,a.nombre,a.valor)}));
+    }
+    return [
+      {label:doc.nombre_attr1,value:doc.attr1},
+      {label:doc.nombre_attr2,value:doc.attr2},
+      {label:doc.nombre_attr3,value:doc.attr3}
+    ].filter(p=>p.label&&p.value).map(p=>({label:p.label,value:mergeVariantValue(doc,p.label,p.value)}));
   }
+  const isTemperatureSpec=spec=>/temperatura|luz|kelvin|\bcct\b/i.test(String(spec.label||""))||/\b\d{4}\s*k\b/i.test(String(spec.value||""));
+  const isSmartSpec=spec=>/^smart$/i.test(String(spec.value||"").trim())||/\bsmart\b/i.test(String(spec.label||""));
+  const normalizedLabel=value=>String(value||"").trim().toLocaleLowerCase("es");
+  function variantSpec(doc){
+    const label=String(doc.nombre_attr_variantes||"").trim();
+    const value=String(doc.attr_variantes||"").trim();
+    return label&&value?{label,value}:null;
+  }
+  function buildSpecs(doc){
+    const variant=variantSpec(doc);
+    const variantLabel=normalizedLabel(variant?.label);
+    const specs=rawSpecs(doc).filter(spec=>normalizedLabel(spec.label)!==variantLabel&&!isTemperatureSpec(spec)&&!isSmartSpec(spec));
+    if(variant&&!isTemperatureSpec(variant)&&!isSmartSpec(variant)) specs.unshift(variant);
+    return specs.slice(0,2);
+  }
+  const ICON_BULB='<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M12 2a7 7 0 0 0-4 12.7c.6.5 1 1.3 1 2.1V17h6v-.2c0-.8.4-1.6 1-2.1A7 7 0 0 0 12 2z"/></svg>';
+  const TEMP_TONES={calido:{color:"#fff79b",label:"Cálido"},neutro:{color:"#d9d9d9",label:"Neutro"},frio:{color:"#bce4fa",label:"Frío"}};
   function tempCategoryKey(value){
     const raw=String(value||"").trim().toLowerCase();
     if(/c[aá]lido/.test(raw))return "calido";
@@ -232,22 +258,46 @@
     if(kelvin<=4500)return "neutro";
     return "frio";
   }
-  function buildLuzCategoryKeys(doc,fallbackValue){
+  function buildLuzCategoryKeys(doc){
     const isVariantLuz=String(doc.nombre_attr_variantes||"").trim().toLowerCase()==="luz"&&doc.attr_variantes;
-    const source=isVariantLuz?doc.attr_variantes:fallbackValue;if(!source)return [];
+    const sources=[
+      isVariantLuz?doc.attr_variantes:"",
+      doc.attr3,
+      doc.rango_temperatura,
+      ...(rawSpecs(doc).filter(isTemperatureSpec).map(spec=>spec.value)),
+      ...(Array.isArray(doc.variante_temperatura_filtro)?doc.variante_temperatura_filtro:[])
+    ];
     const bestKelvinByKey=new Map();
-    String(source).split(";").map(tone=>tone.trim()).filter(Boolean).forEach(tone=>{const key=tempCategoryKey(tone);if(!key)return;const parsed=parseInt(tone,10),sortKelvin=Number.isNaN(parsed)?(key==="calido"?2700:key==="neutro"?4000:6500):parsed;if(!bestKelvinByKey.has(key)||sortKelvin<bestKelvinByKey.get(key))bestKelvinByKey.set(key,sortKelvin)});
+    sources.filter(Boolean).forEach(source=>{
+      String(source).split(/[;,|]/).map(tone=>tone.trim()).filter(Boolean).forEach(tone=>{
+        const key=tempCategoryKey(tone);
+        if(!key) return;
+        const parsed=parseInt(tone,10);
+        const sortKelvin=Number.isNaN(parsed)?(key==="calido"?2700:key==="neutro"?4000:6500):parsed;
+        if(!bestKelvinByKey.has(key)||sortKelvin<bestKelvinByKey.get(key)) bestKelvinByKey.set(key,sortKelvin);
+      });
+    });
     return [...bestKelvinByKey.entries()].sort((a,b)=>a[1]-b[1]).map(([key])=>key);
   }
-  function buildLuzMediaDots(doc){
-    const isVariantLuz=String(doc.nombre_attr_variantes||"").trim().toLowerCase()==="luz";
-    const fallback=isVariantLuz?(doc.attr_variantes||doc.attr3||""):(doc.attr3||"");
-    const keys=buildLuzCategoryKeys(doc,fallback);if(!keys.length)return "";
-    const rows=keys.map(key=>{const {color,label}=TEMP_TONES[key];return `<span class="temp-dots-row"><span class="temp-dots-label">${label}</span><span class="dot luz-dot" style="background:${color}" title="${label}" aria-label="${label}"></span></span>`}).join("");
+  function buildTempBadge(doc){
+    const keys=buildLuzCategoryKeys(doc);
+    if(!keys.length) return "";
+    const rows=keys.map(key=>{
+      const {color,label}=TEMP_TONES[key];
+      return `<span class="temp-dots-row"><span class="temp-dots-label">${label}</span><span class="dot luz-dot" style="background:${color}" title="${label}" aria-label="${label}"></span></span>`;
+    }).join("");
     return `<span class="temp-dots${keys.length>=2?" is-collapsed":""}" tabindex="0" aria-label="Temperatura de luz"><span class="temp-dots-icon" aria-hidden="true">${ICON_BULB}</span>${rows}</span>`;
   }
+  function buildVariantBadge(doc){
+    const configured=parseInt(doc.cant_variantes,10);
+    const fieldCount=variantSpec(doc)?.value.split(";").map(value=>value.trim()).filter(Boolean).length||0;
+    const skuCount=Array.isArray(doc.variantes_sku)?doc.variantes_sku.length:0;
+    const count=configured>0?configured:Math.max(fieldCount,skuCount);
+    return count>1?`<span class="badge">${count} variantes</span>`:"";
+  }
   function buildSmartBadge(doc){
-    return String(doc.attr2||"").trim().toLowerCase()==="smart"?`<span class="smart-badge">${ICON_WIFI}SMART</span>`:"";
+    const directSmart=doc.smart===true||doc.es_smart===true||[doc.smart,doc.es_smart].some(value=>/^(si|sí|true|1|smart)$/i.test(String(value||"").trim()));
+    return directSmart||rawSpecs(doc).some(isSmartSpec)?'<span class="ml-product-smart-badge" aria-label="Producto Smart">SMART</span>':"";
   }
   const filterValue=value=>String(value??"").replace(/`/g,"\\`");
   const shuffled=items=>{const copy=[...items];for(let index=copy.length-1;index>0;index--){const swap=Math.floor(Math.random()*(index+1));[copy[index],copy[swap]]=[copy[swap],copy[index]]}return copy};
@@ -274,12 +324,14 @@
   }
   function cardTemplate(doc){
     const imgs=parseImages(doc),specs=buildSpecs(doc),link=safeUrl(doc.link_ficha_web),tag=link?"a":"div";
-    const specsHtml=specs.map(spec=>`<div class="spec"><span class="spec-label">${escapeHTML(spec.label)}</span><span class="val">${escapeHTML(spec.value)}</span></div>`).join("");
-    const variantCount=Array.isArray(doc.variantes_sku)?doc.variantes_sku.length:0;
-    const badgeHtml=variantCount>1?`<span class="badge">${variantCount} variantes</span>`:"";
-    const tempHtml=buildLuzMediaDots(doc),metaInner=`${badgeHtml}${tempHtml}`;
-    const image=imgs.length?`<img src="${escapeHTML(imgs[0])}" alt="${escapeHTML(doc.nombre_typesense||"Producto Macroled")}" loading="lazy" decoding="async" width="400" height="400">`:'<span class="ml-product-card__note">Sin imagen</span>';
-    return `<${tag} class="ml-product-card${link?"":" ml-product-card--disabled"}"${link?` href="${escapeHTML(link)}"`:""} data-id="${escapeHTML(doc.id||doc.sku||"")}"><div class="media"><div class="media-frame"><div class="media-badges-left">${buildSmartBadge(doc)}</div>${image}</div>${metaInner?`<div class="card-overlays">${metaInner}</div>`:""}</div><div class="card-content"><div class="ml-card-body"><div class="card-title">${escapeHTML(doc.nombre_typesense||"Producto sin nombre")}</div>${specsHtml?`<div class="specs">${specsHtml}</div>`:""}</div></div></${tag}>`;
+    const attrs=specs.length
+      ?specs.map(spec=>`<div class="ml-product-attr"><span class="ml-product-attr__label">${escapeHTML(spec.label)}</span><span class="ml-product-attr__value">${escapeHTML(spec.value)}</span></div>`).join("")
+      :'<span class="ml-product-card__note">Sin atributos cargados</span>';
+    const image=imgs.length
+      ?`<img src="${escapeHTML(imgs[0])}" alt="${escapeHTML(doc.nombre_typesense||"Producto Macroled")}" loading="lazy" width="400" height="400">`
+      :'<span class="ml-product-card__note">Sin imagen</span>';
+    const linkAttrs=link?` href="${escapeHTML(link)}" data-href="${escapeHTML(link)}"`:"";
+    return `<${tag} class="ml-product-card${link?"":" ml-product-card--disabled"}"${linkAttrs} data-id="${escapeHTML(doc.id||doc.sku||"")}"><div class="ml-product-card__media">${buildSmartBadge(doc)}${buildVariantBadge(doc)}${buildTempBadge(doc)}${image}</div><div class="ml-product-card__title">${escapeHTML(doc.nombre_typesense||"Producto sin nombre")}</div><div class="ml-product-card__attrs">${attrs}</div></${tag}>`;
   }
   function wireCarousels(grid){
     grid.querySelectorAll(".ml-product-card__media").forEach(media=>{const img=media.querySelector("img[data-images]");if(!img)return;let images=[];try{images=JSON.parse(img.dataset.images)}catch(_){return}const move=direction=>{let index=Number(img.dataset.index||0);index=(index+direction+images.length)%images.length;img.dataset.index=String(index);img.src=images[index]};media.querySelector(".ml-product-card__nav--prev")?.addEventListener("click",event=>{event.preventDefault();event.stopPropagation();move(-1)});media.querySelector(".ml-product-card__nav--next")?.addEventListener("click",event=>{event.preventDefault();event.stopPropagation();move(1)})});
@@ -293,7 +345,7 @@
     try{const data=await fetchProducts(field,value,fetchCount,filters);if(!data.hits?.length){grid.innerHTML=`<div class="ml-product-state">No hay productos para “${escapeHTML(label)}”.</div>`;return}const hits=pickRandomByField(data.hits,randomizeBy,count);grid.innerHTML=hits.map(hit=>cardTemplate(hit.document)).join("");wireCarousels(grid);const block=grid.closest(".ml-products-block");if(block)window.MacroledFeatured?.setupTrackControls(block,grid,{mobileOnly:true})}catch(error){console.error(`Macroled Home · Error consultando Typesense (${buildFilter(field,value,filters)})`,error);grid.innerHTML=`<div class="ml-product-state">No se pudieron cargar los productos. Verificá la configuración de Typesense y que “${escapeHTML(label)}” exista.</div>`}finally{grid.setAttribute("aria-busy","false")}
   }
   function init(root=document){root.querySelectorAll(".ml-product-grid:not([data-products-ready])").forEach(grid=>{grid.dataset.productsReady="true";renderGrid(grid)})}
-  window.MacroledProducts={init,parseImages,mergeVariantValue,buildSpecs,cardTemplate,wireCarousels};
+  window.MacroledProducts={init,parseImages,mergeVariantValue,buildSpecs,cardTemplate,wireCarousels,pickRandomByField};
 })(window);
 
 /* Source: home/js/featured.js */
@@ -330,10 +382,11 @@
     const next = root.querySelector("[data-featured-next]");
     const arrows = root.querySelector(".ml-featured-products__arrows");
     const viewport = root.querySelector(".ml-featured-products__viewport");
+    const cardSelector = options.cardSelector || ".ml-product-card";
     const mobile = matchMedia("(max-width: 640px)");
     if (!controls || !progressBar || !progress || !prev || !next || !arrows) return;
 
-    const cards = [...track.querySelectorAll(".ml-product-card")];
+    const getCards = () => [...track.querySelectorAll(cardSelector)];
 
     const update = () => {
       const enabled = !options.mobileOnly || mobile.matches;
@@ -357,6 +410,8 @@
     };
     track.onscroll = update;
     const moveToCard = direction => {
+      const cards = getCards();
+      if (!cards.length) return;
       const firstLeft = cards[0].getBoundingClientRect().left;
       const positions = cards.map(card => card.getBoundingClientRect().left - firstLeft);
       const current = positions.reduce((closest, position, index) =>
@@ -427,7 +482,7 @@
         track.innerHTML = '<div class="ml-featured-products__state">Todavía no hay productos destacados cargados.</div>';
         return;
       }
-      track.innerHTML = data.hits.map(hit => window.MacroledProducts.cardTemplate(hit.document)).join("");
+      track.innerHTML = window.MacroledProducts.pickRandomByField(data.hits, "nombre_typesense", data.hits.length).map(hit => window.MacroledProducts.cardTemplate(hit.document)).join("");
       window.MacroledProducts.wireCarousels(track);
       track.scrollLeft = 0;
       setupTrackControls(root, track);
@@ -510,6 +565,9 @@
         <span class="ml-project-lines-concept__shade" aria-hidden="true"></span>
         <img class="ml-project-lines-concept__product" src="${esc(item.productImage)}"
           alt="" loading="lazy" aria-hidden="true">
+        <div class="ml-project-lines-concept__cta-wrap" aria-hidden="true">
+          <span class="ml-project-lines-concept__cta ml-project-lines-concept__cta--outline">Ver productos</span>
+        </div>
         <div class="ml-project-lines-concept__content">
           <span>${esc(item.title)}</span>
           <span class="ml-project-lines-concept__arrow" aria-hidden="true">&rarr;</span>
@@ -572,7 +630,7 @@
 
   function categoryTemplate(item) {
     const badge = item.badge ? `<span class="ml-highlight-badge ml-category-card__badge">${esc(item.badge)}</span>` : "";
-    return `<a class="ml-category-card" href="${esc(item.href)}" data-editorial-id="${esc(item.id)}"><h3>${esc(item.title)}</h3>${badge}<div class="ml-category-card__media"><img src="${esc(item.image)}" alt="" loading="lazy" width="800" height="800"></div></a>`;
+    return `<a class="ml-category-card" href="${esc(item.href)}" data-editorial-id="${esc(item.id)}"><h3>${esc(item.title)}</h3>${badge}<div class="ml-category-card__media"><img src="${esc(item.image)}" alt="" loading="lazy" width="800" height="800"></div><div class="ml-category-card__cta-wrap" aria-hidden="true"><span class="ml-category-card__cta">Ver productos</span></div></a>`;
   }
 
   function productControlsTemplate() {
@@ -594,7 +652,8 @@
 
   function lineTemplate(item) {
     const mode = item.content?.mode || "typesense";
-    return `<article class="ml-featured ml-shell" data-theme="${esc(item.theme)}" data-visual-theme="${esc(item.visualTheme || "solid")}" data-layout="${esc(item.layout)}" data-image-fit="${esc(item.imageFit || "cover")}" data-description-lines="${Number(item.descriptionLines || 0)}" data-button-tone="${buttonTone(item.textColor)}" data-content-mode="${esc(mode)}" style="--line-bg:${esc(item.theme)};--line-color:${esc(item.textColor)};--title-emphasis-weight:${Number(item.titleEmphasisWeight || 600)}"><div class="ml-featured__story"><div class="ml-featured__media"><img src="${esc(item.image)}" alt="" loading="lazy" width="1600" height="1000"></div><div class="ml-featured__copy"><h3>${emphasize(item.title, item.titleEmphasis)}</h3><p>${emphasize(item.description, item.descriptionEmphasis)}</p><div class="ml-featured__actions"><a class="ml-button ml-button--primary" href="${esc(item.href)}">Ver productos</a><a class="ml-button--tertiary" href="${esc(item.catalogHref || "#")}">Ver catálogo <span aria-hidden="true">→</span></a></div></div></div>${lineContentTemplate(item)}</article>`;
+    const lineId = item.id ? ` data-line="${esc(item.id)}"` : "";
+    return `<article class="ml-featured ml-shell"${lineId} data-theme="${esc(item.theme)}" data-visual-theme="${esc(item.visualTheme || "solid")}" data-layout="${esc(item.layout)}" data-image-fit="${esc(item.imageFit || "cover")}" data-description-lines="${Number(item.descriptionLines || 0)}" data-button-tone="${buttonTone(item.textColor)}" data-content-mode="${esc(mode)}" style="--line-bg:${esc(item.theme)};--line-color:${esc(item.textColor)};--title-emphasis-weight:${Number(item.titleEmphasisWeight || 600)}"><div class="ml-featured__story"><div class="ml-featured__media"><img src="${esc(item.image)}" alt="" loading="lazy" width="1600" height="1000"></div><div class="ml-featured__copy"><h3>${emphasize(item.title, item.titleEmphasis)}</h3><p>${emphasize(item.description, item.descriptionEmphasis)}</p><div class="ml-featured__actions"><a class="ml-button ml-button--primary" href="${esc(item.href)}">Ver productos</a><a class="ml-button--tertiary" href="${esc(item.catalogHref || "#")}">Ver catálogo <span aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 12h14m-6-6 6 6-6 6"/></svg></span></a></div></div></div>${lineContentTemplate(item)}</article>`;
   }
 
   function renderSections() {
@@ -615,74 +674,124 @@
 
   function placeFeaturedProducts() {
     const featuredProducts = root.querySelector("#productos-destacados");
-    const professionalLighting = root.querySelector("[data-project-lines-concept]");
-    if (!featuredProducts || !professionalLighting) return;
-    professionalLighting.insertAdjacentElement("afterend", featuredProducts);
+    const foa = root.querySelector("[data-foa]");
+    if (!featuredProducts || !foa) return;
+    foa.insertAdjacentElement("beforebegin", featuredProducts);
+  }
+
+  function initExpandBanners() {
+    const banners = [...root.querySelectorAll("[data-expand-banner]")];
+    if (!banners.length) return;
+
+    if (matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      banners.forEach(banner => banner.style.setProperty("--ml-expand-progress", "1"));
+      return;
+    }
+
+    let frame = 0;
+    const update = () => {
+      frame = 0;
+      const viewportHeight = window.innerHeight || 1;
+      const start = viewportHeight * 0.88;
+      banners.forEach(banner => {
+        const rect = banner.getBoundingClientRect();
+        const end = banner.matches(".ml-newsletter-banner")
+          ? Math.max(viewportHeight * 0.26, viewportHeight - rect.height)
+          : viewportHeight * 0.26;
+        const raw = (start - rect.top) / Math.max(1, start - end);
+        const clamped = Math.max(0, Math.min(1, raw));
+        const progress = clamped * clamped * (3 - 2 * clamped);
+        banner.style.setProperty("--ml-expand-progress", progress.toFixed(4));
+      });
+    };
+    const requestUpdate = () => {
+      if (!frame) frame = requestAnimationFrame(update);
+    };
+
+    window.addEventListener("scroll", requestUpdate, { passive: true });
+    window.addEventListener("resize", requestUpdate);
+    update();
   }
 
   function placePrimarySections() {
-    const professionalLighting = root.querySelector("[data-project-lines-concept]");
-    const categoriesTest = root.querySelector("[data-categories-test]");
-    if (!professionalLighting || !categoriesTest) return;
-    professionalLighting.insertAdjacentElement("afterend", categoriesTest);
+    /* Categories now live inside solutions banners. */
+  }
+
+  function initSolutionsBanner() {
+    /* Fixed product image set in HTML. */
   }
 
   function renderCategoriesTest() {
-    const section = root.querySelector("[data-categories-test]");
-    const tabs = section?.querySelector("[data-categories-test-tabs]");
-    const grid = section?.querySelector("[data-categories-test-grid]");
+    const sections = [...root.querySelectorAll("[data-categories-test]")];
     const entries = Object.entries(config.categoriesTest || {});
-    if (!section || !tabs || !grid || !entries.length) return;
+    if (!sections.length || !entries.length) return;
 
-    grid.id = "ml-categories-test-panel";
-    tabs.innerHTML = entries.map(([key, item], index) => `
+    sections.forEach((section, sectionIndex) => {
+      const tabs = section.querySelector("[data-categories-test-tabs]");
+      const grid = section.querySelector("[data-categories-test-grid]");
+      if (!tabs || !grid) return;
+
+      const panelId = `ml-categories-test-panel-${sectionIndex}`;
+      const compactCategoryLabels = matchMedia("(max-width: 640px)");
+      const activeLabel = item => compactCategoryLabels.matches && item.labelActiveMobile
+        ? item.labelActiveMobile
+        : item.labelActive;
+      grid.id = panelId;
+      tabs.innerHTML = entries.map(([key, item], index) => `
       <button class="ml-categories-test__tab ml-featured-products__tab${index === 0 ? " is-active" : ""}"
-        id="ml-categories-test-tab-${esc(key)}"
+        id="ml-categories-test-tab-${sectionIndex}-${esc(key)}"
         type="button"
         role="tab"
-        aria-controls="${grid.id}"
+        aria-controls="${panelId}"
         aria-selected="${index === 0}"
         tabindex="${index === 0 ? "0" : "-1"}"
-        data-categories-test-tab="${esc(key)}">${esc(index === 0 ? item.labelActive : item.labelInactive)}</button>
+        data-categories-test-tab="${esc(key)}">${esc(index === 0 ? activeLabel(item) : item.labelInactive)}</button>
     `).join("");
-    const activate = key => {
-      const item = config.categoriesTest[key];
-      if (!item) return;
-      section.dataset.activeCategory = key;
-      section.style.setProperty("--categories-test-color", item.color);
-      section.style.setProperty("--categories-test-text", item.textColor);
-      grid.innerHTML = item.categories.map(categoryTemplate).join("");
-      grid.setAttribute("aria-labelledby", `ml-categories-test-tab-${key}`);
-      tabs.querySelectorAll("[data-categories-test-tab]").forEach(button => {
-        const active = button.dataset.categoriesTestTab === key;
-        const buttonConfig = config.categoriesTest[button.dataset.categoriesTestTab];
-        button.classList.toggle("is-active", active);
-        button.setAttribute("aria-selected", String(active));
-        button.tabIndex = active ? 0 : -1;
-        button.textContent = active ? buttonConfig.labelActive : buttonConfig.labelInactive;
+
+      const activate = key => {
+        const item = config.categoriesTest[key];
+        if (!item) return;
+        const sliderRoot = section.querySelector("[data-categories-slider]") || section;
+        section.dataset.activeCategory = key;
+        section.style.setProperty("--categories-test-color", item.color);
+        section.style.setProperty("--categories-test-text", item.textColor);
+        grid.innerHTML = item.categories.map(categoryTemplate).join("");
+        grid.scrollLeft = 0;
+        grid.setAttribute("aria-labelledby", `ml-categories-test-tab-${sectionIndex}-${key}`);
+        tabs.querySelectorAll("[data-categories-test-tab]").forEach(button => {
+          const active = button.dataset.categoriesTestTab === key;
+          const buttonConfig = config.categoriesTest[button.dataset.categoriesTestTab];
+          button.classList.toggle("is-active", active);
+          button.setAttribute("aria-selected", String(active));
+          button.tabIndex = active ? 0 : -1;
+          button.textContent = active ? activeLabel(buttonConfig) : buttonConfig.labelInactive;
+        });
+        window.MacroledFeatured?.setupTrackControls(sliderRoot, grid, {
+          cardSelector: ".ml-category-card"
+        });
+      };
+
+      tabs.addEventListener("click", event => {
+        const button = event.target.closest("[data-categories-test-tab]");
+        if (button) activate(button.dataset.categoriesTestTab);
       });
-    };
+      tabs.addEventListener("keydown", event => {
+        if (!["ArrowLeft", "ArrowRight", "Home", "End"].includes(event.key)) return;
+        const buttons = [...tabs.querySelectorAll("[data-categories-test-tab]")];
+        const current = buttons.indexOf(document.activeElement);
+        if (current < 0) return;
+        event.preventDefault();
+        const next = event.key === "Home"
+          ? 0
+          : event.key === "End"
+            ? buttons.length - 1
+            : (current + (event.key === "ArrowRight" ? 1 : -1) + buttons.length) % buttons.length;
+        buttons[next].focus();
+        activate(buttons[next].dataset.categoriesTestTab);
+      });
 
-    tabs.addEventListener("click", event => {
-      const button = event.target.closest("[data-categories-test-tab]");
-      if (button) activate(button.dataset.categoriesTestTab);
+      activate(entries[0][0]);
     });
-    tabs.addEventListener("keydown", event => {
-      if (!["ArrowLeft", "ArrowRight", "Home", "End"].includes(event.key)) return;
-      const buttons = [...tabs.querySelectorAll("[data-categories-test-tab]")];
-      const current = buttons.indexOf(document.activeElement);
-      if (current < 0) return;
-      event.preventDefault();
-      const next = event.key === "Home"
-        ? 0
-        : event.key === "End"
-          ? buttons.length - 1
-          : (current + (event.key === "ArrowRight" ? 1 : -1) + buttons.length) % buttons.length;
-      buttons[next].focus();
-      activate(buttons[next].dataset.categoriesTestTab);
-    });
-
-    activate(entries[0][0]);
   }
 
   function initCategoryCarousels() {
@@ -712,20 +821,26 @@
         const background = !line
           ? "#fff"
           : line.dataset.visualTheme === "silver-dark"
-          ? "radial-gradient(circle at 16% 12%, rgba(214, 220, 226, 0.24), transparent 34%), linear-gradient(125deg, #030405 0%, #101318 56%, #3d444b 100%)"
+          ? "radial-gradient(circle at 18% 10%, rgba(214, 220, 226, 0.08), transparent 30%), linear-gradient(180deg, #16283a 0%, #0c1218 42%, #07090c 100%)"
           : line.dataset.theme;
         if (background === activeBackground) return;
+        if (activeBackground) {
+          list.style.background = activeBackground;
+          list.style.setProperty("--ml-panel-underlay", activeBackground);
+        }
         activeBackground = background;
         const previousLayer = activeLayer;
         const layer = document.createElement("div");
         layer.className = "ml-line-theme-layer";
+        if (line && (line.dataset.visualTheme === "silver-dark" || buttonTone(line.dataset.theme) === "dark")) {
+          layer.classList.add("ml-line-theme-layer--dark");
+        }
         layer.setAttribute("aria-hidden", "true");
         layer.style.setProperty("--ml-layer-background", background);
-        list.prepend(layer);
+        list.append(layer);
         activeLayer = layer;
         requestAnimationFrame(() => {
           layer.classList.add("is-visible");
-          previousLayer?.classList.remove("is-visible");
         });
         if (previousLayer) {
           const removePrevious = () => previousLayer.remove();
@@ -754,19 +869,21 @@
       let scrollFrame = 0;
       const updateStoryIntegration = () => {
         scrollFrame = 0;
-        const viewportBottom = window.innerHeight || document.documentElement.clientHeight;
+        const viewportHeight = window.innerHeight || document.documentElement.clientHeight;
         let integratedLine = lines[0];
         lines.forEach(line => {
-          const story = line.querySelector(".ml-featured__story");
-          if (!story) return;
-          const bounds = story.getBoundingClientRect();
-          const visibleProgress = Math.min(
-            1,
-            Math.max(0, (viewportBottom - bounds.top) / Math.max(bounds.height, 1))
+          const copy = line.querySelector(".ml-featured__copy");
+          const lineBounds = line.getBoundingClientRect();
+          const copyBounds = copy?.getBoundingClientRect();
+          const isReading = Boolean(
+            copyBounds &&
+            copyBounds.top < viewportHeight * 0.58 &&
+            copyBounds.bottom > viewportHeight * 0.22
           );
-          const isIntegrated = visibleProgress >= 0.06;
-          line.classList.toggle("is-story-integrated", isIntegrated);
-          if (isIntegrated) integratedLine = line;
+          line.classList.toggle("is-story-integrated", isReading);
+          /* Keep each line's theme through its cards and bottom padding.
+             Falling back to Monaco here was flashing white between Reflectores and Skyline. */
+          if (lineBounds.top < viewportHeight * 0.78) integratedLine = line;
         });
         setBackground(integratedLine);
       };
@@ -791,6 +908,122 @@
     root.querySelectorAll(".ml-faq__trigger").forEach(button => button.addEventListener("click", () => {
       button.setAttribute("aria-expanded", String(button.getAttribute("aria-expanded") !== "true"));
     }));
+  }
+
+  function initHeroLuminariasRise() {
+    const hero = root.querySelector(".ml-hero");
+    const luminarias = root.querySelector(".ml-project-lines-concept");
+    if (!hero || !luminarias) return;
+
+    const reducedMotion = matchMedia("(prefers-reduced-motion: reduce)");
+    let animating = false;
+    let touchStartY = 0;
+
+    const coverThreshold = () => Math.max(48, (hero.offsetHeight || window.innerHeight) * 0.12);
+
+    const isOnCover = () => window.scrollY < coverThreshold();
+
+    const riseTarget = () => {
+      const top = luminarias.getBoundingClientRect().top + window.scrollY;
+      return Math.max(0, Math.round(top));
+    };
+
+    const isReadyToFall = () => {
+      const y = window.scrollY;
+      return y > coverThreshold() && y <= riseTarget() + 64;
+    };
+
+    const animateScrollTo = (toY, duration) => {
+      const fromY = window.scrollY;
+      const distance = toY - fromY;
+      if (Math.abs(distance) < 2) return Promise.resolve();
+
+      const start = performance.now();
+      const easeOutQuart = t => 1 - Math.pow(1 - t, 4);
+
+      return new Promise(resolve => {
+        const step = now => {
+          const t = Math.min(1, (now - start) / duration);
+          window.scrollTo(0, fromY + distance * easeOutQuart(t));
+          if (t < 1) requestAnimationFrame(step);
+          else resolve();
+        };
+        requestAnimationFrame(step);
+      });
+    };
+
+    const goTo = target => {
+      if (animating || reducedMotion.matches) return;
+      if (Math.abs(target - window.scrollY) < 8) return;
+      animating = true;
+      animateScrollTo(target, 880).finally(() => {
+        animating = false;
+      });
+    };
+
+    const rise = () => goTo(riseTarget());
+    const fall = () => goTo(0);
+
+    window.addEventListener("wheel", event => {
+      if (reducedMotion.matches) return;
+      if (animating) {
+        event.preventDefault();
+        return;
+      }
+      if (event.deltaY > 0 && isOnCover()) {
+        event.preventDefault();
+        rise();
+        return;
+      }
+      if (event.deltaY < 0 && isReadyToFall()) {
+        event.preventDefault();
+        fall();
+      }
+    }, { passive: false });
+
+    window.addEventListener("touchstart", event => {
+      touchStartY = event.touches[0]?.clientY || 0;
+    }, { passive: true });
+
+    window.addEventListener("touchmove", event => {
+      if (reducedMotion.matches) return;
+      if (animating) {
+        event.preventDefault();
+        return;
+      }
+      const currentY = event.touches[0]?.clientY || 0;
+      const swipe = touchStartY - currentY;
+      if (swipe > 14 && isOnCover()) {
+        event.preventDefault();
+        rise();
+        return;
+      }
+      if (swipe < -14 && isReadyToFall()) {
+        event.preventDefault();
+        fall();
+      }
+    }, { passive: false });
+
+    window.addEventListener("keydown", event => {
+      if (reducedMotion.matches || event.altKey || event.ctrlKey || event.metaKey) return;
+      if (animating) {
+        if (["ArrowDown", "ArrowUp", "PageDown", "PageUp", " "].includes(event.key)) {
+          event.preventDefault();
+        }
+        return;
+      }
+      const scrollingDown = ["ArrowDown", "PageDown"].includes(event.key) || (event.key === " " && !event.shiftKey);
+      const scrollingUp = ["ArrowUp", "PageUp"].includes(event.key) || (event.key === " " && event.shiftKey);
+      if (scrollingDown && isOnCover()) {
+        event.preventDefault();
+        rise();
+        return;
+      }
+      if (scrollingUp && isReadyToFall()) {
+        event.preventDefault();
+        fall();
+      }
+    });
   }
 
   function handleVideo() {
@@ -823,97 +1056,169 @@
 
     if (video.readyState >= HTMLMediaElement.HAVE_FUTURE_DATA) revealVideo();
     video.play().catch(revealVideo);
+
+    const restMs = 10000;
+    const reverseSpeed = 8;
+    let reverseFrame = 0;
+    let restTimer = 0;
+    let lastTick = 0;
+
+    const stopReverse = () => {
+      cancelAnimationFrame(reverseFrame);
+      reverseFrame = 0;
+    };
+
+    const playForward = () => {
+      stopReverse();
+      video.currentTime = 0;
+      video.play().catch(() => {});
+    };
+
+    const playReverse = () => {
+      video.pause();
+      lastTick = performance.now();
+      const step = now => {
+        const elapsed = ((now - lastTick) / 1000) * reverseSpeed;
+        lastTick = now;
+        const nextTime = video.currentTime - elapsed;
+        if (nextTime <= 0.04) {
+          video.currentTime = 0;
+          stopReverse();
+          playForward();
+          return;
+        }
+        video.currentTime = nextTime;
+        reverseFrame = requestAnimationFrame(step);
+      };
+      reverseFrame = requestAnimationFrame(step);
+    };
+
+    video.addEventListener("ended", () => {
+      restTimer = window.setTimeout(playReverse, restMs);
+    });
+
+    reducedMotion.addEventListener("change", event => {
+      if (!event.matches) return;
+      window.clearTimeout(restTimer);
+      stopReverse();
+      video.pause();
+      video.hidden = true;
+    });
   }
 
   function animateHeroTitle() {
     const title = root.querySelector("#ml-hero-title");
     if (!title || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    const text = title.textContent.trim();
-    title.setAttribute("aria-label", text);
+    const ariaText = title.innerText.replace(/\s+/g, " ").trim();
+    title.setAttribute("aria-label", ariaText);
+
+    const chunks = [...title.childNodes].flatMap(node => {
+      if (node.nodeName === "BR") {
+        return [{ type: "br", className: node.className }];
+      }
+      const text = node.textContent;
+      return text ? [{ type: "text", value: text }] : [];
+    });
+
     title.textContent = "";
     let letterIndex = 0;
-    text.split(/(\s+)/).forEach(part => {
-      if (/^\s+$/.test(part)) {
-        title.appendChild(document.createTextNode(" "));
+    chunks.forEach(chunk => {
+      if (chunk.type === "br") {
+        const br = document.createElement("br");
+        if (chunk.className) br.className = chunk.className;
+        title.appendChild(br);
         return;
       }
 
-      const word = document.createElement("span");
-      word.className = "ml-hero__word";
-      word.setAttribute("aria-hidden", "true");
-      [...part].forEach(character => {
-        const letter = document.createElement("span");
-        letter.className = "ml-hero__letter";
-        letter.style.setProperty("--letter-delay", `${letterIndex * 28}ms`);
-        letter.textContent = character;
-        word.appendChild(letter);
-        letterIndex += 1;
+      chunk.value.split(/(\s+)/).forEach(part => {
+        if (/^\s+$/.test(part)) {
+          title.appendChild(document.createTextNode(" "));
+          return;
+        }
+
+        const word = document.createElement("span");
+        word.className = "ml-hero__word";
+        word.setAttribute("aria-hidden", "true");
+        [...part].forEach(character => {
+          const letter = document.createElement("span");
+          letter.className = "ml-hero__letter";
+          letter.style.setProperty("--letter-delay", `${letterIndex * 52}ms`);
+          letter.textContent = character;
+          word.appendChild(letter);
+          letterIndex += 1;
+        });
+        title.appendChild(word);
       });
-      title.appendChild(word);
     });
     requestAnimationFrame(() => title.classList.add("is-illuminating"));
   }
 
   function animateCategoriesTitle() {
-    const title = root.querySelector("#ml-categories-test-title");
-    if (!title || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    const text = title.textContent.trim();
-    title.setAttribute("aria-label", text);
-    title.textContent = "";
-    let letterIndex = 0;
-    const letterCount = [...text.replace(/\s/g, "")].length;
+    const titles = [...root.querySelectorAll(".ml-categories-test__title")];
+    if (!titles.length || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
-    text.split(/(\s+)/).forEach(part => {
-      if (/^\s+$/.test(part)) {
-        title.appendChild(document.createTextNode(" "));
+    titles.forEach(title => {
+      const text = title.textContent.trim();
+      title.setAttribute("aria-label", text);
+      title.textContent = "";
+      let letterIndex = 0;
+      const letterCount = [...text.replace(/\s/g, "")].length;
+
+      text.split(/(\s+)/).forEach(part => {
+        if (/^\s+$/.test(part)) {
+          title.appendChild(document.createTextNode(" "));
+          return;
+        }
+
+        const word = document.createElement("span");
+        word.className = "ml-categories-title__word";
+        word.setAttribute("aria-hidden", "true");
+        [...part].forEach(character => {
+          const letter = document.createElement("span");
+          letter.className = "ml-categories-title__letter";
+          letter.style.setProperty("--letter-delay", `${letterIndex * 24}ms`);
+          const progress = letterCount > 1
+            ? Math.round((letterIndex / (letterCount - 1)) * 100)
+            : 100;
+          letter.style.setProperty(
+            "--letter-color",
+            `color-mix(in srgb, var(--ml-light-blue-500) ${100 - progress}%, var(--ml-dark-blue-700) ${progress}%)`
+          );
+          letter.textContent = character;
+          word.appendChild(letter);
+          letterIndex += 1;
+        });
+        title.appendChild(word);
+      });
+
+      const illuminate = () => title.classList.add("is-illuminating");
+      if (!("IntersectionObserver" in window)) {
+        requestAnimationFrame(illuminate);
         return;
       }
 
-      const word = document.createElement("span");
-      word.className = "ml-categories-title__word";
-      word.setAttribute("aria-hidden", "true");
-      [...part].forEach(character => {
-        const letter = document.createElement("span");
-        letter.className = "ml-categories-title__letter";
-        letter.style.setProperty("--letter-delay", `${letterIndex * 24}ms`);
-        const progress = letterCount > 1
-          ? Math.round((letterIndex / (letterCount - 1)) * 100)
-          : 100;
-        letter.style.setProperty(
-          "--letter-color",
-          `color-mix(in srgb, var(--ml-light-blue-500) ${100 - progress}%, var(--ml-dark-blue-700) ${progress}%)`
-        );
-        letter.textContent = character;
-        word.appendChild(letter);
-        letterIndex += 1;
-      });
-      title.appendChild(word);
+      const observer = new IntersectionObserver(entries => {
+        if (!entries[0]?.isIntersecting) return;
+        illuminate();
+        observer.disconnect();
+      }, { threshold: 0.35, rootMargin: "0px 0px -8% 0px" });
+      observer.observe(title);
     });
-
-    const illuminate = () => title.classList.add("is-illuminating");
-    if (!("IntersectionObserver" in window)) {
-      requestAnimationFrame(illuminate);
-      return;
-    }
-
-    const observer = new IntersectionObserver(entries => {
-      if (!entries[0]?.isIntersecting) return;
-      illuminate();
-      observer.disconnect();
-    }, { threshold: 0.35, rootMargin: "0px 0px -8% 0px" });
-    observer.observe(title);
   }
 
   function initSectionMotion() {
     if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
+    const solutionsSection = root.querySelector("[data-solutions-banner]");
     const projectSection = root.querySelector("[data-project-lines-concept]");
     const featuredSection = root.querySelector("#productos-destacados");
-    const categoriesSection = root.querySelector("[data-categories-test]");
-    const foaSection = root.querySelector("[data-foa]");
-    const newsletterBanner = root.querySelector(".ml-newsletter-banner");
+    const newsSection = root.querySelector(".ml-news");
+    const conversionSection = root.querySelector(".ml-conversion");
+    const newsletterSection = root.querySelector("[data-newsletter]");
+    const categoriesSections = [...root.querySelectorAll("[data-categories-test]")];
     const featuredTrack = featuredSection?.querySelector("[data-featured-track]");
-    const categoriesGrid = categoriesSection?.querySelector("[data-categories-test-grid]");
+    const newsGrid = newsSection?.querySelector("[data-news]");
+    const faqList = conversionSection?.querySelector("[data-faq]");
     const pendingSections = new Set();
     let motionArmed = false;
 
@@ -943,7 +1248,7 @@
         section.classList.add("is-motion-visible");
         section._motionSettleTimer = setTimeout(() => {
           section.classList.add("is-motion-settled");
-        }, 1500);
+        }, section === projectSection ? 1800 : 1500);
       });
     };
 
@@ -967,18 +1272,129 @@
       }
     });
 
-    [projectSection, featuredSection, categoriesSection, foaSection, newsletterBanner].forEach(section => {
-      if (!section) return;
-      section.classList.add("ml-motion-ready");
-      const observer = new IntersectionObserver(entries => {
-        if (!entries[0]?.isIntersecting) return;
-        if (motionArmed) reveal(section);
-        else pendingSections.add(section);
-        observer.disconnect();
-      }, { threshold: 0.13, rootMargin: "0px 0px -8% 0px" });
-      observer.observe(section);
-    });
+    if (solutionsSection) {
+      const solutionsGrid = solutionsSection.querySelector("[data-categories-test-grid]");
+      let solutionsPending = false;
+      solutionsSection.classList.add("ml-solutions-motion-ready");
+      prepareCards(solutionsGrid, ".ml-category-card");
 
+      const showSolutions = () => {
+        prepareCards(solutionsGrid, ".ml-category-card");
+        clearTimeout(solutionsSection._motionSettleTimer);
+        solutionsSection.classList.remove("is-motion-settled", "is-motion-visible");
+        solutionsGrid?.classList.remove("is-cards-refreshing", "is-cards-visible");
+        /* Force a fresh transition cycle when re-entering. */
+        void solutionsSection.offsetWidth;
+        requestAnimationFrame(() => {
+          solutionsSection.classList.add("is-motion-visible");
+          solutionsSection._motionSettleTimer = setTimeout(() => {
+            solutionsSection.classList.add("is-motion-settled");
+          }, 3600);
+        });
+      };
+
+      const hideSolutions = () => {
+        clearTimeout(solutionsSection._motionSettleTimer);
+        solutionsPending = false;
+        solutionsSection.classList.remove("is-motion-visible", "is-motion-settled");
+        solutionsGrid?.classList.remove("is-cards-refreshing", "is-cards-visible");
+      };
+
+      const armSolutions = () => {
+        if (!solutionsPending) return;
+        solutionsPending = false;
+        showSolutions();
+      };
+
+      window.addEventListener("wheel", armSolutions, { passive: true });
+      window.addEventListener("touchmove", armSolutions, { passive: true });
+      window.addEventListener("keydown", event => {
+        if (["ArrowDown", "ArrowUp", "PageDown", "PageUp", "Home", "End", " "].includes(event.key)) {
+          armSolutions();
+        }
+      });
+
+      const observer = new IntersectionObserver(entries => {
+        const entry = entries[0];
+        if (!entry) return;
+        if (!entry.isIntersecting) {
+          hideSolutions();
+          return;
+        }
+        if (motionArmed) showSolutions();
+        else solutionsPending = true;
+      }, { threshold: 0.22, rootMargin: "0px 0px -10% 0px" });
+      observer.observe(solutionsSection);
+
+      if (solutionsGrid) {
+        new MutationObserver(() => {
+          prepareCards(solutionsGrid, ".ml-category-card");
+          if (!solutionsSection.classList.contains("is-motion-visible")) return;
+          clearTimeout(solutionsGrid._cardsMotionTimer);
+          solutionsGrid.classList.remove("is-cards-visible");
+          solutionsGrid.classList.add("is-cards-refreshing");
+          requestAnimationFrame(() => requestAnimationFrame(() => {
+            solutionsGrid.classList.add("is-cards-visible");
+            solutionsGrid._cardsMotionTimer = setTimeout(() => {
+              solutionsGrid.classList.remove("is-cards-refreshing", "is-cards-visible");
+            }, 2200);
+          }));
+        }).observe(solutionsGrid, { childList: true });
+      }
+    }
+
+    if (projectSection) {
+      let projectsPending = false;
+      projectSection.classList.add("ml-motion-ready");
+      prepareCards(projectSection, ".ml-project-lines-concept__card");
+
+      const showProjects = () => {
+        prepareCards(projectSection, ".ml-project-lines-concept__card");
+        clearTimeout(projectSection._motionSettleTimer);
+        projectSection.classList.remove("is-motion-settled", "is-motion-visible");
+        void projectSection.offsetWidth;
+        requestAnimationFrame(() => {
+          projectSection.classList.add("is-motion-visible");
+          projectSection._motionSettleTimer = setTimeout(() => {
+            projectSection.classList.add("is-motion-settled");
+          }, 2400);
+        });
+      };
+
+      const hideProjects = () => {
+        clearTimeout(projectSection._motionSettleTimer);
+        projectsPending = false;
+        projectSection.classList.remove("is-motion-visible", "is-motion-settled");
+      };
+
+      const armProjects = () => {
+        if (!projectsPending) return;
+        projectsPending = false;
+        showProjects();
+      };
+
+      window.addEventListener("wheel", armProjects, { passive: true });
+      window.addEventListener("touchmove", armProjects, { passive: true });
+      window.addEventListener("keydown", event => {
+        if (["ArrowDown", "ArrowUp", "PageDown", "PageUp", "Home", "End", " "].includes(event.key)) {
+          armProjects();
+        }
+      });
+
+      const observer = new IntersectionObserver(entries => {
+        const entry = entries[0];
+        if (!entry) return;
+        if (!entry.isIntersecting) {
+          hideProjects();
+          return;
+        }
+        if (motionArmed) showProjects();
+        else projectsPending = true;
+      }, { threshold: 0.13, rootMargin: "0px 0px -8% 0px" });
+      observer.observe(projectSection);
+    }
+
+    /* Line sections keep their own content motion + background playbook. */
     root.querySelectorAll(".ml-featured[data-content-mode]").forEach(line => {
       const cardSelector = line.dataset.contentMode === "static"
         ? ".ml-category-card"
@@ -988,14 +1404,52 @@
           ? ".ml-line-content--static"
           : ".ml-product-grid"
       );
+      let linePending = false;
       line.classList.add("ml-content-motion-ready");
       prepareCards(line, cardSelector);
 
+      const showLine = () => {
+        prepareCards(line, cardSelector);
+        clearTimeout(line._motionSettleTimer);
+        line.classList.remove("is-motion-settled", "is-motion-visible");
+        void line.offsetWidth;
+        requestAnimationFrame(() => {
+          line.classList.add("is-motion-visible");
+          line._motionSettleTimer = setTimeout(() => {
+            line.classList.add("is-motion-settled");
+          }, 1800);
+        });
+      };
+
+      const hideLine = () => {
+        clearTimeout(line._motionSettleTimer);
+        linePending = false;
+        line.classList.remove("is-motion-visible", "is-motion-settled");
+      };
+
+      const armLine = () => {
+        if (!linePending) return;
+        linePending = false;
+        showLine();
+      };
+
+      window.addEventListener("wheel", armLine, { passive: true });
+      window.addEventListener("touchmove", armLine, { passive: true });
+      window.addEventListener("keydown", event => {
+        if (["ArrowDown", "ArrowUp", "PageDown", "PageUp", "Home", "End", " "].includes(event.key)) {
+          armLine();
+        }
+      });
+
       const observer = new IntersectionObserver(entries => {
-        if (!entries[0]?.isIntersecting) return;
-        if (motionArmed) reveal(line);
-        else pendingSections.add(line);
-        observer.disconnect();
+        const entry = entries[0];
+        if (!entry) return;
+        if (!entry.isIntersecting) {
+          hideLine();
+          return;
+        }
+        if (motionArmed) showLine();
+        else linePending = true;
       }, { threshold: 0.12, rootMargin: "0px 0px -8% 0px" });
       observer.observe(line);
 
@@ -1009,11 +1463,235 @@
       }
     });
 
-    const refreshDynamicCards = (section, container, selector) => {
-      if (!section || !container) return;
+    /* Featured products: same replayable entrance as soluciones. */
+    if (featuredSection) {
+      let featuredPending = false;
+      featuredSection.classList.add("ml-featured-products-motion-ready");
+      prepareCards(featuredTrack, ".ml-product-card");
+
+      const showFeatured = () => {
+        prepareCards(featuredTrack, ".ml-product-card");
+        clearTimeout(featuredSection._motionSettleTimer);
+        featuredSection.classList.remove("is-motion-settled", "is-motion-visible");
+        void featuredSection.offsetWidth;
+        requestAnimationFrame(() => {
+          featuredSection.classList.add("is-motion-visible");
+          featuredSection._motionSettleTimer = setTimeout(() => {
+            featuredSection.classList.add("is-motion-settled");
+          }, 3600);
+        });
+      };
+
+      const hideFeatured = () => {
+        clearTimeout(featuredSection._motionSettleTimer);
+        featuredPending = false;
+        featuredSection.classList.remove("is-motion-visible", "is-motion-settled");
+      };
+
+      const armFeatured = () => {
+        if (!featuredPending) return;
+        featuredPending = false;
+        showFeatured();
+      };
+
+      window.addEventListener("wheel", armFeatured, { passive: true });
+      window.addEventListener("touchmove", armFeatured, { passive: true });
+      window.addEventListener("keydown", event => {
+        if (["ArrowDown", "ArrowUp", "PageDown", "PageUp", "Home", "End", " "].includes(event.key)) {
+          armFeatured();
+        }
+      });
+
+      const observer = new IntersectionObserver(entries => {
+        const entry = entries[0];
+        if (!entry) return;
+        if (!entry.isIntersecting) {
+          hideFeatured();
+          return;
+        }
+        if (motionArmed) showFeatured();
+        else featuredPending = true;
+      }, { threshold: 0.22, rootMargin: "0px 0px -10% 0px" });
+      observer.observe(featuredSection);
+
+      if (featuredTrack) {
+        new MutationObserver(() => {
+          prepareCards(featuredTrack, ".ml-product-card");
+          if (!featuredSection.classList.contains("is-motion-visible")) return;
+          featuredSection.classList.remove("is-motion-visible");
+          requestAnimationFrame(() => requestAnimationFrame(() => {
+            featuredSection.classList.add("is-motion-visible");
+          }));
+        }).observe(featuredTrack, { childList: true });
+      }
+    }
+
+    if (newsSection) {
+      let newsPending = false;
+      newsSection.classList.add("ml-news-motion-ready");
+      prepareCards(newsGrid, ".ml-news-card");
+
+      const showNews = () => {
+        prepareCards(newsGrid, ".ml-news-card");
+        clearTimeout(newsSection._motionSettleTimer);
+        newsSection.classList.remove("is-motion-settled", "is-motion-visible");
+        void newsSection.offsetWidth;
+        requestAnimationFrame(() => {
+          newsSection.classList.add("is-motion-visible");
+          newsSection._motionSettleTimer = setTimeout(() => {
+            newsSection.classList.add("is-motion-settled");
+          }, 3600);
+        });
+      };
+
+      const hideNews = () => {
+        clearTimeout(newsSection._motionSettleTimer);
+        newsPending = false;
+        newsSection.classList.remove("is-motion-visible", "is-motion-settled");
+      };
+
+      const armNews = () => {
+        if (!newsPending) return;
+        newsPending = false;
+        showNews();
+      };
+
+      window.addEventListener("wheel", armNews, { passive: true });
+      window.addEventListener("touchmove", armNews, { passive: true });
+      window.addEventListener("keydown", event => {
+        if (["ArrowDown", "ArrowUp", "PageDown", "PageUp", "Home", "End", " "].includes(event.key)) {
+          armNews();
+        }
+      });
+
+      const observer = new IntersectionObserver(entries => {
+        const entry = entries[0];
+        if (!entry) return;
+        if (!entry.isIntersecting) {
+          hideNews();
+          return;
+        }
+        if (motionArmed) showNews();
+        else newsPending = true;
+      }, { threshold: 0.22, rootMargin: "0px 0px -10% 0px" });
+      observer.observe(newsSection);
+
+      if (newsGrid) {
+        new MutationObserver(() => {
+          prepareCards(newsGrid, ".ml-news-card");
+          if (!newsSection.classList.contains("is-motion-visible")) return;
+          newsSection.classList.remove("is-motion-visible");
+          requestAnimationFrame(() => requestAnimationFrame(() => {
+            newsSection.classList.add("is-motion-visible");
+          }));
+        }).observe(newsGrid, { childList: true });
+      }
+    }
+
+    if (conversionSection) {
+      let faqPending = false;
+      conversionSection.classList.add("ml-faq-motion-ready");
+      prepareCards(faqList, ".ml-faq__item");
+
+      const showFaq = () => {
+        prepareCards(faqList, ".ml-faq__item");
+        clearTimeout(conversionSection._motionSettleTimer);
+        conversionSection.classList.remove("is-motion-settled", "is-motion-visible");
+        void conversionSection.offsetWidth;
+        requestAnimationFrame(() => {
+          conversionSection.classList.add("is-motion-visible");
+          conversionSection._motionSettleTimer = setTimeout(() => {
+            conversionSection.classList.add("is-motion-settled");
+          }, 3600);
+        });
+      };
+
+      const hideFaq = () => {
+        clearTimeout(conversionSection._motionSettleTimer);
+        faqPending = false;
+        conversionSection.classList.remove("is-motion-visible", "is-motion-settled");
+      };
+
+      const armFaq = () => {
+        if (!faqPending) return;
+        faqPending = false;
+        showFaq();
+      };
+
+      window.addEventListener("wheel", armFaq, { passive: true });
+      window.addEventListener("touchmove", armFaq, { passive: true });
+      window.addEventListener("keydown", event => {
+        if (["ArrowDown", "ArrowUp", "PageDown", "PageUp", "Home", "End", " "].includes(event.key)) {
+          armFaq();
+        }
+      });
+
+      const observer = new IntersectionObserver(entries => {
+        const entry = entries[0];
+        if (!entry) return;
+        if (!entry.isIntersecting) {
+          hideFaq();
+          return;
+        }
+        if (motionArmed) showFaq();
+        else faqPending = true;
+      }, { threshold: 0.18, rootMargin: "0px 0px -8% 0px" });
+      observer.observe(conversionSection);
+    }
+
+    if (newsletterSection) {
+      let newsletterPending = false;
+      newsletterSection.classList.add("ml-newsletter-motion-ready");
+
+      const showNewsletter = () => {
+        clearTimeout(newsletterSection._motionSettleTimer);
+        newsletterSection.classList.remove("is-motion-settled", "is-motion-visible");
+        void newsletterSection.offsetWidth;
+        requestAnimationFrame(() => {
+          newsletterSection.classList.add("is-motion-visible");
+          newsletterSection._motionSettleTimer = setTimeout(() => {
+            newsletterSection.classList.add("is-motion-settled");
+          }, 2200);
+        });
+      };
+
+      const hideNewsletter = () => {
+        clearTimeout(newsletterSection._motionSettleTimer);
+        newsletterPending = false;
+        newsletterSection.classList.remove("is-motion-visible", "is-motion-settled");
+      };
+
+      const armNewsletter = () => {
+        if (!newsletterPending) return;
+        newsletterPending = false;
+        showNewsletter();
+      };
+
+      window.addEventListener("wheel", armNewsletter, { passive: true });
+      window.addEventListener("touchmove", armNewsletter, { passive: true });
+      window.addEventListener("keydown", event => {
+        if (["ArrowDown", "ArrowUp", "PageDown", "PageUp", "Home", "End", " "].includes(event.key)) {
+          armNewsletter();
+        }
+      });
+
+      const observer = new IntersectionObserver(entries => {
+        const entry = entries[0];
+        if (!entry) return;
+        if (!entry.isIntersecting) {
+          hideNewsletter();
+          return;
+        }
+        if (motionArmed) showNewsletter();
+        else newsletterPending = true;
+      }, { threshold: 0.22, rootMargin: "0px 0px -10% 0px" });
+      observer.observe(newsletterSection);
+    }
+
+    const refreshDynamicCards = (container, selector) => {
+      if (!container) return;
       new MutationObserver(() => {
         prepareCards(container, selector);
-        if (!section.classList.contains("is-motion-visible")) return;
         clearTimeout(container._cardsMotionTimer);
         container.classList.remove("is-cards-visible");
         container.classList.add("is-cards-refreshing");
@@ -1026,8 +1704,13 @@
       }).observe(container, { childList: true });
     };
 
-    refreshDynamicCards(featuredSection, featuredTrack, ".ml-product-card");
-    refreshDynamicCards(categoriesSection, categoriesGrid, ".ml-category-card");
+    categoriesSections.forEach(section => {
+      if (solutionsSection?.contains(section) || section === solutionsSection) return;
+      refreshDynamicCards(
+        section.querySelector("[data-categories-test-grid]"),
+        ".ml-category-card"
+      );
+    });
   }
 
   renderSections();
@@ -1036,6 +1719,7 @@
   renderCategoriesTest();
   initCategoryCarousels();
   initLineBackgrounds();
+  initSolutionsBanner();
   renderCommon();
   window.MacroledProducts.init(root);
   window.MacroledFeatured.init(root);
@@ -1043,7 +1727,9 @@
   handleVideo();
   animateHeroTitle();
   animateCategoriesTitle();
+  initHeroLuminariasRise();
   initSectionMotion();
+  initExpandBanners();
   }
 
   if (initializeHome()) return;

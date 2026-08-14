@@ -131,7 +131,7 @@
         track.innerHTML = '<div class="ml-featured-products__state">Todavía no hay productos destacados cargados.</div>';
         return;
       }
-      track.innerHTML = window.MacroledProducts.pickRandomByField(data.hits, "nombre_typesense", data.hits.length).map(hit => window.MacroledProducts.cardTemplate(hit.document)).join("");
+      track.innerHTML = data.hits.map(hit => window.MacroledProducts.cardTemplate(hit.document)).join("");
       window.MacroledProducts.wireCarousels(track);
       track.scrollLeft = 0;
       setupTrackControls(root, track);

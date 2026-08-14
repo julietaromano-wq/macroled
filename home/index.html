@@ -1,4 +1,4 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="es">
 <head>
   <meta charset="utf-8">
@@ -8,35 +8,89 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/home.css?v=20260728-1">
+  <link rel="stylesheet" href="css/home.css?v=20260812-129">
 </head>
 <body>
   <div id="macroled-home" class="ml-home is-video-loading">
-    <div class="ml-hero" aria-labelledby="ml-hero-title" data-nav-theme="dark">
-      <video class="ml-hero__video" autoplay muted playsinline preload="auto" aria-hidden="true">
-        <source src="https://s3.coresagroup.com/MACROLED/video/HOMEMOBILE.mp4" media="(max-width: 1024px)" type="video/mp4">
-        <source src="https://s3.coresagroup.com/MACROLED/video/HOMEDESKTOP.mp4" type="video/mp4">
-      </video>
-      <div class="ml-hero__fallback" aria-hidden="true"></div>
-      <div class="ml-hero__overlay"></div>
-      <div class="ml-hero__content">
-        <div class="ml-hero__copy">
-          <h1 id="ml-hero-title">La iluminación alcanza otro nivel</h1>
-          <p class="ml-hero__subtitle">Tecnología lumínica con la precisión técnica que exige cada proyecto.</p>
-          <a class="ml-button ml-button--primary" href="#productos-destacados">Explorá nuestros productos</a>
+    <div class="ml-hero-overlap">
+      <div class="ml-hero" aria-labelledby="ml-hero-title" data-nav-theme="dark">
+        <video class="ml-hero__video" autoplay muted playsinline preload="auto" aria-hidden="true">
+          <source src="assets/images/banner-web-horizontal-alta-negro.mp4" type="video/mp4">
+        </video>
+        <div class="ml-hero__fallback" aria-hidden="true"></div>
+        <div class="ml-hero__overlay"></div>
+        <div class="ml-hero__content">
+          <div class="ml-hero__copy">
+            <h1 id="ml-hero-title">La iluminación<br class="ml-hero__title-break">alcanza otro nivel</h1>
+            <p class="ml-hero__subtitle">Tecnología lumínica con la precisión técnica<br class="ml-hero__subtitle-break">que exige cada proyecto.</p>
+            <a class="ml-button ml-button--primary" href="#productos-destacados">Explorá nuestros productos</a>
+          </div>
         </div>
       </div>
+
+      <section class="ml-project-lines-concept" aria-labelledby="ml-project-lines-concept-title" data-project-lines-concept data-nav-theme="dark">
+        <div class="ml-project-lines-concept__inner ml-shell">
+          <div class="ml-project-lines-concept__header">
+            <div id="ml-project-lines-concept-title">Luminarias profesionales<br class="ml-project-lines-concept__title-break"><span class="ml-project-lines-concept__title-highlight">para obras de gran escala</span></div>
+            <a class="ml-button ml-button--primary ml-button--primary-light ml-project-lines-concept__explore" href="#ml-section-proyectos">
+              Ver productos
+            </a>
+          </div>
+          <div class="ml-project-lines-concept__cards" data-project-lines-concept-list></div>
+        </div>
+      </section>
     </div>
 
     <main>
+      <section class="ml-solutions-banner" aria-labelledby="ml-solutions-banner-title" data-solutions-banner>
+        <div class="ml-solutions-banner__inner ml-shell ml-categories-test" data-categories-test>
+          <div class="ml-solutions-banner__hero">
+            <div class="ml-solutions-banner__copy">
+              <h2 id="ml-solutions-banner-title">Soluciones<br class="ml-solutions-banner__title-break">que se adaptan<br class="ml-solutions-banner__title-break"><span class="ml-solutions-banner__title-highlight">a tu proyecto</span></h2>
+              <p class="ml-solutions-banner__subtitle">Desde iluminación residencial hasta soluciones profesionales: encontrá productos pensados para cada espacio, aplicación y necesidad.</p>
+            </div>
+            <div class="ml-solutions-banner__media" aria-hidden="true">
+              <img data-solutions-banner-image src="assets/images/Product_Macro_TIRAS_web.png" alt="" loading="lazy" width="1200" height="800">
+            </div>
+          </div>
+          <div class="ml-solutions-banner__categories" data-categories-slider>
+            <div class="ml-categories-test__tabs ml-featured-products__tabs" role="tablist" aria-label="Explorar categorías por ambiente" data-categories-test-tabs></div>
+            <div class="ml-solutions-banner__viewport ml-featured-products__viewport">
+              <div class="ml-solutions-banner__track ml-categories-test__grid" role="tabpanel" aria-live="polite" data-categories-test-grid></div>
+            </div>
+            <div class="ml-featured-products__controls" hidden>
+              <div class="ml-featured-products__arrows">
+                <button class="ml-featured-products__nav" type="button" data-featured-prev aria-label="Categoría anterior">
+                  <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M19 12H5m6-6-6 6 6 6"/>
+                  </svg>
+                </button>
+                <button class="ml-featured-products__nav" type="button" data-featured-next aria-label="Categoría siguiente">
+                  <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M5 12h14m-6-6 6 6-6 6"/>
+                  </svg>
+                </button>
+              </div>
+              <div class="ml-featured-products__progress" aria-hidden="true">
+                <span data-featured-progress></span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="ml-explore" class="ml-explore" aria-label="Explorar productos">
+        <div data-home-sections></div>
+      </section>
+
       <section class="ml-featured-products" id="productos-destacados" aria-labelledby="ml-featured-products-title">
         <div class="ml-featured-products__head ml-section-heading ml-shell">
           <div class="ml-featured-products__heading-copy">
-            <h2 id="ml-featured-products-title">Productos destacados</h2>
+            <h2 id="ml-featured-products-title">Productos <span class="ml-featured-products__title-highlight">destacados</span></h2>
             <p class="ml-featured-products__subtitle">Una selección de luminarias y soluciones LED destacadas por su rendimiento, diseño y versatilidad para diferentes espacios y proyectos.</p>
           </div>
           <a class="ml-button--tertiary ml-featured-products__view-all" href="/productos">
-            Ver todos <span aria-hidden="true">→</span>
+            Ver todos <span aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 12h14m-6-6 6 6-6 6"/></svg></span>
           </a>
         </div>
         <div class="ml-featured-products__viewport">
@@ -63,31 +117,7 @@
         </div>
       </section>
 
-      <section class="ml-project-lines-concept" aria-labelledby="ml-project-lines-concept-title" data-project-lines-concept data-nav-theme="dark">
-        <div class="ml-project-lines-concept__inner ml-shell">
-          <div class="ml-project-lines-concept__header">
-            <div id="ml-project-lines-concept-title">Luminarias profesionales<br class="ml-project-lines-concept__title-break"><span class="ml-project-lines-concept__title-highlight">para obras de gran escala</span></div>
-            <a class="ml-button ml-button--primary ml-button--primary-light ml-project-lines-concept__explore" href="#ml-section-proyectos">
-              Ver productos
-            </a>
-          </div>
-          <div class="ml-project-lines-concept__cards" data-project-lines-concept-list></div>
-        </div>
-      </section>
-
-      <section id="ml-explore" class="ml-explore" aria-label="Explorar productos">
-        <div data-home-sections></div>
-      </section>
-
-      <section class="ml-categories-test" aria-labelledby="ml-categories-test-title" data-categories-test>
-        <div class="ml-categories-test__content ml-shell">
-          <h2 id="ml-categories-test-title">Explorá nuestras categorías</h2>
-          <div class="ml-categories-test__tabs ml-featured-products__tabs" role="tablist" aria-label="Explorar categorías por ambiente" data-categories-test-tabs></div>
-          <div class="ml-categories-test__grid ml-categories" role="tabpanel" aria-live="polite" data-categories-test-grid></div>
-        </div>
-      </section>
-
-      <section class="ml-foa ml-shell" aria-labelledby="ml-foa-title" data-foa>
+      <section class="ml-foa" aria-labelledby="ml-foa-title" data-foa data-expand-banner>
         <div class="ml-foa__slideshow" aria-hidden="true">
           <img src="https://www.casafoa.com/landing/wp-content/uploads/2025/05/BEL4153_.jpg" alt="" loading="lazy">
           <img src="https://www.casafoa.com/landing/wp-content/uploads/2025/06/DSC07392_.jpg" alt="" loading="lazy">
@@ -95,14 +125,20 @@
         </div>
         <div class="ml-foa__overlay" aria-hidden="true"></div>
         <div class="ml-foa__content">
-          <img class="ml-foa__macroled-logo" src="https://cdn.prod.website-files.com/674eb5c4242fba76abefe2f3/69d3fb77a9a80b27e6d12c21_macroled.webp" alt="Macroled" loading="lazy">
           <h2 id="ml-foa-title">Sponsor oficial de <strong>Casa FOA</strong></h2>
           <a class="ml-button ml-button--primary ml-button--primary-light" href="https://www.macroled.com.ar/casafoa">Descubrí Casa FOA</a>
         </div>
       </section>
 
       <section class="ml-news ml-shell" aria-labelledby="ml-news-title">
-        <div class="ml-section-heading"><h2 id="ml-news-title">Últimas novedades</h2></div>
+        <div class="ml-news__head ml-section-heading">
+          <div class="ml-news__heading-copy">
+            <h2 id="ml-news-title">Últimas <span class="ml-news__title-highlight">novedades</span></h2>
+          </div>
+          <a class="ml-button--tertiary ml-news__view-all" href="/novedades">
+            Ver todas <span aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 12h14m-6-6 6 6-6 6"/></svg></span>
+          </a>
+        </div>
         <div class="ml-news__grid" data-news></div>
       </section>
 
@@ -125,30 +161,122 @@
               </div>
             </article>
           </div>
+        </div>
+      </section>
 
-          <article class="ml-newsletter-banner" aria-labelledby="ml-newsletter-title">
-            <div class="ml-newsletter-banner__content">
-              <div class="ml-newsletter-banner__copy">
-                <h2 id="ml-newsletter-title">Nuevos productos directo a tu mail</h2>
-              </div>
-              <div class="ml-newsletter-banner__action">
-                <p>Recibí novedades de productos, lanzamientos y soluciones para tus proyectos.</p>
-                <a class="ml-conversion__button ml-conversion__button--light" href="/newsletter">
-                  Recibir novedades
-                </a>
-              </div>
-            </div>
-          </article>
-
+      <section class="ml-newsletter-banner" aria-labelledby="ml-newsletter-title" data-newsletter data-expand-banner>
+        <div class="ml-newsletter-banner__media" aria-hidden="true">
+          <img src="assets/images/conversion-lighting-background.png" alt="" loading="lazy" width="1600" height="900">
+        </div>
+        <div class="ml-newsletter-banner__overlay" aria-hidden="true"></div>
+        <div class="ml-newsletter-banner__content">
+          <div class="ml-newsletter-banner__copy">
+            <h2 id="ml-newsletter-title">Nuevos productos <span class="ml-newsletter-banner__title-highlight">directo a tu mail</span></h2>
+            <p class="ml-newsletter-banner__subtitle">Recibí novedades de productos, lanzamientos y soluciones para tus proyectos.</p>
+          </div>
+          <button type="button" class="ml-button ml-button--primary ml-button--primary-light" data-newsletter-open>Recibir novedades</button>
         </div>
       </section>
     </main>
 
   </div>
-  <script src="js/config.js"></script>
-  <script src="js/products.js"></script>
-  <script src="js/featured.js"></script>
-  <script src="js/project-lines-concept.js"></script>
-  <script src="js/home.js?v=20260805-1"></script>
+
+  <button type="button" class="ai-launch" id="aiLaunch" aria-haspopup="dialog" aria-controls="aiPanel" aria-hidden="true" inert>
+    <span class="ai-launch-dot" aria-hidden="true"></span>
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 3a7 7 0 0 0-4 12.7V19l4-2 4 2v-3.3A7 7 0 0 0 12 3z"/><path d="M9.5 10h.01M14.5 10h.01"/></svg>
+    <span>Asistente</span>
+  </button>
+
+  <div class="ai-backdrop" id="aiBackdrop" hidden></div>
+  <aside class="ai-panel" id="aiPanel" role="dialog" aria-modal="true" aria-labelledby="aiTitle" hidden>
+    <div class="ai-head">
+      <div class="ai-head-main">
+        <div class="ai-avatar" aria-hidden="true">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 3a7 7 0 0 0-4 12.7V19l4-2 4 2v-3.3A7 7 0 0 0 12 3z"/><path d="M9.5 10h.01M14.5 10h.01"/></svg>
+          <span class="ai-avatar-online"></span>
+        </div>
+        <div class="ai-head-copy">
+          <h2 id="aiTitle">Asistente de producto</h2>
+          <p class="ai-head-sub">Estamos para ayudarte</p>
+        </div>
+      </div>
+      <button type="button" class="ai-close" id="aiClose" aria-label="Cerrar asistente">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+      </button>
+    </div>
+    <div class="ai-messages" id="aiMessages" aria-live="polite"></div>
+    <div class="ai-typing" id="aiTyping" aria-hidden="true"><span></span><span></span><span></span></div>
+    <div class="ai-suggestions" id="aiSuggestions"></div>
+    <form class="ai-form" id="aiForm">
+      <input type="text" id="aiInput" placeholder="Escribí tu pregunta…" autocomplete="off" aria-label="Pregunta">
+      <button type="submit" class="ai-send" aria-label="Enviar">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+      </button>
+    </form>
+  </aside>
+
+  <div class="nl-backdrop" id="nlBackdrop" hidden></div>
+  <div class="nl-popup" id="nlPopup" role="dialog" aria-modal="true" aria-labelledby="nlTitle" hidden>
+    <button type="button" class="nl-close" id="nlClose" aria-label="Cerrar">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+    </button>
+    <div class="nl-popup__icon" aria-hidden="true">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="5" width="18" height="14" rx="2"/>
+        <path d="M3 7l9 7 9-7"/>
+      </svg>
+    </div>
+    <h2 id="nlTitle">Sumate a nuestro newsletter</h2>
+    <p class="nl-popup__sub">Completá tus datos para recibir novedades, lanzamientos y contenido exclusivo.</p>
+    <form id="nlForm" class="nl-form">
+      <div class="nl-field">
+        <div class="nl-pill">
+          <label class="nl-border-label" for="nl-nombre">Nombre</label>
+          <input id="nl-nombre" type="text" name="nombre" placeholder="Tu nombre" required autocomplete="name">
+        </div>
+      </div>
+      <div class="nl-field">
+        <div class="nl-pill">
+          <label class="nl-border-label" for="nl-cuit">CUIT</label>
+          <input id="nl-cuit" type="text" name="cuit" placeholder="20-12345678-9" required inputmode="numeric" autocomplete="off">
+        </div>
+      </div>
+      <div class="nl-field">
+        <div class="nl-pill">
+          <label class="nl-border-label" for="nl-email">Email</label>
+          <input id="nl-email" type="email" name="email" placeholder="tu@email.com" required autocomplete="email">
+        </div>
+      </div>
+      <div class="nl-field">
+        <div class="nl-pill">
+          <label class="nl-border-label" for="nl-interes">Área de interés</label>
+          <div class="nl-select-wrap">
+            <select id="nl-interes" name="area_interes" required>
+              <option value="" disabled selected>Seleccioná una opción</option>
+              <option value="residencial">Residencial</option>
+              <option value="comercial">Comercial</option>
+              <option value="industrial">Industrial</option>
+              <option value="proyectos">Obras y proyectos</option>
+              <option value="otro">Otro</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <button type="submit" class="nl-submit">Suscribirme</button>
+      <p class="nl-popup__note">Podés darte de baja cuando quieras.</p>
+    </form>
+    <div class="nl-success" id="nlSuccess" hidden>
+      <p class="nl-success__title">¡Listo, ya estás suscripto!</p>
+      <p>Te vamos a contar novedades, lanzamientos y contenido exclusivo.</p>
+    </div>
+  </div>
+
+  <script src="js/config.js?v=20260812-27"></script>
+  <script src="js/products.js?v=20260812-29"></script>
+  <script src="js/featured.js?v=20260812-26"></script>
+  <script src="js/project-lines-concept.js?v=20260812-18"></script>
+  <script src="js/home.js?v=20260812-94"></script>
+  <script src="js/asistente.js?v=20260812-2"></script>
+  <script src="js/newsletter.js?v=20260812-1"></script>
 </body>
 </html>

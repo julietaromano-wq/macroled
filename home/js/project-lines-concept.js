@@ -44,6 +44,9 @@
         <span class="ml-project-lines-concept__shade" aria-hidden="true"></span>
         <img class="ml-project-lines-concept__product" src="${esc(item.productImage)}"
           alt="" loading="lazy" aria-hidden="true">
+        <div class="ml-project-lines-concept__cta-wrap" aria-hidden="true">
+          <span class="ml-project-lines-concept__cta ml-project-lines-concept__cta--outline">Ver productos</span>
+        </div>
         <div class="ml-project-lines-concept__content">
           <span>${esc(item.title)}</span>
           <span class="ml-project-lines-concept__arrow" aria-hidden="true">&rarr;</span>
