@@ -1387,12 +1387,19 @@
    * secundario = el siguiente disponible de esa misma prioridad.
    */
   function syncActionDownloads(fichaUrl, catalogoUrl, manualUrl) {
+    const btnPrimary = document.getElementById("btn-ficha");
+    const btnSecondary = document.getElementById("btn-catalogo");
+    const actions = document.querySelector(".cta-stack .actions");
+
+    const hasManualOverride = btnPrimary && btnPrimary.getAttribute("data-cta-mode") === "contact";
+    const contactUrl = (btnPrimary && btnPrimary.getAttribute("data-contact-url")) || "https://www.electroestrada.com.ar/";
+
     const docs = [
       {
-        key: "contacto",
-        url: "https://www.electroestrada.com.ar/",
-        primaryLabel: "Contacto comercial",
-        secondaryLabel: "Contacto comercial",
+        key: "ficha",
+        url: fichaUrl,
+        primaryLabel: "Descargar ficha técnica",
+        secondaryLabel: "Ficha técnica",
       },
       {
         key: "catalogo",
@@ -1406,11 +1413,16 @@
         primaryLabel: "Descargar manual",
         secondaryLabel: "Manual",
       },
-    ].filter((d) => isValidFileUrl(d.url) || d.key === "contacto");
+    ].filter((d) => isValidFileUrl(d.url));
 
-    const btnPrimary = document.getElementById("btn-ficha");
-    const btnSecondary = document.getElementById("btn-catalogo");
-    const actions = document.querySelector(".cta-stack .actions");
+    const contactDoc = {
+      key: "contacto",
+      url: contactUrl,
+      primaryLabel: "Contacto comercial",
+      secondaryLabel: "Contacto comercial",
+    };
+
+    const finalDocs = hasManualOverride ? [contactDoc, ...docs.filter((d) => d.key !== "ficha")] : docs;
 
     const apply = (btn, doc, isPrimary) => {
       if (!btn) return;
@@ -1426,9 +1438,9 @@
       setDownloadBtnLabel(btn, isPrimary ? doc.primaryLabel : doc.secondaryLabel);
     };
 
-    apply(btnPrimary, docs[0] || null, true);
-    apply(btnSecondary, docs[1] || null, false);
-    if (actions) actions.hidden = docs.length === 0;
+    apply(btnPrimary, finalDocs[0] || null, true);
+    apply(btnSecondary, finalDocs[1] || null, false);
+    if (actions) actions.hidden = finalDocs.length === 0;
   }
 
   function syncFileCards(files) {
