@@ -819,7 +819,8 @@
   const SMART_APP_LINES = new Set(["ROMA", "TOKIO"]);
 
   function isRomaTokioSmartProduct(el, specs) {
-    const smartRaw = specs["Smart"] || el.getAttribute("data-smart");
+    const smartRaw =
+      specs["Smart"] || specs["Tecnología"] || el.getAttribute("data-smart");
     if (!isTruthyFlag(smartRaw)) return false;
 
     const linea = normalizeLinea(
@@ -1860,7 +1861,8 @@
     const dimVal = specs["Dimerizable"];
     setTrustEligible("dimerizable", isTruthyFlag(dimVal));
 
-    const smartRaw = specs["Smart"] || el.getAttribute("data-smart");
+    const smartRaw =
+      specs["Smart"] || specs["Tecnología"] || el.getAttribute("data-smart");
     setTrustEligible("smart", isTruthyFlag(smartRaw));
 
     const panelRaw = specs["Panel táctil"] || el.getAttribute("data-panel-tactil");
