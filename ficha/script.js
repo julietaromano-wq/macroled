@@ -816,6 +816,35 @@
     return /^(si|sí|true|1|yes|smart)$/i.test(String(v == null ? "" : v).trim());
   }
 
+  const SMART_APP_LINES = new Set(["ROMA", "TOKIO"]);
+
+  function isRomaTokioSmartProduct(el, specs) {
+    const smartRaw = specs["Smart"] || el.getAttribute("data-smart");
+    if (!isTruthyFlag(smartRaw)) return false;
+
+    const linea = normalizeLinea(
+      el.getAttribute("data-linea") || el.getAttribute("data-line") || ""
+    );
+    if (SMART_APP_LINES.has(linea)) return true;
+
+    const hints = [
+      el.getAttribute("data-name"),
+      el.getAttribute("data-family"),
+      el.getAttribute("data-subfamilia"),
+      specs["Subfamilia"],
+      specs["Familia"],
+    ]
+      .map((v) => normalizeLinea(v))
+      .join(" ");
+    return /\bROMA\b/.test(hints) || /\bTOKIO\b/.test(hints);
+  }
+
+  function syncSmartBanner(el, specs) {
+    const banner = document.getElementById("smartBanner");
+    if (!banner) return;
+    banner.hidden = !isRomaTokioSmartProduct(el, specs);
+  }
+
   /* Orden de jerarquía. Solo se muestran hasta TRUST_MAX visibles. */
   const TRUST_PRIORITY = [
     "garantia",
@@ -1859,6 +1888,7 @@
     setTrustEligible("material", !!matVal);
 
     syncTrustPriority();
+    syncSmartBanner(el, specs);
 
     const PRODUCT_CTX = window.__mlProductCtx || (window.__mlProductCtx = {});
     PRODUCT_CTX.name = name;
