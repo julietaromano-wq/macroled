@@ -454,7 +454,7 @@ const state = {
   query: "",
   view: "grid",
   collapsed: { macrofamilia: true, variante_temperatura_filtro: true, color: true, potencia: false, dimerizable: true, familia: true, subfamilia: true, categoria: true },
-  compareCollapsed: false
+  compareCollapsed: true
 };
 window.state = state;
 let currentSearchController = null;   // ← agregar esta línea
@@ -1627,8 +1627,16 @@ function wireCarousels(){
 /* =========================================================
    COMPARAR: link con contexto de origen
    ========================================================= */
-// URL real (staging) de la página de comparación en Webflow
-const COMPARE_PAGE_URL = "https://macroled.webflow.io/nuevo-comparativa";
+/* Página local de comparación (carpeta /comparar).
+   - En GitHub/Webflow (productos/ y comparar/ al mismo nivel): ../comparar/
+   - En prototipo archivos_finales/productos/: ../../comparar/ */
+const COMPARE_PAGE_URL = (() => {
+  try{
+    const path = (location.pathname || "").replace(/\\/g, "/");
+    if(/\/archivos_finales\/productos(\/|$)/i.test(path)) return "../../comparar/";
+  }catch(_){}
+  return "../comparar/";
+})();
 
 // Arma la URL a la página de comparación con dos query params:
 // - from: la URL actual completa (con macrofamilia/búsqueda aplicados)
@@ -1668,12 +1676,12 @@ function renderCompareBar(){
   if(!list.length){
     bar.style.display = "none";
     compareBarPrevCount = 0;
+    state.compareCollapsed = true;
     updateComparePadding();
     return;
   }
-  // Al agregar el primer producto en mobile, arranca cerrada para no
-  // taparle la pantalla al usuario; en desktop se mantiene como estaba.
-  if(compareBarPrevCount === 0 && window.matchMedia("(max-width:900px)").matches){
+  // Al agregar el primer producto, la barra arranca cerrada (desktop y mobile).
+  if(compareBarPrevCount === 0){
     state.compareCollapsed = true;
   }
   compareBarPrevCount = list.length;
@@ -1783,9 +1791,32 @@ window.addEventListener("macroled-compare-changed", () => { renderCompareBar(); 
 window.addEventListener("storage", (e) => { if(e.key === "macroled_compare"){ renderCompareBar(); syncCompareCheckboxes(); } });
 
 
+/* En Highbay PRO 2026: luminarias/galponeras primero, accesorios después. */
+function isHighbayAccessory(doc){
+  if(!doc) return false;
+  const cat = String(doc.categoria || "").toLowerCase();
+  if(/sensor|control remoto|brazo/.test(cat)) return true;
+  const sku = String(doc.sku || "");
+  if(/^PHB-(SEN|CONTROL|BR)/i.test(sku)) return true;
+  const name = String(doc.nombre_typesense || "").toLowerCase();
+  if(/sensor|control remoto|brazo/.test(name) && !/galponera/.test(name)) return true;
+  return false;
+}
+
+function prioritizeHighbayHits(hits){
+  if([...state.selected.familia][0] !== "Highbay PRO 2026") return hits;
+  if(!hits || hits.length < 2) return hits;
+  return [...hits].sort((a, b) => {
+    const aAcc = isHighbayAccessory(a.document) ? 1 : 0;
+    const bAcc = isHighbayAccessory(b.document) ? 1 : 0;
+    return aAcc - bAcc;
+  });
+}
+
 function renderCards(hits, found){
   const grid = document.getElementById("grid");
-  if(!hits || !hits.length){
+  const orderedHits = prioritizeHighbayHits(hits);
+  if(!orderedHits || !orderedHits.length){
     grid.innerHTML = `<div class="state-msg">
       <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
       <span class="state-title">No encontramos productos</span>
@@ -1793,7 +1824,7 @@ function renderCards(hits, found){
     </div>`;
     return;
   }
-  grid.innerHTML = hits.map(h => cardTemplate(h.document)).join("");
+  grid.innerHTML = orderedHits.map(h => cardTemplate(h.document)).join("");
   wireCarousels();
   wireCardLinks();
   wireCompareCheckboxes();
@@ -1833,8 +1864,14 @@ function renderBreadcrumb(){
     state.selected.subfamilia.clear();
     state.selected.familia.clear();
     state.selected.categoria.clear();
+    state.selected.color.clear();
+    state.selected.variante_temperatura_filtro.clear();
+    state.selected.dimerizable.clear();
+    resetPotenciaRange();
+    state.sortBy = "";
+    const sortSelect = document.getElementById("sortSelect");
+    if(sortSelect) sortSelect.value = "";
     state.page = 1;
-    history.pushState({}, "", location.pathname);
     loadAndRender();
   }
 
@@ -1945,6 +1982,7 @@ async function loadAndRender(){
     const applyBtn = document.getElementById("filtersApply");
     if(applyBtn) applyBtn.textContent = `Ver ${data.found} resultado${data.found === 1 ? "" : "s"}`;
 
+    syncFiltersToURL();
     finishInitialPreload();
   }finally{
     if(gridShell){
@@ -2348,32 +2386,138 @@ function openDetailScreen(field){
 }
 
 /* =========================================================
-   BÚSQUEDA GENERAL (?q=) — leída desde la URL al cargar, la
-   pusiste desde el buscador del menú (ts-search-input) con
-   PRODUCTS_PAGE_URL + "?q=" + encodeURIComponent(query)
+   URL ↔ FILTROS
+   Permite enlazar catálogo filtrado, p.ej.:
+   ?macrofamilia=Luminarias%20de%20Proyecto&familia=Highbay%20PRO%202026
+   También sigue funcionando ?q= desde el buscador del menú.
    ========================================================= */
-function initSearchQueryFromURL(){
+const URL_FILTER_KEYS = [
+  ["macrofamilia", "macrofamilia"],
+  ["familia", "familia"],
+  ["subfamilia", "subfamilia"],
+  ["categoria", "categoria"],
+  ["color", "color"],
+  ["temperatura", "variante_temperatura_filtro"],
+  ["dimerizable", "dimerizable"]
+];
+let skipUrlSync = false;
+let pendingUrlPotencia = null; // { min, max } hasta que carguen los bounds
+
+function clearSelectedFilters(){
+  Object.keys(state.selected).forEach(k => state.selected[k].clear());
+}
+
+function expandUrlParamValues(params, key){
+  return params.getAll(key).flatMap(v =>
+    String(v).split("|").map(s => s.trim()).filter(Boolean)
+  );
+}
+
+function applyStateFromURL(){
   const params = new URLSearchParams(location.search);
-  const q = params.get("q");
-  if(q && q.trim()){
-    state.query = q.trim();
-    // Si entra por búsqueda, no arranca con una macrofamilia ya filtrada
+  clearSelectedFilters();
+  resetPotenciaRange();
+  pendingUrlPotencia = null;
+
+  const q = (params.get("q") || "").trim();
+  state.query = q;
+
+  URL_FILTER_KEYS.forEach(([param, field]) => {
+    expandUrlParamValues(params, param).forEach(v => state.selected[field].add(v));
+  });
+
+  // Si entra solo por búsqueda del menú, no mezclar con filtros viejos
+  if(q && !params.has("macrofamilia") && !params.has("familia")){
     state.selected.macrofamilia.clear();
     state.selected.subfamilia.clear();
     state.selected.familia.clear();
     state.selected.categoria.clear();
   }
+
+  const page = parseInt(params.get("page") || "1", 10);
+  state.page = Number.isFinite(page) && page > 0 ? page : 1;
+
+  const sort = params.get("sort") || "";
+  state.sortBy = sort;
+  const sortSelect = document.getElementById("sortSelect");
+  if(sortSelect) sortSelect.value = sort;
+
+  const potMin = params.get("pot_min");
+  const potMax = params.get("pot_max");
+  if(potMin != null || potMax != null){
+    const min = potMin != null ? Number(potMin) : null;
+    const max = potMax != null ? Number(potMax) : null;
+    pendingUrlPotencia = {
+      min: Number.isFinite(min) ? min : null,
+      max: Number.isFinite(max) ? max : null
+    };
+    if(pendingUrlPotencia.min != null) state.potenciaMin = pendingUrlPotencia.min;
+    if(pendingUrlPotencia.max != null) state.potenciaMax = pendingUrlPotencia.max;
+  }
 }
 
-initSearchQueryFromURL();
+function applyPendingUrlPotencia(){
+  if(!pendingUrlPotencia) return false;
+  ensurePotenciaSelectionDefaults();
+  if(pendingUrlPotencia.min != null){
+    state.potenciaMin = Math.max(potenciaBounds.min, Math.min(potenciaBounds.max, pendingUrlPotencia.min));
+  }
+  if(pendingUrlPotencia.max != null){
+    state.potenciaMax = Math.max(potenciaBounds.min, Math.min(potenciaBounds.max, pendingUrlPotencia.max));
+  }
+  if(state.potenciaMin > state.potenciaMax){
+    const t = state.potenciaMin;
+    state.potenciaMin = state.potenciaMax;
+    state.potenciaMax = t;
+  }
+  state.pendingPotenciaMin = state.potenciaMin;
+  state.pendingPotenciaMax = state.potenciaMax;
+  pendingUrlPotencia = null;
+  return true;
+}
+
+function syncFiltersToURL(){
+  if(skipUrlSync) return;
+  const params = new URLSearchParams();
+
+  if(state.query) params.set("q", state.query);
+
+  URL_FILTER_KEYS.forEach(([param, field]) => {
+    [...state.selected[field]].forEach(v => params.append(param, v));
+  });
+
+  if(isPotenciaRangeActive(state.potenciaMin, state.potenciaMax)){
+    params.set("pot_min", String(state.potenciaMin));
+    params.set("pot_max", String(state.potenciaMax));
+  }
+  if(state.sortBy) params.set("sort", state.sortBy);
+  if(state.page > 1) params.set("page", String(state.page));
+
+  const qs = params.toString();
+  const next = qs ? `${location.pathname}?${qs}` : location.pathname;
+  const current = `${location.pathname}${location.search}`;
+  if(next === current) return;
+  history.replaceState({}, "", next);
+}
+
+applyStateFromURL();
 loadMacrofamiliaOptions();
 loadPotenciaOptions().then(() => {
+  const appliedPot = applyPendingUrlPotencia();
   // Re-render facets si ya cargó el catálogo, para que el slider tenga bounds reales
   if(document.getElementById("filtersPanel")?.children.length){
     renderFacets(lastFacetCounts);
   }
+  if(appliedPot && initialPreloadDone) loadAndRender();
 });
 loadAndRender();
+
+window.addEventListener("popstate", () => {
+  skipUrlSync = true;
+  applyStateFromURL();
+  applyPendingUrlPotencia();
+  loadAndRender().finally(() => { skipUrlSync = false; });
+});
 
 /* Precarga videos de banners en idle para que no se sientan lentos al filtrar. */
 if(typeof requestIdleCallback === "function"){

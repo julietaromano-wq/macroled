@@ -93,6 +93,7 @@
     align-self:start;
     opacity:1;
     transition:max-width .32s ease,width .32s ease,opacity .28s ease;
+    overscroll-behavior:contain;
   }
   .filters-desktop-only{display:block;}
   /* Drawer mobile: oculto en desktop */
@@ -102,10 +103,11 @@
   .filters-desktop-heading{
     display:flex;align-items:center;justify-content:space-between;gap:12px;
     margin:0 0 8px;letter-spacing:0;
-    padding:4px 0 18px;
+    padding: 10px 8px 10px;
     border-bottom:1px solid var(--line);
     cursor:pointer;
     user-select:none;
+    background: #e8eef5;
   }
   .filters-desktop-heading:hover .filters-desktop-title,
   .filters-desktop-heading:hover .filters-collapse-btn{color:var(--dark-blue--700);}
@@ -815,40 +817,56 @@
     text-size-adjust:100%;
   }
   .compare-bar-inner{
-    background:#fff;border-radius:16px;box-shadow:0 16px 44px rgba(10,14,25,.22);
-    padding:16px 22px;border:1px solid #eef0f3;
+    background:#fff;border-radius:14px;box-shadow:0 12px 32px rgba(10,14,25,.18);
+    padding:12px 16px;border:1px solid #eef0f3;
   }
   .compare-bar-header{display:flex;align-items:center;justify-content:space-between;cursor:pointer;}
-  .compare-bar-title{font-size:15px;font-weight:700;color:var(--ink);display:flex;align-items:center;gap:10px;}
+  .compare-bar-title{font-size:14px;font-weight:700;color:var(--ink);display:flex;align-items:center;gap:8px;}
   .compare-count{
-    background:var(--brand);color:#fff;font-size:12px;font-weight:700;
-    width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex:none;
+    background:var(--brand);color:#fff;font-size:11px;font-weight:700;
+    width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex:none;
   }
   .compare-toggle{
     border:none;background:none;cursor:pointer;color:var(--ink-soft);
-    width:30px;height:30px;display:flex;align-items:center;justify-content:center;border-radius:7px;
+    width:26px;height:26px;display:flex;align-items:center;justify-content:center;border-radius:6px;
     transition:background .12s,transform .2s;flex:none;
   }
   .compare-toggle:hover{background:var(--bg-card);}
   .compare-bar.collapsed .compare-bar-body{display:none;}
   .compare-bar.collapsed .compare-toggle svg{transform:rotate(180deg);}
-  .compare-bar-body{display:flex;align-items:center;gap:16px;margin-top:16px;flex-wrap:wrap;}
-  .compare-items{display:flex;gap:12px;flex:1;flex-wrap:wrap;}
+  .compare-bar-body{
+    display:flex;
+    align-items:stretch;
+    gap:10px;
+    margin-top:14px;
+    flex-wrap:nowrap;
+    min-width:0;
+  }
+  .compare-items{
+    display:grid;
+    grid-template-columns:repeat(3, minmax(0, 1fr));
+    gap:8px;
+    flex:1 1 0;
+    width:0; /* reparte los 3 slots y evita que el CTA baje de fila */
+    min-width:0;
+  }
   .compare-chip{
     position:relative;
-    display:flex;align-items:center;gap:12px;background:#f5f6f7;border:1px solid #eceef1;
-    border-radius:12px;padding:8px 40px 8px 8px;min-width:280px;flex:1;max-width:360px;
+    display:flex;align-items:center;gap:10px;background:#f5f6f7;border:1px solid #eceef1;
+    border-radius:10px;padding:9px 30px 9px 8px;
+    width:auto;min-width:0;max-width:none;flex:none;
+    box-sizing:border-box;overflow:hidden;
   }
   .compare-chip-remove{
-    position:absolute;top:8px;right:8px;
-    border:none;background:#fff;color:var(--ink-soft);width:22px;height:22px;border-radius:50%;
-    display:flex;align-items:center;justify-content:center;font-size:15px;line-height:1;
+    position:absolute;top:6px;right:6px;
+    border:none;background:#fff;color:var(--ink-soft);width:18px;height:18px;border-radius:50%;
+    display:flex;align-items:center;justify-content:center;font-size:13px;line-height:1;
     cursor:pointer;flex:none;box-shadow:0 1px 3px rgba(10,14,25,.15);transition:background .12s,color .12s;
   }
   .compare-chip-remove:hover{background:#fbeceb;color:#d1453b;}
   .compare-chip .thumb {
-    width: 50px;
-    height: 50px;
+    width: 46px;
+    height: 46px;
     border-radius: 8px;
     background: #ffffff;
     display: flex;
@@ -856,55 +874,58 @@
     justify-content: center;
     flex: none;
     overflow: hidden;
-    padding: 5px;
+    padding: 4px;
   }
   .compare-chip .thumb img{width:100%;height:100%;object-fit:contain;}
-  .compare-chip .info{display:flex;flex-direction:column;align-items:flex-start;text-align:left;gap:2px;min-width:0;flex:1;}
-  .compare-chip .name{font-size:13px;font-weight:700;color:var(--ink);line-height:1.3;}
-  .compare-chip .sku{font-size:11px;color:var(--ink-soft);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .compare-chip .info{display:flex;flex-direction:column;align-items:flex-start;text-align:left;gap:2px;min-width:0;flex:1;overflow:hidden;}
+  .compare-chip .name{
+    font-size:12px;font-weight:700;color:var(--ink);line-height:1.25;
+    display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;
+    max-width:100%;
+  }
+  .compare-chip .sku{font-size:10px;color:var(--ink-soft);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;}
   .compare-slot-empty{
-    width:64px;height:64px;border-radius:12px;border:1.5px dashed #d8dce1;
-    display:flex;align-items:center;justify-content:center;color:#c3c9d1;flex:none;font-size:20px;
+    width:auto;min-width:0;min-height:64px;height:100%;border-radius:10px;border:1.5px dashed #d8dce1;
+    display:flex;align-items:center;justify-content:center;color:#c3c9d1;flex:none;font-size:16px;
+    box-sizing:border-box;background:#fafbfc;
   }
   .compare-cta{
-    margin-left:auto;background:var(--btn-blue);color:#fff;border:none;border-radius:var(--radius-sm);
-    padding:13px 22px;font-size:14px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:8px;
-    white-space:nowrap;transition:background .15s;flex:none;text-decoration:none;
+    margin-left:0;background:var(--btn-blue);color:#fff;border:none;border-radius:var(--radius-sm);
+    padding:9px 12px;font-size:12px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:6px;
+    white-space:nowrap;transition:background .15s;flex:0 0 auto;align-self:center;text-decoration:none;
   }
+  .compare-cta svg{width:14px;height:14px;}
   .compare-cta:hover{background:var(--btn-blue-dark);color:#fff;}
   .compare-cta.disabled{background:#c3cad6;cursor:not-allowed;pointer-events:none;}
 
-  /* Desktop mediano: 3 chips + CTA en una sola fila */
-  @media (min-width:901px) and (max-width:1400px){
-    .compare-bar-body{
-      flex-wrap:nowrap;
-      gap:12px;
-    }
+  @media (min-width:901px){
+    .compare-bar-body{flex-wrap:nowrap !important;}
     .compare-items{
-      flex-wrap:nowrap;
-      gap:8px;
-      min-width:0;
+      grid-template-columns:repeat(3, minmax(0, 1fr)) !important;
     }
+    .compare-slot-empty{display:flex !important;}
+  }
+
+  /* Desktop mediano: compacto, pero cards un poco más altas */
+  @media (min-width:901px) and (max-width:1400px){
+    .compare-bar-inner{padding:10px 14px;}
+    .compare-bar-title{font-size:13px;}
+    .compare-bar-body{gap:8px;margin-top:12px;}
+    .compare-items{gap:6px;}
     .compare-chip{
-      min-width:0;
-      max-width:none;
-      flex:1 1 0;
       gap:8px;
-      padding:6px 32px 6px 6px;
+      padding:8px 26px 8px 7px;
+      border-radius:9px;
     }
     .compare-chip .thumb{
-      width:40px;height:40px;padding:4px;
+      width:40px;height:40px;padding:3px;border-radius:7px;
     }
-    .compare-chip .name{
-      font-size:12px;
-      display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;
-    }
-    .compare-chip .sku{font-size:12px;}
-    .compare-chip-remove{top:6px;right:6px;width:20px;height:20px;font-size:14px;}
-    .compare-slot-empty{width:48px;height:48px;flex:none;}
+    .compare-chip .name{font-size:11px;}
+    .compare-chip .sku{font-size:9px;}
+    .compare-chip-remove{top:5px;right:5px;width:16px;height:16px;font-size:12px;}
+    .compare-slot-empty{min-height:56px;font-size:15px;border-radius:9px;}
     .compare-cta{
-      padding:11px 14px;font-size:13px;gap:6px;
-      margin-left:0;
+      padding:8px 10px;font-size:11px;gap:5px;
     }
   }
   @media (max-width:900px){
@@ -1181,7 +1202,7 @@
       font-size:16px;
     }
     .compare-chip .name{font-size:16px;}
-    .compare-chip .sku{font-size:13px;}
+    .compare-chip .sku{font-size:12px;}
     .compare-chip-remove{font-size:16px;}
     .compare-checkbox{font-size:16px;}
     .compare-row{font-size:14px;}
@@ -1192,8 +1213,8 @@
       margin-top:12px;
     }
     .compare-items{
-      display:flex;
-      flex-wrap:wrap;
+      display:grid;
+      grid-template-columns:1fr;
       gap:12px;
       width:100%;
       flex:none;
@@ -1204,6 +1225,7 @@
       max-width:none;
       flex:none;
     }
+    .compare-slot-empty{display:none;}
     .compare-cta{
       margin-left:0;
       width:100%;

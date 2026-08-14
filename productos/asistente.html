@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Macroled — Asistente de producto</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --brand:#00bdff;
+    --ink:#16294f;
+    --muted:#4f5a68;
+    --line:#e6e6e6;
+    --line-soft:#efefef;
+    --bg-card:#efefef;
+    --bg-page:#f4f6f8;
+    --paper:#f5f5f5;
+    --white:#fff;
+    --radius-sm:8px;
+    --navy:#00152B;
+    --btn-blue:#0077a8;
+    --btn-blue-dark:#005f87;
+    --tint:rgb(227,242,253);
+    --tint-text:rgb(0,110,165);
+    --focus-ring:0 0 0 3px rgba(0,189,255,.35);
+    --ease:cubic-bezier(.22,.61,.36,1);
+    --btn-dur:.2s;
+    --font:'Noto Sans',sans-serif;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    min-height:100vh;
+    font-family:var(--font);
+    color:var(--ink);
+    background:
+      radial-gradient(900px 420px at 12% -10%, rgba(0,189,255,.12), transparent 60%),
+      radial-gradient(700px 360px at 100% 0%, rgba(0,21,43,.06), transparent 55%),
+      var(--bg-page);
+    -webkit-font-smoothing:antialiased;
+  }
+  .demo-wrap{
+    max-width:720px;
+    margin:0 auto;
+    padding:48px 24px 120px;
+  }
+  .demo-wrap h1{
+    margin:0 0 10px;
+    font-size:28px;
+    font-weight:800;
+    letter-spacing:-.3px;
+    color:var(--navy);
+  }
+  .demo-wrap p{
+    margin:0;
+    font-size:15px;
+    line-height:1.55;
+    color:var(--muted);
+    max-width:42ch;
+  }
+
+  body.assistant-open{overflow:hidden;}
+  body.assistant-open .ai-launch{
+    visibility:hidden;
+    pointer-events:none;
+  }
+
+  .ai-launch{
+    position:fixed;
+    right:max(16px,env(safe-area-inset-right,0px));
+    left:auto;
+    bottom:max(20px,env(safe-area-inset-bottom,0px));
+    z-index:10050;
+    display:inline-flex;align-items:center;gap:10px;
+    padding:16px 20px;border:none;border-radius:999px;
+    background:#00152B !important;color:#fff !important;
+    font-family:var(--font);
+    font-size:15px !important;font-weight:600 !important;cursor:pointer;
+    box-shadow:0 12px 32px rgba(0,21,43,.28);
+    transition:transform var(--btn-dur) var(--ease),background var(--btn-dur) var(--ease),box-shadow var(--btn-dur) var(--ease),visibility .2s,bottom .3s var(--ease);
+    -webkit-font-smoothing:antialiased;
+  }
+  .ai-launch:hover{
+    background:#021c38 !important;
+    color:#fff !important;
+    transform:translateY(-2px);
+    box-shadow:0 16px 36px rgba(0,21,43,.34);
+  }
+  .ai-launch svg{flex:none;width:20px;height:20px;color:#fff !important;stroke:#fff !important;}
+  .ai-launch > span{
+    color:#fff !important;
+    font-size:15px !important;
+    font-weight:600 !important;
+    line-height:1.2 !important;
+  }
+  .ai-launch-dot{
+    width:8px;height:8px;border-radius:50%;background:var(--brand);
+    box-shadow:0 0 0 3px rgba(0,189,255,.25);
+    flex:none;
+  }
+
+  .ai-backdrop{
+    position:fixed;inset:0;z-index:10060;
+    background:rgba(6,12,22,.35);
+    opacity:0;pointer-events:none;transition:opacity .25s;
+  }
+  .ai-backdrop.is-open{opacity:1;pointer-events:auto;}
+
+  .ai-panel{
+    position:fixed;top:0;right:0;z-index:10070;
+    width:min(400px,100%);height:100%;
+    background:var(--white);
+    border-left:1px solid var(--line);
+    display:flex;flex-direction:column;
+    font-family:var(--font);
+    color:var(--ink);
+    font-weight:400;
+    transform:translateX(105%);
+    transition:transform .3s var(--ease);
+    box-shadow:-16px 0 48px rgba(0,21,43,.12);
+    -webkit-font-smoothing:antialiased;
+  }
+  .ai-panel.is-open{transform:none;}
+  .ai-panel *{font-family:inherit;}
+
+  .ai-head{
+    display:flex;align-items:center;justify-content:space-between;gap:12px;
+    padding:26px 18px 16px;border-bottom:1px solid var(--line-soft);
+    background:#fff;
+  }
+  .ai-head-main{display:flex;align-items:center;gap:14px;min-width:0;}
+  .ai-avatar{
+    position:relative;flex:none;
+    width:52px;height:52px;border-radius:50%;
+    background:#00152B;color:#fff;
+    display:grid;place-items:center;
+    box-shadow:0 8px 20px rgba(0,21,43,.22);
+  }
+  .ai-avatar svg{display:block;color:#fff;stroke:#fff;}
+  .ai-avatar-online{
+    position:absolute;right:2px;bottom:2px;
+    width:12px;height:12px;border-radius:50%;
+    background:#22c55e;border:2px solid #fff;
+  }
+  .ai-head-copy h2{
+    margin:0 0 4px;font-size:18px;font-weight:800;color:var(--navy);
+    letter-spacing:-.2px;line-height:1.15;
+  }
+  .ai-head-sub{margin:0;font-size:14px;color:var(--muted);line-height:1.35;}
+  .ai-close{
+    width:36px;height:36px;border:none;border-radius:var(--radius-sm);
+    background:transparent;color:var(--muted);cursor:pointer;
+    display:grid;place-items:center;flex:none;
+  }
+  .ai-close:hover{background:var(--bg-card);color:var(--navy);}
+
+  .ai-messages{
+    flex:1;overflow-y:auto;padding:18px 20px;
+    display:flex;flex-direction:column;gap:14px;
+  }
+  .ai-msg{max-width:92%;font-size:13.5px;line-height:1.5;}
+  .ai-msg.bot{align-self:flex-start;}
+  .ai-msg.user{align-self:flex-end;}
+  .ai-bubble{padding:12px 14px;border-radius:12px;}
+  .ai-msg.bot .ai-bubble{
+    background:var(--paper);color:var(--ink);border-radius:4px 12px 12px 12px;
+  }
+  .ai-msg.user .ai-bubble{
+    background:var(--navy);color:#fff;border-radius:12px 12px 4px 12px;
+  }
+  .ai-msg a{color:var(--btn-blue);font-weight:600;text-decoration:underline;}
+
+  .ai-typing{
+    display:none;align-self:flex-start;gap:4px;padding:12px 14px;
+    background:var(--paper);border-radius:4px 12px 12px 12px;
+    margin:0 20px 8px;
+  }
+  .ai-typing.is-on{display:flex;}
+  .ai-typing span{
+    width:6px;height:6px;border-radius:50%;background:#b0b8c4;
+    animation:aiDot 1s infinite ease-in-out;
+  }
+  .ai-typing span:nth-child(2){animation-delay:.15s;}
+  .ai-typing span:nth-child(3){animation-delay:.3s;}
+  @keyframes aiDot{
+    0%,80%,100%{transform:translateY(0);opacity:.4}
+    40%{transform:translateY(-3px);opacity:1}
+  }
+
+  .ai-suggestions{
+    display:flex;flex-wrap:wrap;gap:8px;padding:0 20px 12px;
+  }
+  .ai-chip{
+    border:1px solid var(--line);background:var(--white);
+    border-radius:var(--radius-sm);padding:8px 12px;
+    font-family:var(--font);
+    font-size:12px;font-weight:500;color:var(--ink);cursor:pointer;
+    transition:background var(--btn-dur) var(--ease),border-color var(--btn-dur) var(--ease),color var(--btn-dur) var(--ease);
+  }
+  .ai-chip:hover{border-color:var(--tint-text);background:var(--tint);color:var(--tint-text);}
+
+  .ai-form{
+    display:flex;gap:8px;padding:14px 16px 18px;
+    border-top:1px solid var(--line-soft);background:var(--white);
+  }
+  .ai-form input{
+    flex:1;min-width:0;border:1px solid var(--line);border-radius:var(--radius-sm);
+    padding:12px 14px;font-size:13.5px;font-family:inherit;color:var(--ink);
+  }
+  .ai-form input:focus{outline:none;border-color:var(--brand);box-shadow:var(--focus-ring);}
+  .ai-send{
+    width:44px;height:44px;border:none;border-radius:var(--radius-sm);
+    background:var(--btn-blue);color:#fff;cursor:pointer;display:grid;place-items:center;flex:none;
+  }
+  .ai-send:hover{background:var(--btn-blue-dark);}
+  .ai-send:disabled{opacity:.45;cursor:not-allowed;}
+
+  @media (max-width:640px){
+    .demo-wrap{padding:28px 18px 110px;}
+    .demo-wrap h1{font-size:22px;}
+    .ai-launch span:last-child{display:none;}
+    .ai-launch{
+      width:60px;height:60px;padding:0;
+      border-radius:50%;
+      justify-content:center;
+    }
+    .ai-launch svg{width:22px;height:22px;}
+    .ai-launch-dot{display:none;}
+    .ai-panel{width:100%;}
+    .ai-head{padding:24px 16px 14px;}
+    .ai-avatar{width:48px;height:48px;}
+    .ai-form{padding:12px 14px max(14px,env(safe-area-inset-bottom));}
+    .ai-form input,
+    .ai-form input:focus{font-size:16px !important;}
+  }
+</style>
+</head>
+<body>
+
+<main class="demo-wrap">
+  <h1>Asistente de producto</h1>
+  <p>Probá el botón flotante. Abre el panel, mandá una pregunta o usá las sugerencias. Este archivo concentra visual y funcionamiento del widget.</p>
+</main>
+
+<button type="button" class="ai-launch" id="aiLaunch" aria-haspopup="dialog" aria-controls="aiPanel">
+  <span class="ai-launch-dot" aria-hidden="true"></span>
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 3a7 7 0 0 0-4 12.7V19l4-2 4 2v-3.3A7 7 0 0 0 12 3z"/><path d="M9.5 10h.01M14.5 10h.01"/></svg>
+  <span>Asistente</span>
+</button>
+
+<div class="ai-backdrop" id="aiBackdrop" hidden></div>
+<aside class="ai-panel" id="aiPanel" role="dialog" aria-modal="true" aria-labelledby="aiTitle" hidden>
+  <div class="ai-head">
+    <div class="ai-head-main">
+      <div class="ai-avatar" aria-hidden="true">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 3a7 7 0 0 0-4 12.7V19l4-2 4 2v-3.3A7 7 0 0 0 12 3z"/><path d="M9.5 10h.01M14.5 10h.01"/></svg>
+        <span class="ai-avatar-online"></span>
+      </div>
+      <div class="ai-head-copy">
+        <h2 id="aiTitle">Asistente de producto</h2>
+        <p class="ai-head-sub">Estamos para ayudarte</p>
+      </div>
+    </div>
+    <button type="button" class="ai-close" id="aiClose" aria-label="Cerrar asistente">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+    </button>
+  </div>
+  <div class="ai-messages" id="aiMessages" aria-live="polite"></div>
+  <div class="ai-typing" id="aiTyping" aria-hidden="true"><span></span><span></span><span></span></div>
+  <div class="ai-suggestions" id="aiSuggestions"></div>
+  <form class="ai-form" id="aiForm">
+    <input type="text" id="aiInput" placeholder="Escribí tu pregunta…" autocomplete="off" aria-label="Pregunta">
+    <button type="submit" class="ai-send" aria-label="Enviar">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+    </button>
+  </form>
+</aside>
+
+<script>
+/* Contexto vacío para páginas sin catálogo (el webhook igual recibe la pregunta). */
+window.state = window.state || {
+  query: "",
+  selected: {
+    macrofamilia: new Set(),
+    familia: new Set(),
+    subfamilia: new Set(),
+    categoria: new Set(),
+    variante_temperatura_filtro: new Set(),
+    color: new Set(),
+    dimerizable: new Set()
+  }
+};
+
+(function () {
+  "use strict";
+
+  const N8N_WEBHOOK_URL = "https://n8n.coresagroup.com/webhook/macroled-ia";
+  const AI_TIMEOUT_MS = 12000;
+
+  function defaultFallbackHtml() {
+    return "No pude encontrar información sobre esa consulta en este momento.";
+  }
+
+  function init(options) {
+    options = options || {};
+    const getPayload = typeof options.getPayload === "function" ? options.getPayload : (q) => ({ pregunta: q });
+    const localAnswer = typeof options.localAnswer === "function" ? options.localAnswer : null;
+    const getSuggestions = typeof options.suggestions === "function" ? options.suggestions : () => [];
+    const fallbackHtml = typeof options.fallbackHtml === "function" ? options.fallbackHtml : defaultFallbackHtml;
+    const greeting = options.greeting || "Hola, soy el asistente de <b>productos Macroled</b>.";
+
+    const aiLaunch = document.getElementById("aiLaunch");
+    const aiPanel = document.getElementById("aiPanel");
+    const aiBackdrop = document.getElementById("aiBackdrop");
+    const aiMessages = document.getElementById("aiMessages");
+    const aiTyping = document.getElementById("aiTyping");
+    const aiSuggestions = document.getElementById("aiSuggestions");
+    const aiForm = document.getElementById("aiForm");
+    const aiInput = document.getElementById("aiInput");
+    const aiClose = document.getElementById("aiClose");
+    const openFromCta = document.getElementById("openAssistantFromCta");
+
+    if (!aiPanel || !aiForm || !aiMessages) {
+      console.warn("[asistente] Faltan elementos del widget en el DOM.");
+      return;
+    }
+
+    let aiBusy = false;
+    let aiLastTrigger = null;
+    const usedSuggestions = new Set();
+
+    function openAssistant(trigger) {
+      aiLastTrigger = trigger || document.activeElement;
+      if (aiBackdrop) {
+        aiBackdrop.hidden = false;
+        aiBackdrop.removeAttribute("hidden");
+      }
+      aiPanel.hidden = false;
+      aiPanel.removeAttribute("hidden");
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          aiPanel.classList.add("is-open");
+          if (aiBackdrop) aiBackdrop.classList.add("is-open");
+        });
+      });
+      document.body.classList.add("assistant-open");
+      try {
+        const isTouchUi =
+          window.matchMedia("(max-width: 640px)").matches ||
+          window.matchMedia("(hover: none) and (pointer: coarse)").matches;
+        if (aiInput) {
+          if (isTouchUi) aiInput.blur();
+          else aiInput.focus();
+        }
+      } catch (_) {}
+    }
+
+    function closeAssistant() {
+      aiPanel.classList.remove("is-open");
+      if (aiBackdrop) aiBackdrop.classList.remove("is-open");
+      document.body.classList.remove("assistant-open");
+      setTimeout(() => {
+        aiPanel.hidden = true;
+        if (aiBackdrop) aiBackdrop.hidden = true;
+        if (aiLastTrigger && typeof aiLastTrigger.focus === "function") aiLastTrigger.focus();
+      }, 280);
+    }
+
+    function addMsg(role, html) {
+      const el = document.createElement("div");
+      el.className = `ai-msg ${role}`;
+      el.innerHTML = `<div class="ai-bubble">${html}</div>`;
+      aiMessages.appendChild(el);
+      aiMessages.scrollTop = aiMessages.scrollHeight;
+    }
+
+    function renderSuggestions() {
+      if (!aiSuggestions) return;
+      aiSuggestions.innerHTML = getSuggestions()
+        .filter((s) => !usedSuggestions.has(s))
+        .map((s) => `<button type="button" class="ai-chip">${s}</button>`)
+        .join("");
+    }
+
+    async function askAI(question) {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), AI_TIMEOUT_MS);
+      try {
+        const res = await fetch(N8N_WEBHOOK_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          signal: controller.signal,
+          body: JSON.stringify(getPayload(question)),
+        });
+        clearTimeout(timeoutId);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
+        const item = Array.isArray(data) ? data[0] : data;
+        const texto = item && (item.respuesta || item.output || item.answer);
+        if (!texto) throw new Error("Respuesta vacía del agente");
+        return String(texto).replace(/\n/g, "<br>");
+      } catch (err) {
+        clearTimeout(timeoutId);
+        console.warn("[asistente] error consultando IA:", err);
+        return fallbackHtml();
+      }
+    }
+
+    async function ask(question) {
+      const q = question.trim();
+      if (!q || aiBusy) return;
+      aiBusy = true;
+      if (getSuggestions().includes(q)) usedSuggestions.add(q);
+      if (aiSuggestions) aiSuggestions.innerHTML = "";
+      addMsg("user", q.replace(/</g, "&lt;"));
+      aiTyping.classList.add("is-on");
+      aiForm.querySelector(".ai-send").disabled = true;
+
+      let respuesta = localAnswer ? localAnswer(q) : null;
+      if (respuesta) {
+        await new Promise((r) => setTimeout(r, 300 + Math.random() * 250));
+      } else {
+        respuesta = await askAI(q);
+      }
+
+      aiTyping.classList.remove("is-on");
+      addMsg("bot", respuesta);
+      renderSuggestions();
+      aiForm.querySelector(".ai-send").disabled = false;
+      aiBusy = false;
+    }
+
+    if (aiLaunch) aiLaunch.addEventListener("click", (e) => openAssistant(e.currentTarget));
+    if (openFromCta) openFromCta.addEventListener("click", (e) => openAssistant(e.currentTarget));
+    if (aiClose) aiClose.addEventListener("click", closeAssistant);
+    if (aiBackdrop) aiBackdrop.addEventListener("click", closeAssistant);
+
+    if (aiSuggestions) {
+      aiSuggestions.addEventListener("click", (e) => {
+        const chip = e.target.closest(".ai-chip");
+        if (chip) ask(chip.textContent);
+      });
+    }
+    aiForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const q = aiInput.value;
+      aiInput.value = "";
+      ask(q);
+    });
+
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && aiPanel.classList.contains("is-open")) closeAssistant();
+    });
+
+    addMsg("bot", greeting);
+    renderSuggestions();
+    window.MacroledAssistantOpen = openAssistant;
+    return { openAssistant, closeAssistant, renderSuggestions, ask };
+  }
+
+  window.MacroledAssistant = { init };
+})();
+
+(function () {
+  "use strict";
+  if (!window.MacroledAssistant) return;
+
+  function buildSuggestions() {
+    return [
+      "¿Qué luz me conviene para un living?",
+      "Busco algo para iluminar un local comercial",
+    ];
+  }
+
+  function getPayload(question) {
+    const s = window.state || {};
+    const selected = s.selected || {};
+    const filtros = {};
+    ["macrofamilia", "familia", "subfamilia", "categoria", "variante_temperatura_filtro", "color", "dimerizable"].forEach((field) => {
+      if (selected[field] && selected[field].size) filtros[field] = [...selected[field]];
+    });
+    return {
+      pregunta: question,
+      contexto: "asistente-standalone",
+      busqueda: s.query || "",
+      filtros,
+    };
+  }
+
+  window.MacroledAssistant.init({
+    greeting: `Hola, soy el asistente de <b>productos Macroled</b>. Estoy para ayudarte a encontrar productos y soluciones según tus necesidades de iluminación.`,
+    suggestions: buildSuggestions,
+    getPayload,
+    fallbackHtml: () => `No pude encontrar información sobre esa consulta. Probá con otra pregunta o explorá el catálogo.`,
+  });
+})();
+</script>
+</body>
+</html>
