@@ -384,6 +384,7 @@ const ICON_CHEVRON_RIGHT = `<svg width="14" height="14" viewBox="0 0 24 24" fill
 const ICON_FACET_CHEV = `<svg xmlns="http://www.w3.org/2000/svg" height="10" viewBox="0 -960 960 960" width="14" fill="currentColor" aria-hidden="true"><path d="m321-80-71-71 329-329-329-329 71-71 400 400L321-80Z"/></svg>`;
 const CHEV_HTML = `<span class="chev">${ICON_FACET_CHEV}</span>`;
 const ICON_WIFI = `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/></svg>`;
+const ICON_DIMERIZABLE = `<svg viewBox="0 0 17.91 14.17" aria-hidden="true"><path fill="#1d1d1b" d="M17.08,14.17H.82c-.31,0-.58-.16-.73-.43-.14-.26-.13-.56.04-.81L8.26.38c.15-.24.42-.38.7-.38.28,0,.54.14.69.38l8.13,12.55c.16.24.17.55.03.81-.14.27-.42.43-.73.43M8.95.58s-.15.01-.21.11L.62,13.25c-.07.1-.03.19-.01.22.04.08.12.13.22.13h16.26c.1,0,.18-.05.22-.13.02-.04.05-.13,0-.22L9.17.69c-.07-.1-.17-.11-.21-.11"/><path fill="#1d1d1b" d="M8.96,12.69c-2.23,0-4.05-1.76-4.05-3.93s1.82-3.93,4.05-3.93,4.05,1.76,4.05,3.93-1.82,3.93-4.05,3.93M8.96,5.39c-1.92,0-3.48,1.51-3.48,3.36s1.56,3.36,3.48,3.36,3.48-1.51,3.48-3.36-1.56-3.36-3.48-3.36"/><path fill="#1d1d1b" d="M10.96,8.75c.03-.51-.17-1.04-.55-1.42-.37-.39-.9-.63-1.46-.65-.55-.02-1.13.17-1.56.55-.43.37-.71.94-.73,1.53-.03-.59.21-1.2.63-1.63.42-.44,1.03-.71,1.66-.73.63-.03,1.27.19,1.76.63.49.42.8,1.07.82,1.74h-.58Z"/></svg>`;
 const ICON_BULB = `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M12 2a7 7 0 0 0-4 12.7c.6.5 1 1.3 1 2.1V17h6v-.2c0-.8.4-1.6 1-2.1A7 7 0 0 0 12 2z"/></svg>`;
 const ICON_ANGLE = `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 20H3"/><path d="M3 20 15 4"/><path d="M9.5 14.5a6 6 0 0 1 5 5"/></svg>`;
 const ICON_COLOR = `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a10 10 0 1 0 0 20 3 3 0 0 0 0-6h-1a2 2 0 0 1 0-4h3a2 2 0 0 0 2-2 10 10 0 0 0-4-8z"/><circle cx="7.5" cy="10.5" r="1" fill="currentColor" stroke="none"/><circle cx="12" cy="7" r="1" fill="currentColor" stroke="none"/><circle cx="16.5" cy="10.5" r="1" fill="currentColor" stroke="none"/></svg>`;
@@ -1479,6 +1480,18 @@ function buildLuzMediaDots(doc){
   return `<span class="temp-dots${collapsed}" tabindex="0" aria-label="Temperatura de luz"><span class="temp-dots-icon" aria-hidden="true">${ICON_BULB}</span>${rows}</span>`;
 }
 
+function isDimerizableProduct(doc){
+  const raw = doc && doc.dimerizable;
+  if(raw == null || raw === "") return false;
+  const values = Array.isArray(raw) ? raw : String(raw).split(/[;,|]/);
+  return values.some(v => String(v).trim() && !isDimerizableNoValue(v));
+}
+
+function buildDimBadge(doc){
+  if(!isDimerizableProduct(doc)) return "";
+  return `<span class="dim-badge" title="Dimerizable" aria-label="Dimerizable">${ICON_DIMERIZABLE}</span>`;
+}
+
 function cardTemplate(doc){
   const imgs = parseImages(doc);
   // Todas las imágenes de la card se re-escriben hacia CloudFront/webp
@@ -1508,6 +1521,7 @@ function cardTemplate(doc){
           </div>
           ${optimizedImgs.length ? `<img src="${optimizedImgs[0]}" alt="${doc.nombre_typesense || ""}" data-idx="0" data-imgs='${JSON.stringify(optimizedImgs)}' loading="lazy" decoding="async">` : `<span style="color:#c3c9d1;font-size:12px">Sin imagen</span>`}
           ${optimizedImgs.length > 1 ? `<div class="nav-arrow prev">${ICON_CHEVRON_LEFT}</div><div class="nav-arrow next">${ICON_CHEVRON_RIGHT}</div>` : ""}
+          ${buildDimBadge(doc)}
         </div>
         ${metaInner ? `<div class="card-overlays">${metaInner}</div>` : ""}
       </div>
@@ -1860,6 +1874,7 @@ function renderBreadcrumb(){
 
   function clearToProductos(){
     state.query = "";
+    syncSearchInputFromState();
     state.selected.macrofamilia.clear();
     state.selected.subfamilia.clear();
     state.selected.familia.clear();
@@ -1908,30 +1923,22 @@ function renderBreadcrumb(){
 /* =========================================================
    RENDER: ENCABEZADO DE MACROFAMILIA / FAMILIA / BÚSQUEDA
    ========================================================= */
-function renderCategoryHeading(found){
+function renderCategoryHeading(){
   const holder = document.getElementById("categoryHeading");
   const active = [...state.selected.macrofamilia][0];
   const activeFamilia = [...state.selected.familia][0];
+  let title = "Productos";
+  if(state.query) title = `Resultados para "${state.query}"`;
+  else if(activeFamilia) title = activeFamilia;
+  else if(active) title = active;
 
-  if(state.query){
-    holder.hidden = false;
-    holder.innerHTML = `<h1>Resultados para "${state.query}"</h1>`;
-    return;
-  }
-
-  if(activeFamilia){
-    holder.hidden = false;
-    holder.innerHTML = `<h1>${activeFamilia}</h1>`;
-    return;
-  }
-
-  if(!active){
-    holder.hidden = false;
-    holder.innerHTML = `<h1>Productos</h1>`;
-    return;
-  }
   holder.hidden = false;
-  holder.innerHTML = `<h1>${active}</h1>`;
+  let h1 = holder.querySelector("h1");
+  if(!h1){
+    h1 = document.createElement("h1");
+    holder.prepend(h1);
+  }
+  h1.textContent = title;
 }
 
 /* =========================================================
@@ -2000,6 +2007,33 @@ document.getElementById("sortSelect").addEventListener("change", (e) => {
   state.page = 1;
   loadAndRender();
 });
+
+function syncSearchInputFromState(){
+  const el = document.getElementById("searchInput");
+  if(!el) return;
+  if(el.value !== state.query) el.value = state.query;
+}
+
+let searchDebounce;
+const searchInput = document.getElementById("searchInput");
+if(searchInput){
+  searchInput.addEventListener("input", (e) => {
+    clearTimeout(searchDebounce);
+    searchDebounce = setTimeout(() => {
+      state.query = e.target.value.trim();
+      state.page = 1;
+      loadAndRender();
+    }, 250);
+  });
+  searchInput.addEventListener("keydown", (e) => {
+    if(e.key !== "Enter") return;
+    e.preventDefault();
+    clearTimeout(searchDebounce);
+    state.query = e.target.value.trim();
+    state.page = 1;
+    loadAndRender();
+  });
+}
 document.getElementById("btnGrid").addEventListener("click", () => {
   state.view = "grid";
   document.getElementById("grid").classList.remove("list");
@@ -2421,6 +2455,7 @@ function applyStateFromURL(){
 
   const q = (params.get("q") || "").trim();
   state.query = q;
+  syncSearchInputFromState();
 
   URL_FILTER_KEYS.forEach(([param, field]) => {
     expandUrlParamValues(params, param).forEach(v => state.selected[field].add(v));
@@ -2560,6 +2595,15 @@ if(typeof requestIdleCallback === "function"){
   const N8N_WEBHOOK_URL = "https://n8n.coresagroup.com/webhook/macroled-ia";
   const AI_TIMEOUT_MS = 12000;
 
+  /* Id de sesión: uno por carga de página, se manda en cada request al webhook
+     para que n8n pueda mantener memoria de la conversación (nodo Memory con
+     Session Key = {{ $json.body.sessionId }}). */
+  window.MacroledSessionId =
+    window.MacroledSessionId ||
+    (window.crypto && crypto.randomUUID
+      ? crypto.randomUUID()
+      : `sid-${Date.now()}-${Math.random().toString(36).slice(2)}`);
+
   function defaultFallbackHtml() {
     return "No pude encontrar información sobre esa consulta en este momento.";
   }
@@ -2655,7 +2699,10 @@ if(typeof requestIdleCallback === "function"){
           method: "POST",
           headers: { "Content-Type": "application/json" },
           signal: controller.signal,
-          body: JSON.stringify(getPayload(question)),
+          body: JSON.stringify({
+            ...getPayload(question),
+            sessionId: window.MacroledSessionId,
+          }),
         });
         clearTimeout(timeoutId);
 
@@ -2798,6 +2845,7 @@ if(typeof requestIdleCallback === "function"){
       contexto: "catalogo",
       busqueda: s.query || "",
       filtros,
+      sessionId: window.MacroledSessionId,
     };
   }
 

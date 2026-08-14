@@ -293,6 +293,15 @@ window.state = window.state || {
   }
 };
 
+/* Id de sesión: uno por carga de página, se manda en cada request al webhook
+   para que n8n pueda mantener memoria de la conversación (nodo Memory con
+   Session Key = {{ $json.body.sessionId }}). */
+window.MacroledSessionId =
+  window.MacroledSessionId ||
+  (window.crypto && crypto.randomUUID
+    ? crypto.randomUUID()
+    : `sid-${Date.now()}-${Math.random().toString(36).slice(2)}`);
+
 (function () {
   "use strict";
 
@@ -486,6 +495,7 @@ window.state = window.state || {
       contexto: "asistente-standalone",
       busqueda: s.query || "",
       filtros,
+      sessionId: window.MacroledSessionId,
     };
   }
 
