@@ -438,6 +438,21 @@ main{padding:clamp(12px,2vw,24px) clamp(12px,2vw,24px) 0;}
 }
 .trust-lines [hidden]{display:none !important;}
 
+.trust-ally,
+.distribution-note{
+  display:flex;align-items:center;justify-content:flex-start;flex-wrap:wrap;gap:10px;
+  margin-top:16px;padding-top:16px;border-top:1px solid var(--line-soft);
+  color:var(--muted);font-size:var(--fs-xs);font-weight:600;line-height:1.4;
+}
+.trust-ally img,
+.distribution-note img{
+  display:block;height:26px;width:auto;max-width:160px;object-fit:contain;
+}
+.distribution-note{
+  justify-content:center;text-align:center;
+  margin-top:clamp(24px,3vw,34px);padding-top:18px;
+}
+
 /* —— CTA stack: jerarquía nueva ——
    Fila 1 (.actions): ficha técnica (fuerte, más ancho) + catálogo (secundario)
    Fila 2 (.cta-utility): comparar (pill) + preguntá (link, terciario) */

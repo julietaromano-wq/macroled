@@ -1389,10 +1389,10 @@
   function syncActionDownloads(fichaUrl, catalogoUrl, manualUrl) {
     const docs = [
       {
-        key: "ficha",
-        url: fichaUrl,
-        primaryLabel: "Descargar ficha técnica",
-        secondaryLabel: "Ficha técnica",
+        key: "contacto",
+        url: "https://www.electroestrada.com.ar/",
+        primaryLabel: "Contacto comercial",
+        secondaryLabel: "Contacto comercial",
       },
       {
         key: "catalogo",
@@ -1406,7 +1406,7 @@
         primaryLabel: "Descargar manual",
         secondaryLabel: "Manual",
       },
-    ].filter((d) => isValidFileUrl(d.url));
+    ].filter((d) => isValidFileUrl(d.url) || d.key === "contacto");
 
     const btnPrimary = document.getElementById("btn-ficha");
     const btnSecondary = document.getElementById("btn-catalogo");
