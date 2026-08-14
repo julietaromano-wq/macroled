@@ -664,6 +664,15 @@ resolveProductsFromStorage();
   const N8N_WEBHOOK_URL = "https://n8n.coresagroup.com/webhook/macroled-ia";
   const AI_TIMEOUT_MS = 12000;
 
+  /* Id de sesión: uno por carga de página, se manda en cada request al webhook
+     para que n8n pueda mantener memoria de la conversación (nodo Memory con
+     Session Key = {{ $json.body.sessionId }}). */
+  window.MacroledSessionId =
+    window.MacroledSessionId ||
+    (window.crypto && crypto.randomUUID
+      ? crypto.randomUUID()
+      : `sid-${Date.now()}-${Math.random().toString(36).slice(2)}`);
+
   function defaultFallbackHtml() {
     return "No pude encontrar información sobre esa consulta en este momento.";
   }
@@ -756,7 +765,10 @@ resolveProductsFromStorage();
           method: "POST",
           headers: { "Content-Type": "application/json" },
           signal: controller.signal,
-          body: JSON.stringify(getPayload(question)),
+          body: JSON.stringify({
+            ...getPayload(question),
+            sessionId: window.MacroledSessionId,
+          }),
         });
         clearTimeout(timeoutId);
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
@@ -846,6 +858,7 @@ resolveProductsFromStorage();
       contexto: "comparar",
       productos,
       skus: productos.map((p) => p.sku).filter(Boolean),
+      sessionId: window.MacroledSessionId,
     };
   }
 
