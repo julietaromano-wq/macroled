@@ -10,6 +10,7 @@ const javascriptFiles = [
   "featured.js",
   "project-lines-concept.js",
   "home.js",
+  "asistente.js",
 ];
 
 export async function build() {
