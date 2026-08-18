@@ -33,6 +33,27 @@ export async function build() {
   const css = await readFile(resolve(homeDirectory, "css", "home.css"), "utf8");
   await writeFile(resolve(distDirectory, "home.css"), css, "utf8");
 
+  const newsletterMarker = "/* Newsletter popup — contact form field language */";
+  const newsletterStart = css.indexOf(newsletterMarker);
+  if (newsletterStart === -1) {
+    throw new Error("No se pudo encontrar el bloque CSS del popup de newsletter.");
+  }
+  await writeFile(
+    resolve(distDirectory, "newsletter.css"),
+    `${css.slice(newsletterStart).trim()}\n`,
+    "utf8",
+  );
+
+  const newsletterJavascript = await readFile(
+    resolve(homeDirectory, "js", "newsletter.js"),
+    "utf8",
+  );
+  await writeFile(
+    resolve(distDirectory, "newsletter.js"),
+    newsletterJavascript,
+    "utf8",
+  );
+
   const page = await readFile(resolve(homeDirectory, "index.html"), "utf8");
   const componentStart = page.indexOf('<div id="macroled-home"');
   const scriptsStart = page.indexOf("<script src=", componentStart);
@@ -53,5 +74,5 @@ export async function build() {
 
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
   await build();
-  console.log("Build completed: home/dist/home.bundle.js, home.css and webflow-embed.html");
+  console.log("Build completed: home bundle, CSS, newsletter assets and Webflow embed");
 }

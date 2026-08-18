@@ -4626,6 +4626,7 @@ a.ml-news-card:focus-visible {
 .ml-home .ml-button--tertiary.ml-news__view-all {
   flex: 0 0 auto;
   margin-bottom: 0.125rem;
+  padding-right: 0.25rem;
   color: var(--ml-light-blue-700);
   white-space: nowrap;
 }
@@ -4760,7 +4761,7 @@ a.ml-news-card:focus-visible {
   overflow: hidden;
   background:
     #0a0a0a
-    url("../assets/images/conversion-lighting-background.png")
+    url("https://s3.coresagroup.com/MACROLED/WEB/HOME/novedades_background.png")
     center / cover no-repeat;
 }
 
@@ -6448,9 +6449,8 @@ a.ml-news-card:focus-visible {
   }
 }
 
-/* Newsletter banner · same side entrance */
-.ml-home .ml-newsletter-banner.ml-newsletter-motion-ready .ml-newsletter-banner__copy,
-.ml-home .ml-newsletter-banner.ml-newsletter-motion-ready .ml-newsletter-banner__content > .ml-button {
+/* Newsletter copy · same side entrance. The CTA keeps the canonical primary-button response. */
+.ml-home .ml-newsletter-banner.ml-newsletter-motion-ready .ml-newsletter-banner__copy {
   transition:
     opacity 1.15s ease,
     transform 1.45s cubic-bezier(0.16, 1, 0.3, 1);
@@ -6462,13 +6462,7 @@ a.ml-news-card:focus-visible {
   transform: translate3d(-4.5rem, 0, 0);
 }
 
-.ml-home .ml-newsletter-banner.ml-newsletter-motion-ready .ml-newsletter-banner__content > .ml-button {
-  opacity: 0;
-  transform: translate3d(4.5rem, 0, 0);
-}
-
-.ml-home .ml-newsletter-banner.ml-newsletter-motion-ready.is-motion-visible .ml-newsletter-banner__copy,
-.ml-home .ml-newsletter-banner.ml-newsletter-motion-ready.is-motion-visible .ml-newsletter-banner__content > .ml-button {
+.ml-home .ml-newsletter-banner.ml-newsletter-motion-ready.is-motion-visible .ml-newsletter-banner__copy {
   opacity: 1;
   transform: none;
 }
@@ -6477,12 +6471,7 @@ a.ml-news-card:focus-visible {
   transition-delay: 0ms;
 }
 
-.ml-home .ml-newsletter-banner.ml-newsletter-motion-ready.is-motion-visible .ml-newsletter-banner__content > .ml-button {
-  transition-delay: 160ms;
-}
-
-.ml-home .ml-newsletter-banner.ml-newsletter-motion-ready.is-motion-settled .ml-newsletter-banner__copy,
-.ml-home .ml-newsletter-banner.ml-newsletter-motion-ready.is-motion-settled .ml-newsletter-banner__content > .ml-button {
+.ml-home .ml-newsletter-banner.ml-newsletter-motion-ready.is-motion-settled .ml-newsletter-banner__copy {
   transition-delay: 0ms;
 }
 
@@ -6490,18 +6479,28 @@ a.ml-news-card:focus-visible {
   .ml-home .ml-newsletter-banner.ml-newsletter-motion-ready .ml-newsletter-banner__copy {
     transform: translate3d(-3rem, 0, 0);
   }
-
-  .ml-home .ml-newsletter-banner.ml-newsletter-motion-ready .ml-newsletter-banner__content > .ml-button {
-    transform: translate3d(3rem, 0, 0);
-  }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .ml-home .ml-newsletter-banner.ml-newsletter-motion-ready .ml-newsletter-banner__copy,
-  .ml-home .ml-newsletter-banner.ml-newsletter-motion-ready .ml-newsletter-banner__content > .ml-button {
+  .ml-home .ml-newsletter-banner.ml-newsletter-motion-ready .ml-newsletter-banner__copy {
     opacity: 1 !important;
     transform: none !important;
     transition: none !important;
+  }
+}
+
+/* Keep the shared button lift after section entrance animations settle. */
+@media (hover: hover) and (pointer: fine) {
+  .ml-home .ml-project-lines-concept.ml-motion-ready.is-motion-visible
+    .ml-project-lines-concept__explore:hover,
+  .ml-home .ml-featured-products.ml-featured-products-motion-ready.is-motion-visible
+    .ml-featured-products__view-all:hover,
+  .ml-home .ml-news.ml-news-motion-ready.is-motion-visible
+    .ml-news__view-all:hover {
+    transform: translateY(-2px);
+    transition-duration: 0.25s;
+    transition-delay: 0ms;
+    transition-timing-function: ease;
   }
 }
 

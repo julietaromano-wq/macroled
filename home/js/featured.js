@@ -74,30 +74,37 @@
     let dragStartX = 0;
     let dragStartScroll = 0;
     let dragged = false;
+    let activePointerId = null;
 
     track.onpointerdown = event => {
       if (event.pointerType !== "mouse" || event.button !== 0) return;
       dragStartX = event.clientX;
       dragStartScroll = track.scrollLeft;
       dragged = false;
-      track.setPointerCapture(event.pointerId);
+      activePointerId = event.pointerId;
     };
     track.onpointermove = event => {
-      if (!track.hasPointerCapture(event.pointerId)) return;
+      if (event.pointerId !== activePointerId) return;
       const distance = event.clientX - dragStartX;
       if (Math.abs(distance) > 4 && !dragged) {
         dragged = true;
         track.classList.add("is-dragging");
+        track.setPointerCapture(event.pointerId);
       }
+      if (!dragged) return;
       track.scrollLeft = dragStartScroll - distance;
     };
     const stopDragging = event => {
-      if (!track.hasPointerCapture(event.pointerId)) return;
-      track.releasePointerCapture(event.pointerId);
+      if (event.pointerId !== activePointerId) return;
+      if (track.hasPointerCapture(event.pointerId)) track.releasePointerCapture(event.pointerId);
+      activePointerId = null;
       track.classList.remove("is-dragging");
     };
     track.onpointerup = stopDragging;
-    track.onpointercancel = stopDragging;
+    track.onpointercancel = event => {
+      stopDragging(event);
+      dragged = false;
+    };
     track.ondragstart = () => false;
     track.onclick = event => {
       if (!dragged) return;

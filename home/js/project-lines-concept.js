@@ -9,7 +9,7 @@
       badge: "Nueva línea",
       productImage: "https://s3.coresagroup.com/MACROLED/WEB/HOME/streetlight.png",
       ambientImage: "https://s3.coresagroup.com/MACROLED/WEB/HOME/streetlight_ambient.png",
-      href: "#ml-section-proyectos"
+      href: "https://macroled.webflow.io/nuevo-productos?macrofamilia=Luminarias+de+Proyecto&familia=Luz+de+Calle+Standard,"
     },
     {
       id: "invictus",
@@ -17,7 +17,7 @@
       subtitle: "Para grandes áreas, fachadas y espacios deportivos.",
       productImage: "https://s3.coresagroup.com/MACROLED/WEB/HOME/invictus.png",
       ambientImage: "https://s3.coresagroup.com/MACROLED/WEB/HOME/invictus_ambient.png",
-      href: "#ml-section-proyectos"
+      href: "https://macroled.webflow.io/nuevo-productos?macrofamilia=Luminarias+de+Proyecto&familia=Invictus"
     },
     {
       id: "highbay",
@@ -25,7 +25,7 @@
       subtitle: "Para naves industriales y espacios de gran altura.",
       productImage: "https://d1zltvqju4u8ql.cloudfront.net/fit-in/1000x1000/MACROLED/WEB/PHB-100W-90D-857-CW_FRONT.webp",
       ambientImage: "https://s3.coresagroup.com/MACROLED/WEB/HOME/highbay_ambient.png",
-      href: "#ml-section-proyectos"
+      href: "https://macroled.webflow.io/nuevo-productos?macrofamilia=Luminarias+de+Proyecto&familia=Highbay+PRO+2026"
     }
   ];
 

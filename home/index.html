@@ -11,11 +11,15 @@
   <link rel="stylesheet" href="css/home.css?v=20260812-129">
 </head>
 <body>
-  <div id="macroled-home" class="ml-home is-video-loading">
+  <div id="macroled-home" class="ml-home">
     <div class="ml-hero-overlap">
       <div class="ml-hero" aria-labelledby="ml-hero-title" data-nav-theme="dark">
-        <video class="ml-hero__video" autoplay muted playsinline preload="auto" aria-hidden="true">
-          <source src="assets/images/banner-web-horizontal-alta-negro.mp4" type="video/mp4">
+        <video class="ml-hero__video" autoplay muted playsinline preload="auto" aria-hidden="true"
+          poster="https://s3.coresagroup.com/MACROLED/video/HOMEDESKTOP-poster.webp"
+          data-poster-desktop="https://s3.coresagroup.com/MACROLED/video/HOMEDESKTOP-poster.webp"
+          data-poster-mobile="https://s3.coresagroup.com/MACROLED/video/HOMEMOBILE-poster.webp">
+          <source src="https://s3.coresagroup.com/MACROLED/video/HOMEMOBILE-faststart.mp4" type="video/mp4" media="(max-width: 640px)">
+          <source src="https://s3.coresagroup.com/MACROLED/video/HOMEDESKTOP-faststart.mp4" type="video/mp4" media="(min-width: 641px)">
         </video>
         <div class="ml-hero__fallback" aria-hidden="true"></div>
         <div class="ml-hero__overlay"></div>
@@ -32,7 +36,7 @@
         <div class="ml-project-lines-concept__inner ml-shell">
           <div class="ml-project-lines-concept__header">
             <div id="ml-project-lines-concept-title">Luminarias profesionales<br class="ml-project-lines-concept__title-break"><span class="ml-project-lines-concept__title-highlight">para obras de gran escala</span></div>
-            <a class="ml-button ml-button--primary ml-button--primary-light ml-project-lines-concept__explore" href="#ml-section-proyectos">
+            <a class="ml-button ml-button--primary ml-button--primary-light ml-project-lines-concept__explore" href="https://www.macroled.com.ar/proyectos">
               Ver productos
             </a>
           </div>
@@ -50,7 +54,7 @@
               <p class="ml-solutions-banner__subtitle">Desde iluminación residencial hasta soluciones profesionales: encontrá productos pensados para cada espacio, aplicación y necesidad.</p>
             </div>
             <div class="ml-solutions-banner__media" aria-hidden="true">
-              <img data-solutions-banner-image src="assets/images/Product_Macro_TIRAS_web.png" alt="" loading="lazy" width="1200" height="800">
+              <img data-solutions-banner-image src="https://s3.coresagroup.com/MACROLED/WEB/HOME/tirasled.png" alt="" loading="lazy" width="1200" height="800">
             </div>
           </div>
           <div class="ml-solutions-banner__categories" data-categories-slider>
@@ -166,7 +170,7 @@
 
       <section class="ml-newsletter-banner" aria-labelledby="ml-newsletter-title" data-newsletter data-expand-banner>
         <div class="ml-newsletter-banner__media" aria-hidden="true">
-          <img src="assets/images/conversion-lighting-background.png" alt="" loading="lazy" width="1600" height="900">
+          <img src="https://s3.coresagroup.com/MACROLED/WEB/HOME/novedades_background.png" alt="" loading="lazy" width="1600" height="900">
         </div>
         <div class="ml-newsletter-banner__overlay" aria-hidden="true"></div>
         <div class="ml-newsletter-banner__content">

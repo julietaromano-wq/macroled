@@ -442,6 +442,9 @@
       revealHome();
       return;
     }
+    video.poster = matchMedia("(max-width: 640px)").matches
+      ? video.dataset.posterMobile
+      : video.dataset.posterDesktop;
     const reducedMotion = matchMedia("(prefers-reduced-motion: reduce)");
 
     if (reducedMotion.matches) {
@@ -451,9 +454,7 @@
       return;
     }
 
-    let revealTimer;
     const revealVideo = () => {
-      clearTimeout(revealTimer);
       video.removeEventListener("canplay", revealVideo);
       video.removeEventListener("error", revealVideo);
       revealHome();
@@ -461,7 +462,6 @@
 
     video.addEventListener("canplay", revealVideo, { once: true });
     video.addEventListener("error", revealVideo, { once: true });
-    revealTimer = setTimeout(revealVideo, 8000);
 
     if (video.readyState >= HTMLMediaElement.HAVE_FUTURE_DATA) revealVideo();
     video.play().catch(revealVideo);
