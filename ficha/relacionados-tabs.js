@@ -10,7 +10,9 @@
   (colección Macroled_Prueba) para que esto funcione. Solo necesitan
   existir como documentos los SKU listados en cada campo — no el campo
   de relación en sí. Si un SKU listado todavía no está en Typesense, esa
-  card simplemente no aparece.
+  card simplemente no aparece; y si NINGUNO de los SKU del grupo resuelve
+  (dato roto o incompleto en el CMS), el tab entero queda oculto en vez
+  de mostrarse vacío.
 
   Si el SKU actual no tiene datos cargados en ninguno de los campos, el
   tab correspondiente queda oculto (atributo hidden en el HTML por default).
@@ -372,14 +374,20 @@
     if (countEl) countEl.textContent = count > 0 ? String(count) : "";
   }
 
-  function renderGroup(group, docs, requestedCount) {
+  // Ninguno de los SKU listados resolvió en Typesense (dato roto/incompleto
+  // en el CMS): se oculta el tab en vez de mostrarlo con un estado vacío.
+  function hideTab(group) {
+    const tab = document.getElementById(`tab-${group.key}`);
+    if (tab) tab.hidden = true;
+  }
+
+  function renderGroup(group, docs) {
     const track = document.getElementById(`${group.key}-grid`);
     if (!track) return;
     track.setAttribute("aria-busy", "false");
     if (!docs.length) {
-      track.innerHTML = requestedCount
-        ? '<span class="ml-product-card__note">No pudimos cargar los productos relacionados.</span>'
-        : "";
+      track.innerHTML = "";
+      hideTab(group);
       return;
     }
     track.innerHTML = docs.map((doc) => cardTemplate(doc, group)).join("");
@@ -391,15 +399,14 @@
   async function loadGroup(group, ctx) {
     const skuList = ctx[group.key];
     if (!skuList.length) return; // tab queda oculto, tal como viene en el HTML
-    showTab(group, skuList.length); // feedback inmediato mientras resuelve
     try {
       const docs = await fetchBySkus(
         skuList.filter((sku) => sku !== ctx.sku)
       );
-      renderGroup(group, docs, skuList.length);
+      renderGroup(group, docs);
     } catch (err) {
       console.warn(`[relacionados-tabs] error resolviendo "${group.key}":`, err);
-      renderGroup(group, [], skuList.length);
+      renderGroup(group, []);
     }
   }
 
