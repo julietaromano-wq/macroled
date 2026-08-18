@@ -370,13 +370,10 @@
       });
       tab.classList.add("is-active");
       tab.setAttribute("aria-selected", "true");
-      const panels = {
-        specs: document.getElementById("panel-specs"),
-        commercial: document.getElementById("panel-commercial"),
-        files: document.getElementById("panel-files"),
-      };
-      Object.entries(panels).forEach(([key, panel]) => {
-        if (!panel) return;
+      // Genérico: cualquier .tab-panel cuyo id sea "panel-<data-tab>" se sincroniza.
+      // Así los tabs nuevos (armados/despiece, etc.) no requieren tocar este archivo.
+      document.querySelectorAll(".tab-panel[id^='panel-']").forEach((panel) => {
+        const key = panel.id.slice("panel-".length);
         const on = key === tab.dataset.tab;
         panel.classList.toggle("is-active", on);
         panel.hidden = !on;
