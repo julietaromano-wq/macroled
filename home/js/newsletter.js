@@ -1,6 +1,7 @@
 (function () {
   "use strict";
 
+  function initNewsletter() {
   const popup = document.getElementById("nlPopup");
   const backdrop = document.getElementById("nlBackdrop");
   const form = document.getElementById("nlForm");
@@ -162,4 +163,11 @@
       success.removeAttribute("hidden");
     }
   });
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initNewsletter, { once: true });
+  } else {
+    initNewsletter();
+  }
 })();
