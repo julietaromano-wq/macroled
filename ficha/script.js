@@ -370,13 +370,10 @@
       });
       tab.classList.add("is-active");
       tab.setAttribute("aria-selected", "true");
-      const panels = {
-        specs: document.getElementById("panel-specs"),
-        commercial: document.getElementById("panel-commercial"),
-        files: document.getElementById("panel-files"),
-      };
-      Object.entries(panels).forEach(([key, panel]) => {
-        if (!panel) return;
+      // Genérico: cualquier .tab-panel cuyo id sea "panel-<data-tab>" se sincroniza.
+      // Así los tabs nuevos (armados/despiece, etc.) no requieren tocar este archivo.
+      document.querySelectorAll(".tab-panel[id^='panel-']").forEach((panel) => {
+        const key = panel.id.slice("panel-".length);
         const on = key === tab.dataset.tab;
         panel.classList.toggle("is-active", on);
         panel.hidden = !on;
@@ -814,6 +811,36 @@
 
   function isTruthyFlag(v) {
     return /^(si|sí|true|1|yes|smart)$/i.test(String(v == null ? "" : v).trim());
+  }
+
+  const SMART_APP_LINES = new Set(["ROMA", "TOKIO"]);
+
+  function isRomaTokioSmartProduct(el, specs) {
+    const smartRaw =
+      specs["Smart"] || specs["Tecnología"] || el.getAttribute("data-smart");
+    if (!isTruthyFlag(smartRaw)) return false;
+
+    const linea = normalizeLinea(
+      el.getAttribute("data-linea") || el.getAttribute("data-line") || ""
+    );
+    if (SMART_APP_LINES.has(linea)) return true;
+
+    const hints = [
+      el.getAttribute("data-name"),
+      el.getAttribute("data-family"),
+      el.getAttribute("data-subfamilia"),
+      specs["Subfamilia"],
+      specs["Familia"],
+    ]
+      .map((v) => normalizeLinea(v))
+      .join(" ");
+    return /\bROMA\b/.test(hints) || /\bTOKIO\b/.test(hints);
+  }
+
+  function syncSmartBanner(el, specs) {
+    const banner = document.getElementById("smartBanner");
+    if (!banner) return;
+    banner.hidden = !isRomaTokioSmartProduct(el, specs);
   }
 
   /* Orden de jerarquía. Solo se muestran hasta TRUST_MAX visibles. */
@@ -1387,6 +1414,13 @@
    * secundario = el siguiente disponible de esa misma prioridad.
    */
   function syncActionDownloads(fichaUrl, catalogoUrl, manualUrl) {
+    const btnPrimary = document.getElementById("btn-ficha");
+    const btnSecondary = document.getElementById("btn-catalogo");
+    const actions = document.querySelector(".cta-stack .actions");
+
+    const hasManualOverride = btnPrimary && btnPrimary.getAttribute("data-cta-mode") === "contact";
+    const contactUrl = (btnPrimary && btnPrimary.getAttribute("data-contact-url")) || "https://www.electroestrada.com.ar/";
+
     const docs = [
       {
         key: "ficha",
@@ -1408,9 +1442,14 @@
       },
     ].filter((d) => isValidFileUrl(d.url));
 
-    const btnPrimary = document.getElementById("btn-ficha");
-    const btnSecondary = document.getElementById("btn-catalogo");
-    const actions = document.querySelector(".cta-stack .actions");
+    const contactDoc = {
+      key: "contacto",
+      url: contactUrl,
+      primaryLabel: "Contacto comercial",
+      secondaryLabel: "Contacto comercial",
+    };
+
+    const finalDocs = hasManualOverride ? [contactDoc, ...docs.filter((d) => d.key !== "ficha")] : docs;
 
     const apply = (btn, doc, isPrimary) => {
       if (!btn) return;
@@ -1426,9 +1465,9 @@
       setDownloadBtnLabel(btn, isPrimary ? doc.primaryLabel : doc.secondaryLabel);
     };
 
-    apply(btnPrimary, docs[0] || null, true);
-    apply(btnSecondary, docs[1] || null, false);
-    if (actions) actions.hidden = docs.length === 0;
+    apply(btnPrimary, finalDocs[0] || null, true);
+    apply(btnSecondary, finalDocs[1] || null, false);
+    if (actions) actions.hidden = finalDocs.length === 0;
   }
 
   function syncFileCards(files) {
@@ -1819,7 +1858,8 @@
     const dimVal = specs["Dimerizable"];
     setTrustEligible("dimerizable", isTruthyFlag(dimVal));
 
-    const smartRaw = specs["Smart"] || el.getAttribute("data-smart");
+    const smartRaw =
+      specs["Smart"] || specs["Tecnología"] || el.getAttribute("data-smart");
     setTrustEligible("smart", isTruthyFlag(smartRaw));
 
     const panelRaw = specs["Panel táctil"] || el.getAttribute("data-panel-tactil");
@@ -1847,6 +1887,7 @@
     setTrustEligible("material", !!matVal);
 
     syncTrustPriority();
+    syncSmartBanner(el, specs);
 
     const PRODUCT_CTX = window.__mlProductCtx || (window.__mlProductCtx = {});
     PRODUCT_CTX.name = name;

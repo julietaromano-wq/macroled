@@ -3,14 +3,14 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Space Blanca — MACROLED</title>
+<title>Roma Smart 30W — MACROLED</title>
 <!--
   WEBFLOW — Custom Code → Head (copiar):
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0/dist/fancybox/fancybox.css">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/julietaromano-wq/macroled@8935cac/ficha/styles.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/mldalio/macroled@30abe49/ficha/styles.css">
   (Usá el hash del commit para saltar cache del CDN)
 -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -27,7 +27,7 @@
     <nav class="crumb" aria-label="Miga de pan">
       <a href="index.html">Productos</a><span class="sep">/</span>
       <a href="#" id="crumb-family">Luminarias Inalámbricas</a><span class="sep">/</span>
-      <span class="here" id="crumb-name">Space Blanca</span>
+      <span class="here" id="crumb-name">Roma Smart 30W</span>
     </nav>
 
     <section class="hero" aria-label="Producto">
@@ -37,7 +37,7 @@
           <div class="stage-wrap" id="stageWrap">
             <div class="stage" id="stage">
               <span class="stage-badge" id="stage-badge" hidden>Nuevo</span>
-              <img class="stage-img" id="stageImg" alt="Space Blanca" draggable="false" fetchpriority="high">
+              <img class="stage-img" id="stageImg" alt="Roma Smart 30W" draggable="false" fetchpriority="high">
               <video class="stage-video" id="stageVideo" playsinline controls preload="metadata" hidden></video>
               <span class="stage-play" id="stagePlay" hidden aria-hidden="true">
                 <svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>
@@ -84,14 +84,14 @@
       </div>
 
       <div class="info">
-        <span class="eyebrow" id="ficha-eyebrow">Decorativas · Luminarias Inalámbricas</span>
-        <h1 id="ficha-name">Space Blanca</h1>
-        <p class="lead" id="ficha-lead">Velador a batería Space Macroled, dimerizable, color blanco, DC 5V, 2700K, IP44, 160lm, incluye cable USB-C</p>
+        <span class="eyebrow" id="ficha-eyebrow">Reflectores · ROMA</span>
+        <h1 id="ficha-name">Roma Smart 30W</h1>
+        <p class="lead" id="ficha-lead">Reflector Roma Smart Macroled, control por app, Wi-Fi, 30W, 3000K, IP65, 2700lm, compatible con Alexa y Google Home</p>
 
         <div class="meta">
-          <span>SKU <b id="ficha-sku">SPACE-B</b></span>
+          <span>SKU <b id="ficha-sku">ROMA-S-30W</b></span>
           <span class="dot" aria-hidden="true"></span>
-          <span>EAN <b id="ficha-ean">7428325595880</b></span>
+          <span>EAN <b id="ficha-ean">7428325600001</b></span>
         </div>
 
         <div id="product-variants" class="container_variants" hidden aria-live="polite"></div>
@@ -101,7 +101,7 @@
           <div class="quick-specs" data-count="2" aria-label="Características destacadas">
             <div class="qspec" data-spec-key="Potencia">
               <span class="label">Potencia</span>
-              <span class="val" data-spec-val>1.6W</span>
+              <span class="val" data-spec-val>30W</span>
             </div>
             <div class="qspec" data-spec-key="Temperatura del color" hidden>
               <span class="label">Luz</span>
@@ -109,7 +109,7 @@
             </div>
             <div class="qspec" data-spec-key="Flujo luminoso">
               <span class="label">Lúmenes</span>
-              <span class="val" data-spec-val>160lm</span>
+              <span class="val" data-spec-val>2700lm</span>
             </div>
           </div>
         </div>
@@ -121,7 +121,7 @@
         -->
         <div class="cta-stack">
           <div class="actions">
-            <a class="btn btn-primary" id="btn-ficha" href="https://s3.coresagroup.com/MACROLED/DS/SPACE-B.pdf" target="_blank" rel="noopener">
+            <a class="btn btn-primary" id="btn-ficha" href="https://s3.coresagroup.com/MACROLED/DS/ROMA-S-30W.pdf" target="_blank" rel="noopener">
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/></svg>
               Descargar ficha técnica
             </a>
@@ -235,6 +235,10 @@
         <button class="tab is-active" role="tab" aria-selected="true" data-tab="specs">Especificaciones</button>
         <button class="tab" role="tab" aria-selected="false" data-tab="commercial">Información comercial</button>
         <button class="tab" role="tab" aria-selected="false" data-tab="files">Descargas</button>
+        <!-- Ocultos por default: relacionados-tabs.js los muestra solo si el SKU tiene datos cargados en el CMS -->
+        <button class="tab" role="tab" aria-selected="false" data-tab="armados" id="tab-armados" hidden>Productos armados<span class="tab-count" id="tab-armados-count"></span></button>
+        <button class="tab" role="tab" aria-selected="false" data-tab="despiece" id="tab-despiece" hidden>Despiece<span class="tab-count" id="tab-despiece-count"></span></button>
+        <button class="tab" role="tab" aria-selected="false" data-tab="compatibles" id="tab-compatibles" hidden>Productos compatibles<span class="tab-count" id="tab-compatibles-count"></span></button>
       </div>
 
       <div class="tab-panel is-active" id="panel-specs" role="tabpanel">
@@ -376,7 +380,90 @@
           </a>
         </div>
       </div>
+
+      <!-- Se muestran solo si el SKU tiene "Productos relacionados (Armados/Despiece)" cargados en el CMS -->
+      <div class="tab-panel" id="panel-armados" role="tabpanel" hidden>
+        <div class="ml-rel-carousel">
+          <div class="ml-rel-carousel__viewport">
+            <div class="ml-rel-carousel__track" id="armados-grid" aria-busy="true"></div>
+            <div class="ml-rel-carousel__arrows" hidden>
+              <button class="ml-rel-carousel__nav" type="button" data-rel-prev aria-label="Producto anterior">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 12H5m6-6-6 6 6 6"/></svg>
+              </button>
+              <button class="ml-rel-carousel__nav" type="button" data-rel-next aria-label="Producto siguiente">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6"/></svg>
+              </button>
+            </div>
+          </div>
+          <div class="ml-rel-carousel__controls" hidden>
+            <div class="ml-rel-carousel__progress" aria-hidden="true"><span data-rel-progress></span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="tab-panel" id="panel-despiece" role="tabpanel" hidden>
+        <div class="ml-rel-carousel">
+          <div class="ml-rel-carousel__viewport">
+            <div class="ml-rel-carousel__track" id="despiece-grid" aria-busy="true"></div>
+            <div class="ml-rel-carousel__arrows" hidden>
+              <button class="ml-rel-carousel__nav" type="button" data-rel-prev aria-label="Producto anterior">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 12H5m6-6-6 6 6 6"/></svg>
+              </button>
+              <button class="ml-rel-carousel__nav" type="button" data-rel-next aria-label="Producto siguiente">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6"/></svg>
+              </button>
+            </div>
+          </div>
+          <div class="ml-rel-carousel__controls" hidden>
+            <div class="ml-rel-carousel__progress" aria-hidden="true"><span data-rel-progress></span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Se muestra solo si el SKU tiene "Productos compatibles" cargados en el CMS (familia Tiras LED) -->
+      <div class="tab-panel" id="panel-compatibles" role="tabpanel" hidden>
+        <div class="ml-rel-carousel">
+          <div class="ml-rel-carousel__viewport">
+            <div class="ml-rel-carousel__track" id="compatibles-grid" aria-busy="true"></div>
+            <div class="ml-rel-carousel__arrows" hidden>
+              <button class="ml-rel-carousel__nav" type="button" data-rel-prev aria-label="Producto anterior">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 12H5m6-6-6 6 6 6"/></svg>
+              </button>
+              <button class="ml-rel-carousel__nav" type="button" data-rel-next aria-label="Producto siguiente">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6"/></svg>
+              </button>
+            </div>
+          </div>
+          <div class="ml-rel-carousel__controls" hidden>
+            <div class="ml-rel-carousel__progress" aria-hidden="true"><span data-rel-progress></span></div>
+          </div>
+        </div>
+      </div>
     </section>
+
+    <aside class="smart-banner" id="smartBanner" hidden aria-label="App Macroled Smart">
+      <div class="smart-banner__content">
+        <div class="smart-banner__header">
+          <img class="smart-banner__logo" src="https://s3.coresagroup.com/MACROLED/WEB/logo-macroled-blanco.svg" alt="Macroled" width="220" height="56" loading="lazy">
+          <span class="smart-banner__tag">Smart</span>
+        </div>
+        <p class="smart-banner__invite">Descargá la app y sumate al mundo Smart</p>        
+        <p class="smart-banner__copy">Controlá tus luminarias desde cualquier lugar.</p>
+        <div class="smart-banner__stores">
+          <a class="smart-store-btn" href="https://apps.apple.com/ar/app/macroled/id1592655986" target="_blank" rel="noopener noreferrer">
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
+            <span><span class="smart-store-btn__sub">Disponible en</span><strong>App Store</strong></span>
+          </a>
+          <a class="smart-store-btn" href="https://play.google.com/store/apps/details?id=com.macroled&amp;hl=es_AR" target="_blank" rel="noopener noreferrer">
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M3.609 1.814 13.792 12 3.61 22.186a1.002 1.002 0 0 1-.41-.875V2.689c0-.35.21-.665.525-.814l.484-.061zM14.5 12.707l2.302 2.302-10.937 6.333 8.635-8.635zM16.896 10.311 20.553 8.22A1 1 0 0 1 22 9.109v5.782a1 1 0 0 1-1.447.894l-3.657-2.091-2.302-2.302 1.302-1.072zM14.5 11.293 6.865 3.658l10.937 6.333L14.5 11.293z"/></svg>
+            <span><span class="smart-store-btn__sub">Disponible en</span><strong>Google Play</strong></span>
+          </a>
+        </div>
+      </div>
+      <div class="smart-banner__media">
+        <img src="https://s3.coresagroup.com/MACROLED/WEB/mockup-mobile-smart.png" alt="App Macroled Smart en un celular" loading="lazy">
+      </div>
+    </aside>
   </div>
 
   <section class="ml-related-products" id="productos-relacionados" data-reveal hidden>
@@ -426,6 +513,56 @@
 <div class="cms-product-source" id="cmsProductSource" aria-hidden="true">
   <div class="cms-product-item"
        data-hero
+       data-sku="ROMA-S-30W"
+       data-name="Roma Smart 30W"
+       data-image="https://d1zltvqju4u8ql.cloudfront.net/fit-in/1000x1000/filters:format(webp)/MACROLED/250/roma.png"
+       data-family="Reflectores"
+       data-macrofamilia="Exterior"
+       data-nuevo="true"
+       data-link="roma-smart-30w"
+       data-ficha="https://s3.coresagroup.com/MACROLED/DS/ROMA-S-30W.pdf"
+       data-catalogo=""
+       data-manual=""
+       data-ies=""
+       data-garantia="https://s3.coresagroup.com/MACROLED/Garantias/ROMA-S-30W.pdf"
+       data-descripcion="Reflector Roma Smart Macroled, control por app, Wi-Fi, 30W, 3000K, IP65, 2700lm, compatible con Alexa y Google Home"
+       data-multiimage="https://d1zltvqju4u8ql.cloudfront.net/fit-in/1000x1000/filters:format(webp)/MACROLED/250/roma.png"
+       data-video=""
+       data-video-poster=""
+       data-linea="ROMA"
+       data-variantes-sku=""
+       data-nombre-attr-variantes=""
+       data-ean13="7428325600001"
+       data-relacionados-armados="M-1CN-1TC-G ; M-1CN-1TC-N"
+       data-relacionados-despiece="M-BAST-1CN-1TC ; M-TAPA-1CN-1TC-B ; M-TAPA-1CN-1TC-G ; M-TAPA-1CN-1TC-N"
+       data-compatibles="pal-esq-al-16x16-10mm-2m; pal-ap-b-14x8-12mm-2m; pal-ap-n-14x8-12mm-2m; pal-em-b-18x8-12mm-2m; pal-em-n-18x8-12mm-2m; pal-ap-al-14x8-12mm-2m; pal-bd-b-28x20-12mm-2m; pal-bd-n-28x20-12mm-2m; pal-em-al-18x8-12mm-2m; pal-per-n-29x14-12mm-2m; pal-per-al-29x14-12mm-2m"
+       data-product-url="/roma-smart-30w"
+       data-angulo-de-apertura="120°"
+       data-clase="1"
+       data-color="Negro"
+       data-cri="80"
+       data-dimensiones="220x180mm"
+       data-funciones="Control por app"
+       data-flujo-luminoso="2700lm"
+       data-frecuencia="50/60Hz"
+       data-garantia-tiempo="2 años"
+       data-ip="IP65"
+       data-lumenes-w="90lm/W"
+       data-material-cuerpo="Aluminio"
+       data-panel-tactil=""
+       data-peso="1.2kg"
+       data-potencia="30W"
+       data-temperatura-color="3000K"
+       data-temperatura-de-operacion="-20°C a 45°C"
+       data-tension="220V"
+       data-tiempo-de-carga=""
+       data-tipo-de-carga=""
+       data-tipo-de-led="SMD"
+       data-tipo-de-luz="Cálido"
+       data-smart="Si"
+       data-control-remoto=""
+       data-dimerizable="Si"></div>
+  <div class="cms-product-item"
        data-sku="SPACE-B"
        data-name="Space Blanca"
        data-image="https://d1zltvqju4u8ql.cloudfront.net/fit-in/2000x2000/filters:format(webp)/MACROLED/2000/7428325595880a.png"
@@ -638,8 +775,8 @@
   <div class="ai-product">
     <img id="aiProductImg" src="" alt="">
     <div>
-      <strong id="aiProductName">Space Blanca</strong>
-      <span id="aiProductMeta">SKU SPACE-B · Decorativas</span>
+      <strong id="aiProductName">Roma Smart 30W</strong>
+      <span id="aiProductMeta">SKU ROMA-S-30W · Exterior</span>
     </div>
   </div>
   <div class="ai-messages" id="aiMessages" aria-live="polite"></div>
@@ -657,16 +794,34 @@
 <!--
   WEBFLOW — Custom Code → Before body close (copiar):
   <script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0/dist/fancybox/fancybox.umd.js"></script>
-  <script src="https://cdn.jsdelivr.net/gh/julietaromano-wq/macroled@8935cac/ficha/comparar.js"></script>
-  <script src="https://cdn.jsdelivr.net/gh/julietaromano-wq/macroled@8935cac/ficha/script.js"></script>
-  <script src="https://cdn.jsdelivr.net/gh/julietaromano-wq/macroled@8935cac/ficha/destacados.js"></script>
-  <script src="https://cdn.jsdelivr.net/gh/julietaromano-wq/macroled@8935cac/ficha/comparar-ficha.js"></script>
-  (Hash 8935cac = commit actual; cambiá el hash tras cada push para evitar cache)
+  <script src="https://cdn.jsdelivr.net/gh/julietaromano-wq/macroled@bd3feb1/ficha/comparar.js"></script>
+  <script src="https://cdn.jsdelivr.net/gh/mldalio/macroled@30abe49/ficha/script.js"></script>
+  <script src="https://cdn.jsdelivr.net/gh/mldalio/macroled@30abe49/ficha/destacados.js"></script>
+  <script src="https://cdn.jsdelivr.net/gh/mldalio/macroled@30abe49/ficha/relacionados-tabs.js"></script>
+  <script src="https://cdn.jsdelivr.net/gh/julietaromano-wq/macroled@bd3feb1/ficha/comparar-ficha.js"></script>
+  (comparar.js / comparar-ficha.js viven en el fork julietaromano-wq/macroled — no tocar
+   ese hash desde acá. styles.css / script.js / destacados.js / relacionados-tabs.js viven
+   en mldalio/macroled: subí el hash de este repo tras cada push para evitar cache del CDN)
+
+  IMPORTANTE — Embed "También te puede interesar" (#productos-relacionados):
+  ese bloque vive en un Embed aparte dentro de la plantilla de producto en
+  Webflow Designer, y en algún momento le pegaron ahí una copia manual y vieja
+  de la lógica de destacados.js (con su propio <style> duplicado y un <script>
+  que fuerza flex/min-width por JS con matchMedia leído una sola vez). Esa
+  copia quedó desincronizada del destacados.js real y causaba que sus cards
+  se vieran con un ancho distinto a las de las tabs (armados/despiece/
+  compatibles), que sí usan relacionados-tabs.js sin estilos inline.
+  El contenido de ESE Embed debe ser solo el HTML de la sección (igual al de
+  este archivo, línea ~469) + un único:
+    <script src="https://cdn.jsdelivr.net/gh/mldalio/macroled@30abe49/ficha/destacados.js"></script>
+  Nunca le vuelvas a pegar un <style> o <script> propio ahí — toda la lógica
+  y el CSS de las cards ya viven en styles.css / destacados.js de este repo.
 -->
 <script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0/dist/fancybox/fancybox.umd.js"></script>
 <script src="comparar.js"></script>
 <script src="script.js?v=ai-suggest1"></script>
 <script src="destacados.js?v=ai-suggest1"></script>
+<script src="relacionados-tabs.js?v=1"></script>
 <script src="comparar-ficha.js"></script>
 
 </body>

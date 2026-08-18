@@ -438,6 +438,132 @@ main{padding:clamp(12px,2vw,24px) clamp(12px,2vw,24px) 0;}
 }
 .trust-lines [hidden]{display:none !important;}
 
+/* —— Smart app banner (Roma / Tokio smart) —— */
+.smart-banner{
+  position:relative;
+  margin-top:clamp(22px,3vw,30px);
+  margin-bottom:clamp(22px,3vw,30px);
+  min-height:clamp(240px,26vw,300px);
+  border-radius:20px;
+  overflow:hidden;
+  display:flex;align-items:flex-start;justify-content:space-between;gap:20px;
+  background:#0b0f14;
+  border:1px solid var(--navy);
+  box-shadow:
+    0 20px 40px -20px rgba(0,0,0,.5),
+    0 4px 14px rgba(0,0,0,.3);
+  padding:clamp(26px,3.2vw,38px) clamp(24px,3.2vw,38px);
+}
+.smart-banner[hidden]{display:none !important;}
+.smart-banner__content{
+  position:relative;
+  flex:1 1 320px;min-width:0;max-width:70%;
+}
+.smart-banner__header{
+  display:flex;flex-direction:column;align-items:flex-start;gap:6px;
+  margin-bottom:14px;
+}
+.smart-banner__logo{
+  height:clamp(26px,3vw,32px);width:auto;max-width:200px;
+}
+.smart-banner__tag{
+  font-size:clamp(.85rem,1.1vw,1rem);
+  font-weight:400;letter-spacing:.14em;
+  text-transform:uppercase;
+  color:rgba(255,255,255,.5);
+}
+.smart-banner__copy{
+  margin:0 0 24px;max-width:560px;
+  font-size:var(--fs-sm);font-weight:500;
+  color:rgba(255,255,255,.62);line-height:1.55;
+}
+.smart-banner__invite{
+  margin:0 0 8px;max-width:560px;
+  font-size:var(--fs-lg);font-weight:800;
+  color:#fff;line-height:1.3;
+}
+.smart-banner__stores{
+  display:flex;flex-wrap:wrap;gap:12px;
+}
+.smart-store-btn{
+  display:inline-flex;align-items:center;gap:11px;
+  flex:0 1 auto; /* Webflow ships a bare a{flex:1;} rule; sin esto se estira full-width */
+  min-height:52px;padding:10px 20px;
+  border-radius:999px;
+  background:rgba(255,255,255,.08);
+  border:1px solid rgba(255,255,255,.16);
+  color:#fff;
+  font-size:12px;font-weight:700;line-height:1.2;
+  transition:background .15s,border-color .15s,transform .15s;
+}
+.smart-store-btn svg{flex:none;width:24px;height:24px;}
+.smart-store-btn:hover{
+  background:rgba(255,255,255,.14);
+  border-color:rgba(255,255,255,.32);
+  transform:translateY(-2px);
+}
+.smart-store-btn__sub{display:block;opacity:.7;font-weight:500;font-size:10px;}
+.smart-store-btn strong{display:block;font-size:14px;font-weight:800;letter-spacing:.01em;}
+.smart-banner__media{
+  position:absolute;
+  right:clamp(16px,4vw,40px);
+  top:clamp(14px,2vw,20px);
+  width:clamp(190px,17vw,220px);
+  pointer-events:none;
+}
+.smart-banner__media::before{
+  content:"";
+  position:absolute;
+  inset:-25% -35%;
+  background:radial-gradient(circle,rgba(0,189,255,.16) 0%,transparent 68%);
+  filter:blur(18px);
+  z-index:0;
+}
+.smart-banner__media img{
+  position:relative;z-index:1;
+  display:block;width:100%;height:auto;
+  object-fit:contain;
+  filter:drop-shadow(0 24px 30px rgba(0,0,0,.5));
+}
+@media (max-width:760px){
+  .smart-banner{flex-direction:column;text-align:center;padding-bottom:0;}
+  .smart-banner__content{flex:1 1 auto;width:100%;max-width:100%;}
+  .smart-banner__header{align-items:center;}
+  .smart-banner__copy,
+  .smart-banner__invite{margin-left:auto;margin-right:auto;}
+  .smart-banner__stores{justify-content:center;width:100%;margin-bottom:20px;}
+  .smart-banner__media{
+    position:relative;right:auto;top:auto;
+    width:clamp(150px,42vw,200px);
+    height:clamp(110px,80vw,226px);
+    margin:4px auto 0;
+    overflow:hidden;
+  }
+  .smart-banner__media img{
+    position:absolute;top:0;left:50%;
+    width:100%;height:auto;
+    transform:translateX(-50%);
+  }
+}
+@media (max-width:480px){
+  .smart-store-btn{flex:1;min-width:calc(50% - 6px);justify-content:center;padding:10px 12px;}
+}
+
+.trust-ally,
+.distribution-note{
+  display:flex;align-items:center;justify-content:flex-start;flex-wrap:wrap;gap:10px;
+  margin-top:16px;padding-top:16px;border-top:1px solid var(--line-soft);
+  color:var(--muted);font-size:var(--fs-xs);font-weight:600;line-height:1.4;
+}
+.trust-ally img,
+.distribution-note img{
+  display:block;height:26px;width:auto;max-width:160px;object-fit:contain;
+}
+.distribution-note{
+  justify-content:center;text-align:center;
+  margin-top:clamp(24px,3vw,34px);padding-top:18px;
+}
+
 /* —— CTA stack: jerarquía nueva ——
    Fila 1 (.actions): ficha técnica (fuerte, más ancho) + catálogo (secundario)
    Fila 2 (.cta-utility): comparar (pill) + preguntá (link, terciario) */
@@ -733,7 +859,7 @@ body.assistant-open .ai-launch{
 
 /* Tabs below hero */
 .detail{
-  padding:var(--space-section) 0;
+  padding:0;
 }
 .tabs{
   display:flex;gap:4px;border-bottom:1px solid var(--line);
@@ -1196,8 +1322,128 @@ body.assistant-open .ai-launch{
   text-overflow:ellipsis;
 }
 
+/* —— Tabs "Productos armados" / "Despiece" / "Compatibles" (panel-armados / panel-despiece / panel-compatibles) —— */
+.tab .tab-count{
+  display:inline-block;margin-left:6px;padding:1px 7px;border-radius:999px;
+  background:var(--fill-soft);color:var(--muted);font-size:.72rem;font-weight:700;
+  vertical-align:1px;
+}
+.tab.is-active .tab-count{background:var(--tint);color:var(--tint-text);}
+.tab[hidden]{display:none;}
+
+.panel-intro{font-size:var(--fs-sm);color:var(--muted);margin:0 0 14px;max-width:60ch;}
+
+/* Carrusel de las tabs armados/despiece/compatibles — mismo lenguaje visual
+   y comportamiento (flechas, drag, progreso) que .ml-related-products__* */
+.ml-rel-carousel{
+  --rel-arrow-space:3.25rem;
+  position:relative;
+}
+.ml-rel-carousel__viewport{position:relative;width:100%;}
+.ml-rel-carousel__track{
+  display:flex;
+  width:calc(100% - (var(--rel-arrow-space) * 2));
+  gap:1rem;
+  margin-inline:auto;
+  padding:.25rem 0 1rem;
+  overflow-x:auto;
+  scroll-behavior:smooth;
+  scroll-snap-type:x mandatory;
+  scroll-padding-inline:.25rem;
+  scrollbar-width:none;
+  cursor:grab;
+  user-select:none;
+  -webkit-overflow-scrolling:touch;
+  touch-action:pan-x;
+}
+.ml-rel-carousel__track.is-dragging{cursor:grabbing;scroll-behavior:auto;scroll-snap-type:none;}
+.ml-rel-carousel__track.is-dragging .ml-product-card{pointer-events:none;}
+.ml-rel-carousel__track::-webkit-scrollbar{display:none;}
+.ml-rel-carousel__track[aria-busy="true"]:empty::after{
+  content:"Cargando…";width:100%;padding:2rem 1.25rem;color:var(--muted);
+  font-size:var(--fs-sm);text-align:center;
+}
+.ml-rel-carousel__track .ml-product-card{
+  flex:0 0 calc((100% - 3rem) / 4);
+  min-width:min(240px, 78vw);
+  background:#fff;
+  box-shadow:2px 3px 20px 2px rgba(0,17,33,.04);
+  scroll-snap-align:start;
+  border:solid 1px #f1f1f1;
+}
+.ml-rel-carousel__controls{
+  position:relative;display:flex;align-items:center;justify-content:center;
+  min-height:2.75rem;margin-top:.25rem;
+}
+.ml-rel-carousel__controls[hidden]{display:none;}
+.ml-rel-carousel__progress{
+  position:relative;flex:0 0 clamp(6rem,10vw,9rem);height:2px;
+  overflow:hidden;border-radius:999px;background:rgba(0,13,25,.12);
+}
+.ml-rel-carousel__progress span{
+  position:absolute;inset:0 auto 0 0;border-radius:inherit;
+  background:var(--ml-light-blue-700,var(--brand));opacity:0;
+  transition:transform .2s ease,width .2s ease,opacity .2s ease;
+}
+.ml-rel-carousel__progress.has-progress span{opacity:.72;}
+.ml-rel-carousel__arrows{position:absolute;inset:.25rem 0 1rem;z-index:3;pointer-events:none;}
+.ml-rel-carousel__arrows[hidden]{display:none;}
+.ml-rel-carousel__nav{
+  position:absolute;top:50%;display:grid;place-items:center;
+  width:2.625rem;height:2.625rem;padding:0;border:0;border-radius:50%;
+  background:rgba(255,255,255,.94);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.9),0 4px 14px rgba(0,21,43,.1);
+  backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+  color:var(--ml-light-blue-500,var(--brand));cursor:pointer;pointer-events:auto;
+  transition:background .2s,color .2s,box-shadow .2s,opacity .2s,transform .2s;
+}
+.ml-rel-carousel__nav svg{
+  width:1.125rem;height:1.125rem;fill:none;stroke:currentColor;stroke-width:2.4;
+  stroke-linecap:round;stroke-linejoin:round;
+}
+.ml-rel-carousel__nav[data-rel-prev]{left:0;transform:translateY(-50%);}
+.ml-rel-carousel__nav[data-rel-next]{right:0;transform:translateY(-50%);}
+.ml-rel-carousel__nav:hover{
+  background:#fff;color:#007ba8;box-shadow:inset 0 1px 0 #fff,0 7px 20px rgba(0,87,119,.16);
+}
+.ml-rel-carousel__nav[data-rel-prev]:hover{transform:translate(-2px,-50%);}
+.ml-rel-carousel__nav[data-rel-next]:hover{transform:translate(2px,-50%);}
+.ml-rel-carousel__nav:active{background:#f2fbfe;color:#006b92;scale:.94;}
+.ml-rel-carousel__nav:disabled{opacity:0;cursor:default;pointer-events:none;}
+.ml-rel-carousel__nav:focus-visible{outline:3px solid var(--ml-light-blue-500,var(--brand));outline-offset:3px;}
+
+/* Wrapper para combinar el badge de rol (Armado/Despiece/Compatible) con el
+   badge Smart sin que se pisen — ambos quedan como pills en fila, no apilados
+   con position:absolute individual. */
+.ml-product-card__topleft-badges{
+  position:absolute;top:.55rem;left:.55rem;z-index:2;
+  display:flex;align-items:center;gap:.4rem;flex-wrap:wrap;
+}
+.ml-product-card__topleft-badges .ml-product-role-badge,
+.ml-product-card__topleft-badges .ml-product-smart-badge{
+  position:static;top:auto;left:auto;
+}
+.ml-product-role-badge{
+  position:absolute;top:.55rem;left:.55rem;z-index:2;
+  padding:.32rem .55rem;border-radius:999px;
+  font-size:.62rem;font-weight:700;letter-spacing:.02em;text-transform:uppercase;
+  color:#fff;white-space:nowrap;
+}
+.ml-product-role-badge.is-armado,
+.ml-product-role-badge.is-despiece,
+.ml-product-role-badge.is-compatible{background:#5b6572;}
+
+.ml-product-card__sku{
+  display:block;margin-top:-.4rem;
+  font-size:.68rem;color:var(--ink-soft);font-weight:600;
+  font-variant-numeric:tabular-nums;letter-spacing:.01em;
+}
+
 @media (max-width:1100px){
   .ml-related-products__track .ml-product-card{
+    flex-basis:calc((100% - 2rem) / 3);
+  }
+  .ml-rel-carousel__track .ml-product-card{
     flex-basis:calc((100% - 2rem) / 3);
   }
 }
@@ -1207,7 +1453,8 @@ body.assistant-open .ai-launch{
     flex-direction:column;
     gap:10px;
   }
-  .ml-related-products__track .ml-product-card{
+  .ml-related-products__track .ml-product-card,
+  .ml-rel-carousel__track .ml-product-card{
     flex-basis:calc((100% - 1rem) / 2);
   }
 }
@@ -1215,10 +1462,14 @@ body.assistant-open .ai-launch{
   .ml-related-products{
     --related-arrow-space:0px;
   }
+  .ml-rel-carousel{
+    --rel-arrow-space:0px;
+  }
   .ml-related-products > .wrap{
     padding-bottom:30px;
   }
-  .ml-related-products__track{
+  .ml-related-products__track,
+  .ml-rel-carousel__track{
     width:100%;
     margin:0;
     padding:1.25rem 0 1rem;
@@ -1228,20 +1479,23 @@ body.assistant-open .ai-launch{
     touch-action:pan-x;
     -webkit-overflow-scrolling:touch;
   }
-  .ml-related-products__track .ml-product-card{
+  .ml-related-products__track .ml-product-card,
+  .ml-rel-carousel__track .ml-product-card{
     max-width:100%;
     flex-basis:78vw;
     box-sizing:border-box;
     scroll-snap-align:center;
   }
-  .ml-related-products__controls{
+  .ml-related-products__controls,
+  .ml-rel-carousel__controls{
     width:100%;
     min-height:0;
     flex-direction:column;
     gap:.875rem;
     margin-top:1rem;
   }
-  .ml-related-products__arrows{
+  .ml-related-products__arrows,
+  .ml-rel-carousel__arrows{
     position:relative;
     inset:auto;
     display:flex;
@@ -1252,7 +1506,8 @@ body.assistant-open .ai-launch{
     width:100%;
     pointer-events:auto;
   }
-  .ml-related-products__progress{
+  .ml-related-products__progress,
+  .ml-rel-carousel__progress{
     order:2;
     width:min(9rem,45%);
     flex:0 0 auto;
@@ -1261,14 +1516,21 @@ body.assistant-open .ai-launch{
   .ml-related-products__nav[data-related-prev],
   .ml-related-products__nav[data-related-next],
   .ml-related-products__nav[data-related-prev]:hover,
-  .ml-related-products__nav[data-related-next]:hover{
+  .ml-related-products__nav[data-related-next]:hover,
+  .ml-rel-carousel__nav,
+  .ml-rel-carousel__nav[data-rel-prev],
+  .ml-rel-carousel__nav[data-rel-next],
+  .ml-rel-carousel__nav[data-rel-prev]:hover,
+  .ml-rel-carousel__nav[data-rel-next]:hover{
     position:static;
     transform:none;
   }
-  .ml-related-products__nav{
+  .ml-related-products__nav,
+  .ml-rel-carousel__nav{
     width:2.375rem;height:2.375rem;
   }
-  .ml-related-products__nav:disabled{opacity:.3;}
+  .ml-related-products__nav:disabled,
+  .ml-rel-carousel__nav:disabled{opacity:.3;}
 }
 
 /* Legacy compat aliases (por si quedan refs) */
@@ -1723,24 +1985,29 @@ body.assistant-open .ai-launch{
 
   .tabs{
     gap:0;
-    justify-content:center;
+    justify-content:flex-start;
     overflow-x:auto;
     -webkit-overflow-scrolling:touch;
     scrollbar-width:none;
+    scroll-snap-type:x proximity;
     margin-left:calc(var(--pad-x) * -1);
     margin-right:calc(var(--pad-x) * -1);
-    padding:0;
+    padding:0 var(--pad-x);
     border-bottom:1px solid var(--line);
+    /* Fade en los bordes para insinuar que hay más tabs fuera de pantalla */
+    mask-image:linear-gradient(to right,transparent 0,#000 var(--pad-x),#000 calc(100% - var(--pad-x)),transparent 100%);
+    -webkit-mask-image:linear-gradient(to right,transparent 0,#000 var(--pad-x),#000 calc(100% - var(--pad-x)),transparent 100%);
   }
   .tabs::-webkit-scrollbar{display:none;}
   .tab{
-    padding:12px 8px;
+    padding:12px 10px;
     font-size:12px;
-    flex:1 1 0;
-    min-width:0;
+    flex:0 0 auto;
+    min-width:max-content;
     text-align:center;
+    scroll-snap-align:start;
   }
-  .tab.is-active::after{left:8px;right:8px;}
+  .tab.is-active::after{left:10px;right:10px;}
 
   .spec-row{
     grid-template-columns:1fr;
@@ -1831,6 +2098,22 @@ body.assistant-open .ai-launch{
 /* —— Webflow isolation ——
    Reassert ficha type/color so Designer globals (body color, bold inheritance,
    link styles) don't alter the local design. Keep this stylesheet last in Head. */
+/* Webflow's own compiled CSS ships a bare `a{flex:1;}` rule (for some Designer
+   component elsewhere on the site). Since .crumb's links are plain <a> tags
+   with no Webflow classes, that rule reaches them too and stretches "Productos"
+   and the family link to equal-width flex columns — the "space-between" look
+   on mobile. Reassert the intended tight, left-aligned layout with !important. */
+.wrap .crumb{
+  display:flex !important;
+  flex-wrap:wrap !important;
+  justify-content:flex-start !important;
+  align-items:center !important;
+  gap:6px !important;
+  width:auto !important;
+}
+.wrap .crumb a{
+  flex:0 1 auto !important;
+}
 .wrap,
 .hero,
 .detail,
