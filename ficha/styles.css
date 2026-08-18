@@ -2092,6 +2092,18 @@ body.assistant-open .ai-launch{
 /* —— Webflow isolation ——
    Reassert ficha type/color so Designer globals (body color, bold inheritance,
    link styles) don't alter the local design. Keep this stylesheet last in Head. */
+/* "crumb" is a generic enough class name that a Webflow Designer global style
+   sharing it (e.g. a site-wide breadcrumb component with justify-content:
+   space-between) can win the cascade and spread the items apart on mobile.
+   Reassert the intended tight, left-aligned layout with !important. */
+.wrap .crumb{
+  display:flex !important;
+  flex-wrap:wrap !important;
+  justify-content:flex-start !important;
+  align-items:center !important;
+  gap:6px !important;
+  width:auto !important;
+}
 .wrap,
 .hero,
 .detail,
