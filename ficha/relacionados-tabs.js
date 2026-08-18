@@ -61,6 +61,109 @@
     return safeUrl((first || "").trim());
   }
 
+  /* Badges y specs: mismo criterio que cardTemplate() en destacados.js,
+     para que estas cards tengan el mismo nivel de información. */
+  function mergeVariantValue(doc, nombre, baseValor) {
+    const base = String(baseValor ?? "");
+    if (!Array.isArray(doc.atributo_variante)) return base;
+    const existing = base.split(";").map((s) => s.trim());
+    const extras = doc.atributo_variante
+      .filter(
+        (v) =>
+          String(v.nombre || "").toLowerCase() ===
+            String(nombre || "").toLowerCase() &&
+          v.valor &&
+          !existing.includes(String(v.valor))
+      )
+      .map((v) => String(v.valor));
+    return extras.length ? [base, ...extras].filter(Boolean).join(" ; ") : base;
+  }
+
+  function rawSpecs(doc) {
+    if (Array.isArray(doc.atributos) && doc.atributos.length) {
+      return doc.atributos.map((a) => ({
+        label: a.nombre,
+        value: mergeVariantValue(doc, a.nombre, a.valor),
+      }));
+    }
+    return [
+      { label: doc.nombre_attr1, value: doc.attr_1 },
+      { label: doc.nombre_attr2, value: doc.attr_2 },
+      { label: doc.nombre_attr3, value: doc.attr_3 },
+    ]
+      .filter((p) => p.label && p.value)
+      .map((p) => ({
+        label: p.label,
+        value: mergeVariantValue(doc, p.label, p.value),
+      }));
+  }
+
+  const isTemperatureSpec = (spec) =>
+    /temperatura|luz|kelvin|\bcct\b/i.test(String(spec.label || "")) ||
+    /\b\d{4}\s*k\b/i.test(String(spec.value || ""));
+  const isSmartSpec = (spec) =>
+    /^smart$/i.test(String(spec.value || "").trim()) ||
+    /\bsmart\b/i.test(String(spec.label || ""));
+
+  function variantSpec(doc) {
+    const label = String(doc.nombre_attr_variantes || "").trim();
+    const value = String(doc.attr_variantes || "").trim();
+    return label && value ? { label, value } : null;
+  }
+
+  function tempCategoryColor(value) {
+    const kelvin = parseInt(value, 10);
+    if (kelvin <= 3000) return "#fff79b";
+    if (kelvin <= 4500) return "#d9d9d9";
+    return "#bce4fa";
+  }
+
+  function buildTempBadge(doc) {
+    const candidates = [
+      ...rawSpecs(doc)
+        .filter(isTemperatureSpec)
+        .map((spec) => spec.value),
+      doc.rango_temperatura,
+      doc.temperatura_filtro,
+    ];
+    const variant = variantSpec(doc);
+    if (variant && isTemperatureSpec(variant)) candidates.unshift(variant.value);
+    const matches = candidates.flatMap(
+      (source) => String(source || "").match(/\d{4}\s*K/gi) || []
+    );
+    const tones = [
+      ...new Set(matches.map((value) => value.replace(/\s+/g, "").toUpperCase())),
+    ].sort((a, b) => parseInt(a, 10) - parseInt(b, 10));
+    if (!tones.length) return "";
+    const label =
+      tones.length === 1 ? tones[0] : `${tones[0]}–${tones[tones.length - 1]}`;
+    const colors = [...new Set(tones.map(tempCategoryColor))];
+    const background =
+      colors.length === 1
+        ? colors[0]
+        : `linear-gradient(to right, ${colors
+            .map((color, index) => {
+              const step = 100 / colors.length;
+              return `${color} ${index * step}%, ${color} ${(index + 1) * step}%`;
+            })
+            .join(", ")})`;
+    return `<span class="ml-product-temp-badge">${escapeHTML(label)}<span class="ml-product-badge-dot${
+      colors.length > 1 ? " is-split" : ""
+    }" style="background:${background}"></span></span>`;
+  }
+
+  function buildSmartBadge(doc) {
+    const directSmart =
+      doc.smart === true ||
+      doc.es_smart === true ||
+      [doc.smart, doc.es_smart].some((value) =>
+        /^(si|sí|true|1|smart)$/i.test(String(value || "").trim())
+      );
+    return directSmart || rawSpecs(doc).some(isSmartSpec)
+      ? '<span class="ml-product-smart-badge" aria-label="Producto Smart">SMART</span>'
+      : "";
+  }
+
   /* "sku-a ; sku-b" (case que sea) -> ["SKU-A","SKU-B"], sin vacíos ni duplicados */
   function parseSkuList(raw) {
     const seen = new Set();
@@ -123,9 +226,11 @@
       : '<span class="ml-product-card__note">Sin imagen</span>';
     return `<${tag} class="ml-product-card${
       link ? "" : " ml-product-card--disabled"
-    }"${link ? ` href="${escapeHTML(link)}"` : ""}><div class="ml-product-card__media"><span class="ml-product-role-badge ${
+    }"${link ? ` href="${escapeHTML(link)}"` : ""}><div class="ml-product-card__media"><div class="ml-product-card__topleft-badges"><span class="ml-product-role-badge ${
       group.roleClass
-    }">${group.role}</span>${media}</div><div class="ml-product-card__title">${escapeHTML(
+    }">${group.role}</span>${buildSmartBadge(
+      doc
+    )}</div>${buildTempBadge(doc)}${media}</div><div class="ml-product-card__title">${escapeHTML(
       doc.nombre_typesense || doc.descripcion || "Producto sin nombre"
     )}</div><span class="ml-product-card__sku">${escapeHTML(
       doc.sku || ""

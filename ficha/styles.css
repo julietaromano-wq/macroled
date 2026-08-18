@@ -1411,6 +1411,17 @@ body.assistant-open .ai-launch{
 .ml-rel-carousel__nav:disabled{opacity:0;cursor:default;pointer-events:none;}
 .ml-rel-carousel__nav:focus-visible{outline:3px solid var(--ml-light-blue-500,var(--brand));outline-offset:3px;}
 
+/* Wrapper para combinar el badge de rol (Armado/Despiece/Compatible) con el
+   badge Smart sin que se pisen — ambos quedan como pills en fila, no apilados
+   con position:absolute individual. */
+.ml-product-card__topleft-badges{
+  position:absolute;top:.55rem;left:.55rem;z-index:2;
+  display:flex;align-items:center;gap:.4rem;flex-wrap:wrap;
+}
+.ml-product-card__topleft-badges .ml-product-role-badge,
+.ml-product-card__topleft-badges .ml-product-smart-badge{
+  position:static;top:auto;left:auto;
+}
 .ml-product-role-badge{
   position:absolute;top:.55rem;left:.55rem;z-index:2;
   padding:.32rem .55rem;border-radius:999px;
@@ -1984,13 +1995,13 @@ body.assistant-open .ai-launch{
   }
   .tabs::-webkit-scrollbar{display:none;}
   .tab{
-    padding:12px 8px;
+    padding:12px 10px;
     font-size:12px;
-    flex:1 1 0;
-    min-width:0;
+    flex:1 0 auto;
+    min-width:max-content;
     text-align:center;
   }
-  .tab.is-active::after{left:8px;right:8px;}
+  .tab.is-active::after{left:10px;right:10px;}
 
   .spec-row{
     grid-template-columns:1fr;
