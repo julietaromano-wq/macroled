@@ -10,7 +10,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0/dist/fancybox/fancybox.css">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/mldalio/macroled@60c5d2d/ficha/styles.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/mldalio/macroled@cd2da23/ficha/styles.css">
   (Usá el hash del commit para saltar cache del CDN)
 -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -795,13 +795,27 @@
   WEBFLOW — Custom Code → Before body close (copiar):
   <script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0/dist/fancybox/fancybox.umd.js"></script>
   <script src="https://cdn.jsdelivr.net/gh/julietaromano-wq/macroled@bd3feb1/ficha/comparar.js"></script>
-  <script src="https://cdn.jsdelivr.net/gh/mldalio/macroled@60c5d2d/ficha/script.js"></script>
-  <script src="https://cdn.jsdelivr.net/gh/mldalio/macroled@60c5d2d/ficha/destacados.js"></script>
-  <script src="https://cdn.jsdelivr.net/gh/mldalio/macroled@60c5d2d/ficha/relacionados-tabs.js"></script>
+  <script src="https://cdn.jsdelivr.net/gh/mldalio/macroled@cd2da23/ficha/script.js"></script>
+  <script src="https://cdn.jsdelivr.net/gh/mldalio/macroled@cd2da23/ficha/destacados.js"></script>
+  <script src="https://cdn.jsdelivr.net/gh/mldalio/macroled@cd2da23/ficha/relacionados-tabs.js"></script>
   <script src="https://cdn.jsdelivr.net/gh/julietaromano-wq/macroled@bd3feb1/ficha/comparar-ficha.js"></script>
   (comparar.js / comparar-ficha.js viven en el fork julietaromano-wq/macroled — no tocar
    ese hash desde acá. styles.css / script.js / destacados.js / relacionados-tabs.js viven
    en mldalio/macroled: subí el hash de este repo tras cada push para evitar cache del CDN)
+
+  IMPORTANTE — Embed "También te puede interesar" (#productos-relacionados):
+  ese bloque vive en un Embed aparte dentro de la plantilla de producto en
+  Webflow Designer, y en algún momento le pegaron ahí una copia manual y vieja
+  de la lógica de destacados.js (con su propio <style> duplicado y un <script>
+  que fuerza flex/min-width por JS con matchMedia leído una sola vez). Esa
+  copia quedó desincronizada del destacados.js real y causaba que sus cards
+  se vieran con un ancho distinto a las de las tabs (armados/despiece/
+  compatibles), que sí usan relacionados-tabs.js sin estilos inline.
+  El contenido de ESE Embed debe ser solo el HTML de la sección (igual al de
+  este archivo, línea ~469) + un único:
+    <script src="https://cdn.jsdelivr.net/gh/mldalio/macroled@cd2da23/ficha/destacados.js"></script>
+  Nunca le vuelvas a pegar un <style> o <script> propio ahí — toda la lógica
+  y el CSS de las cards ya viven en styles.css / destacados.js de este repo.
 -->
 <script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0/dist/fancybox/fancybox.umd.js"></script>
 <script src="comparar.js"></script>
