@@ -5,7 +5,7 @@
     host: "https://typesense.coresagroup.com",
     apiKey: "g0oiNYY8THGuU9jnCsvqIH1X9HtvYRCR",
     collection: "Macroled_Prueba",
-    queryBy: "nombre,descripcion",
+    queryBy: "nombre_typesense,descripcion",
   };
   const RELATED_COUNT = 8;
   const RELATED_FALLBACK_POOL = 50;
@@ -111,9 +111,9 @@
       }));
     }
     return [
-      { label: doc.nombre_attr1, value: doc.attr_1 },
-      { label: doc.nombre_attr2, value: doc.attr_2 },
-      { label: doc.nombre_attr3, value: doc.attr_3 },
+      { label: doc.nombre_attr1, value: doc.attr1 },
+      { label: doc.nombre_attr2, value: doc.attr2 },
+      { label: doc.nombre_attr3, value: doc.attr3 },
     ]
       .filter((p) => p.label && p.value)
       .map((p) => ({
@@ -242,7 +242,7 @@
       : '<span class="ml-product-card__note">Sin atributos cargados</span>';
     const image = imgs.length
       ? `<img src="${escapeHTML(imgs[0])}" alt="${escapeHTML(
-          doc.nombre || "Producto Macroled"
+          doc.nombre_typesense || "Producto Macroled"
         )}" loading="lazy" width="400" height="400">`
       : '<span class="ml-product-card__note">Sin imagen</span>';
     return `<${tag} class="ml-product-card${
@@ -254,7 +254,7 @@
     )}${buildVariantBadge(doc)}${buildTempBadge(
       doc
     )}${image}</div><div class="ml-product-card__title">${escapeHTML(
-      doc.nombre || "Producto sin nombre"
+      doc.nombre_typesense || "Producto sin nombre"
     )}</div><div class="ml-product-card__attrs">${attrs}</div></${tag}>`;
   }
 
@@ -438,9 +438,9 @@
 
   function sortByNameSimilarity(docs, currentName) {
     return docs.sort((a, b) => {
-      const score = nameSimilarity(currentName, b.nombre) - nameSimilarity(currentName, a.nombre);
+      const score = nameSimilarity(currentName, b.nombre_typesense) - nameSimilarity(currentName, a.nombre_typesense);
       if (score) return score;
-      return String(a.nombre || "").localeCompare(String(b.nombre || ""), "es", {
+      return String(a.nombre_typesense || "").localeCompare(String(b.nombre_typesense || ""), "es", {
         numeric: true,
         sensitivity: "base",
       });
