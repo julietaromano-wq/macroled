@@ -1985,22 +1985,27 @@ body.assistant-open .ai-launch{
 
   .tabs{
     gap:0;
-    justify-content:center;
+    justify-content:flex-start;
     overflow-x:auto;
     -webkit-overflow-scrolling:touch;
     scrollbar-width:none;
+    scroll-snap-type:x proximity;
     margin-left:calc(var(--pad-x) * -1);
     margin-right:calc(var(--pad-x) * -1);
-    padding:0;
+    padding:0 var(--pad-x);
     border-bottom:1px solid var(--line);
+    /* Fade en los bordes para insinuar que hay más tabs fuera de pantalla */
+    mask-image:linear-gradient(to right,transparent 0,#000 var(--pad-x),#000 calc(100% - var(--pad-x)),transparent 100%);
+    -webkit-mask-image:linear-gradient(to right,transparent 0,#000 var(--pad-x),#000 calc(100% - var(--pad-x)),transparent 100%);
   }
   .tabs::-webkit-scrollbar{display:none;}
   .tab{
     padding:12px 10px;
     font-size:12px;
-    flex:1 0 auto;
+    flex:0 0 auto;
     min-width:max-content;
     text-align:center;
+    scroll-snap-align:start;
   }
   .tab.is-active::after{left:10px;right:10px;}
 
