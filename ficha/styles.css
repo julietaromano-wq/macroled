@@ -487,6 +487,7 @@ main{padding:clamp(12px,2vw,24px) clamp(12px,2vw,24px) 0;}
 }
 .smart-store-btn{
   display:inline-flex;align-items:center;gap:11px;
+  flex:0 1 auto; /* Webflow ships a bare a{flex:1;} rule; sin esto se estira full-width */
   min-height:52px;padding:10px 20px;
   border-radius:999px;
   background:rgba(255,255,255,.08);
@@ -2092,10 +2093,11 @@ body.assistant-open .ai-launch{
 /* —— Webflow isolation ——
    Reassert ficha type/color so Designer globals (body color, bold inheritance,
    link styles) don't alter the local design. Keep this stylesheet last in Head. */
-/* "crumb" is a generic enough class name that a Webflow Designer global style
-   sharing it (e.g. a site-wide breadcrumb component with justify-content:
-   space-between) can win the cascade and spread the items apart on mobile.
-   Reassert the intended tight, left-aligned layout with !important. */
+/* Webflow's own compiled CSS ships a bare `a{flex:1;}` rule (for some Designer
+   component elsewhere on the site). Since .crumb's links are plain <a> tags
+   with no Webflow classes, that rule reaches them too and stretches "Productos"
+   and the family link to equal-width flex columns — the "space-between" look
+   on mobile. Reassert the intended tight, left-aligned layout with !important. */
 .wrap .crumb{
   display:flex !important;
   flex-wrap:wrap !important;
@@ -2103,6 +2105,9 @@ body.assistant-open .ai-launch{
   align-items:center !important;
   gap:6px !important;
   width:auto !important;
+}
+.wrap .crumb a{
+  flex:0 1 auto !important;
 }
 .wrap,
 .hero,
