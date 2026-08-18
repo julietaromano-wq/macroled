@@ -912,7 +912,7 @@
       const href = item.href ? ` href="${esc(item.href)}"` : "";
       const hoverImage = item.hoverImage || item.image;
       const defaultImageClass = item.zoomDefaultImage ? " ml-news-card__image--zoomed" : "";
-      return `<${tag} class="ml-news-card"${href}><div class="ml-news-card__media"><img class="ml-news-card__image ml-news-card__image--default${defaultImageClass}" src="${esc(item.image)}" alt="${esc(item.title)}" loading="lazy" width="700" height="560"><img class="ml-news-card__image ml-news-card__image--hover" src="${esc(hoverImage)}" alt="" aria-hidden="true" loading="lazy" width="700" height="560"></div><h3>${esc(item.title)}</h3><p>${esc(item.description)}</p></${tag}>`;
+      return `<${tag} class="ml-news-card"${href}><div class="ml-news-card__media"><img class="ml-news-card__image ml-news-card__image--default${defaultImageClass}" src="${esc(item.image)}" alt="${esc(item.title)}" loading="lazy" width="700" height="560"><img class="ml-news-card__image ml-news-card__image--hover" src="${esc(hoverImage)}" alt="" aria-hidden="true" loading="lazy" width="700" height="560"></div><h3><span>${esc(item.title)}</span><span class="ml-news-card__arrow" aria-hidden="true">&rarr;</span></h3><p>${esc(item.description)}</p></${tag}>`;
     }).join("");
     root.querySelector("[data-faq]").innerHTML = config.faq.map((item, index) => `<div class="ml-faq__item"><button class="ml-faq__trigger" type="button" aria-expanded="false" aria-controls="ml-faq-answer-${index}"><span>${esc(item.question)}</span><span class="ml-faq__icon" aria-hidden="true">＋</span></button><div class="ml-faq__answer" id="ml-faq-answer-${index}"><div><p>${esc(item.answer)}</p></div></div></div>`).join("");
     root.querySelectorAll(".ml-faq__trigger").forEach(button => button.addEventListener("click", () => {
@@ -1995,4 +1995,3 @@
     syncLaunch();
   }
 })();
-

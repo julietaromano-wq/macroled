@@ -1128,19 +1128,37 @@ a.ml-news-card:focus-visible {
   text-transform: uppercase;
 }
 .ml-news-card h3 {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
   margin: 0.45rem 0;
   font-size: 1.25rem;
   transition: color 0.2s ease;
+}
+.ml-news-card__arrow {
+  flex: 0 0 auto;
+  color: var(--ml-dark-blue-600);
+  font-size: 1.75rem;
+  font-weight: 400;
+  line-height: 0.8;
+  opacity: 0;
+  transform: translateX(-0.3rem);
+  transition: opacity 0.25s ease, transform 0.3s ease;
 }
 .ml-news-card p {
   color: var(--ml-dark-blue-400);
   font-size: 0.85rem;
 }
 @media (hover: hover) and (pointer: fine) {
-  a.ml-news-card:hover h3 {
-    text-decoration: underline;
-    text-underline-offset: 0.18em;
+  a.ml-news-card:hover .ml-news-card__arrow {
+    opacity: 1;
+    transform: translateX(0);
   }
+}
+a.ml-news-card:focus-visible .ml-news-card__arrow {
+  opacity: 1;
+  transform: translateX(0);
 }
 .ml-faq__list {
   border-top: 1px solid color-mix(in srgb, var(--ml-grey-800) 14%, transparent);
