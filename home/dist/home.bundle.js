@@ -433,8 +433,7 @@
     let activePointerId = null;
 
     track.onpointerdown = event => {
-      if (event.pointerType === "mouse" && event.button !== 0) return;
-      if (event.isPrimary === false) return;
+      if (event.pointerType !== "mouse" || event.button !== 0) return;
       dragStartX = event.clientX;
       dragStartY = event.clientY;
       dragStartScroll = track.scrollLeft;
@@ -474,6 +473,47 @@
       stopDragging(event);
       dragged = false;
     };
+
+    track.removeEventListener("touchstart", track._featuredTouchStart);
+    track.removeEventListener("touchmove", track._featuredTouchMove);
+    track.removeEventListener("touchend", track._featuredTouchEnd);
+    track.removeEventListener("touchcancel", track._featuredTouchEnd);
+    let touchStartX = 0;
+    let touchStartY = 0;
+    let touchStartScroll = 0;
+    let touchAxis = null;
+    track._featuredTouchStart = event => {
+      if (event.touches.length !== 1) return;
+      const touch = event.touches[0];
+      touchStartX = touch.clientX;
+      touchStartY = touch.clientY;
+      touchStartScroll = track.scrollLeft;
+      touchAxis = null;
+      dragged = false;
+    };
+    track._featuredTouchMove = event => {
+      if (event.touches.length !== 1) return;
+      const touch = event.touches[0];
+      const distanceX = touch.clientX - touchStartX;
+      const distanceY = touch.clientY - touchStartY;
+      if (!touchAxis && Math.max(Math.abs(distanceX), Math.abs(distanceY)) > 7) {
+        touchAxis = Math.abs(distanceX) > Math.abs(distanceY) * 1.15 ? "x" : "y";
+      }
+      if (touchAxis !== "x") return;
+      event.preventDefault();
+      dragged = true;
+      track.classList.add("is-dragging");
+      track.scrollLeft = touchStartScroll - distanceX;
+    };
+    track._featuredTouchEnd = () => {
+      touchAxis = null;
+      track.classList.remove("is-dragging");
+    };
+    track.addEventListener("touchstart", track._featuredTouchStart, { passive: true });
+    track.addEventListener("touchmove", track._featuredTouchMove, { passive: false });
+    track.addEventListener("touchend", track._featuredTouchEnd, { passive: true });
+    track.addEventListener("touchcancel", track._featuredTouchEnd, { passive: true });
+
     track.ondragstart = () => false;
     track.onclick = event => {
       if (!dragged) return;

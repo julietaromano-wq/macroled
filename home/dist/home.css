@@ -482,7 +482,7 @@ body {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 1rem;
-  touch-action: pan-y pinch-zoom;
+  touch-action: auto;
 }
 @media (min-width: 1601px) {
   .ml-product-grid {
@@ -1905,7 +1905,7 @@ a.ml-news-card:focus-visible .ml-news-card__arrow {
   scrollbar-width: none;
   cursor: grab;
   user-select: none;
-  touch-action: pan-y pinch-zoom;
+  touch-action: auto;
 }
 .ml-featured-products__track.is-dragging {
   cursor: grabbing;
@@ -5808,8 +5808,8 @@ a.ml-news-card:focus-visible .ml-news-card__arrow {
     --ml-expand-start: calc(100% - 2rem);
     max-width: none;
     margin-top: 0;
-    margin-right: 0;
-    margin-left: 0;
+    margin-right: auto !important;
+    margin-left: auto !important;
     padding-right: 0;
     padding-left: 0;
   }
