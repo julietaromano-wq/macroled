@@ -7420,6 +7420,14 @@ body.newsletter-open {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
+  .nl-form .nl-field:nth-child(1) {
+    grid-column: 1;
+  }
+
+  .nl-form .nl-field:nth-child(2) {
+    grid-column: 2;
+  }
+
   .nl-form .nl-field:nth-child(n + 3),
   .nl-form .nl-submit,
   .nl-form .nl-popup__note {
