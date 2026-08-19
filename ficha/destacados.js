@@ -324,25 +324,35 @@
     let dragStartScroll = 0;
     let dragged = false;
 
+    // OJO: la captura del puntero se toma solo cuando se confirma arrastre real
+    // (>6px de movimiento), nunca en pointerdown — capturarla antes rompe la
+    // navegación del <a> y la selección de texto en un click normal sobre la card.
     track.onpointerdown = (event) => {
       if (event.pointerType !== "mouse" || event.button !== 0) return;
       dragStartX = event.clientX;
       dragStartScroll = track.scrollLeft;
       dragged = false;
-      track.setPointerCapture(event.pointerId);
     };
     track.onpointermove = (event) => {
-      if (!track.hasPointerCapture(event.pointerId)) return;
+      if (event.pointerType !== "mouse" || event.buttons !== 1) return;
       const distance = event.clientX - dragStartX;
-      if (Math.abs(distance) > 4 && !dragged) {
+      if (!dragged && Math.abs(distance) <= 6) return;
+      if (!dragged) {
         dragged = true;
         track.classList.add("is-dragging");
+        try {
+          track.setPointerCapture(event.pointerId);
+        } catch (_) {
+          /* ignore */
+        }
       }
       track.scrollLeft = dragStartScroll - distance;
     };
     const stopDragging = (event) => {
-      if (!track.hasPointerCapture(event.pointerId)) return;
-      track.releasePointerCapture(event.pointerId);
+      if (event.pointerType && event.pointerType !== "mouse") return;
+      if (track.hasPointerCapture?.(event.pointerId)) {
+        track.releasePointerCapture(event.pointerId);
+      }
       track.classList.remove("is-dragging");
     };
     track.onpointerup = stopDragging;
