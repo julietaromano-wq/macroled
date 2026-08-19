@@ -426,32 +426,47 @@
     next.onclick = () => moveToCard(1);
 
     let dragStartX = 0;
+    let dragStartY = 0;
     let dragStartScroll = 0;
     let dragged = false;
+    let dragAxis = null;
     let activePointerId = null;
 
     track.onpointerdown = event => {
-      if (event.pointerType !== "mouse" || event.button !== 0) return;
+      if (event.pointerType === "mouse" && event.button !== 0) return;
+      if (event.isPrimary === false) return;
       dragStartX = event.clientX;
+      dragStartY = event.clientY;
       dragStartScroll = track.scrollLeft;
       dragged = false;
+      dragAxis = null;
       activePointerId = event.pointerId;
     };
     track.onpointermove = event => {
       if (event.pointerId !== activePointerId) return;
-      const distance = event.clientX - dragStartX;
-      if (Math.abs(distance) > 4 && !dragged) {
+      const distanceX = event.clientX - dragStartX;
+      const distanceY = event.clientY - dragStartY;
+      if (!dragAxis && Math.max(Math.abs(distanceX), Math.abs(distanceY)) > 7) {
+        dragAxis = Math.abs(distanceX) > Math.abs(distanceY) * 1.15 ? "x" : "y";
+        if (dragAxis === "y") {
+          activePointerId = null;
+          return;
+        }
+      }
+      if (dragAxis !== "x") return;
+      if (!dragged) {
         dragged = true;
         track.classList.add("is-dragging");
         track.setPointerCapture(event.pointerId);
       }
-      if (!dragged) return;
-      track.scrollLeft = dragStartScroll - distance;
+      event.preventDefault();
+      track.scrollLeft = dragStartScroll - distanceX;
     };
     const stopDragging = event => {
       if (event.pointerId !== activePointerId) return;
       if (track.hasPointerCapture(event.pointerId)) track.releasePointerCapture(event.pointerId);
       activePointerId = null;
+      dragAxis = null;
       track.classList.remove("is-dragging");
     };
     track.onpointerup = stopDragging;
@@ -663,7 +678,7 @@
   function lineTemplate(item) {
     const mode = item.content?.mode || "typesense";
     const lineId = item.id ? ` data-line="${esc(item.id)}"` : "";
-    return `<article class="ml-featured ml-shell"${lineId} data-theme="${esc(item.theme)}" data-visual-theme="${esc(item.visualTheme || "solid")}" data-layout="${esc(item.layout)}" data-image-fit="${esc(item.imageFit || "cover")}" data-description-lines="${Number(item.descriptionLines || 0)}" data-button-tone="${buttonTone(item.textColor)}" data-content-mode="${esc(mode)}" style="--line-bg:${esc(item.theme)};--line-color:${esc(item.textColor)};--title-emphasis-weight:${Number(item.titleEmphasisWeight || 600)}"><div class="ml-featured__story"><div class="ml-featured__media"><img src="${esc(item.image)}" alt="" loading="lazy" width="1600" height="1000"></div><div class="ml-featured__copy"><h3>${emphasize(item.title, item.titleEmphasis)}</h3><p>${emphasize(item.description, item.descriptionEmphasis)}</p><div class="ml-featured__actions"><a class="ml-button ml-button--primary" href="${esc(item.href)}">Ver productos</a><a class="ml-button--tertiary" href="${esc(item.catalogHref || "#")}">Ver catálogo <span aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 12h14m-6-6 6 6-6 6"/></svg></span></a></div></div></div>${lineContentTemplate(item)}</article>`;
+    return `<article class="ml-featured ml-shell"${lineId} data-theme="${esc(item.theme)}" data-visual-theme="${esc(item.visualTheme || "solid")}" data-layout="${esc(item.layout)}" data-image-fit="${esc(item.imageFit || "cover")}" data-description-lines="${Number(item.descriptionLines || 0)}" data-button-tone="${buttonTone(item.textColor)}" data-content-mode="${esc(mode)}" style="--line-bg:${esc(item.theme)};--line-color:${esc(item.textColor)};--title-emphasis-weight:${Number(item.titleEmphasisWeight || 600)}"><div class="ml-featured__story"><div class="ml-featured__media"><img src="${esc(item.image)}" alt="" loading="lazy" width="1600" height="1000"></div><div class="ml-featured__copy"><h3>${emphasize(item.title, item.titleEmphasis)}</h3><p>${emphasize(item.description, item.descriptionEmphasis)}</p><div class="ml-featured__actions"><a class="ml-button ml-button--primary" href="${esc(item.href)}">Ver productos</a><a class="ml-button--tertiary ml-featured__resource-link" href="${esc(item.catalogHref || "#")}">Ver catálogo <span aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 12h14m-6-6 6 6-6 6"/></svg></span></a></div></div></div>${lineContentTemplate(item)}</article>`;
   }
 
   function renderSections() {

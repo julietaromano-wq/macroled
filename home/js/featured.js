@@ -72,32 +72,47 @@
     next.onclick = () => moveToCard(1);
 
     let dragStartX = 0;
+    let dragStartY = 0;
     let dragStartScroll = 0;
     let dragged = false;
+    let dragAxis = null;
     let activePointerId = null;
 
     track.onpointerdown = event => {
-      if (event.pointerType !== "mouse" || event.button !== 0) return;
+      if (event.pointerType === "mouse" && event.button !== 0) return;
+      if (event.isPrimary === false) return;
       dragStartX = event.clientX;
+      dragStartY = event.clientY;
       dragStartScroll = track.scrollLeft;
       dragged = false;
+      dragAxis = null;
       activePointerId = event.pointerId;
     };
     track.onpointermove = event => {
       if (event.pointerId !== activePointerId) return;
-      const distance = event.clientX - dragStartX;
-      if (Math.abs(distance) > 4 && !dragged) {
+      const distanceX = event.clientX - dragStartX;
+      const distanceY = event.clientY - dragStartY;
+      if (!dragAxis && Math.max(Math.abs(distanceX), Math.abs(distanceY)) > 7) {
+        dragAxis = Math.abs(distanceX) > Math.abs(distanceY) * 1.15 ? "x" : "y";
+        if (dragAxis === "y") {
+          activePointerId = null;
+          return;
+        }
+      }
+      if (dragAxis !== "x") return;
+      if (!dragged) {
         dragged = true;
         track.classList.add("is-dragging");
         track.setPointerCapture(event.pointerId);
       }
-      if (!dragged) return;
-      track.scrollLeft = dragStartScroll - distance;
+      event.preventDefault();
+      track.scrollLeft = dragStartScroll - distanceX;
     };
     const stopDragging = event => {
       if (event.pointerId !== activePointerId) return;
       if (track.hasPointerCapture(event.pointerId)) track.releasePointerCapture(event.pointerId);
       activePointerId = null;
+      dragAxis = null;
       track.classList.remove("is-dragging");
     };
     track.onpointerup = stopDragging;

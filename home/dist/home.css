@@ -14,6 +14,9 @@ body {
   background: var(--ml-grey-200);
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
+  /* Entry animations may start outside the viewport; keep them from widening the page. */
+  max-width: 100%;
+  overflow-x: clip;
 }
 .ml-home main {
   background: #fff;
@@ -448,6 +451,15 @@ body {
   gap: clamp(1rem, 2vw, 1.5rem);
   flex-wrap: wrap;
 }
+.ml-home .ml-featured__actions .ml-featured__resource-link {
+  width: max-content !important;
+  max-width: 100% !important;
+  min-width: max-content !important;
+  flex: 0 0 auto !important;
+  white-space: nowrap !important;
+  overflow-wrap: normal !important;
+  word-break: keep-all !important;
+}
 .ml-featured[data-layout="image-full"] .ml-featured__copy {
   min-height: min(68vw, 47rem);
   max-width: 48rem;
@@ -470,6 +482,7 @@ body {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 1rem;
+  touch-action: pan-y pinch-zoom;
 }
 @media (min-width: 1601px) {
   .ml-product-grid {
@@ -1020,6 +1033,15 @@ body {
   gap: 1.5rem;
   padding: clamp(3rem, 6vw, 5rem) 0;
   text-align: left;
+}
+.ml-home .ml-foa__content > .ml-foa__button {
+  width: auto !important;
+  height: 48px !important;
+  min-height: 48px !important;
+  max-height: 48px !important;
+  flex: 0 0 48px !important;
+  align-self: flex-start !important;
+  padding-block: 0 !important;
 }
 .ml-home .ml-foa #ml-foa-title {
   max-width: 16ch;
@@ -1766,7 +1788,8 @@ a.ml-news-card:focus-visible .ml-news-card__arrow {
   height: auto !important;
   min-height: 0 !important;
   max-height: none !important;
-  overflow: visible !important;
+  overflow-x: clip !important;
+  overflow-y: visible !important;
 }
 .ml-home#macroled-home main {
   display: block;
@@ -1882,6 +1905,7 @@ a.ml-news-card:focus-visible .ml-news-card__arrow {
   scrollbar-width: none;
   cursor: grab;
   user-select: none;
+  touch-action: pan-y pinch-zoom;
 }
 .ml-featured-products__track.is-dragging {
   cursor: grabbing;
@@ -4304,7 +4328,7 @@ a.ml-news-card:focus-visible .ml-news-card__arrow {
     height: 175%;
   }
 }
-@media (max-width: 640px) {
+@media (max-width: 900px) {
   .ml-project-lines-concept {
     padding: 4rem 0 5.5rem;
   }
@@ -4321,6 +4345,43 @@ a.ml-news-card:focus-visible .ml-news-card__arrow {
   }
   .ml-project-lines-concept__cards {
     order: 2;
+    display: flex;
+    width: calc(100% + 1rem);
+    flex-direction: row;
+    gap: 1rem;
+    padding-right: 1rem;
+    overflow-x: auto;
+    overscroll-behavior-inline: contain;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+  }
+  .ml-project-lines-concept__cards::-webkit-scrollbar {
+    display: none;
+  }
+  .ml-project-lines-concept__card {
+    width: min(82vw, 20rem);
+    height: clamp(20rem, 100vw, 24rem);
+    flex: 0 0 min(82vw, 20rem);
+    scroll-snap-align: start;
+  }
+  .ml-project-lines-concept__product {
+    right: -24%;
+    bottom: -10%;
+    width: 112%;
+    height: 78%;
+  }
+  [data-project-lines-concept-card="invictus"] .ml-project-lines-concept__product {
+    right: -36%;
+    bottom: -16%;
+    width: 140%;
+    height: 78%;
+  }
+  [data-project-lines-concept-card="highbay"] .ml-project-lines-concept__product {
+    right: -35%;
+    bottom: -20%;
+    width: 145%;
+    height: 82%;
   }
   .ml-project-lines-concept__explore {
     order: 3;
@@ -4329,6 +4390,56 @@ a.ml-news-card:focus-visible .ml-news-card__arrow {
   }
   .ml-project-lines-concept__content p {
     font-size: 1rem;
+  }
+}
+@media (min-width: 901px) and (max-width: 900px) {
+  .ml-project-lines-concept__title-break {
+    display: block;
+  }
+  .ml-project-lines-concept__header {
+    align-items: flex-end;
+    flex-direction: row;
+  }
+  .ml-project-lines-concept__cards {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: clamp(0.65rem, 1.5vw, 1rem);
+    width: 100%;
+    height: clamp(27rem, 64vw, 34rem);
+    overflow: visible;
+  }
+  .ml-project-lines-concept__card {
+    width: auto;
+    height: 100%;
+    min-width: 0;
+    flex: initial;
+  }
+  .ml-project-lines-concept__content {
+    inset: clamp(0.75rem, 1.8vw, 1.25rem);
+    gap: 0.65rem;
+    font-size: clamp(0.9rem, 1.9vw, 1.15rem);
+  }
+  .ml-project-lines-concept__content p {
+    width: 92%;
+    font-size: clamp(0.72rem, 1.45vw, 0.9rem);
+  }
+  .ml-project-lines-concept__product {
+    right: -24%;
+    bottom: -10%;
+    width: 112%;
+    height: 78%;
+  }
+  [data-project-lines-concept-card="invictus"] .ml-project-lines-concept__product {
+    right: -36%;
+    bottom: -16%;
+    width: 140%;
+    height: 78%;
+  }
+  [data-project-lines-concept-card="highbay"] .ml-project-lines-concept__product {
+    right: -35%;
+    bottom: -20%;
+    width: 145%;
+    height: 82%;
   }
 }
 @media (prefers-reduced-motion: reduce) {
@@ -4598,6 +4709,12 @@ a.ml-news-card:focus-visible .ml-news-card__arrow {
 .ml-home .ml-news {
   overflow: hidden;
 }
+@media (max-width: 640px) {
+  .ml-home .ml-news {
+    /* Let the horizontal track use the shell's right gutter instead of clipping it. */
+    overflow: visible;
+  }
+}
 
 .ml-home .ml-news__head {
   display: flex;
@@ -4647,6 +4764,25 @@ a.ml-news-card:focus-visible .ml-news-card__arrow {
   padding-right: 0.25rem;
   color: var(--ml-light-blue-700);
   white-space: nowrap;
+}
+
+@media (max-width: 640px) {
+  .ml-home .ml-featured-products__head,
+  .ml-home .ml-news__head {
+    row-gap: 1.5rem !important;
+  }
+
+  .ml-home .ml-featured-products__view-all,
+  .ml-home .ml-news__view-all {
+    align-self: flex-start;
+    margin: 0 !important;
+  }
+
+  .ml-home .ml-featured__actions .ml-featured__resource-link {
+    display: inline-flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+  }
 }
 
 .ml-home .ml-project-lines-concept__header #ml-project-lines-concept-title {
@@ -6614,6 +6750,49 @@ a.ml-news-card:focus-visible .ml-news-card__arrow {
 
   .ml-home .ml-project-lines-concept__content p {
     font-size: 0.9rem;
+  }
+}
+
+/* Stable framing for intermediate desktop widths, independent of viewport height. */
+@media (min-width: 901px) and (max-width: 1599px) {
+  .ml-home .ml-project-lines-concept {
+    height: auto !important;
+    min-height: 100svh !important;
+    max-height: none !important;
+  }
+
+  .ml-home .ml-project-lines-concept__inner {
+    height: auto !important;
+    min-height: 0;
+  }
+
+  .ml-home .ml-project-lines-concept__cards {
+    height: clamp(27rem, 38vw, 35rem) !important;
+    max-height: none !important;
+  }
+
+  .ml-home .ml-project-lines-concept__product {
+    bottom: -12% !important;
+    right: 0 !important;
+    width: auto !important;
+    height: 72% !important;
+    aspect-ratio: 1 / 1;
+    max-width: none !important;
+    object-fit: contain !important;
+    object-position: right bottom !important;
+  }
+
+  .ml-home [data-project-lines-concept-card="street"] .ml-project-lines-concept__product {
+    translate: 39% 0;
+  }
+
+  .ml-home [data-project-lines-concept-card="invictus"] .ml-project-lines-concept__product {
+    translate: 22% 0;
+    aspect-ratio: 1000 / 1349;
+  }
+
+  .ml-home [data-project-lines-concept-card="highbay"] .ml-project-lines-concept__product {
+    translate: 22% 0;
   }
 }
 
