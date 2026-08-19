@@ -482,12 +482,18 @@
     let touchStartY = 0;
     let touchStartScroll = 0;
     let touchAxis = null;
+    let touchLastX = 0;
+    let touchLastTime = 0;
+    let touchVelocityX = 0;
     track._featuredTouchStart = event => {
       if (event.touches.length !== 1) return;
       const touch = event.touches[0];
       touchStartX = touch.clientX;
       touchStartY = touch.clientY;
       touchStartScroll = track.scrollLeft;
+      touchLastX = touch.clientX;
+      touchLastTime = event.timeStamp;
+      touchVelocityX = 0;
       touchAxis = null;
       dragged = false;
     };
@@ -503,11 +509,26 @@
       event.preventDefault();
       dragged = true;
       track.classList.add("is-dragging");
+      track.style.scrollBehavior = "auto";
+      track.style.scrollSnapType = "none";
       track.scrollLeft = touchStartScroll - distanceX;
+      const elapsed = Math.max(1, event.timeStamp - touchLastTime);
+      touchVelocityX = (touch.clientX - touchLastX) / elapsed;
+      touchLastX = touch.clientX;
+      touchLastTime = event.timeStamp;
     };
     track._featuredTouchEnd = () => {
+      const wasHorizontal = touchAxis === "x";
       touchAxis = null;
       track.classList.remove("is-dragging");
+      track.style.scrollBehavior = "";
+      track.style.scrollSnapType = "";
+      if (wasHorizontal && Math.abs(touchVelocityX) > 0.08) {
+        track.scrollTo({
+          left: track.scrollLeft - touchVelocityX * 180,
+          behavior: "smooth"
+        });
+      }
     };
     track.addEventListener("touchstart", track._featuredTouchStart, { passive: true });
     track.addEventListener("touchmove", track._featuredTouchMove, { passive: false });

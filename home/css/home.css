@@ -1899,7 +1899,7 @@ a.ml-news-card:focus-visible .ml-news-card__arrow {
   margin-inline: auto;
   padding: 3rem 0 2rem;
   overflow-x: auto;
-  scroll-behavior: smooth;
+  scroll-behavior: auto;
   scroll-snap-type: x mandatory;
   scroll-padding-inline: 0.25rem;
   scrollbar-width: none;
@@ -1914,6 +1914,14 @@ a.ml-news-card:focus-visible .ml-news-card__arrow {
 }
 .ml-featured-products__track.is-dragging .ml-product-card {
   pointer-events: none;
+}
+.ml-product-grid.is-dragging {
+  scroll-behavior: auto !important;
+  scroll-snap-type: none !important;
+}
+.ml-product-grid.is-dragging .ml-product-card {
+  pointer-events: none;
+  transition: none !important;
 }
 .ml-featured-products__track::-webkit-scrollbar {
   display: none;
