@@ -113,14 +113,27 @@
     return label && value ? { label, value } : null;
   }
 
-  function tempCategoryColor(value) {
+  const ICON_BULB =
+    '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M12 2a7 7 0 0 0-4 12.7c.6.5 1 1.3 1 2.1V17h6v-.2c0-.8.4-1.6 1-2.1A7 7 0 0 0 12 2z"/></svg>';
+  const TEMP_TONES = {
+    calido: { color: "#fff79b", label: "Cálido" },
+    neutro: { color: "#d9d9d9", label: "Neutro" },
+    frio: { color: "#bce4fa", label: "Frío" },
+  };
+
+  function tempCategoryKey(value) {
+    const raw = String(value || "").trim().toLowerCase();
+    if (/c[aá]lido/.test(raw)) return "calido";
+    if (/neutro/.test(raw)) return "neutro";
+    if (/fr[ií]o/.test(raw)) return "frio";
     const kelvin = parseInt(value, 10);
-    if (kelvin <= 3000) return "#fff79b";
-    if (kelvin <= 4500) return "#d9d9d9";
-    return "#bce4fa";
+    if (Number.isNaN(kelvin)) return null;
+    if (kelvin <= 3000) return "calido";
+    if (kelvin <= 4500) return "neutro";
+    return "frio";
   }
 
-  function buildTempBadge(doc) {
+  function buildLuzCategoryKeys(doc) {
     const candidates = [
       ...rawSpecs(doc)
         .filter(isTemperatureSpec)
@@ -130,28 +143,45 @@
     ];
     const variant = variantSpec(doc);
     if (variant && isTemperatureSpec(variant)) candidates.unshift(variant.value);
-    const matches = candidates.flatMap(
-      (source) => String(source || "").match(/\d{4}\s*K/gi) || []
-    );
-    const tones = [
-      ...new Set(matches.map((value) => value.replace(/\s+/g, "").toUpperCase())),
-    ].sort((a, b) => parseInt(a, 10) - parseInt(b, 10));
-    if (!tones.length) return "";
-    const label =
-      tones.length === 1 ? tones[0] : `${tones[0]}–${tones[tones.length - 1]}`;
-    const colors = [...new Set(tones.map(tempCategoryColor))];
-    const background =
-      colors.length === 1
-        ? colors[0]
-        : `linear-gradient(to right, ${colors
-            .map((color, index) => {
-              const step = 100 / colors.length;
-              return `${color} ${index * step}%, ${color} ${(index + 1) * step}%`;
-            })
-            .join(", ")})`;
-    return `<span class="ml-product-temp-badge">${escapeHTML(label)}<span class="ml-product-badge-dot${
-      colors.length > 1 ? " is-split" : ""
-    }" style="background:${background}"></span></span>`;
+    const bestKelvinByKey = new Map();
+    candidates.filter(Boolean).forEach((source) => {
+      String(source)
+        .split(/[;,|]/)
+        .map((tone) => tone.trim())
+        .filter(Boolean)
+        .forEach((tone) => {
+          const key = tempCategoryKey(tone);
+          if (!key) return;
+          const parsed = parseInt(tone, 10);
+          const sortKelvin = Number.isNaN(parsed)
+            ? key === "calido"
+              ? 2700
+              : key === "neutro"
+              ? 4000
+              : 6500
+            : parsed;
+          if (!bestKelvinByKey.has(key) || sortKelvin < bestKelvinByKey.get(key)) {
+            bestKelvinByKey.set(key, sortKelvin);
+          }
+        });
+    });
+    return [...bestKelvinByKey.entries()]
+      .sort((a, b) => a[1] - b[1])
+      .map(([key]) => key);
+  }
+
+  function buildTempBadge(doc) {
+    const keys = buildLuzCategoryKeys(doc);
+    if (!keys.length) return "";
+    const rows = keys
+      .map((key) => {
+        const { color, label } = TEMP_TONES[key];
+        return `<span class="temp-dots-row"><span class="temp-dots-label">${label}</span><span class="luz-dot" style="background:${color}" title="${label}" aria-label="${label}"></span></span>`;
+      })
+      .join("");
+    return `<span class="temp-dots${
+      keys.length >= 2 ? " is-collapsed" : ""
+    }" tabindex="0" aria-label="Temperatura de luz"><span class="temp-dots-icon" aria-hidden="true">${ICON_BULB}</span>${rows}</span>`;
   }
 
   function buildSmartBadge(doc) {
@@ -226,13 +256,14 @@
           doc.nombre_typesense || doc.sku || ""
         )}" loading="lazy" width="300" height="300">`
       : '<span class="ml-product-card__note">Sin imagen</span>';
+    const badgesLeft = `<span class="ml-product-role-badge ${group.roleClass}">${
+      group.role
+    }</span>${buildSmartBadge(doc)}`;
     return `<${tag} class="ml-product-card${
       link ? "" : " ml-product-card--disabled"
-    }"${link ? ` href="${escapeHTML(link)}"` : ""}><div class="ml-product-card__media"><div class="ml-product-card__topleft-badges"><span class="ml-product-role-badge ${
-      group.roleClass
-    }">${group.role}</span>${buildSmartBadge(
+    }"${link ? ` href="${escapeHTML(link)}"` : ""}><div class="media"><div class="media-badges-left">${badgesLeft}</div><div class="card-overlays">${buildTempBadge(
       doc
-    )}</div>${buildTempBadge(doc)}${media}</div><div class="ml-product-card__title">${escapeHTML(
+    )}</div><div class="media-frame">${media}</div></div><div class="ml-product-card__title">${escapeHTML(
       doc.nombre_typesense || doc.descripcion || "Producto sin nombre"
     )}</div><span class="ml-product-card__sku">${escapeHTML(
       doc.sku || ""

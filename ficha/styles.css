@@ -439,6 +439,22 @@ main{padding:clamp(12px,2vw,24px) clamp(12px,2vw,24px) 0;}
 .trust-lines [hidden]{display:none !important;}
 
 /* —— Smart app banner (Roma / Tokio smart) —— */
+/* .smart-banner-section reusa .wrap para el ancho/max-width/centrado (igual
+   cálculo que el resto de los containers, en todos los breakpoints). El bug
+   de las veces anteriores: solo se anulaba el padding-top/bottom del wrap,
+   pero el padding IZQUIERDO/DERECHO seguía activo — como .smart-banner vive
+   ADENTRO de ese padding, su fondo oscuro quedaba más angosto que el borde
+   visible (blanco) de las demás cards, que sí llega hasta el borde del wrap.
+   Acá se anula el padding completo del wrap (los 4 lados) y ese espacio se
+   suma como padding interno de .smart-banner, así el fondo del banner llega
+   exactamente al mismo borde externo que el resto de los containers. */
+.smart-banner-section > .wrap{
+  padding:0;
+  margin-bottom:0;
+  background:transparent;
+  border-radius:0;
+}
+.smart-banner-section:has(.smart-banner[hidden]){display:none;}
 .smart-banner{
   position:relative;
   margin-top:clamp(22px,3vw,30px);
@@ -447,16 +463,29 @@ main{padding:clamp(12px,2vw,24px) clamp(12px,2vw,24px) 0;}
   border-radius:20px;
   overflow:hidden;
   display:flex;align-items:flex-start;justify-content:space-between;gap:20px;
-  background:#0b0f14;
-  border:1px solid var(--navy);
+  background:
+    radial-gradient(130% 110% at 82% -15%, rgba(70,140,255,.4) 0%, transparent 55%),
+    linear-gradient(165deg,#0b1733 0%,#060d1e 55%,#02040a 100%);
   box-shadow:
     0 20px 40px -20px rgba(0,0,0,.5),
     0 4px 14px rgba(0,0,0,.3);
-  padding:clamp(26px,3.2vw,38px) clamp(24px,3.2vw,38px);
+  padding:clamp(40px,5vw,64px) clamp(48px,6.5vw,88px);
+}
+/* Guiño tech, bien leve: grano fino sobre el glow celeste del fondo. */
+.smart-banner::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  z-index:0;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  mix-blend-mode:overlay;
+  opacity:.3;
+  pointer-events:none;
 }
 .smart-banner[hidden]{display:none !important;}
 .smart-banner__content{
   position:relative;
+  z-index:1;
   flex:1 1 320px;min-width:0;max-width:70%;
 }
 .smart-banner__header{
@@ -506,7 +535,8 @@ main{padding:clamp(12px,2vw,24px) clamp(12px,2vw,24px) 0;}
 .smart-store-btn strong{display:block;font-size:14px;font-weight:800;letter-spacing:.01em;}
 .smart-banner__media{
   position:absolute;
-  right:clamp(16px,4vw,40px);
+  z-index:1;
+  right:clamp(16px,8vw,114px);
   top:clamp(14px,2vw,20px);
   width:clamp(190px,17vw,220px);
   pointer-events:none;
@@ -1223,103 +1253,156 @@ body.assistant-open .ai-launch{
   font-size:var(--fs-md);
 }
 
-/* Product cards (mismo lenguaje visual que home destacados) */
+/* Product cards — mismo lenguaje visual que macroled.webflow.io/nuevo-home-final. */
 .ml-product-card{
   display:flex;
   flex-direction:column;
   gap:.8rem;
+  position:relative;
   min-width:0;
   padding:.8rem;
+  overflow:visible;
   border-radius:1rem;
-  background:rgba(255,255,255,.12);
+  border:1px solid #f1f1f1;
+  background:#fff;
   color:var(--ml-grey-800);
   box-shadow:2px 3px 20px 2px rgba(0,17,33,.04);
-  transition:transform .2s;
   text-decoration:none;
+  transition:transform .2s ease;
+  user-select:none;
+  -webkit-tap-highlight-color:transparent;
 }
 .ml-product-card:hover{transform:translateY(-3px);}
 .ml-product-card--disabled:hover{transform:none;}
-.ml-product-card__media{
+
+.ml-product-card .media{
   position:relative;
-  display:grid;
-  place-items:center;
-  aspect-ratio:1 / 1.2;
-  border-radius:.75rem;
-  background:#f5f5f5;
+  display:flex;
+  flex:none;
+  align-items:center;
+  justify-content:center;
+  width:100%;
+  aspect-ratio:1 / 1;
   overflow:hidden;
+  border:1px solid #f5f4f4;
+  border-radius:.75rem;
+  background:#f6f6f6;
   transition:background-color .25s ease;
 }
-.ml-product-card:hover .ml-product-card__media{background:#e6f8ff;}
-.ml-product-card__media img{
-  width:84%;height:84%;
-  object-fit:contain;
-  transition:transform .25s;
+.ml-product-card:hover .media{background:#e6f8ff;}
+.ml-product-card .media-frame{
+  position:absolute;inset:0;
+  display:flex;align-items:center;justify-content:center;
 }
-.ml-product-card:hover .ml-product-card__media img{transform:scale(1.08);}
-.ml-product-smart-badge,
-.ml-product-temp-badge{
+.ml-product-card .media img{
+  position:relative;
+  width:62%;height:62%;
+  max-width:none;max-height:none;
+  object-fit:contain;
+  transition:transform .25s ease;
+}
+.ml-product-card:hover .media img{transform:scale(1.08);}
+
+/* Badges de rol/smart/variantes en una sola columna arriba a la izquierda,
+   para que nunca se pisen entre sí (nuevo-home-final los deja sueltos en la
+   misma esquina y se superponen cuando coinciden dos). */
+.ml-product-card .media-badges-left{
   position:absolute;z-index:2;
-  border-radius:999px;
-  font-size:.68rem;font-weight:500;line-height:1;
-  white-space:nowrap;
+  top:.6rem;left:.6rem;
+  display:flex;flex-direction:column;align-items:flex-start;gap:6px;
+}
+.ml-product-role-badge{
+  padding:.32rem .55rem;border-radius:999px;
+  font-size:.62rem;font-weight:700;letter-spacing:.02em;text-transform:uppercase;
+  color:#fff;white-space:nowrap;
+}
+.ml-product-role-badge.is-armado,
+.ml-product-role-badge.is-despiece,
+.ml-product-role-badge.is-compatible{background:#5b6572;}
+.ml-product-smart-badge{
+  display:inline-flex;align-items:center;gap:5px;
+  padding:.45rem .7rem;border-radius:999px;
+  background:linear-gradient(135deg,#00bdff,#0090c7);
+  color:#fff;box-shadow:0 3px 10px rgba(0,144,199,.35);
+  font-size:.68rem;font-weight:500;line-height:1;letter-spacing:.03em;white-space:nowrap;
 }
 .ml-product-variant-badge{
-  position:absolute;z-index:2;
-  top:.7rem;right:.7rem;
-  color:var(--ml-light-blue-800);
-  font-size:.75rem;font-weight:600;line-height:1;
-  white-space:nowrap;
+  display:inline-flex;align-items:center;
+  max-width:11rem;
+  padding:5px 10px;overflow:hidden;
+  border:1px solid #d3e4ec;border-radius:8px;
+  background:#f9fdff;color:#00688c;
+  font-size:.7rem;font-weight:600;line-height:1.15;
+  text-overflow:ellipsis;white-space:nowrap;
 }
-.ml-product-smart-badge{
-  top:.6rem;left:.6rem;
-  padding:.45rem .7rem;
-  color:#fff;letter-spacing:.03em;
-  background:linear-gradient(135deg,#00bdff,#0090c7);
-  box-shadow:0 3px 10px rgba(0,144,199,.35);
+
+/* Temperatura de color: pill abajo a la derecha, una fila por tono. */
+.ml-product-card .card-overlays{position:absolute;inset:0;z-index:1;pointer-events:none;}
+.ml-product-card .temp-dots{
+  position:absolute;z-index:2;right:8px;bottom:8px;
+  display:inline-flex;flex-direction:row;align-items:center;gap:8px;
+  max-width:calc(100% - 16px);
+  padding:5px 8px;overflow:hidden;
+  border:1px solid #e6e6e6;border-radius:20px;
+  background:#fff;box-shadow:0 1px 3px rgba(20,24,33,.06);
+  pointer-events:auto;
 }
-.ml-product-temp-badge{
-  right:.6rem;bottom:.6rem;
-  display:flex;align-items:center;gap:.4rem;
-  padding:.42rem .55rem .42rem .7rem;
-  color:#26313b;background:#fff;
+.ml-product-card .temp-dots-row{display:flex;align-items:center;gap:5px;min-width:0;}
+.ml-product-card .temp-dots-label{
+  color:#5d5c5c;font-size:12px;font-weight:600;line-height:1;white-space:nowrap;
 }
-.ml-product-badge-dot{
-  width:.58rem;height:.58rem;flex:0 0 auto;
-  border-radius:50%;
+.ml-product-card .temp-dots .luz-dot{
+  display:inline-block;flex:none;width:10px;height:10px;border-radius:50%;
   box-shadow:inset 0 0 0 1px rgba(20,24,33,.12);
 }
-.ml-product-badge-dot.is-split{
-  box-shadow:0 0 0 1px rgba(20,24,33,.12);
+.ml-product-card .temp-dots-icon{
+  display:none;flex:none;align-items:center;justify-content:center;
+  color:#5d5c5c;line-height:0;
 }
+.ml-product-card .temp-dots.is-collapsed{gap:4px;padding:5px 7px;}
+.ml-product-card .temp-dots.is-collapsed .temp-dots-label{
+  max-width:0;margin:0;overflow:hidden;opacity:0;
+  transform:translateX(6px);
+  transition:max-width .28s ease,opacity .2s ease,transform .28s ease;
+}
+.ml-product-card .temp-dots.is-collapsed .temp-dots-row{gap:0;}
+@media (hover:hover) and (pointer:fine){
+  .ml-product-card .temp-dots.is-collapsed:hover,
+  .ml-product-card .temp-dots.is-collapsed:focus-within{gap:8px;padding:5px 8px 5px 10px;}
+  .ml-product-card .temp-dots.is-collapsed:hover .temp-dots-label,
+  .ml-product-card .temp-dots.is-collapsed:focus-within .temp-dots-label{
+    max-width:72px;opacity:1;transform:translateX(0);
+  }
+  .ml-product-card .temp-dots.is-collapsed:hover .temp-dots-row,
+  .ml-product-card .temp-dots.is-collapsed:focus-within .temp-dots-row{gap:5px;}
+}
+
 .ml-product-card__title{
-  font-size:1.05rem;font-weight:600;
-  color:var(--ml-grey-800);
-  line-height:1.3;
+  margin:0 0 10px;
+  color:#16294f;
+  font-size:1.1rem;font-weight:600;line-height:1.35;
 }
-.ml-product-card__attrs{
+.ml-product-card__specs{
   display:grid;
-  grid-template-columns:repeat(2,minmax(0,1fr));
-  gap:.5rem;
+  grid-template-columns:repeat(2,minmax(0,max-content));
+  justify-content:start;
+  column-gap:28px;row-gap:.5rem;
   margin-top:auto;
 }
-.ml-product-attr{min-width:0;}
-.ml-product-attr__label,
-.ml-product-card__note{
-  display:block;
-  color:#7b8389;
-  font-size:.68rem;
-  text-transform:uppercase;
-  white-space:nowrap;
-  overflow:hidden;
-  text-overflow:ellipsis;
+.ml-product-card__spec{min-width:0;}
+.ml-product-card__spec-label{
+  display:block;margin:0 0 2px;overflow:hidden;
+  color:#94989c;font-size:.7rem;font-weight:500;
+  text-overflow:ellipsis;white-space:nowrap;
 }
-.ml-product-attr__value{
-  display:flex;align-items:center;gap:.25rem;
-  font-size:.78rem;font-weight:700;
-  color:var(--ml-grey-600);
-  white-space:nowrap;
-  overflow:hidden;
-  text-overflow:ellipsis;
+.ml-product-card__spec-value{
+  display:flex;align-items:center;gap:.25rem;overflow:hidden;
+  color:#474747;font-size:.8rem;font-weight:500;
+  text-overflow:ellipsis;white-space:nowrap;
+}
+.ml-product-card__note{
+  display:block;color:#7b8389;font-size:.68rem;
+  text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
 }
 
 /* —— Tabs "Productos armados" / "Despiece" / "Compatibles" (panel-armados / panel-despiece / panel-compatibles) —— */
@@ -1412,27 +1495,6 @@ body.assistant-open .ai-launch{
 .ml-rel-carousel__nav:disabled{opacity:0;cursor:default;pointer-events:none;}
 .ml-rel-carousel__nav:focus-visible{outline:3px solid var(--ml-light-blue-500,var(--brand));outline-offset:3px;}
 
-/* Wrapper para combinar el badge de rol (Armado/Despiece/Compatible) con el
-   badge Smart sin que se pisen — ambos quedan como pills en fila, no apilados
-   con position:absolute individual. */
-.ml-product-card__topleft-badges{
-  position:absolute;top:.55rem;left:.55rem;z-index:2;
-  display:flex;align-items:center;gap:.4rem;flex-wrap:wrap;
-}
-.ml-product-card__topleft-badges .ml-product-role-badge,
-.ml-product-card__topleft-badges .ml-product-smart-badge{
-  position:static;top:auto;left:auto;
-}
-.ml-product-role-badge{
-  position:absolute;top:.55rem;left:.55rem;z-index:2;
-  padding:.32rem .55rem;border-radius:999px;
-  font-size:.62rem;font-weight:700;letter-spacing:.02em;text-transform:uppercase;
-  color:#fff;white-space:nowrap;
-}
-.ml-product-role-badge.is-armado,
-.ml-product-role-badge.is-despiece,
-.ml-product-role-badge.is-compatible{background:#5b6572;}
-
 .ml-product-card__sku{
   display:block;margin-top:-.4rem;
   font-size:.68rem;color:var(--ink-soft);font-weight:600;
@@ -1457,6 +1519,9 @@ body.assistant-open .ai-launch{
   .ml-rel-carousel__track .ml-product-card{
     flex-basis:calc((100% - 1rem) / 2);
   }
+  .ml-product-card__title{font-size:1rem;}
+  .ml-product-card__spec-label{font-size:.7rem;}
+  .ml-product-card__spec-value{font-size:.75rem;}
 }
 @media (max-width:640px){
   .ml-related-products{
@@ -1465,6 +1530,12 @@ body.assistant-open .ai-launch{
   .ml-rel-carousel{
     --rel-arrow-space:0px;
   }
+  .ml-product-card{padding:.6rem;border-radius:.75rem;}
+  .ml-product-card__title{margin-bottom:6px;font-size:.9rem;}
+  .ml-product-variant-badge{max-width:52%;padding:5px 9px;font-size:.68rem;}
+  .ml-product-card .temp-dots{right:5px;bottom:5px;max-width:46%;padding:4px 6px;}
+  .ml-product-card .temp-dots .luz-dot{width:8px;height:8px;}
+  .ml-product-card .temp-dots-label{font-size:11px;}
   .ml-related-products > .wrap{
     padding-bottom:30px;
   }

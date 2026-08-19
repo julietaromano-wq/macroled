@@ -1494,6 +1494,11 @@
   let heroItem = null;
   let siblings = [];
   let dimensionKeys = [];
+  /* Video "de familia": la mayoría de las variantes (color/tamaño) no cargan
+     su propio campo Video en el CMS — solo el SKU elegido como hero lo tiene.
+     Se guarda acá para no perder el video al cambiar de variante. */
+  let sharedVideoSrc = [];
+  let sharedVideoPoster = "";
 
   /**
    * Las hermanas salen de la Collection List atada a Variantes_Multireference:
@@ -1761,8 +1766,12 @@
       el.getAttribute("data-video") ||
       el.getAttribute("data-videos") ||
       "";
-    const videos = parseList(videoRaw);
-    const videoPoster = resolveVideoPoster(el, videos, image);
+    let videos = parseList(videoRaw);
+    let videoPoster = resolveVideoPoster(el, videos, image);
+    if (!videos.length && sharedVideoSrc.length) {
+      videos = sharedVideoSrc.slice();
+      videoPoster = sharedVideoPoster || videoPoster;
+    }
     const description = (el.getAttribute("data-descripcion") || "").trim();
     const family = (el.getAttribute("data-family") || "").trim();
     const macro = (el.getAttribute("data-macrofamilia") || "").trim();
@@ -1966,6 +1975,17 @@
     const signature = siblings.map((el) => (el.getAttribute("data-sku") || "").trim()).join("|");
     if (lastVariantSignature && signature === lastVariantSignature) return;
     lastVariantSignature = signature;
+
+    sharedVideoSrc = [];
+    sharedVideoPoster = "";
+    const videoOwner =
+      [heroItem, ...siblings].find(
+        (el) => parseList(el.getAttribute("data-video") || el.getAttribute("data-videos") || "").length
+      ) || null;
+    if (videoOwner) {
+      sharedVideoSrc = parseList(videoOwner.getAttribute("data-video") || videoOwner.getAttribute("data-videos") || "");
+      sharedVideoPoster = resolveVideoPoster(videoOwner, sharedVideoSrc, videoOwner.getAttribute("data-image") || "");
+    }
 
     siblings.forEach((el) => {
       const videos = parseList(
