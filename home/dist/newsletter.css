@@ -42,7 +42,7 @@ body.newsletter-open {
   z-index: 10090;
   top: 50%;
   left: 50%;
-  width: min(760px, calc(100vw - 32px));
+  width: min(544px, calc(100vw - 32px));
   max-height: calc(100dvh - 32px);
   overflow-x: hidden;
   overflow-y: auto;
@@ -121,7 +121,7 @@ body.newsletter-open {
 
 .nl-form {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: 1fr;
   gap: 20px 16px;
   margin-top: 28px;
 }
@@ -132,10 +132,10 @@ body.newsletter-open {
   margin: 0;
 }
 
-.nl-form .nl-field:nth-child(n + 3),
+.nl-form .nl-field,
 .nl-form .nl-submit,
 .nl-form .nl-popup__note {
-  grid-column: 1 / -1;
+  grid-column: 1;
 }
 
 .nl-field:has(.nl-select-open) {
@@ -351,6 +351,18 @@ body.newsletter-open {
 .nl-popup.is-success .nl-form,
 .nl-popup.is-success .nl-popup__sub {
   display: none;
+}
+
+@media (min-width: 641px) and (max-width: 1919px) {
+  .nl-form {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .nl-form .nl-field:nth-child(n + 3),
+  .nl-form .nl-submit,
+  .nl-form .nl-popup__note {
+    grid-column: 1 / -1;
+  }
 }
 
 @media (max-width: 640px) {
