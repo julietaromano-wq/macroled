@@ -217,10 +217,19 @@
         <button class="tab is-active" role="tab" aria-selected="true" data-tab="specs">Especificaciones</button>
         <button class="tab" role="tab" aria-selected="false" data-tab="commercial">Información comercial</button>
         <button class="tab" role="tab" aria-selected="false" data-tab="files">Descargas</button>
+        <!-- Ocultos por default: relacionados-tabs.js los muestra solo si el SKU tiene datos cargados en el CMS -->
+        <button class="tab" role="tab" aria-selected="false" data-tab="armados" id="tab-armados" hidden>Productos armados<span class="tab-count" id="tab-armados-count"></span></button>
+        <button class="tab" role="tab" aria-selected="false" data-tab="despiece" id="tab-despiece" hidden>Productos despiece<span class="tab-count" id="tab-despiece-count"></span></button>
+        <button class="tab" role="tab" aria-selected="false" data-tab="compatibles" id="tab-compatibles" hidden>Productos compatibles<span class="tab-count" id="tab-compatibles-count"></span></button>
       </div>
 
       <div class="tab-panel is-active" id="panel-specs" role="tabpanel">
         <div class="spec-groups" id="specGroups"></div>
+
+        <div class="smart-warning" id="smartWarning" hidden role="note">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><path d="M12 9v4M12 17h.01"/></svg>
+          <p><strong>¡Precaución!</strong> Conectar el neutro de la tecla Smart solo dentro de un circuito de iluminación. No usar neutro de tomacorrientes: el retorno de tensión puede dañar la tecla.</p>
+        </div>
       </div>
 
       <div class="tab-panel" id="panel-commercial" role="tabpanel" hidden>
@@ -358,8 +367,95 @@
           </a>
         </div>
       </div>
+
+      <!-- Se muestran solo si el SKU tiene "Productos relacionados (Armados/Despiece)" cargados en el CMS -->
+      <div class="tab-panel" id="panel-armados" role="tabpanel" hidden>
+        <div class="ml-rel-carousel">
+          <div class="ml-rel-carousel__viewport">
+            <div class="ml-rel-carousel__track" id="armados-grid" aria-busy="true"></div>
+            <div class="ml-rel-carousel__arrows" hidden>
+              <button class="ml-rel-carousel__nav" type="button" data-rel-prev aria-label="Producto anterior">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 12H5m6-6-6 6 6 6"/></svg>
+              </button>
+              <button class="ml-rel-carousel__nav" type="button" data-rel-next aria-label="Producto siguiente">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6"/></svg>
+              </button>
+            </div>
+          </div>
+          <div class="ml-rel-carousel__controls" hidden>
+            <div class="ml-rel-carousel__progress" aria-hidden="true"><span data-rel-progress></span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="tab-panel" id="panel-despiece" role="tabpanel" hidden>
+        <div class="ml-rel-carousel">
+          <div class="ml-rel-carousel__viewport">
+            <div class="ml-rel-carousel__track" id="despiece-grid" aria-busy="true"></div>
+            <div class="ml-rel-carousel__arrows" hidden>
+              <button class="ml-rel-carousel__nav" type="button" data-rel-prev aria-label="Producto anterior">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 12H5m6-6-6 6 6 6"/></svg>
+              </button>
+              <button class="ml-rel-carousel__nav" type="button" data-rel-next aria-label="Producto siguiente">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6"/></svg>
+              </button>
+            </div>
+          </div>
+          <div class="ml-rel-carousel__controls" hidden>
+            <div class="ml-rel-carousel__progress" aria-hidden="true"><span data-rel-progress></span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Se muestra solo si el SKU tiene "Productos compatibles" cargados en el CMS (familia Tiras LED) -->
+      <div class="tab-panel" id="panel-compatibles" role="tabpanel" hidden>
+        <div class="ml-rel-carousel">
+          <div class="ml-rel-carousel__viewport">
+            <div class="ml-rel-carousel__track" id="compatibles-grid" aria-busy="true"></div>
+            <div class="ml-rel-carousel__arrows" hidden>
+              <button class="ml-rel-carousel__nav" type="button" data-rel-prev aria-label="Producto anterior">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 12H5m6-6-6 6 6 6"/></svg>
+              </button>
+              <button class="ml-rel-carousel__nav" type="button" data-rel-next aria-label="Producto siguiente">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6"/></svg>
+              </button>
+            </div>
+          </div>
+          <div class="ml-rel-carousel__controls" hidden>
+            <div class="ml-rel-carousel__progress" aria-hidden="true"><span data-rel-progress></span></div>
+          </div>
+        </div>
+      </div>
     </section>
   </div>
+
+  <section class="smart-banner-section">
+    <div class="wrap">
+    <aside class="smart-banner" id="smartBanner" hidden aria-label="App Macroled Smart">
+      <div class="smart-banner__content">
+        <div class="smart-banner__header">
+          <img class="smart-banner__logo" src="https://s3.coresagroup.com/MACROLED/WEB/logo-macroled-blanco.svg" alt="Macroled" width="220" height="56" loading="lazy">
+          <span class="smart-banner__tag">Smart</span>
+        </div>
+        <p class="smart-banner__invite">Descargá la app y sumate al mundo Smart</p>
+        <p class="smart-banner__copy">Controlá tus luminarias desde cualquier lugar con la app de Macroled.</p>
+        <div class="smart-banner__stores">
+          <a class="smart-store-btn" href="https://apps.apple.com/ar/app/macroled/id1592655986" target="_blank" rel="noopener noreferrer">
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
+            <span><span class="smart-store-btn__sub">Disponible en</span><strong>App Store</strong></span>
+          </a>
+          <a class="smart-store-btn" href="https://play.google.com/store/apps/details?id=com.macroled&amp;hl=es_AR" target="_blank" rel="noopener noreferrer">
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M3.609 1.814 13.792 12 3.61 22.186a1.002 1.002 0 0 1-.41-.875V2.689c0-.35.21-.665.525-.814l.484-.061zM14.5 12.707l2.302 2.302-10.937 6.333 8.635-8.635zM16.896 10.311 20.553 8.22A1 1 0 0 1 22 9.109v5.782a1 1 0 0 1-1.447.894l-3.657-2.091-2.302-2.302 1.302-1.072zM14.5 11.293 6.865 3.658l10.937 6.333L14.5 11.293z"/></svg>
+            <span><span class="smart-store-btn__sub">Disponible en</span><strong>Google Play</strong></span>
+          </a>
+        </div>
+      </div>
+      <div class="smart-banner__media">
+        <img src="https://s3.coresagroup.com/MACROLED/WEB/mockup-mobile-smart.png" alt="App Macroled Smart en un celular" loading="lazy">
+      </div>
+    </aside>
+    </div>
+  </section>
 
   <!-- Relacionados: pegá el embed de relacionados en un Embed aparte (más fiable). -->
 </main>

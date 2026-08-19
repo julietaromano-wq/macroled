@@ -370,13 +370,10 @@
       });
       tab.classList.add("is-active");
       tab.setAttribute("aria-selected", "true");
-      const panels = {
-        specs: document.getElementById("panel-specs"),
-        commercial: document.getElementById("panel-commercial"),
-        files: document.getElementById("panel-files"),
-      };
-      Object.entries(panels).forEach(([key, panel]) => {
-        if (!panel) return;
+      // Genérico: cualquier .tab-panel cuyo id sea "panel-<data-tab>" se sincroniza.
+      // Así los tabs nuevos (armados/despiece, etc.) no requieren tocar este archivo.
+      document.querySelectorAll(".tab-panel[id^='panel-']").forEach((panel) => {
+        const key = panel.id.slice("panel-".length);
         const on = key === tab.dataset.tab;
         panel.classList.toggle("is-active", on);
         panel.hidden = !on;
@@ -814,6 +811,38 @@
 
   function isTruthyFlag(v) {
     return /^(si|sí|true|1|yes|smart)$/i.test(String(v == null ? "" : v).trim());
+  }
+
+  const SMART_APP_LINES = new Set(["ROMA", "TOKIO"]);
+
+  function isRomaTokioSmartProduct(el, specs) {
+    const smartRaw =
+      specs["Smart"] || specs["Tecnología"] || el.getAttribute("data-smart");
+    if (!isTruthyFlag(smartRaw)) return false;
+
+    const linea = normalizeLinea(
+      el.getAttribute("data-linea") || el.getAttribute("data-line") || ""
+    );
+    if (SMART_APP_LINES.has(linea)) return true;
+
+    const hints = [
+      el.getAttribute("data-name"),
+      el.getAttribute("data-family"),
+      el.getAttribute("data-subfamilia"),
+      specs["Subfamilia"],
+      specs["Familia"],
+    ]
+      .map((v) => normalizeLinea(v))
+      .join(" ");
+    return /\bROMA\b/.test(hints) || /\bTOKIO\b/.test(hints);
+  }
+
+  function syncSmartBanner(el, specs) {
+    const isSmart = isRomaTokioSmartProduct(el, specs);
+    const banner = document.getElementById("smartBanner");
+    if (banner) banner.hidden = !isSmart;
+    const warning = document.getElementById("smartWarning");
+    if (warning) warning.hidden = !isSmart;
   }
 
   /* Orden de jerarquía. Solo se muestran hasta TRUST_MAX visibles. */
@@ -1387,6 +1416,13 @@
    * secundario = el siguiente disponible de esa misma prioridad.
    */
   function syncActionDownloads(fichaUrl, catalogoUrl, manualUrl) {
+    const btnPrimary = document.getElementById("btn-ficha");
+    const btnSecondary = document.getElementById("btn-catalogo");
+    const actions = document.querySelector(".cta-stack .actions");
+
+    const hasManualOverride = btnPrimary && btnPrimary.getAttribute("data-cta-mode") === "contact";
+    const contactUrl = (btnPrimary && btnPrimary.getAttribute("data-contact-url")) || "https://www.electroestrada.com.ar/";
+
     const docs = [
       {
         key: "ficha",
@@ -1408,9 +1444,14 @@
       },
     ].filter((d) => isValidFileUrl(d.url));
 
-    const btnPrimary = document.getElementById("btn-ficha");
-    const btnSecondary = document.getElementById("btn-catalogo");
-    const actions = document.querySelector(".cta-stack .actions");
+    const contactDoc = {
+      key: "contacto",
+      url: contactUrl,
+      primaryLabel: "Contacto comercial",
+      secondaryLabel: "Contacto comercial",
+    };
+
+    const finalDocs = hasManualOverride ? [contactDoc, ...docs.filter((d) => d.key !== "ficha")] : docs;
 
     const apply = (btn, doc, isPrimary) => {
       if (!btn) return;
@@ -1426,9 +1467,9 @@
       setDownloadBtnLabel(btn, isPrimary ? doc.primaryLabel : doc.secondaryLabel);
     };
 
-    apply(btnPrimary, docs[0] || null, true);
-    apply(btnSecondary, docs[1] || null, false);
-    if (actions) actions.hidden = docs.length === 0;
+    apply(btnPrimary, finalDocs[0] || null, true);
+    apply(btnSecondary, finalDocs[1] || null, false);
+    if (actions) actions.hidden = finalDocs.length === 0;
   }
 
   function syncFileCards(files) {
@@ -1455,6 +1496,11 @@
   let heroItem = null;
   let siblings = [];
   let dimensionKeys = [];
+  /* Video "de familia": la mayoría de las variantes (color/tamaño) no cargan
+     su propio campo Video en el CMS — solo el SKU elegido como hero lo tiene.
+     Se guarda acá para no perder el video al cambiar de variante. */
+  let sharedVideoSrc = [];
+  let sharedVideoPoster = "";
 
   /**
    * Las hermanas salen de la Collection List atada a Variantes_Multireference:
@@ -1722,8 +1768,12 @@
       el.getAttribute("data-video") ||
       el.getAttribute("data-videos") ||
       "";
-    const videos = parseList(videoRaw);
-    const videoPoster = resolveVideoPoster(el, videos, image);
+    let videos = parseList(videoRaw);
+    let videoPoster = resolveVideoPoster(el, videos, image);
+    if (!videos.length && sharedVideoSrc.length) {
+      videos = sharedVideoSrc.slice();
+      videoPoster = sharedVideoPoster || videoPoster;
+    }
     const description = (el.getAttribute("data-descripcion") || "").trim();
     const family = (el.getAttribute("data-family") || "").trim();
     const macro = (el.getAttribute("data-macrofamilia") || "").trim();
@@ -1819,7 +1869,8 @@
     const dimVal = specs["Dimerizable"];
     setTrustEligible("dimerizable", isTruthyFlag(dimVal));
 
-    const smartRaw = specs["Smart"] || el.getAttribute("data-smart");
+    const smartRaw =
+      specs["Smart"] || specs["Tecnología"] || el.getAttribute("data-smart");
     setTrustEligible("smart", isTruthyFlag(smartRaw));
 
     const panelRaw = specs["Panel táctil"] || el.getAttribute("data-panel-tactil");
@@ -1847,6 +1898,7 @@
     setTrustEligible("material", !!matVal);
 
     syncTrustPriority();
+    syncSmartBanner(el, specs);
 
     const PRODUCT_CTX = window.__mlProductCtx || (window.__mlProductCtx = {});
     PRODUCT_CTX.name = name;
@@ -1925,6 +1977,17 @@
     const signature = siblings.map((el) => (el.getAttribute("data-sku") || "").trim()).join("|");
     if (lastVariantSignature && signature === lastVariantSignature) return;
     lastVariantSignature = signature;
+
+    sharedVideoSrc = [];
+    sharedVideoPoster = "";
+    const videoOwner =
+      [heroItem, ...siblings].find(
+        (el) => parseList(el.getAttribute("data-video") || el.getAttribute("data-videos") || "").length
+      ) || null;
+    if (videoOwner) {
+      sharedVideoSrc = parseList(videoOwner.getAttribute("data-video") || videoOwner.getAttribute("data-videos") || "");
+      sharedVideoPoster = resolveVideoPoster(videoOwner, sharedVideoSrc, videoOwner.getAttribute("data-image") || "");
+    }
 
     siblings.forEach((el) => {
       const videos = parseList(
