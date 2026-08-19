@@ -838,9 +838,11 @@
   }
 
   function syncSmartBanner(el, specs) {
+    const isSmart = isRomaTokioSmartProduct(el, specs);
     const banner = document.getElementById("smartBanner");
-    if (!banner) return;
-    banner.hidden = !isRomaTokioSmartProduct(el, specs);
+    if (banner) banner.hidden = !isSmart;
+    const warning = document.getElementById("smartWarning");
+    if (warning) warning.hidden = !isSmart;
   }
 
   /* Orden de jerarquía. Solo se muestran hasta TRUST_MAX visibles. */

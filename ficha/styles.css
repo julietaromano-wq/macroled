@@ -438,6 +438,20 @@ main{padding:clamp(12px,2vw,24px) clamp(12px,2vw,24px) 0;}
 }
 .trust-lines [hidden]{display:none !important;}
 
+/* —— Aviso de instalación (tecla Smart Roma / Tokio) —— */
+.smart-warning{
+  display:flex;align-items:flex-start;gap:10px;
+  margin-top:clamp(16px,2.2vw,22px);
+  padding:14px 16px;
+  border:1px solid #f2d9a6;border-radius:10px;
+  background:#fdf3e0;
+  color:#7a5518;
+}
+.smart-warning[hidden]{display:none !important;}
+.smart-warning svg{flex:none;margin-top:1px;color:#b3811f;}
+.smart-warning p{margin:0;font-size:var(--fs-sm);line-height:1.5;}
+.smart-warning strong{color:#5c3f10;}
+
 /* —— Smart app banner (Roma / Tokio smart) —— */
 /* .smart-banner-section reusa .wrap para el ancho/max-width/centrado (igual
    cálculo que el resto de los containers, en todos los breakpoints). El bug
@@ -1303,13 +1317,17 @@ body.assistant-open .ai-launch{
 }
 .ml-product-card:hover .media img{transform:scale(1.08);}
 
-/* Badges de rol/smart/variantes en una sola columna arriba a la izquierda,
-   para que nunca se pisen entre sí (nuevo-home-final los deja sueltos en la
-   misma esquina y se superponen cuando coinciden dos). */
+/* Rol/variantes arriba a la izquierda, Smart arriba a la derecha — mismo
+   layout que nuevo-home-final cuando coinciden los dos (no se apilan). */
 .ml-product-card .media-badges-left{
   position:absolute;z-index:2;
   top:.6rem;left:.6rem;
   display:flex;flex-direction:column;align-items:flex-start;gap:6px;
+}
+.ml-product-card .media-badges-right{
+  position:absolute;z-index:2;
+  top:.6rem;right:.6rem;
+  display:flex;flex-direction:column;align-items:flex-end;gap:6px;
 }
 .ml-product-role-badge{
   padding:.32rem .55rem;border-radius:999px;

@@ -275,13 +275,16 @@
           doc.nombre_typesense || "Producto Macroled"
         )}" loading="lazy" width="400" height="400">`
       : '<span class="ml-product-card__note">Sin imagen</span>';
-    const badgesLeft = `${buildSmartBadge(doc)}${buildVariantBadge(doc)}`;
+    const badgesLeft = buildVariantBadge(doc);
+    const badgesRight = buildSmartBadge(doc);
     return `<${tag} class="ml-product-card${
       link ? "" : " ml-product-card--disabled"
     }"${link ? ` href="${escapeHTML(link)}"` : ""} data-id="${escapeHTML(
       doc.id || doc.sku || ""
     )}"><div class="media">${
       badgesLeft ? `<div class="media-badges-left">${badgesLeft}</div>` : ""
+    }${
+      badgesRight ? `<div class="media-badges-right">${badgesRight}</div>` : ""
     }<div class="card-overlays">${buildTempBadge(
       doc
     )}</div><div class="media-frame">${image}</div></div><div class="ml-product-card__title">${escapeHTML(

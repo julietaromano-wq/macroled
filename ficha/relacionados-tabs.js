@@ -258,10 +258,13 @@
       : '<span class="ml-product-card__note">Sin imagen</span>';
     const badgesLeft = `<span class="ml-product-role-badge ${group.roleClass}">${
       group.role
-    }</span>${buildSmartBadge(doc)}`;
+    }</span>`;
+    const badgesRight = buildSmartBadge(doc);
     return `<${tag} class="ml-product-card${
       link ? "" : " ml-product-card--disabled"
-    }"${link ? ` href="${escapeHTML(link)}"` : ""}><div class="media"><div class="media-badges-left">${badgesLeft}</div><div class="card-overlays">${buildTempBadge(
+    }"${link ? ` href="${escapeHTML(link)}"` : ""}><div class="media"><div class="media-badges-left">${badgesLeft}</div>${
+      badgesRight ? `<div class="media-badges-right">${badgesRight}</div>` : ""
+    }<div class="card-overlays">${buildTempBadge(
       doc
     )}</div><div class="media-frame">${media}</div></div><div class="ml-product-card__title">${escapeHTML(
       doc.nombre_typesense || doc.descripcion || "Producto sin nombre"
