@@ -1089,7 +1089,6 @@ body.assistant-open .ai-launch{
   --ml-light-blue-500: #00bdff;
   --ml-light-blue-700: #0086b5;
   --ml-light-blue-800: #00688c;
-  --related-arrow-space: 3.25rem;
   padding: 0;
   background: transparent;
   overflow: hidden;
@@ -1144,7 +1143,7 @@ body.assistant-open .ai-launch{
 }
 .ml-related-products__track{
   display:flex;
-  width:calc(100% - (var(--related-arrow-space) * 2));
+  width:100%;
   gap:1rem;
   margin-inline:auto;
   padding:1.25rem 0 1rem;
@@ -1437,13 +1436,12 @@ body.assistant-open .ai-launch{
 /* Carrusel de las tabs armados/despiece/compatibles — mismo lenguaje visual
    y comportamiento (flechas, drag, progreso) que .ml-related-products__* */
 .ml-rel-carousel{
-  --rel-arrow-space:3.25rem;
   position:relative;
 }
 .ml-rel-carousel__viewport{position:relative;width:100%;}
 .ml-rel-carousel__track{
   display:flex;
-  width:calc(100% - (var(--rel-arrow-space) * 2));
+  width:100%;
   gap:1rem;
   margin-inline:auto;
   padding:.25rem 0 1rem;
@@ -1542,12 +1540,6 @@ body.assistant-open .ai-launch{
   .ml-product-card__spec-value{font-size:.75rem;}
 }
 @media (max-width:640px){
-  .ml-related-products{
-    --related-arrow-space:0px;
-  }
-  .ml-rel-carousel{
-    --rel-arrow-space:0px;
-  }
   .ml-product-card{padding:.6rem;border-radius:.75rem;}
   .ml-product-card__title{margin-bottom:6px;font-size:.9rem;}
   .ml-product-variant-badge{max-width:52%;padding:5px 9px;font-size:.68rem;}
