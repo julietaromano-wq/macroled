@@ -73,8 +73,8 @@
     left:auto;
     bottom:max(20px,env(safe-area-inset-bottom,0px));
     z-index:10050;
-    display:inline-flex;align-items:center;gap:10px;
-    padding:16px 20px;border:none;border-radius:999px;
+    display:inline-flex;align-items:center;gap:8px;
+    padding:8px 18px 8px 12px;border:none;border-radius:999px;
     background:#00152B !important;color:#fff !important;
     font-family:var(--font);
     font-size:15px !important;font-weight:600 !important;cursor:pointer;
@@ -88,7 +88,24 @@
     transform:translateY(-2px);
     box-shadow:0 16px 36px rgba(0,21,43,.34);
   }
-  .ai-launch svg{flex:none;width:20px;height:20px;color:#fff !important;stroke:#fff !important;}
+  .ai-launch svg,
+  .ai-launch img,
+  .ai-launch-icon{
+    flex:none;width:22px;height:22px;object-fit:contain;display:block;pointer-events:none;
+    color:#fff;stroke:#fff;fill:none;
+  }
+  .ai-launch svg .ai-icon-spark,
+  .ai-avatar svg .ai-icon-spark{
+    fill:#fff !important;
+    stroke:none !important;
+  }
+  .ai-launch-label{
+    color:#fff !important;
+    font-size:15px !important;
+    font-weight:600 !important;
+    line-height:1 !important;
+    white-space:nowrap;
+  }
   .ai-launch > span{
     color:#fff !important;
     font-size:15px !important;
@@ -96,9 +113,7 @@
     line-height:1.2 !important;
   }
   .ai-launch-dot{
-    width:8px;height:8px;border-radius:50%;background:var(--brand);
-    box-shadow:0 0 0 3px rgba(0,189,255,.25);
-    flex:none;
+    display:none;
   }
 
   .ai-backdrop{
@@ -138,7 +153,11 @@
     display:grid;place-items:center;
     box-shadow:0 8px 20px rgba(0,21,43,.22);
   }
-  .ai-avatar svg{display:block;color:#fff;stroke:#fff;}
+  .ai-avatar svg,
+  .ai-avatar img,
+  .ai-avatar-icon{
+    display:block;width:22px;height:22px;object-fit:contain;color:#fff;stroke:#fff;
+  }
   .ai-avatar-online{
     position:absolute;right:2px;bottom:2px;
     width:12px;height:12px;border-radius:50%;
@@ -220,13 +239,14 @@
   @media (max-width:640px){
     .demo-wrap{padding:28px 18px 110px;}
     .demo-wrap h1{font-size:22px;}
-    .ai-launch span:last-child{display:none;}
     .ai-launch{
-      width:60px;height:60px;padding:0;
-      border-radius:50%;
+      width:auto;height:44px;padding:8px 16px 8px 11px;
+      border-radius:999px;
       justify-content:center;
     }
-    .ai-launch svg{width:22px;height:22px;}
+    .ai-launch svg,
+    .ai-launch img,
+    .ai-launch-icon{width:20px;height:20px;}
     .ai-launch-dot{display:none;}
     .ai-panel{width:100%;}
     .ai-head{padding:24px 16px 14px;}
@@ -244,10 +264,10 @@
   <p>Probá el botón flotante. Abre el panel, mandá una pregunta o usá las sugerencias. Este archivo concentra visual y funcionamiento del widget.</p>
 </main>
 
-<button type="button" class="ai-launch" id="aiLaunch" aria-haspopup="dialog" aria-controls="aiPanel">
+<button type="button" class="ai-launch" id="aiLaunch" aria-label="Asistente" aria-haspopup="dialog" aria-controls="aiPanel">
   <span class="ai-launch-dot" aria-hidden="true"></span>
-  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 3a7 7 0 0 0-4 12.7V19l4-2 4 2v-3.3A7 7 0 0 0 12 3z"/><path d="M9.5 10h.01M14.5 10h.01"/></svg>
-  <span>Asistente</span>
+  <svg class="ai-launch-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.85" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8.05 6.35h9.15c2.1 0 3.8 1.65 3.8 3.7v5.2c0 2.05-1.7 3.7-3.8 3.7h-3.45l-2.2 2.45.95-2.45H8.05c-2.1 0-3.8-1.65-3.8-3.7V10.05c0-2.05 1.7-3.7 3.8-3.7z"/><path class="ai-icon-spark" fill="currentColor" stroke="none" d="M5.15 1.15 6.05 3.35 8.25 4.25 6.05 5.15 5.15 7.35 4.25 5.15 2.05 4.25 4.25 3.35z"/><path class="ai-icon-spark" fill="currentColor" stroke="none" d="M10.25 1.25 10.78 2.55 12.08 3.08 10.78 3.61 10.25 4.91 9.72 3.61 8.42 3.08 9.72 2.55z"/></svg>
+  <span class="ai-launch-label">Asistente</span>
 </button>
 
 <div class="ai-backdrop" id="aiBackdrop" hidden></div>
@@ -255,7 +275,7 @@
   <div class="ai-head">
     <div class="ai-head-main">
       <div class="ai-avatar" aria-hidden="true">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 3a7 7 0 0 0-4 12.7V19l4-2 4 2v-3.3A7 7 0 0 0 12 3z"/><path d="M9.5 10h.01M14.5 10h.01"/></svg>
+        <svg class="ai-avatar-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.85" stroke-linecap="round" stroke-linejoin="round"><path d="M8.05 6.35h9.15c2.1 0 3.8 1.65 3.8 3.7v5.2c0 2.05-1.7 3.7-3.8 3.7h-3.45l-2.2 2.45.95-2.45H8.05c-2.1 0-3.8-1.65-3.8-3.7V10.05c0-2.05 1.7-3.7 3.8-3.7z"/><path class="ai-icon-spark" fill="currentColor" stroke="none" d="M5.15 1.15 6.05 3.35 8.25 4.25 6.05 5.15 5.15 7.35 4.25 5.15 2.05 4.25 4.25 3.35z"/><path class="ai-icon-spark" fill="currentColor" stroke="none" d="M10.25 1.25 10.78 2.55 12.08 3.08 10.78 3.61 10.25 4.91 9.72 3.61 8.42 3.08 9.72 2.55z"/></svg>
         <span class="ai-avatar-online"></span>
       </div>
       <div class="ai-head-copy">

@@ -80,6 +80,7 @@ async function loadAllDescargables(){
   }catch(err){
     console.error("Error cargando descargables:", err);
     document.getElementById("grid").innerHTML = `<div class="state-msg">No se pudo conectar con Typesense. ${err.message}</div>`;
+    document.getElementById("grid").setAttribute("aria-busy", "false");
     document.getElementById("showingLabel").textContent = "Error al cargar";
   }
 }
@@ -251,7 +252,9 @@ function applyFacetFilters(list, excludeField, selectedObj){
 }
 
 function getFilteredItems(){
-  let list = applyFacetFilters(getSearchFilteredItems(), null);
+  let list = state.query.trim()
+    ? getSearchFilteredItems()
+    : applyFacetFilters(getSearchFilteredItems(), null);
 
   if(state.sortBy === "nuevo"){
     list = [...list].sort((a, b) => (b.nuevo ? 1 : 0) - (a.nuevo ? 1 : 0));
@@ -414,9 +417,11 @@ function renderCards(list){
 
   if(!pageItems.length){
     grid.innerHTML = `<div class="state-msg">No encontramos descargables con estos filtros.</div>`;
+    grid.setAttribute("aria-busy", "false");
     return;
   }
   grid.innerHTML = pageItems.map((it, i) => cardTemplate(it, i)).join("");
+  grid.setAttribute("aria-busy", "false");
 }
 
 function updateCardActiveTab(cardEl, item){

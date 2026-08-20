@@ -32,7 +32,7 @@
     <div class="results-search">
       <div class="search-bar">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-        <input type="text" id="searchInput" placeholder="Buscar por nombre, SKU o descripción..." autocomplete="off" aria-label="Buscar productos">
+        <input type="text" id="searchInput" name="ml-catalog-q" placeholder="Buscar por nombre, SKU o descripción..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" aria-label="Buscar productos">
       </div>
       <button class="filters-toggle" id="filtersToggle" type="button" title="Filtros">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="6" x2="20" y2="6"/><circle cx="9" cy="6" r="2.2" fill="#fff"/><line x1="4" y1="12" x2="20" y2="12"/><circle cx="16" cy="12" r="2.2" fill="#fff"/><line x1="4" y1="18" x2="20" y2="18"/><circle cx="11" cy="18" r="2.2" fill="#fff"/></svg>
@@ -74,8 +74,15 @@
   <div class="results-body">
     <div class="toolbar-top" id="chipsBar"></div>
     <div id="categoryBanner" class="category-banner" hidden></div>
-    <div class="grid-shell" id="gridShell">
+    <div class="grid-shell" id="gridShell" aria-busy="true">
       <div class="grid" id="grid"></div>
+      <script>
+        (function(){
+          var n = 18;
+          var card = '<article class="card card-skel" aria-hidden="true"><div class="media"><span class="skel skel-media"></span></div><div class="card-content"><span class="skel skel-title"></span><span class="skel skel-line"></span><span class="skel skel-line skel-short"></span></div></article>';
+          document.getElementById("grid").innerHTML = new Array(n + 1).join(card);
+        })();
+      </script>
       <div class="grid-loading" id="gridLoading" aria-hidden="true">
         <div class="grid-loading__card" role="status" aria-live="polite">
           <div class="grid-loading__spinner" aria-hidden="true"></div>
@@ -123,10 +130,10 @@
 </div>
 
 <!-- Asistente de producto (Capa 2: siempre agente con IA, sin specs locales) -->
-<button type="button" class="ai-launch" id="aiLaunch" aria-haspopup="dialog" aria-controls="aiPanel" onclick="if(window.MacroledAssistantOpen){window.MacroledAssistantOpen(this);return false;}">
+<button type="button" class="ai-launch" id="aiLaunch" aria-label="Asistente" aria-haspopup="dialog" aria-controls="aiPanel" onclick="if(window.MacroledAssistantOpen){window.MacroledAssistantOpen(this);return false;}">
   <span class="ai-launch-dot" aria-hidden="true"></span>
-  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 3a7 7 0 0 0-4 12.7V19l4-2 4 2v-3.3A7 7 0 0 0 12 3z"/><path d="M9.5 10h.01M14.5 10h.01"/></svg>
-  <span>Asistente</span>
+  <svg class="ai-launch-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.85" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8.05 6.35h9.15c2.1 0 3.8 1.65 3.8 3.7v5.2c0 2.05-1.7 3.7-3.8 3.7h-3.45l-2.2 2.45.95-2.45H8.05c-2.1 0-3.8-1.65-3.8-3.7V10.05c0-2.05 1.7-3.7 3.8-3.7z"/><path class="ai-icon-spark" fill="currentColor" stroke="none" d="M5.15 1.15 6.05 3.35 8.25 4.25 6.05 5.15 5.15 7.35 4.25 5.15 2.05 4.25 4.25 3.35z"/><path class="ai-icon-spark" fill="currentColor" stroke="none" d="M10.25 1.25 10.78 2.55 12.08 3.08 10.78 3.61 10.25 4.91 9.72 3.61 8.42 3.08 9.72 2.55z"/></svg>
+  <span class="ai-launch-label">Asistente</span>
 </button>
 
 <div class="ai-backdrop" id="aiBackdrop" hidden></div>
@@ -134,7 +141,7 @@
   <div class="ai-head">
     <div class="ai-head-main">
       <div class="ai-avatar" aria-hidden="true">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 3a7 7 0 0 0-4 12.7V19l4-2 4 2v-3.3A7 7 0 0 0 12 3z"/><path d="M9.5 10h.01M14.5 10h.01"/></svg>
+        <svg class="ai-avatar-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.85" stroke-linecap="round" stroke-linejoin="round"><path d="M8.05 6.35h9.15c2.1 0 3.8 1.65 3.8 3.7v5.2c0 2.05-1.7 3.7-3.8 3.7h-3.45l-2.2 2.45.95-2.45H8.05c-2.1 0-3.8-1.65-3.8-3.7V10.05c0-2.05 1.7-3.7 3.8-3.7z"/><path class="ai-icon-spark" fill="currentColor" stroke="none" d="M5.15 1.15 6.05 3.35 8.25 4.25 6.05 5.15 5.15 7.35 4.25 5.15 2.05 4.25 4.25 3.35z"/><path class="ai-icon-spark" fill="currentColor" stroke="none" d="M10.25 1.25 10.78 2.55 12.08 3.08 10.78 3.61 10.25 4.91 9.72 3.61 8.42 3.08 9.72 2.55z"/></svg>
         <span class="ai-avatar-online"></span>
       </div>
       <div class="ai-head-copy">

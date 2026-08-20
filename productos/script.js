@@ -33,7 +33,13 @@ if(!window.MacroledCompare){
 const TS_HOST = "https://typesense.coresagroup.com";
 const TS_API_KEY = "g0oiNYY8THGuU9jnCsvqIH1X9HtvYRCR";
 const COLLECTION = "Macroled_Prueba";
+const BASE_FILTER = "tipo_registro:=producto && es_principal:true";
 const PER_PAGE = 18;
+const PER_PAGE_WIDE = 18;
+
+function getPerPage(){
+  return window.matchMedia("(min-width:1600px)").matches ? PER_PAGE_WIDE : PER_PAGE;
+}
 
 const FACET_FIELDS = ["macrofamilia", "variante_temperatura_filtro", "color", "dimerizable"];
 const SUBFAMILIA_FIELD = "subfamilia";
@@ -66,6 +72,17 @@ function optimizeImg(url, size = "400x400"){
   const match = url.match(/^https?:\/\/s3\.coresagroup\.com\/(.+)$/);
   if(!match) return url;
   return `${CDN_HOST}/fit-in/${size}/filters:format(webp)/${match[1]}`;
+}
+
+function sourceImg(url){
+  const u = String(url || "").trim();
+  if(!u) return "";
+  const m = u.match(/cloudfront\.net\/(?:fit-in\/[^/]+\/)?(?:filters:[^/]+\/)?(.+)$/i);
+  return m ? `https://s3.coresagroup.com/${m[1]}` : u;
+}
+
+function escAttr(s){
+  return (s || "").toString().replace(/"/g, "&quot;");
 }
 
 /* ---------------------------------------------------------
@@ -369,12 +386,14 @@ const CCT_DOT = {
 };
 
 const ICON_SIZE = 'width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"';
+const ICON_DIMMER_VB = 'viewBox="0 0 17.91 14.17" fill="currentColor"';
+const ICON_DIMMER_INNER = `<path d="M17.08,14.17H.82c-.31,0-.58-.16-.73-.43-.14-.26-.13-.56.04-.81L8.26.38c.15-.24.42-.38.7-.38.28,0,.54.14.69.38l8.13,12.55c.16.24.17.55.03.81-.14.27-.42.43-.73.43M8.95.58s-.15.01-.21.11L.62,13.25c-.07.1-.03.19-.01.22.04.08.12.13.22.13h16.26c.1,0,.18-.05.22-.13.02-.04.05-.13,0-.22L9.17.69c-.07-.1-.17-.11-.21-.11"/><path d="M8.96,12.69c-2.23,0-4.05-1.76-4.05-3.93s1.82-3.93,4.05-3.93,4.05,1.76,4.05,3.93-1.82,3.93-4.05,3.93M8.96,5.39c-1.92,0-3.48,1.51-3.48,3.36s1.56,3.36,3.48,3.36,3.48-1.51,3.48-3.36-1.56-3.36-3.48-3.36"/><path d="M10.96,8.75c.03-.51-.17-1.04-.55-1.42-.37-.39-.9-.63-1.46-.65-.55-.02-1.13.17-1.56.55-.43.37-.71.94-.73,1.53-.03-.59.21-1.2.63-1.63.42-.44,1.03-.71,1.66-.73.63-.03,1.27.19,1.76.63.49.42.8,1.07.82,1.74h-.58Z"/>`;
 const FACET_ICONS = {
   macrofamilia: `<svg ${ICON_SIZE}><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>`,
   variante_temperatura_filtro: `<svg ${ICON_SIZE}><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>`,
   color: `<svg ${ICON_SIZE}><path d="M12 2a10 10 0 1 0 0 20 3 3 0 0 0 0-6h-1a2 2 0 0 1 0-4h3a2 2 0 0 0 2-2 10 10 0 0 0-4-8z"/><circle cx="7.5" cy="10.5" r="1" fill="currentColor" stroke="none"/><circle cx="12" cy="7" r="1" fill="currentColor" stroke="none"/><circle cx="16.5" cy="10.5" r="1" fill="currentColor" stroke="none"/></svg>`,
   potencia: `<svg ${ICON_SIZE}><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>`,
-  dimerizable: `<svg ${ICON_SIZE}><rect x="2" y="9" width="20" height="6" rx="3"/><circle cx="16" cy="12" r="2" fill="currentColor" stroke="none"/></svg>`,
+  dimerizable: `<svg width="16" height="16" ${ICON_DIMMER_VB} aria-hidden="true">${ICON_DIMMER_INNER}</svg>`,
   categoria: `<svg ${ICON_SIZE}><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>`
 };
 const ICON_CHECK = `<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`;
@@ -384,7 +403,7 @@ const ICON_CHEVRON_RIGHT = `<svg width="14" height="14" viewBox="0 0 24 24" fill
 const ICON_FACET_CHEV = `<svg xmlns="http://www.w3.org/2000/svg" height="10" viewBox="0 -960 960 960" width="14" fill="currentColor" aria-hidden="true"><path d="m321-80-71-71 329-329-329-329 71-71 400 400L321-80Z"/></svg>`;
 const CHEV_HTML = `<span class="chev">${ICON_FACET_CHEV}</span>`;
 const ICON_WIFI = `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/></svg>`;
-const ICON_DIMERIZABLE = `<svg viewBox="0 0 17.91 14.17" aria-hidden="true"><path fill="#1d1d1b" d="M17.08,14.17H.82c-.31,0-.58-.16-.73-.43-.14-.26-.13-.56.04-.81L8.26.38c.15-.24.42-.38.7-.38.28,0,.54.14.69.38l8.13,12.55c.16.24.17.55.03.81-.14.27-.42.43-.73.43M8.95.58s-.15.01-.21.11L.62,13.25c-.07.1-.03.19-.01.22.04.08.12.13.22.13h16.26c.1,0,.18-.05.22-.13.02-.04.05-.13,0-.22L9.17.69c-.07-.1-.17-.11-.21-.11"/><path fill="#1d1d1b" d="M8.96,12.69c-2.23,0-4.05-1.76-4.05-3.93s1.82-3.93,4.05-3.93,4.05,1.76,4.05,3.93-1.82,3.93-4.05,3.93M8.96,5.39c-1.92,0-3.48,1.51-3.48,3.36s1.56,3.36,3.48,3.36,3.48-1.51,3.48-3.36-1.56-3.36-3.48-3.36"/><path fill="#1d1d1b" d="M10.96,8.75c.03-.51-.17-1.04-.55-1.42-.37-.39-.9-.63-1.46-.65-.55-.02-1.13.17-1.56.55-.43.37-.71.94-.73,1.53-.03-.59.21-1.2.63-1.63.42-.44,1.03-.71,1.66-.73.63-.03,1.27.19,1.76.63.49.42.8,1.07.82,1.74h-.58Z"/></svg>`;
+const ICON_DIMERIZABLE = `<svg ${ICON_DIMMER_VB} aria-hidden="true">${ICON_DIMMER_INNER}</svg>`;
 const ICON_BULB = `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M12 2a7 7 0 0 0-4 12.7c.6.5 1 1.3 1 2.1V17h6v-.2c0-.8.4-1.6 1-2.1A7 7 0 0 0 12 2z"/></svg>`;
 const ICON_ANGLE = `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 20H3"/><path d="M3 20 15 4"/><path d="M9.5 14.5a6 6 0 0 1 5 5"/></svg>`;
 const ICON_COLOR = `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a10 10 0 1 0 0 20 3 3 0 0 0 0-6h-1a2 2 0 0 1 0-4h3a2 2 0 0 0 2-2 10 10 0 0 0-4-8z"/><circle cx="7.5" cy="10.5" r="1" fill="currentColor" stroke="none"/><circle cx="12" cy="7" r="1" fill="currentColor" stroke="none"/><circle cx="16.5" cy="10.5" r="1" fill="currentColor" stroke="none"/></svg>`;
@@ -397,7 +416,7 @@ const ICON_SPEC_ANGLE = `<svg ${SPEC_ICON_ATTR}><path d="M21 20H3"/><path d="M3 
 const ICON_SPEC_BULB = `<svg ${SPEC_ICON_ATTR}><path d="M9 18h6"/><path d="M10 22h4"/><path d="M12 2a7 7 0 0 0-4 12.7c.6.5 1 1.3 1 2.1V17h6v-.2c0-.8.4-1.6 1-2.1A7 7 0 0 0 12 2z"/></svg>`;
 const ICON_SPEC_SHIELD = `<svg ${SPEC_ICON_ATTR}><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>`;
 const ICON_SPEC_WARRANTY = `<svg ${SPEC_ICON_ATTR}><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>`;
-const ICON_SPEC_DIM = `<svg ${SPEC_ICON_ATTR}><rect x="2" y="9" width="20" height="6" rx="3"/><circle cx="16" cy="12" r="2" fill="currentColor" stroke="none"/></svg>`;
+const ICON_SPEC_DIM = `<svg width="14" height="14" ${ICON_DIMMER_VB} aria-hidden="true">${ICON_DIMMER_INNER}</svg>`;
 const ICON_SPEC_SUN = `<svg ${SPEC_ICON_ATTR}><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>`;
 const ICON_SPEC_DROP = `<svg ${SPEC_ICON_ATTR}><path d="M12 2.7c.3 0 6 6.2 6 10.3a6 6 0 1 1-12 0C6 8.9 11.7 2.7 12 2.7z"/></svg>`;
 const ICON_SPEC_CLOCK = `<svg ${SPEC_ICON_ATTR}><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>`;
@@ -454,9 +473,11 @@ const state = {
   sortBy: "",
   query: "",
   view: "grid",
-  collapsed: { macrofamilia: true, variante_temperatura_filtro: true, color: true, potencia: false, dimerizable: true, familia: true, subfamilia: true, categoria: true },
+  collapsed: { macrofamilia: false, variante_temperatura_filtro: true, color: true, potencia: false, dimerizable: true, familia: false, subfamilia: true, categoria: true },
   compareCollapsed: true
 };
+/* Macrofamilia y Familia quedan siempre abiertos (no se pueden colapsar). */
+const ALWAYS_OPEN_FACETS = new Set(["macrofamilia", "familia"]);
 window.state = state;
 let currentSearchController = null;   // ← agregar esta línea
 const COMPARE_MAX = window.MacroledCompare ? window.MacroledCompare.MAX : 3;
@@ -512,7 +533,7 @@ async function loadPotenciaOptions(){
     q: "*", query_by: "nombre_typesense,sku,descripcion",
     facet_by: POTENCIA_RAW_FIELD,
     max_facet_values: "250",
-    filter_by: "tipo_registro:=producto",
+    filter_by: BASE_FILTER,
     per_page: "1"
   });
   try{
@@ -569,7 +590,7 @@ async function loadMacrofamiliaOptions(){
     q: "*", query_by: "nombre_typesense,sku,descripcion",
     facet_by: "macrofamilia",
     max_facet_values: "100",
-    filter_by: "tipo_registro:=producto",
+    filter_by: BASE_FILTER,
     per_page: "1"
   });
   try{
@@ -599,15 +620,18 @@ async function searchTypesense(){
 
   const activeMacro = [...state.selected.macrofamilia][0];
   const activeFamilia = state.selected.familia.size > 0;
-  const facetFields = activeMacro
-    ? [...FACET_FIELDS, FAMILIA_FIELD, ...(activeFamilia ? [SUBFAMILIA_FIELD, ...EXTRA_FACET_FIELDS] : [])]
-    : FACET_FIELDS;
+  const searchingAll = Boolean(state.query);
+  const facetFields = searchingAll
+    ? FACET_FIELDS
+    : (activeMacro
+      ? [...FACET_FIELDS, FAMILIA_FIELD, ...(activeFamilia ? [SUBFAMILIA_FIELD, ...EXTRA_FACET_FIELDS] : [])]
+      : FACET_FIELDS);
 
-  const filterParts = ["tipo_registro:=producto"];
-  // Rehidrata aliases de color desde el último facet (por si aún no se re-renderizó)
+  const filterParts = [BASE_FILTER];
   const prevColorFacet = (typeof lastFacetCounts !== "undefined" ? lastFacetCounts : []).find(f => f.field_name === "color");
   if(prevColorFacet) mergeColorFacetCounts(prevColorFacet.counts);
   coerceColorSelection(state.selected.color);
+  // En búsqueda: filtros de inicio (macrofamilias + atributos), sin familia/subfamilia.
   for(const field of FACET_FIELDS){
     const vals = field === "color"
       ? expandColorFilterValues(state.selected.color)
@@ -617,20 +641,22 @@ async function searchTypesense(){
       filterParts.push(`${field}:=[${escaped}]`);
     }
   }
-  if(activeMacro && state.selected.familia.size){
-    const escaped = [...state.selected.familia].map(v => `\`${v}\``).join(",");
-    filterParts.push(`${FAMILIA_FIELD}:=[${escaped}]`);
-  }
-  if(activeMacro && activeFamilia && state.selected.subfamilia.size){
-    const escaped = [...state.selected.subfamilia].map(v => `\`${v}\``).join(",");
-    filterParts.push(`${SUBFAMILIA_FIELD}:=[${escaped}]`);
-  }
-  if(activeFamilia){
-    for(const field of EXTRA_FACET_FIELDS){
-      const vals = [...state.selected[field]];
-      if(vals.length){
-        const escaped = vals.map(v => `\`${v}\``).join(",");
-        filterParts.push(`${field}:=[${escaped}]`);
+  if(!searchingAll){
+    if(activeMacro && state.selected.familia.size){
+      const escaped = [...state.selected.familia].map(v => `\`${v}\``).join(",");
+      filterParts.push(`${FAMILIA_FIELD}:=[${escaped}]`);
+    }
+    if(activeMacro && activeFamilia && state.selected.subfamilia.size){
+      const escaped = [...state.selected.subfamilia].map(v => `\`${v}\``).join(",");
+      filterParts.push(`${SUBFAMILIA_FIELD}:=[${escaped}]`);
+    }
+    if(activeFamilia){
+      for(const field of EXTRA_FACET_FIELDS){
+        const vals = [...state.selected[field]];
+        if(vals.length){
+          const escaped = vals.map(v => `\`${v}\``).join(",");
+          filterParts.push(`${field}:=[${escaped}]`);
+        }
       }
     }
   }
@@ -641,7 +667,7 @@ async function searchTypesense(){
     query_by: "nombre_typesense,sku,descripcion",
     facet_by: facetFields.join(","),
     max_facet_values: "100",
-    per_page: String(PER_PAGE),
+    per_page: String(getPerPage()),
     page: String(state.page)
   });
   if(filterParts.length) params.set("filter_by", filterParts.join(" && "));
@@ -813,8 +839,9 @@ function appendPotenciaRangeFacet(panel, pending){
 function renderFacets(facetCounts){
   const panel = document.getElementById("filtersPanel");
   panel.innerHTML = "";
-  const activeMacro = [...state.selected.macrofamilia][0];
-  const activeFamilia = [...state.selected.familia][0];
+  const searching = Boolean(state.query);
+  const activeMacro = searching ? "" : [...state.selected.macrofamilia][0];
+  const activeFamilia = searching ? "" : [...state.selected.familia][0];
 
   if(activeMacro && !activeFamilia){
     cacheFamiliaImagesFromHits(window._lastHits || []);
@@ -829,10 +856,10 @@ function renderFacets(facetCounts){
 
     if(familiaCounts.length){
       const famGroup = document.createElement("div");
-      famGroup.className = "facet-group" + (state.collapsed.familia ? " collapsed" : "");
+      famGroup.className = "facet-group is-pinned";
       famGroup.innerHTML = `
         <div class="facet-title" data-field="${FAMILIA_FIELD}">
-          <span class="ft-label">${FACET_ICONS.macrofamilia}<span>Familia</span></span>${CHEV_HTML}
+          <span class="ft-label">${FACET_ICONS.macrofamilia}<span>Familia</span></span>
         </div>
         <div class="facet-body"></div>
       `;
@@ -926,13 +953,22 @@ function renderFacets(facetCounts){
     }
 
     const facetData = (facetCounts || []).find(f => f.field_name === field);
-    const counts = sortFacetCounts(facetData ? facetData.counts : []);
+    let counts = sortFacetCounts(facetData ? facetData.counts : []);
+    if(field === "macrofamilia" && searching && macrofamiliaOptions.length){
+      const byVal = {};
+      counts.forEach(c => { byVal[c.value] = c.count; });
+      counts = macrofamiliaOptions.map(c => ({
+        value: c.value,
+        count: byVal[c.value] != null ? byVal[c.value] : 0
+      }));
+    }
 
     const group = document.createElement("div");
-    group.className = "facet-group" + (state.collapsed[field] ? " collapsed" : "");
+    const pinned = ALWAYS_OPEN_FACETS.has(field);
+    group.className = "facet-group" + (pinned ? " is-pinned" : state.collapsed[field] ? " collapsed" : "");
     group.innerHTML = `
       <div class="facet-title" data-field="${field}">
-        <span class="ft-label">${FACET_ICONS[field] || ""}<span>${FACET_LABELS[field]}</span></span>${CHEV_HTML}
+        <span class="ft-label">${FACET_ICONS[field] || ""}<span>${FACET_LABELS[field]}</span></span>${pinned ? "" : CHEV_HTML}
       </div>
       <div class="facet-body"></div>
     `;
@@ -948,7 +984,7 @@ function renderFacets(facetCounts){
     counts.forEach(c => {
       if(field === "macrofamilia"){
         const row = document.createElement("div");
-        row.className = "macro-row";
+        row.className = "macro-row" + (state.selected.macrofamilia.has(c.value) ? " active" : "");
         row.dataset.macro = c.value;
         row.innerHTML = `<span>${c.value}</span><span class="count">${c.count}</span>`;
         body.appendChild(row);
@@ -984,6 +1020,7 @@ function renderFacets(facetCounts){
   panel.querySelectorAll(".facet-title").forEach(title => {
     title.addEventListener("click", () => {
       const field = title.dataset.field;
+      if(ALWAYS_OPEN_FACETS.has(field)) return;
       title.parentElement.classList.toggle("collapsed");
       if(field) state.collapsed[field] = title.parentElement.classList.contains("collapsed");
     });
@@ -1081,33 +1118,52 @@ function renderChips(){
   if(isPotenciaRangeActive(state.potenciaMin, state.potenciaMax)){
     chips.push({ field: "potencia_range", value: `${state.potenciaMin}W – ${state.potenciaMax}W` });
   }
-  if(!chips.length){ bar.style.display = "none"; return; }
+  if(!chips.length){ bar.style.display = "none"; bar.innerHTML = ""; return; }
   bar.style.display = "flex";
   bar.innerHTML = `<span class="label">Filtros aplicados</span>` +
+    `<div class="chips-row">` +
     chips.map(c => {
       const label = c.field === "color" ? colorLabel(c.value) : c.value;
-      return `<span class="chip" data-field="${c.field}" data-value="${c.value}">${label}<button>×</button></span>`;
+      const safeVal = String(c.value).replace(/"/g, "&quot;");
+      return `<span class="chip" data-field="${c.field}" data-value="${safeVal}">${label}<button type="button" aria-label="Quitar filtro">×</button></span>`;
     }).join("") +
-    `<button class="clear-btn" id="clearAll">Borrar filtros</button>`;
+    `<button type="button" class="clear-btn">Borrar filtros</button>` +
+    `</div>`;
+}
 
-  bar.querySelectorAll(".chip button").forEach(btn => {
-    btn.addEventListener("click", (e) => {
-      const chip = e.target.closest(".chip");
-      if(chip.dataset.field === "potencia_range"){
-        resetPotenciaRange();
-      } else {
-        state.selected[chip.dataset.field].delete(chip.dataset.value);
-      }
-      state.page = 1;
-      loadAndRender();
-    });
-  });
-  document.getElementById("clearAll").addEventListener("click", () => {
-    CHIP_FIELDS.forEach(f => state.selected[f].clear());
-    state.selected.subfamilia.clear();
-    state.selected.familia.clear();
-    state.selected.categoria.clear();
-    resetPotenciaRange();
+function clearAppliedFilters(){
+  const CHIP_FIELDS = FACET_FIELDS.filter(f => f !== "macrofamilia");
+  CHIP_FIELDS.forEach(f => state.selected[f].clear());
+  state.selected.subfamilia.clear();
+  state.selected.familia.clear();
+  state.selected.categoria.clear();
+  resetPotenciaRange();
+  syncPendingFromCommitted();
+  state.page = 1;
+  loadAndRender();
+}
+
+const chipsBarEl = document.getElementById("chipsBar");
+if(chipsBarEl){
+  chipsBarEl.addEventListener("click", (e) => {
+    const clearBtn = e.target.closest(".clear-btn");
+    if(clearBtn && chipsBarEl.contains(clearBtn)){
+      e.preventDefault();
+      e.stopPropagation();
+      clearAppliedFilters();
+      return;
+    }
+    const chipBtn = e.target.closest(".chip button");
+    if(!chipBtn) return;
+    const chip = chipBtn.closest(".chip");
+    if(!chip) return;
+    e.preventDefault();
+    if(chip.dataset.field === "potencia_range"){
+      resetPotenciaRange();
+    } else {
+      state.selected[chip.dataset.field].delete(chip.dataset.value);
+    }
+    syncPendingFromCommitted();
     state.page = 1;
     loadAndRender();
   });
@@ -1116,20 +1172,38 @@ function renderChips(){
 /* =========================================================
    RENDER: CARDS
    ========================================================= */
-function parseImages(doc){
-  let imgs = [];
-  const raw = doc.multiimagen;
-  if(Array.isArray(raw)){
-    imgs = raw;
-  }else if(typeof raw === "string" && raw.trim()){
-    try{
-      const parsed = JSON.parse(raw);
-      imgs = Array.isArray(parsed) ? parsed : [parsed].filter(Boolean);
-    }catch(_){
-      imgs = raw.split(/[,;|]/).map(s => s.trim()).filter(Boolean);
-    }
+function imageUrlFromItem(item){
+  if(item && typeof item === "object"){
+    item = item.url || item.src || item.imagen || item.image || item.href || "";
   }
-  return [...new Set(imgs.filter(Boolean))];
+  let u = String(item || "").trim().replace(/^["'\[]+|["'\]]+$/g, "").trim();
+  if(!u || /^null$/i.test(u) || u === "#") return "";
+  if(/\.(mp4|webm|mov|m3u8)(\?|#|$)/i.test(u)) return "";
+  if(u.startsWith("//")) u = "https:" + u;
+  if(!/^https?:\/\//i.test(u)) return "";
+  return u;
+}
+
+function parseImages(doc){
+  if(!doc) return [];
+  let raw = doc.multiimagen || doc.multiimage;
+  for(let i = 0; i < 3 && typeof raw === "string"; i++){
+    const t = raw.trim();
+    if(!(t.startsWith("[") || t.startsWith("{") || t.startsWith('"'))) break;
+    try { raw = JSON.parse(t); } catch(_){ break; }
+  }
+  let items = [];
+  if(Array.isArray(raw)) items = raw;
+  else if(raw && typeof raw === "object") items = [raw];
+  else if(typeof raw === "string" && raw.trim()){
+    items = raw.split(/[;,|]/).map(s => s.trim()).filter(Boolean);
+  }
+  const urls = [];
+  items.forEach(item => {
+    const u = imageUrlFromItem(item);
+    if(u && !urls.includes(u)) urls.push(u);
+  });
+  return urls;
 }
 
 // Si hay variantes, se fusionan valores extra de `atributo_variante`.
@@ -1489,12 +1563,12 @@ function isDimerizableProduct(doc){
 
 function buildDimBadge(doc){
   if(!isDimerizableProduct(doc)) return "";
-  return `<span class="dim-badge" title="Dimerizable" aria-label="Dimerizable">${ICON_DIMERIZABLE}</span>`;
+  return `<span class="dim-badge" title="Dimerizable" aria-label="Dimerizable">${ICON_DIMERIZABLE}<span class="dim-badge-label">DIM</span></span>`;
 }
 
 function cardTemplate(doc){
   const imgs = parseImages(doc);
-  // Todas las imágenes de la card se re-escriben hacia CloudFront/webp
+  const firstImg = imgs[0] || "";
   const optimizedImgs = imgs.map(i => optimizeImg(i, "500x500"));
   const nVariants = Array.isArray(doc.variantes_sku) ? doc.variantes_sku.length : 0;
 
@@ -1519,7 +1593,7 @@ function cardTemplate(doc){
           <div class="media-badges-left">
             ${buildSmartBadge(doc)}
           </div>
-          ${optimizedImgs.length ? `<img src="${optimizedImgs[0]}" alt="${doc.nombre_typesense || ""}" data-idx="0" data-imgs='${JSON.stringify(optimizedImgs)}' loading="lazy" decoding="async">` : `<span style="color:#c3c9d1;font-size:12px">Sin imagen</span>`}
+          ${firstImg ? `<img src="${escAttr(optimizedImgs[0] || firstImg)}" alt="${escAttr(doc.nombre_typesense || "")}" data-idx="0" data-imgs='${JSON.stringify(optimizedImgs)}' data-origs='${JSON.stringify(imgs)}' loading="lazy" decoding="async">` : `<span style="color:#c3c9d1;font-size:12px">Sin imagen</span>`}
           ${optimizedImgs.length > 1 ? `<div class="nav-arrow prev">${ICON_CHEVRON_LEFT}</div><div class="nav-arrow next">${ICON_CHEVRON_RIGHT}</div>` : ""}
           ${buildDimBadge(doc)}
         </div>
@@ -1537,7 +1611,7 @@ function cardTemplate(doc){
               <input type="checkbox" class="compare-checkbox"
                 data-sku="${escAttr(sku)}"
                 data-nombre="${escAttr(doc.nombre_typesense || "Producto sin nombre")}"
-                data-img="${escAttr(optimizeImg(imgs[0], "150x150") || "")}">
+                data-img="${escAttr(firstImg)}">
               <span class="box">${ICON_CHECK}</span>
             </span>
             <span class="compare-label">Comparar</span>
@@ -1571,10 +1645,22 @@ function wireCardLinks(){
   });
 }
 
+function bindImgFallback(img){
+  if(!img || img.dataset.fbBound) return;
+  img.dataset.fbBound = "1";
+  img.addEventListener("error", () => {
+    const origs = JSON.parse(img.dataset.origs || "[]");
+    const idx = Number(img.dataset.idx || 0);
+    const orig = origs[idx];
+    if(orig && img.src !== orig) img.src = orig;
+  });
+}
+
 function wireCarousels(){
   document.querySelectorAll(".card .media").forEach(media => {
     const img = media.querySelector("img");
     if(!img) return;
+    bindImgFallback(img);
     const imgs = JSON.parse(img.dataset.imgs || "[]");
     if(imgs.length < 2) return;
 
@@ -1598,32 +1684,42 @@ function wireCarousels(){
       preload((idx + 1) % imgs.length);
     });
 
+    const origs = JSON.parse(img.dataset.origs || "[]");
+    const srcAt = (i) => imgs[i] || origs[i] || "";
+
     const goTo = (newIdx) => {
       idx = (newIdx + imgs.length) % imgs.length;
       const targetIdx = idx;
-      const target = imgs[targetIdx];
+      const target = srcAt(targetIdx);
+      img.dataset.idx = String(targetIdx);
+      if(!target) return;
 
       if(loadedSet.has(targetIdx)){
         img.style.opacity = "1";
         img.src = target;
       } else {
-        // Todavía no está en caché: bajamos la opacidad para que se vea
-        // que está cargando, en vez de que el click no muestre nada.
         img.style.opacity = "0.4";
         const pre = new Image();
         pre.onload = () => {
           loadedSet.add(targetIdx);
-          // Solo aplicamos si el usuario no siguió clickeando mientras tanto
-          // (evita que una carga vieja pise una más nueva)
           if(idx === targetIdx){
             img.src = target;
             img.style.opacity = "1";
           }
         };
+        pre.onerror = () => {
+          const orig = origs[targetIdx];
+          if(orig && orig !== target){
+            loadedSet.add(targetIdx);
+            if(idx === targetIdx){
+              img.src = orig;
+              img.style.opacity = "1";
+            }
+          }
+        };
         pre.src = target;
       }
 
-      // Encadenamos la precarga de la próxima
       preload((targetIdx + 1) % imgs.length);
     };
 
@@ -1704,16 +1800,19 @@ function renderCompareBar(){
   bar.classList.toggle("collapsed", state.compareCollapsed);
   countEl.textContent = list.length;
 
-  const chips = list.map(p => `
+  const chips = list.map(p => {
+    const img = sourceImg(p.img);
+    return `
     <div class="compare-chip">
       <button type="button" class="compare-chip-remove" data-remove="${p.sku}" aria-label="Quitar">×</button>
-      <div class="thumb">${p.img ? `<img src="${p.img}" alt="" loading="lazy">` : ""}</div>
+      <div class="thumb">${img ? `<img src="${escAttr(img)}" alt="" loading="lazy" onerror="this.remove()">` : ""}</div>
       <div class="info">
         <span class="name">${p.nombre}</span>
         ${p.sku ? `<span class="sku">${p.sku}</span>` : ""}
       </div>
     </div>
-  `).join("");
+  `;
+  }).join("");
 
   const emptySlots = Array.from({ length: Math.max(0, COMPARE_MAX - list.length) })
     .map(() => `<div class="compare-slot-empty">+</div>`).join("");
@@ -1770,7 +1869,7 @@ function wireCompareCheckboxes(){
     const applyCompareState = () => {
       const { sku, nombre, img } = cb.dataset;
       if(cb.checked){
-        const updated = window.MacroledCompare.addToCompare({ sku, nombre, img });
+        const updated = window.MacroledCompare.addToCompare({ sku, nombre, img: sourceImg(img) });
         if(!updated.some(p => p.sku === sku)) cb.checked = false;
       } else {
         window.MacroledCompare.removeFromCompare(sku);
@@ -1836,9 +1935,11 @@ function renderCards(hits, found){
       <span class="state-title">No encontramos productos</span>
       <span>Probá sacando algún filtro para ver más resultados.</span>
     </div>`;
+    grid.setAttribute("aria-busy", "false");
     return;
   }
   grid.innerHTML = orderedHits.map(h => cardTemplate(h.document)).join("");
+  grid.setAttribute("aria-busy", "false");
   wireCarousels();
   wireCardLinks();
   wireCompareCheckboxes();
@@ -1846,7 +1947,7 @@ function renderCards(hits, found){
 }
 
 function renderPagination(found){
-  const totalPages = Math.max(1, Math.ceil(found / PER_PAGE));
+  const totalPages = Math.max(1, Math.ceil(found / getPerPage()));
   const el = document.getElementById("pagination");
   if(totalPages <= 1){ el.innerHTML = ""; return; }
   let html = `<button ${state.page === 1 ? "disabled" : ""} data-p="${state.page - 1}">‹ Anterior</button>`;
@@ -1982,8 +2083,9 @@ async function loadAndRender(){
     renderPagination(data.found);
     renderCompareBar();
 
-    const from = data.hits.length ? (state.page - 1) * PER_PAGE + 1 : 0;
-    const to = (state.page - 1) * PER_PAGE + data.hits.length;
+    const perPage = getPerPage();
+    const from = data.hits.length ? (state.page - 1) * perPage + 1 : 0;
+    const to = (state.page - 1) * perPage + data.hits.length;
     showingLabel.textContent = `${to} de ${data.found} productos`;
 
     const applyBtn = document.getElementById("filtersApply");
@@ -2008,6 +2110,28 @@ document.getElementById("sortSelect").addEventListener("change", (e) => {
   loadAndRender();
 });
 
+function applySearchQuery(raw){
+  const next = String(raw || "").trim();
+  const wasSearching = Boolean(state.query);
+  const nowSearching = Boolean(next);
+  if(nowSearching && !wasSearching){
+    // Al pasar al buscador, el filtro vuelve al inicio (macrofamilias).
+    state.selected.macrofamilia.clear();
+    state.selected.familia.clear();
+    state.selected.subfamilia.clear();
+    state.selected.categoria.clear();
+    syncPendingFromCommitted();
+  } else if(nowSearching){
+    const hadDrillDown = state.selected.familia.size || state.selected.subfamilia.size || state.selected.categoria.size;
+    state.selected.familia.clear();
+    state.selected.subfamilia.clear();
+    state.selected.categoria.clear();
+    if(hadDrillDown) syncPendingFromCommitted();
+  }
+  state.query = next;
+  state.page = 1;
+}
+
 function syncSearchInputFromState(){
   const el = document.getElementById("searchInput");
   if(!el) return;
@@ -2017,11 +2141,17 @@ function syncSearchInputFromState(){
 let searchDebounce;
 const searchInput = document.getElementById("searchInput");
 if(searchInput){
+  let searchTouched = false;
+  searchInput.addEventListener("focus", () => { searchTouched = true; });
   searchInput.addEventListener("input", (e) => {
+    // Autofill / restore del browser no tiene que filtrar el index al cargar.
+    if(!searchTouched){
+      syncSearchInputFromState();
+      return;
+    }
     clearTimeout(searchDebounce);
     searchDebounce = setTimeout(() => {
-      state.query = e.target.value.trim();
-      state.page = 1;
+      applySearchQuery(e.target.value);
       loadAndRender();
     }, 250);
   });
@@ -2029,8 +2159,7 @@ if(searchInput){
     if(e.key !== "Enter") return;
     e.preventDefault();
     clearTimeout(searchDebounce);
-    state.query = e.target.value.trim();
-    state.page = 1;
+    applySearchQuery(e.target.value);
     loadAndRender();
   });
 }
@@ -2180,7 +2309,9 @@ function renderMobileFilters(facetCounts){
   const rows = [{ field: "sort", label: "Ordenar por", summary: currentSortLabel() }];
 
   FMN_ORDER.forEach(field => {
+    const searching = Boolean(state.query);
     const hasFamilia = state.pending.familia.size > 0;
+    if(searching && (field === "familia" || field === "subfamilia" || field === "categoria")) return;
     if(field === "familia" && (!activeMacro || hasFamilia)) return;
     if(field === "subfamilia" && !hasFamilia) return;
     if(field === "categoria" && !hasFamilia) return;
@@ -2260,7 +2391,7 @@ function fmnWireCheckboxRows(bodyEl, field){
 // (sin tocar la grilla real) para que el botón siempre refleje cuántos
 // productos van a aparecer si se confirma la selección actual.
 async function updatePendingResultsCount(){
-  const filterParts = ["tipo_registro:=producto"];
+  const filterParts = [BASE_FILTER];
   for(const field of FACET_FIELDS){
     const vals = field === "color"
       ? expandColorFilterValues(state.pending.color)
@@ -2333,7 +2464,14 @@ function openDetailScreen(field){
     const cached = macrofamiliaOptions.length
       ? macrofamiliaOptions
       : (lastFacetCounts.find(f => f.field_name === "macrofamilia") || {}).counts || [];
-    const counts = sortFacetCounts(cached);
+    const live = (lastFacetCounts.find(f => f.field_name === "macrofamilia") || {}).counts || [];
+    const liveByVal = {};
+    live.forEach(c => { liveByVal[c.value] = c.count; });
+    const counts = sortFacetCounts(
+      Boolean(state.query) && cached.length
+        ? cached.map(c => ({ value: c.value, count: liveByVal[c.value] != null ? liveByVal[c.value] : 0 }))
+        : cached
+    );
     const hasSelection = state.pending.macrofamilia.size > 0;
     bodyEl.innerHTML = counts.map(c => {
       const checked = state.pending.macrofamilia.has(c.value);
@@ -2450,7 +2588,12 @@ function expandUrlParamValues(params, key){
 function applyStateFromURL(){
   const params = new URLSearchParams(location.search);
   clearSelectedFilters();
-  resetPotenciaRange();
+  // No usar resetPotenciaRange() acá: los bounds todavía pueden ser el
+  // placeholder 0–1800 y eso deja el slider “activo” al cargar el index.
+  state.potenciaMin = null;
+  state.potenciaMax = null;
+  state.pendingPotenciaMin = null;
+  state.pendingPotenciaMax = null;
   pendingUrlPotencia = null;
 
   const q = (params.get("q") || "").trim();
@@ -2539,9 +2682,11 @@ applyStateFromURL();
 loadMacrofamiliaOptions();
 loadPotenciaOptions().then(() => {
   const appliedPot = applyPendingUrlPotencia();
+  if(!appliedPot) resetPotenciaRange();
   // Re-render facets si ya cargó el catálogo, para que el slider tenga bounds reales
   if(document.getElementById("filtersPanel")?.children.length){
     renderFacets(lastFacetCounts);
+    renderChips();
   }
   if(appliedPot && initialPreloadDone) loadAndRender();
 });

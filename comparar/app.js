@@ -21,7 +21,15 @@ if(!window.MacroledCompare){
       return _fallbackList.slice();
     },
     clearCompare: () => { _fallbackList.length = 0; },
-    isInCompare: (sku) => _fallbackList.some(p => p.sku === sku)
+    isInCompare: (sku) => _fallbackList.some(p => p.sku === sku || p.variantSku === sku),
+    setCompareVariant: (principalSku, variantSku, img) => {
+      const item = _fallbackList.find(p => p.sku === principalSku);
+      if(item){
+        item.variantSku = variantSku;
+        if(img) item.img = img;
+      }
+      return _fallbackList.slice();
+    }
   };
 }
 
@@ -132,19 +140,477 @@ const FIELD_MAP = {
 // Campos que Typesense necesita devolver en cada búsqueda/resolución (además
 // de query_by): tienen index:false en el schema, así que si no se piden a
 // mano en include_fields, Typesense no los trae aunque estén store:true.
-const COMPARE_FIELDS = "nombre_typesense,sku,descripcion,macrofamilia,familia,multiimagen,ficha_tecnica,link_ficha_web,potencia,factor_potencia,corriente,tension,frecuencia,anti_high_volt,driver,conector,base_conector,conductores,conexion,conectividad,clase,panel_solar,autonomia,lumenes_w,flujo_luminoso,rango_temperatura,angulo_apertura,cri,tipo_led,eficiencia_energetica,cantidad_luces,dimerizable,color,material_cuerpo,material_lente,ip,ik,temperatura_operacion,compatibilidad,vida_util,garantia_tiempo";
+const COMPARE_FIELDS = "nombre_typesense,sku,descripcion,macrofamilia,familia,multiimagen,ficha_tecnica,link_ficha_web,variantes_sku,nombre_attr_variantes,attr_variantes,es_principal,potencia,factor_potencia,corriente,tension,frecuencia,anti_high_volt,driver,conector,base_conector,conductores,conexion,conectividad,clase,panel_solar,autonomia,lumenes_w,flujo_luminoso,rango_temperatura,angulo_apertura,cri,tipo_led,eficiencia_energetica,cantidad_luces,dimerizable,color,material_cuerpo,material_lente,ip,ik,temperatura_operacion,compatibilidad,vida_util,garantia_tiempo";
+const BASE_FILTER = "tipo_registro:=producto && es_principal:true";
 
 function parseImages(doc){
-  let imgs = [];
-  if(doc.multiimagen){
+  if(!doc) return [];
+  let raw = doc.multiimagen || doc.multiimage;
+  for(let i = 0; i < 3 && typeof raw === "string"; i++){
+    const t = raw.trim();
+    if(!(t.startsWith("[") || t.startsWith("{") || t.startsWith('"'))) break;
+    try { raw = JSON.parse(t); } catch(_){ break; }
+  }
+  let items = [];
+  if(Array.isArray(raw)) items = raw;
+  else if(raw && typeof raw === "object") items = [raw];
+  else if(typeof raw === "string" && raw.trim()){
+    items = raw.split(/[;,|]/).map(s => s.trim()).filter(Boolean);
+  }
+  const urls = [];
+  items.forEach(item => {
+    let u = item;
+    if(u && typeof u === "object") u = u.url || u.src || u.imagen || u.image || u.href || "";
+    u = String(u || "").trim().replace(/^["'\[]+|["'\]]+$/g, "").trim();
+    if(!u || /^null$/i.test(u) || u === "#") return;
+    if(/\.(mp4|webm|mov|m3u8)(\?|#|$)/i.test(u)) return;
+    if(u.startsWith("//")) u = "https:" + u;
+    if(!/^https?:\/\//i.test(u)) return;
+    const cdn = u.match(/cloudfront\.net\/(?:fit-in\/[^/]+\/)?(?:filters:[^/]+\/)?(.+)$/i);
+    if(cdn) u = `https://s3.coresagroup.com/${cdn[1]}`;
+    if(!urls.includes(u)) urls.push(u);
+  });
+  return urls;
+}
+
+function sourceImg(url){
+  const u = String(url || "").trim();
+  if(!u) return "";
+  const m = u.match(/cloudfront\.net\/(?:fit-in\/[^/]+\/)?(?:filters:[^/]+\/)?(.+)$/i);
+  return m ? `https://s3.coresagroup.com/${m[1]}` : u;
+}
+
+function parseSkuList(raw){
+  if(!raw) return [];
+  const list = Array.isArray(raw)
+    ? raw.map(s => String(s).trim())
+    : String(raw).split(/[,;|]/).map(s => s.trim());
+  return [...new Set(list.filter(Boolean))];
+}
+
+const COLOR_HEX = {
+  blanco: "#f4f4f4", negro: "#1c1c1c", gris: "#9e9e9e",
+  transparente: "repeating-linear-gradient(45deg,#eef2f6 0 4px,#fff 4px 8px)",
+  aluminio: "#c5c9ce", ambar: "#ffbf00", platil: "#c0c0c0",
+  bronce: "#b08d57", cobre: "#b87333", cromo: "#cfd4d8",
+  verde: "#2e7d32", azul: "#1565c0", rojo: "#c62828", acero: "#8a9399"
+};
+const COLOR_LABELS = {
+  blanco: "Blanco", negro: "Negro", gris: "Gris", transparente: "Transparente",
+  aluminio: "Aluminio", ambar: "Ámbar", platil: "Platil", bronce: "Bronce",
+  cobre: "Cobre", cromo: "Cromo", verde: "Verde", azul: "Azul", rojo: "Rojo", acero: "Acero"
+};
+const COLOR_LIGHT = new Set(["blanco", "transparente", "aluminio", "platil", "cromo", "ambar", "acero"]);
+const TEMP_TONES = {
+  calido: { color: "#fff79b", label: "Cálido" },
+  neutro: { color: "#d9d9d9", label: "Neutro" },
+  frio:   { color: "#bce4fa", label: "Frío" }
+};
+
+function foldText(value){
+  return String(value || "").trim().toLowerCase()
+    .normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+}
+
+function canonicalizeColorPart(part){
+  let p = foldText(part).replace(/\b(satinado|texturado|brillante|oscuro|claro|mate|metalizado)\b/g, " ").replace(/\s+/g, " ").trim();
+  if(!p) return "";
+  if(/^blanc/.test(p)) return "blanco";
+  if(/^negr/.test(p)) return "negro";
+  if(/^(gris|gray|grey)/.test(p) || /\bgris\b/.test(p)) return "gris";
+  if(/transparent/.test(p)) return "transparente";
+  if(/aluminio/.test(p)) return "aluminio";
+  if(/ambar/.test(p)) return "ambar";
+  if(/platil|platead|plata/.test(p)) return "platil";
+  if(/bronce/.test(p)) return "bronce";
+  if(/cobre/.test(p)) return "cobre";
+  if(/cromo|cromado/.test(p)) return "cromo";
+  if(/^verd/.test(p)) return "verde";
+  if(/^azul/.test(p)) return "azul";
+  if(/^roj/.test(p)) return "rojo";
+  if(/acero/.test(p)) return "acero";
+  return p.replace(/\s+/g, "-");
+}
+
+function normalizeColorKey(raw){
+  const v = foldText(raw);
+  if(!v) return "";
+  const parts = v.split(/\s*[-/]\s*|\s+y\s+|\s+con\s+/).map(canonicalizeColorPart).filter(Boolean);
+  const uniq = [];
+  parts.forEach(p => { if(!uniq.includes(p)) uniq.push(p); });
+  return uniq.join("-");
+}
+
+function colorLabel(key){
+  if(!key) return "";
+  if(COLOR_LABELS[key]) return COLOR_LABELS[key];
+  return key.split("-").map(p => COLOR_LABELS[p] || (p.charAt(0).toUpperCase() + p.slice(1))).join(" / ");
+}
+
+function colorSwatchBg(key){
+  const parts = String(key || "").split("-").filter(Boolean);
+  if(!parts.length) return "#c3cad6";
+  if(parts.length === 1) return COLOR_HEX[parts[0]] || "#c3cad6";
+  const colors = parts.map(p => {
+    const bg = COLOR_HEX[p] || "#c3cad6";
+    return bg.includes("gradient") ? "#e8eef3" : bg;
+  });
+  if(colors.length === 2) return `linear-gradient(135deg, ${colors[0]} 50%, ${colors[1]} 50%)`;
+  const step = 100 / colors.length;
+  return `linear-gradient(135deg, ${colors.map((c, i) => `${c} ${i * step}% ${(i + 1) * step}%`).join(", ")})`;
+}
+
+function isLightColorKey(key){
+  return String(key || "").split("-").some(p => COLOR_LIGHT.has(p));
+}
+
+function tempCategoryKey(value){
+  const raw = foldText(value);
+  if(/calido/.test(raw) || /\bww\b/.test(raw)) return "calido";
+  if(/neutro/.test(raw) || /\bnw\b/.test(raw)) return "neutro";
+  if(/frio/.test(raw) || /\bcw\b/.test(raw)) return "frio";
+  const k = parseInt(value, 10);
+  if(Number.isNaN(k)) return null;
+  if(k <= 3000) return "calido";
+  if(k <= 4500) return "neutro";
+  return "frio";
+}
+
+function parseWattsValue(str){
+  const m = String(str || "").match(/(\d+(?:[.,]\d+)?)\s*w\b/i);
+  if(!m) return null;
+  const n = parseFloat(m[1].replace(",", "."));
+  return Number.isFinite(n) ? n : null;
+}
+
+function colorFromDoc(doc){
+  return normalizeColorKey(doc && doc.color);
+}
+
+function potenciaFromDoc(doc){
+  if(!doc) return null;
+  const fromField = parseWattsValue(doc.potencia);
+  if(fromField != null){
+    const raw = String(doc.potencia).trim();
+    return { key: String(fromField), watts: fromField, label: /w/i.test(raw) ? raw.replace(/\s+/g, "") : `${fromField}W` };
+  }
+  const fromSku = parseWattsValue(doc.sku);
+  if(fromSku != null) return { key: String(fromSku), watts: fromSku, label: `${fromSku}W` };
+  return null;
+}
+
+function kelvinFromText(value){
+  const m = String(value || "").match(/(\d{4})\s*k\b/i) || String(value || "").match(/\b(2000|2200|2700|3000|3500|4000|4500|5000|5700|6500)\b/);
+  if(!m) return null;
+  const k = parseInt(m[1], 10);
+  return Number.isFinite(k) && k >= 1800 && k <= 8000 ? k : null;
+}
+
+function kelvinFromSku(sku){
+  const s = String(sku || "");
+  const direct = kelvinFromText(s);
+  if(direct) return direct;
+  // Código lámpara 827/830/840/850/857/865 → CRI + CCT
+  const code = s.match(/\b[89]([23456][057])\b/);
+  if(!code) return null;
+  const k = parseInt(code[1], 10) * 100;
+  return k >= 2000 && k <= 6500 ? k : null;
+}
+
+function skuTempSuffix(sku){
+  const s = String(sku || "");
+  if(/\bWW\b/i.test(s)) return "calido";
+  if(/\bNW\b/i.test(s)) return "neutro";
+  if(/\bCW\b/i.test(s)) return "frio";
+  return null;
+}
+
+function tempInfoFromDoc(doc){
+  if(!doc) return { kelvin: null, tone: null };
+  const suffixTone = skuTempSuffix(doc.sku);
+  const declaredTone = tempCategoryKey(doc.attr_variantes);
+  const tone = suffixTone || declaredTone || tempCategoryKey(doc.rango_temperatura);
+  let kelvin = kelvinFromText(doc.rango_temperatura)
+    || kelvinFromText(doc.attr_variantes)
+    || kelvinFromSku(doc.sku);
+  if(tone && kelvin && tempCategoryKey(String(kelvin)) !== tone){
+    kelvin = null;
+  }
+  return { kelvin, tone: tone || (kelvin ? tempCategoryKey(String(kelvin)) : null) };
+}
+
+function tempFromDoc(doc){
+  const info = tempInfoFromDoc(doc);
+  if(info.kelvin) return `${info.kelvin}K`;
+  return info.tone || "";
+}
+
+function anguloFromDoc(doc){
+  const field = String(doc && doc.angulo_apertura || "").trim();
+  if(field){
+    const n = parseInt(field.replace(",", "."), 10);
+    if(Number.isFinite(n)) return `${n}°`;
+    return field;
+  }
+  const m = String(doc && doc.sku || "").match(/(\d+)\s*D\b/i);
+  return m ? `${m[1]}°` : "";
+}
+
+function resolvedKelvin(doc, docs){
+  const info = tempInfoFromDoc(doc);
+  if(info.kelvin) return info.kelvin;
+  if(!info.tone) return null;
+  const ks = [...new Set((docs || []).map(tempInfoFromDoc)
+    .filter(i => i.tone === info.tone && i.kelvin)
+    .map(i => i.kelvin))];
+  return ks.length === 1 ? ks[0] : null;
+}
+
+function tempAxisKey(doc, docs){
+  const info = tempInfoFromDoc(doc);
+  if(info.tone) return info.tone;
+  const k = resolvedKelvin(doc, docs);
+  return k ? String(k) : "";
+}
+
+function variantOptionLabel(doc){
+  if(!doc) return "";
+  const declared = String(doc.attr_variantes || "").trim();
+  if(declared) return declared;
+  const name = foldText(doc.nombre_attr_variantes);
+  if(/luz|temp/.test(name) && doc.rango_temperatura) return String(doc.rango_temperatura).trim();
+  if(/angulo/.test(name) && doc.angulo_apertura) return String(doc.angulo_apertura).trim();
+  if(/color/.test(name) && doc.color) return String(doc.color).trim();
+  if(/potenc/.test(name) && doc.potencia) return String(doc.potencia).trim();
+  const pot = potenciaFromDoc(doc);
+  if(pot) return pot.label;
+  return "";
+}
+
+function axisValue(doc, axis){
+  if(axis === "color") return colorFromDoc(doc);
+  if(axis === "potencia"){
+    const pot = potenciaFromDoc(doc);
+    return pot ? pot.key : "";
+  }
+  if(axis === "temp") return tempFromDoc(doc);
+  if(axis === "angulo") return anguloFromDoc(doc);
+  return variantOptionLabel(doc) || (doc && doc.sku) || "";
+}
+
+function valuesDiffer(docs, getter){
+  const vals = [...new Set((docs || []).map(getter).filter(v => v != null && v !== ""))];
+  return vals.length > 1;
+}
+
+function detectVariantAxes(docs){
+  const list = docs || [];
+  const axes = [];
+  if(valuesDiffer(list, colorFromDoc)) axes.push("color");
+  if(valuesDiffer(list, d => { const p = potenciaFromDoc(d); return p ? p.key : ""; })) axes.push("potencia");
+  if(valuesDiffer(list, d => tempAxisKey(d, list))) axes.push("temp");
+  if(valuesDiffer(list, anguloFromDoc)) axes.push("angulo");
+  if(axes.length) return axes;
+  if(valuesDiffer(list, d => variantOptionLabel(d) || d.sku)) return ["otro"];
+  return [];
+}
+
+function axisTitle(axis){
+  if(axis === "color") return "Color";
+  if(axis === "potencia") return "Potencia";
+  if(axis === "temp") return "Temperatura";
+  if(axis === "angulo") return "Ángulo";
+  return "Variante";
+}
+
+function tempChipMeta(value){
+  const info = { kelvin: kelvinFromText(value), tone: tempCategoryKey(value) };
+  const tone = info.tone ? TEMP_TONES[info.tone] : null;
+  const k = info.kelvin;
+  if(tone && k) return { color: tone.color, label: `${tone.label} ${k}K`, title: `${tone.label} ${k}K` };
+  if(k) return { color: "#d9d9d9", label: `${k}K`, title: `${k}K` };
+  if(tone) return { color: tone.color, label: tone.label, title: tone.label };
+  return { color: "#d9d9d9", label: String(value || "").trim(), title: String(value || "").trim() };
+}
+
+function variantFriendlyLabel(doc, axes, docs){
+  const bits = (axes || []).map(axis => {
+    if(axis === "color") return colorLabel(colorFromDoc(doc));
+    if(axis === "potencia"){
+      const pot = potenciaFromDoc(doc);
+      return pot ? pot.label : "";
+    }
+    if(axis === "temp"){
+      const info = tempInfoFromDoc(doc);
+      const tone = info.tone && TEMP_TONES[info.tone];
+      const k = info.kelvin || resolvedKelvin(doc, docs);
+      if(tone && k) return `${tone.label} ${k}K`;
+      if(tone) return tone.label;
+      return tempChipMeta(k ? `${k}K` : tempFromDoc(doc)).label;
+    }
+    if(axis === "angulo") return anguloFromDoc(doc);
+    return variantOptionLabel(doc);
+  }).filter(Boolean);
+  const unique = [...new Set(bits)];
+  return unique.join(" · ") || (doc && doc.sku ? String(doc.sku).trim() : "");
+}
+
+function sortVariantDocs(docs, axes){
+  return [...(docs || [])].sort((a, b) => {
+    if((axes || []).includes("potencia")){
+      const wa = (potenciaFromDoc(a) || {}).watts || 0;
+      const wb = (potenciaFromDoc(b) || {}).watts || 0;
+      if(wa !== wb) return wa - wb;
+    }
+    if((axes || []).includes("temp")){
+      const order = { calido: 1, neutro: 2, frio: 3 };
+      const ia = tempInfoFromDoc(a);
+      const ib = tempInfoFromDoc(b);
+      const ta = order[ia.tone] || 9;
+      const tb = order[ib.tone] || 9;
+      if(ta !== tb) return ta - tb;
+      const ka = ia.kelvin || parseInt(tempFromDoc(a), 10) || 0;
+      const kb = ib.kelvin || parseInt(tempFromDoc(b), 10) || 0;
+      if(ka !== kb) return ka - kb;
+    }
+    return variantFriendlyLabel(a, axes, docs).localeCompare(variantFriendlyLabel(b, axes, docs), "es");
+  });
+}
+
+function pickerTitle(){
+  return "Variante";
+}
+
+function productThumbHtml(p){
+  const ph = `<span class="thumb-ph" aria-hidden="true">${ICON_BULB}</span>`;
+  const img = sourceImg(p.img);
+  if(!img) return `<div class="thumb is-empty">${ph}</div>`;
+  return `<div class="thumb">${ph}<img src="${escAttr(img)}" alt="" onerror="this.parentNode.classList.add('is-empty');this.remove()"></div>`;
+}
+
+function buildVariantOptions(docs){
+  const list = (docs || []).filter(d => d && d.sku);
+  const axes = detectVariantAxes(list);
+  return list.map(d => ({
+    sku: d.sku,
+    label: variantFriendlyLabel(d, axes, list) || d.sku,
+    doc: d,
+    axes
+  }));
+}
+
+function mapDocToCompared(doc, extras){
+  extras = extras || {};
+  const imgs = parseImages(doc);
+  let img = imgs[0] || sourceImg(extras.img) || "";
+  if(!img && extras.variants && extras.variants.length){
+    const principal = extras.variants.find(v => v.doc && v.sku === (extras.principalSku || doc.sku));
+    img = principal ? (parseImages(principal.doc)[0] || "") : parseImages(extras.variants[0].doc)[0] || "";
+  }
+  const variants = extras.variants || [];
+  const axes = extras.axes || (variants[0] && variants[0].axes) || detectVariantAxes(variants.map(v => v.doc));
+  return {
+    id: extras.principalSku || doc.sku,
+    principalSku: extras.principalSku || doc.sku,
+    sku: doc.sku,
+    family: doc.familia || doc.macrofamilia || "",
+    name: doc.nombre_typesense || extras.nombre || "Producto sin nombre",
+    img,
+    ficha: doc.link_ficha_web || "#",
+    ficha_pdf: doc.ficha_tecnica || "#",
+    specs: mapAtributosToSpecs(doc),
+    variants,
+    axes
+  };
+}
+
+function currentVariantSummary(p){
+  if(!p || !p.variants || p.variants.length < 2) return p ? `SKU: ${p.sku}` : "";
+  const current = p.variants.find(v => v.sku === p.sku);
+  const doc = current ? current.doc : null;
+  if(!doc) return `SKU: ${p.sku}`;
+  return variantFriendlyLabel(doc, p.axes, p.variants.map(v => v.doc)) || `SKU: ${p.sku}`;
+}
+
+function applyVariantToProduct(product, sku){
+  const opt = (product.variants || []).find(v => v.sku === sku);
+  if(!opt) return product;
+  return mapDocToCompared(opt.doc, { principalSku: product.principalSku, variants: product.variants, axes: product.axes });
+}
+
+function uniqueLabeledDocs(docs, axes, preferredSku){
+  const ordered = sortVariantDocs(docs, axes);
+  const byLabel = new Map();
+  ordered.forEach(doc => {
+    const label = variantFriendlyLabel(doc, axes, docs);
+    const prev = byLabel.get(label);
+    if(!prev || doc.sku === preferredSku) byLabel.set(label, doc);
+  });
+  return [...byLabel.values()];
+}
+
+function variantPickerHtml(p){
+  if(!p.variants || p.variants.length < 2) return "";
+  const docs = p.variants.map(v => v.doc);
+  const axes = (p.axes && p.axes.length) ? p.axes : detectVariantAxes(docs);
+  const ordered = sortVariantDocs(docs, axes);
+  const title = pickerTitle();
+  const opts = ordered.map(doc => {
+    const label = variantFriendlyLabel(doc, axes, docs);
+    return `<option value="${escAttr(doc.sku)}"${doc.sku === p.sku ? " selected" : ""}>${escAttr(label)}</option>`;
+  }).join("");
+  return `<label class="pvariant">
+    <span class="pvariant-label">${escAttr(title)}</span>
+    <select data-principal="${escAttr(p.principalSku)}" aria-label="${escAttr("Elegir " + title)}">${opts}</select>
+  </label>`;
+}
+
+async function fetchDocsBySkus(skus){
+  const unique = [...new Set((skus || []).map(s => String(s).trim()).filter(Boolean))];
+  if(!unique.length) return [];
+  const escaped = unique.map(s => `\`${s.replace(/`/g, "")}\``).join(",");
+  const params = new URLSearchParams({
+    q: "*",
+    query_by: "nombre_typesense,sku",
+    filter_by: `sku:=[${escaped}]`,
+    include_fields: COMPARE_FIELDS,
+    per_page: String(Math.min(Math.max(unique.length, 1), 50))
+  });
+  const res = await fetch(`${TS_HOST}/collections/${COLLECTION}/documents/search?${params.toString()}`, {
+    headers: { "X-TYPESENSE-API-KEY": TS_API_KEY }
+  });
+  if(!res.ok) throw new Error(`Typesense ${res.status}`);
+  const data = await res.json();
+  const bySku = {};
+  (data.hits || []).forEach(h => { if(h.document && h.document.sku) bySku[h.document.sku] = h.document; });
+  return unique.map(s => bySku[s]).filter(Boolean);
+}
+
+async function hydrateComparedProduct(doc, variantSku, extras){
+  extras = extras || {};
+  const skuSet = new Set(parseSkuList(doc.variantes_sku));
+  skuSet.add(doc.sku);
+  if(variantSku) skuSet.add(variantSku);
+  let sibs = [doc];
+  if(skuSet.size > 1){
     try{
-      const parsed = JSON.parse(doc.multiimagen);
-      if(Array.isArray(parsed)) imgs = parsed;
-    }catch(_){
-      imgs = doc.multiimagen.split(/[,|]/).map(s => s.trim()).filter(Boolean);
+      const fetched = await fetchDocsBySkus([...skuSet]);
+      const bySku = {};
+      fetched.forEach(d => { bySku[d.sku] = d; });
+      bySku[doc.sku] = bySku[doc.sku] || doc;
+      sibs = Object.values(bySku);
+    }catch(err){
+      console.warn("No se pudieron cargar las variantes:", err);
     }
   }
-  return imgs;
+  const variants = sibs.length > 1 ? buildVariantOptions(sibs) : [];
+  const active = (variantSku && sibs.find(d => d.sku === variantSku)) || doc;
+  return mapDocToCompared(active, {
+    principalSku: extras.principalSku || doc.sku,
+    nombre: extras.nombre,
+    img: extras.img,
+    variants
+  });
 }
 
 function mapAtributosToSpecs(doc){
@@ -167,6 +633,7 @@ async function searchTypesenseModal(query){
   const params = new URLSearchParams({
     q: query && query.trim() ? query.trim() : "*",
     query_by: "nombre_typesense,sku,descripcion",
+    filter_by: BASE_FILTER,
     include_fields: COMPARE_FIELDS,
     per_page: "20",
     page: "1"
@@ -186,7 +653,8 @@ async function searchTypesenseModal(query){
 const COMPARE_MAX = 3;
 const ICON_CHECK = `<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`;
 const ICON_LINK = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>`;
-const ICON_DOC = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>`;
+const ICON_DOWNLOAD = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>`;
+const ICON_BULB = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18h6M10 22h4"/><path d="M12 2a7 7 0 0 0-4 12.9V17h8v-2.1A7 7 0 0 0 12 2z"/></svg>`;
 const SPEC_TIP_MARK = `<svg class="spec-tip__mark" viewBox="0 0 16 16" fill="none" aria-hidden="true"><circle cx="8" cy="8" r="6.25" stroke="currentColor" stroke-width="1.4"/><path d="M8 7.2v4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><circle cx="8" cy="5.1" r="0.9" fill="currentColor"/></svg>`;
 
 let showOnlyDiffs = false;
@@ -321,12 +789,13 @@ function render(){
           <button class="remove" data-remove="${p.id}" title="Quitar de la comparación">
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
           </button>
-          <div class="thumb"><img src="${p.img}" alt=""></div>
+          ${productThumbHtml(p)}
           <div class="pname">${p.name}</div>
-          <div class="psku">SKU: ${p.sku}</div>
+          <div class="psku">${escAttr(p.sku)}</div>
+          ${variantPickerHtml(p)}
           <div class="phead-btns">
             <a class="btn btn-primary" href="${p.ficha}">${ICON_LINK} Ver producto</a>
-            <a class="btn btn-ghost" href="${p.ficha_pdf}" target="_blank" rel="noopener">${ICON_DOC} Ficha técnica</a>
+            <a class="btn btn-ghost" href="${p.ficha_pdf}" target="_blank" rel="noopener">${ICON_DOWNLOAD} Ficha técnica</a>
           </div>
         </div>`;
     }else{
@@ -364,11 +833,26 @@ function render(){
   });
 
   grid.innerHTML = html;
+  grid.setAttribute("aria-busy", "false");
 
   grid.querySelectorAll("[data-remove]").forEach(btn => {
     btn.addEventListener("click", () => {
       comparedProducts = comparedProducts.filter(p => p.id !== btn.dataset.remove);
       window.MacroledCompare.removeFromCompare(btn.dataset.remove);
+      render();
+    });
+  });
+  grid.querySelectorAll(".pvariant select").forEach(sel => {
+    sel.addEventListener("change", () => {
+      const principalSku = sel.dataset.principal;
+      const sku = sel.value;
+      comparedProducts = comparedProducts.map(p =>
+        p.principalSku === principalSku ? applyVariantToProduct(p, sku) : p
+      );
+      const updated = comparedProducts.find(p => p.principalSku === principalSku);
+      if(window.MacroledCompare.setCompareVariant){
+        window.MacroledCompare.setCompareVariant(principalSku, sku, updated && updated.img);
+      }
       render();
     });
   });
@@ -417,14 +901,14 @@ async function renderModalList(query){
   list.innerHTML = docs.map(doc => {
     const img = parseImages(doc)[0] || "";
     const sku = doc.sku || doc.id || "";
-    const already = comparedProducts.some(cp => cp.sku === sku);
+    const already = comparedProducts.some(cp => cp.principalSku === sku || cp.sku === sku);
     const disabledAtLimit = !already && comparedProducts.length >= COMPARE_MAX;
     const action = already
       ? `<span class="added">Ya agregado</span>`
       : `<button class="add-btn" data-sku="${escAttr(sku)}" ${disabledAtLimit ? "disabled" : ""}>+ Agregar</button>`;
     return `
       <div class="modal-item">
-        <div class="mi-thumb">${img ? `<img src="${img}" alt="">` : ""}</div>
+        <div class="mi-thumb">${img ? `<img src="${escAttr(img)}" alt="" loading="lazy" onerror="this.remove()">` : ""}</div>
         <div class="mi-info">
           <div class="mi-name">${doc.nombre_typesense || "Producto sin nombre"}</div>
           <div class="mi-sku">${sku}</div>
@@ -434,23 +918,15 @@ async function renderModalList(query){
   }).join("");
 
   list.querySelectorAll("[data-sku]").forEach(btn => {
-    btn.addEventListener("click", () => {
+    btn.addEventListener("click", async () => {
       if(comparedProducts.length >= COMPARE_MAX) return;
       const doc = modalCurrentDocs.find(d => (d.sku || d.id) === btn.dataset.sku);
       if(!doc) return;
-      const imgs = parseImages(doc);
       const sku = doc.sku || doc.id || "";
-      comparedProducts.push({
-        id: sku,
-        sku: sku,
-        family: doc.familia || doc.macrofamilia || "",
-        name: doc.nombre_typesense || "Producto sin nombre",
-        img: imgs[0] || "",
-        ficha: doc.link_ficha_web || "#",
-        ficha_pdf: doc.ficha_tecnica || "#",
-        specs: mapAtributosToSpecs(doc)
-      });
-      window.MacroledCompare.addToCompare({ sku, nombre: doc.nombre_typesense || "", img: imgs[0] || "" });
+      const imgs = parseImages(doc);
+      const hydrated = await hydrateComparedProduct(doc, sku, { principalSku: sku });
+      comparedProducts.push(hydrated);
+      window.MacroledCompare.addToCompare({ sku, nombre: hydrated.name || "", img: hydrated.img || imgs[0] || "" });
       closeModal();
       render();
     });
@@ -569,7 +1045,7 @@ function updateMiniHeader(){
   for(let i = 0; i < COMPARE_MAX; i++){
     const p = comparedProducts[i];
     html += p
-      ? `<div class="mini-cell"><div class="thumb"><img src="${p.img}" alt=""></div><div class="mini-info"><div class="name">${p.name}</div><div class="sku">SKU: ${p.sku}</div></div></div>`
+      ? `<div class="mini-cell"><div class="thumb">${p.img ? `<img src="${escAttr(p.img)}" alt="">` : ""}</div><div class="mini-info"><div class="name">${p.name}</div><div class="sku">${escAttr(currentVariantSummary(p))}</div></div></div>`
       : `<div class="mini-cell"></div>`;
   }
   miniGrid.innerHTML = html;
@@ -601,7 +1077,7 @@ document.getElementById("compareShell").addEventListener("scroll", function(){
    (compare.js) contra Typesense para traer los datos completos
    ========================================================= */
 async function resolveProductsFromStorage(){
-  const stored = window.MacroledCompare.getCompareList(); // [{sku, nombre, img}]
+  const stored = window.MacroledCompare.getCompareList(); // [{sku, nombre, img, variantSku}]
 
   if(!stored.length){
     comparedProducts = [];
@@ -609,43 +1085,42 @@ async function resolveProductsFromStorage(){
     return;
   }
 
-  const escaped = stored.map(p => `\`${p.sku}\``).join(",");
-  const params = new URLSearchParams({
-    q: "*",
-    query_by: "nombre_typesense",
-    filter_by: `sku:=[${escaped}]`,
-    include_fields: COMPARE_FIELDS,
-    per_page: String(stored.length)
-  });
-
   try{
-    const res = await fetch(`${TS_HOST}/collections/${COLLECTION}/documents/search?${params.toString()}`, {
-      headers: { "X-TYPESENSE-API-KEY": TS_API_KEY }
+    const principalDocs = await fetchDocsBySkus(stored.map(p => p.sku));
+    const bySku = {};
+    principalDocs.forEach(d => { bySku[d.sku] = d; });
+
+    const siblingSkus = [];
+    stored.forEach(p => {
+      const doc = bySku[p.sku];
+      if(doc) parseSkuList(doc.variantes_sku).forEach(s => siblingSkus.push(s));
+      if(p.variantSku) siblingSkus.push(p.variantSku);
     });
-    if(!res.ok) throw new Error(`Typesense ${res.status}`);
-    const data = await res.json();
-    const docsBySku = {};
-    (data.hits || []).forEach(h => { docsBySku[h.document.sku] = h.document; });
+    if(siblingSkus.length){
+      (await fetchDocsBySkus(siblingSkus)).forEach(d => { bySku[d.sku] = d; });
+    }
 
     comparedProducts = stored.map(p => {
-      const doc = docsBySku[p.sku];
-      if(!doc){
-        // el SKU guardado ya no existe en Typesense (o fue borrado) — lo
-        // mostramos igual con lo mínimo que teníamos guardado localmente
-        return { id: p.sku, sku: p.sku, family: "", name: p.nombre || p.sku, img: p.img || "", ficha: "#", ficha_pdf: "#", specs: {} };
+      const principal = bySku[p.sku];
+      if(!principal){
+        return { id: p.sku, principalSku: p.sku, sku: p.sku, family: "", name: p.nombre || p.sku, img: p.img || "", ficha: "#", ficha_pdf: "#", specs: {}, variants: [] };
       }
-      const imgs = parseImages(doc);
-      return {
-        id: doc.sku, sku: doc.sku, family: doc.familia || doc.macrofamilia || "",
-        name: doc.nombre_typesense || p.nombre || "Producto sin nombre",
-        img: imgs[0] || p.img || "",
-        ficha: doc.link_ficha_web || "#", ficha_pdf: doc.ficha_tecnica || "#",
-        specs: mapAtributosToSpecs(doc)
-      };
+      const skuSet = new Set(parseSkuList(principal.variantes_sku));
+      skuSet.add(principal.sku);
+      const sibs = [...skuSet].map(s => bySku[s]).filter(Boolean);
+      if(!sibs.some(d => d.sku === principal.sku)) sibs.unshift(principal);
+      const variants = sibs.length > 1 ? buildVariantOptions(sibs) : [];
+      const activeSku = (p.variantSku && bySku[p.variantSku]) ? p.variantSku : principal.sku;
+      return mapDocToCompared(bySku[activeSku] || principal, {
+        principalSku: p.sku,
+        nombre: p.nombre,
+        img: p.img,
+        variants
+      });
     });
   }catch(err){
     console.error("No se pudieron resolver los productos guardados contra Typesense:", err);
-    comparedProducts = stored.map(p => ({ id: p.sku, sku: p.sku, family: "", name: p.nombre || p.sku, img: p.img || "", ficha: "#", ficha_pdf: "#", specs: {} }));
+    comparedProducts = stored.map(p => ({ id: p.sku, principalSku: p.sku, sku: p.sku, family: "", name: p.nombre || p.sku, img: p.img || "", ficha: "#", ficha_pdf: "#", specs: {}, variants: [] }));
   }
   render();
 }
