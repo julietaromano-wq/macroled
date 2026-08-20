@@ -25,8 +25,13 @@
               </span>
               <div class="zoom-lens" id="zoomLens" aria-hidden="true"></div>
               <button type="button" class="zoom-btn" id="openLightboxBtn" aria-label="Ampliar">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
-                Ampliar
+                <span class="zoom-btn__enlarge">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+                  Ampliar
+                </span>
+                <span class="zoom-btn__share" aria-hidden="true">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4"/></svg>
+                </span>
               </button>
             </div>
             <div class="zoom-pane" id="zoomPane" aria-hidden="true"></div>
@@ -462,6 +467,51 @@
 
 <!-- Share toast -->
 <div class="share-toast" id="shareToast" role="status" aria-live="polite">Link copiado</div>
+
+<!-- Mobile share bottom sheet -->
+<div class="share-sheet" id="shareSheet" hidden>
+  <button type="button" class="share-sheet__backdrop" id="shareSheetBackdrop" aria-label="Cerrar"></button>
+  <div class="share-sheet__panel" role="dialog" aria-modal="true" aria-labelledby="shareSheetTitle">
+    <div class="share-sheet__head">
+      <h2 class="share-sheet__title" id="shareSheetTitle">Compartí este producto</h2>
+      <button type="button" class="share-sheet__close" id="shareSheetClose" aria-label="Cerrar">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+      </button>
+    </div>
+    <div class="share-sheet__grid" role="menu">
+      <a class="share-sheet__opt" data-share="whatsapp" role="menuitem" target="_blank" rel="noopener">
+        <span class="share-sheet__icon share-sheet__icon--wa" aria-hidden="true">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.7 14.9L2 22l5.3-1.4A10 10 0 1 0 12 2zm0 18a8 8 0 0 1-4.1-1.1l-.3-.2-3.1.8.8-3-.2-.3A8 8 0 1 1 12 20zm4.4-5.7c-.2-.1-1.4-.7-1.6-.8s-.4-.1-.5.1-.6.8-.7.9-.3.2-.5.1a6.6 6.6 0 0 1-3.2-2.8c-.2-.4.2-.4.6-1.3.1-.1 0-.3 0-.4l-.8-1.9c-.2-.5-.4-.4-.5-.4h-.5c-.2 0-.4.1-.6.3s-.8.8-.8 1.9.8 2.2.9 2.3a9.3 9.3 0 0 0 3.5 3.1c1.3.6 1.8.6 2.4.5.4-.1 1.4-.6 1.6-1.1.2-.6.2-1 .1-1.1s-.2-.2-.4-.3z"/></svg>
+        </span>
+        <span class="share-sheet__label">WhatsApp</span>
+      </a>
+      <button type="button" class="share-sheet__opt" data-share="copy" role="menuitem">
+        <span class="share-sheet__icon" aria-hidden="true">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.07 0l1.41-1.41a5 5 0 0 0-7.07-7.07L10 5"/><path d="M14 11a5 5 0 0 0-7.07 0L5.52 12.4a5 5 0 0 0 7.07 7.07L14 19"/></svg>
+        </span>
+        <span class="share-sheet__label">Copiar<br>enlace</span>
+      </button>
+      <a class="share-sheet__opt" data-share="linkedin" role="menuitem" target="_blank" rel="noopener">
+        <span class="share-sheet__icon share-sheet__icon--in" aria-hidden="true">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M6.5 8.5A2 2 0 1 1 6.5 4.5a2 2 0 0 1 0 4zM4.8 10h3.4v10H4.8zM13.2 10c-1.7 0-2.5.9-2.9 1.6V10H7.2v10h3.1v-5.4c0-1.4.7-2.3 1.9-2.3s1.7.8 1.7 2.3V20H17v-5.9C16.9 11.4 15.4 10 13.2 10z"/></svg>
+        </span>
+        <span class="share-sheet__label">LinkedIn</span>
+      </a>
+      <a class="share-sheet__opt" data-share="email" role="menuitem">
+        <span class="share-sheet__icon" aria-hidden="true">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 6h16v12H4z"/><path d="M4 7l8 6 8-6"/></svg>
+        </span>
+        <span class="share-sheet__label">E-mail</span>
+      </a>
+      <button type="button" class="share-sheet__opt" data-share="native" role="menuitem" id="shareSheetNative" hidden>
+        <span class="share-sheet__icon" aria-hidden="true">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4"/></svg>
+        </span>
+        <span class="share-sheet__label">Más</span>
+      </button>
+    </div>
+  </div>
+</div>
 
 <div class="compare-bar" id="compareBar" style="display:none;">
   <div class="compare-bar-inner">
