@@ -156,8 +156,8 @@ body.newsletter-open {
 }
 
 .nl-pill:focus-within {
-  border-color: #a8a7a7;
-  box-shadow: 0 0 0 3px rgba(23, 27, 38, 0.06);
+  border-color: #0086b5;
+  box-shadow: 0 0 0 3px rgba(0, 134, 181, 0.15);
 }
 
 .nl-border-label {

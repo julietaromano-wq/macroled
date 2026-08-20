@@ -5788,18 +5788,32 @@ a.ml-news-card:focus-visible .ml-news-card__arrow {
 
 /* Highlight label */
 .ml-home .ml-highlight-badge {
-  padding: 0.3rem 0.5rem;
+  display: inline-flex;
+  align-items: center;
+  padding: 0.45rem 0.7rem;
   border-radius: 999px;
-  background: #c9b376;
+  background: #ddca97;
   color: var(--ml-dark-blue-700);
-  font-size: var(--ml-type-label-highlight-size);
-  font-weight: var(--ml-type-label-highlight-weight);
-  line-height: var(--ml-type-label-leading);
-  letter-spacing: var(--ml-type-label-highlight-tracking);
+  box-shadow: 0 3px 10px rgba(201, 179, 118, 0.35);
+  font-size: 0.68rem;
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  white-space: nowrap;
 }
 
-.ml-home .ml-category-card__badge {
-  background: #e2d09e;
+.ml-home .ml-highlight-badge.ml-project-lines-concept__badge {
+  padding: 0.55rem 0.85rem;
+  background: #c9b376;
+  font-size: 0.78rem;
+  letter-spacing: 0;
+}
+
+@media (min-width: 641px) {
+  .ml-home .ml-highlight-badge.ml-project-lines-concept__badge {
+    line-height: 0.85;
+  }
 }
 
 .ml-home .ml-product-attr__value {
@@ -7463,8 +7477,8 @@ body.newsletter-open {
 }
 
 .nl-pill:focus-within {
-  border-color: #a8a7a7;
-  box-shadow: 0 0 0 3px rgba(23, 27, 38, 0.06);
+  border-color: #0086b5;
+  box-shadow: 0 0 0 3px rgba(0, 134, 181, 0.15);
 }
 
 .nl-border-label {
