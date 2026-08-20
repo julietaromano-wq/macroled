@@ -156,8 +156,8 @@ body.newsletter-open {
 }
 
 .nl-pill:focus-within {
-  border-color: #a8a7a7;
-  box-shadow: 0 0 0 3px rgba(23, 27, 38, 0.06);
+  border-color: #0086b5;
+  box-shadow: 0 0 0 3px rgba(0, 134, 181, 0.15);
 }
 
 .nl-border-label {
@@ -263,8 +263,11 @@ body.newsletter-open {
   position: absolute;
   left: 0;
   right: 0;
-  top: calc(100% + 8px);
-  bottom: auto;
+  width: 100%;
+  min-width: 100%;
+  max-width: none;
+  top: auto;
+  bottom: calc(100% + 8px);
   max-height: 220px;
   overflow-x: hidden;
   overflow-y: auto;
@@ -296,7 +299,7 @@ body.newsletter-open {
 
 .nl-select-option:hover,
 .nl-select-option.is-active {
-  background: #f2f4f7;
+  background-color: rgb(227, 242, 253);
 }
 
 .nl-select-option:disabled {
