@@ -191,7 +191,11 @@
 
     stageEl.classList.toggle("is-video", video);
     if (openLightboxBtn) {
-      openLightboxBtn.setAttribute("aria-label", video ? "Ampliar video" : "Ampliar imagen");
+      const mobileShare = window.matchMedia("(max-width: 640px)").matches;
+      openLightboxBtn.setAttribute(
+        "aria-label",
+        mobileShare ? "Compartir" : video ? "Ampliar video" : "Ampliar imagen"
+      );
     }
 
     if (g.type === "html5video" && stageVideo) {
@@ -357,7 +361,32 @@
     if (e.target.closest("video") && stageVideo && !stageVideo.hidden) return;
     onOpenGallery(e);
   });
-  if (openLightboxBtn) openLightboxBtn.addEventListener("click", onOpenGallery);
+  const mqShareInStage = window.matchMedia("(max-width: 640px)");
+  function syncStageCornerLabel() {
+    if (!openLightboxBtn || !GALLERY.length) return;
+    const g = GALLERY[activeIndex];
+    const video = g && isVideoType(g.type);
+    openLightboxBtn.setAttribute(
+      "aria-label",
+      mqShareInStage.matches ? "Compartir" : video ? "Ampliar video" : "Ampliar imagen"
+    );
+  }
+  mqShareInStage.addEventListener?.("change", syncStageCornerLabel);
+
+  if (openLightboxBtn) {
+    openLightboxBtn.addEventListener("click", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      if (mqShareInStage.matches) {
+        /* En mobile el botón abre compartir; el tap en la imagen sigue ampliando */
+        if (typeof window.__mlToggleShareFromStage === "function") {
+          window.__mlToggleShareFromStage(openLightboxBtn);
+        }
+        return;
+      }
+      onOpenGallery(e);
+    });
+  }
 
   window.MacroledFicha = { setGallery, setActive, getGallery: () => GALLERY };
 
@@ -2657,9 +2686,15 @@
   /* —— Share —— */
   const shareBtn = document.getElementById("shareBtn");
   const shareMenu = document.getElementById("shareMenu");
+  const shareSheet = document.getElementById("shareSheet");
+  const shareSheetBackdrop = document.getElementById("shareSheetBackdrop");
+  const shareSheetClose = document.getElementById("shareSheetClose");
+  const shareSheetNative = document.getElementById("shareSheetNative");
   const shareToast = document.getElementById("shareToast");
   const shareNativeOpt = document.getElementById("shareNativeOpt");
   const canNativeShare = typeof navigator.share === "function";
+  const mqShareMobile = window.matchMedia("(max-width: 640px)");
+  let shareOpen = false;
 
   function sharePayload() {
     const sku = (document.getElementById("ficha-sku") || {}).textContent || "SPACE-B";
@@ -2671,21 +2706,83 @@
 
   function setShareLinks() {
     const { title, text, url } = sharePayload();
-    shareMenu.querySelector('[data-share="whatsapp"]').href = `https://wa.me/?text=${encodeURIComponent(`${text}\n${url}`)}`;
-    shareMenu.querySelector('[data-share="linkedin"]').href = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`;
-    shareMenu.querySelector('[data-share="email"]').href = `mailto:?subject=${encodeURIComponent(title)}&body=${encodeURIComponent(`${text}\n\n${url}`)}`;
+    const wa = `https://wa.me/?text=${encodeURIComponent(`${text}\n${url}`)}`;
+    const li = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`;
+    const mail = `mailto:?subject=${encodeURIComponent(title)}&body=${encodeURIComponent(`${text}\n\n${url}`)}`;
+    document.querySelectorAll('[data-share="whatsapp"]').forEach((el) => {
+      if (el.tagName === "A") el.href = wa;
+    });
+    document.querySelectorAll('[data-share="linkedin"]').forEach((el) => {
+      if (el.tagName === "A") el.href = li;
+    });
+    document.querySelectorAll('[data-share="email"]').forEach((el) => {
+      if (el.tagName === "A") el.href = mail;
+    });
+  }
+
+  function isShareSheetOpen() {
+    return !!(shareSheet && shareSheet.classList.contains("is-open"));
+  }
+
+  function openShareSheet() {
+    if (!shareSheet) return;
+    setShareLinks();
+    if (canNativeShare && shareSheetNative) shareSheetNative.hidden = false;
+    shareSheet.hidden = false;
+    document.body.classList.add("share-sheet-open");
+    requestAnimationFrame(() => {
+      shareSheet.classList.add("is-open");
+    });
+    shareOpen = true;
+    if (shareBtn) shareBtn.setAttribute("aria-expanded", "true");
+    if (openLightboxBtn) openLightboxBtn.setAttribute("aria-expanded", "true");
+  }
+
+  function closeShareSheet() {
+    if (!shareSheet) return;
+    shareSheet.classList.remove("is-open");
+    document.body.classList.remove("share-sheet-open");
+    const finish = () => {
+      if (!shareSheet.classList.contains("is-open")) shareSheet.hidden = true;
+    };
+    shareSheet.addEventListener("transitionend", finish, { once: true });
+    setTimeout(finish, 360);
+    shareOpen = false;
+    if (shareBtn) shareBtn.setAttribute("aria-expanded", "false");
+    if (openLightboxBtn) openLightboxBtn.setAttribute("aria-expanded", "false");
   }
 
   function openShareMenu() {
     setShareLinks();
-    if (canNativeShare) shareNativeOpt.hidden = false;
-    shareMenu.hidden = false;
-    shareBtn.setAttribute("aria-expanded", "true");
+    if (mqShareMobile.matches) {
+      openShareSheet();
+      return;
+    }
+    if (canNativeShare && shareNativeOpt) shareNativeOpt.hidden = false;
+    if (shareMenu) shareMenu.hidden = false;
+    shareOpen = true;
+    if (shareBtn) shareBtn.setAttribute("aria-expanded", "true");
   }
+
   function closeShareMenu() {
-    shareMenu.hidden = true;
-    shareBtn.setAttribute("aria-expanded", "false");
+    if (mqShareMobile.matches || isShareSheetOpen()) {
+      closeShareSheet();
+      return;
+    }
+    if (shareMenu) shareMenu.hidden = true;
+    shareOpen = false;
+    if (shareBtn) shareBtn.setAttribute("aria-expanded", "false");
+    if (openLightboxBtn) openLightboxBtn.setAttribute("aria-expanded", "false");
   }
+
+  function toggleShareFromStage() {
+    if (isShareSheetOpen() || (shareOpen && mqShareMobile.matches)) {
+      closeShareMenu();
+      return;
+    }
+    openShareMenu();
+  }
+  window.__mlToggleShareFromStage = toggleShareFromStage;
 
   function showShareToast(msg) {
     shareToast.textContent = msg;
@@ -2718,12 +2815,7 @@
     }
   }
 
-  shareBtn.addEventListener("click", (e) => {
-    e.stopPropagation();
-    if (shareMenu.hidden) openShareMenu();
-    else closeShareMenu();
-  });
-  shareMenu.addEventListener("click", async (e) => {
+  async function handleShareAction(e) {
     const opt = e.target.closest("[data-share]");
     if (!opt) return;
     const type = opt.getAttribute("data-share");
@@ -2736,14 +2828,50 @@
       closeShareMenu();
       await nativeShare();
     } else {
+      /* links externos: cerrar después del tap */
+      closeShareMenu();
+    }
+  }
+
+  if (shareBtn) {
+    shareBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      if (shareOpen || isShareSheetOpen() || (shareMenu && !shareMenu.hidden)) closeShareMenu();
+      else openShareMenu();
+    });
+  }
+  if (shareMenu) shareMenu.addEventListener("click", handleShareAction);
+  if (shareSheet) shareSheet.addEventListener("click", handleShareAction);
+  if (shareSheetBackdrop) {
+    shareSheetBackdrop.addEventListener("click", (e) => {
+      e.preventDefault();
+      closeShareMenu();
+    });
+  }
+  if (shareSheetClose) {
+    shareSheetClose.addEventListener("click", (e) => {
+      e.preventDefault();
+      closeShareMenu();
+    });
+  }
+  document.addEventListener("click", (e) => {
+    if (mqShareMobile.matches) return;
+    if (!shareMenu || shareMenu.hidden) return;
+    if (e.target.closest(".share-wrap")) return;
+    if (e.target.closest(".share-menu")) return;
+    closeShareMenu();
+  });
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && (shareOpen || isShareSheetOpen() || (shareMenu && !shareMenu.hidden))) {
       closeShareMenu();
     }
   });
-  document.addEventListener("click", (e) => {
-    if (!shareMenu.hidden && !e.target.closest(".share-wrap")) closeShareMenu();
-  });
-  document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape" && !shareMenu.hidden) closeShareMenu();
+  mqShareMobile.addEventListener?.("change", () => {
+    if (!mqShareMobile.matches && isShareSheetOpen()) closeShareSheet();
+    if (mqShareMobile.matches && shareMenu && !shareMenu.hidden) {
+      shareMenu.hidden = true;
+      openShareSheet();
+    }
   });
 
   /* Scroll / entrance reveals */

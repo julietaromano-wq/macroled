@@ -228,6 +228,8 @@ main{padding:clamp(12px,2vw,24px) clamp(12px,2vw,24px) 0;}
   border-radius:var(--radius-sm);padding:9px 12px;
   font-size:12px;font-weight:600;color:var(--ink);cursor:pointer;
 }
+.zoom-btn__enlarge{display:inline-flex;align-items:center;gap:7px;}
+.zoom-btn__share{display:none;align-items:center;justify-content:center;}
 .zoom-btn:hover{
   border-color:var(--line-hover);background:var(--bg-card);color:var(--ink);
 }
@@ -305,6 +307,9 @@ main{padding:clamp(12px,2vw,24px) clamp(12px,2vw,24px) 0;}
   box-shadow:0 10px 28px rgba(0,21,43,.25);
 }
 .share-toast.is-on{opacity:1;transform:translateX(-50%) translateY(0);}
+
+/* Mobile share sheet — oculto en desktop */
+.share-sheet{display:none;}
 
 /* Info column — sin max-width fijo para aprovechar el ancho con galería más ancha */
 .hero .info{min-width:0;position:relative;z-index:1;}
@@ -2009,16 +2014,102 @@ body.assistant-open .ai-launch{
     width:64px;height:64px;flex:none;
     scroll-snap-align:start;
   }
-  .gallery-actions{justify-content:flex-start;padding-top:2px;}
-  .share-menu{
-    bottom:auto;top:calc(100% + 8px);
-  }
-  .stage{cursor:pointer;border-radius:10px;}
+  .gallery-actions{display:none !important;}
+  .share-menu{display:none !important;}
+  .stage{cursor:pointer;border-radius:10px;touch-action:pan-y;}
   .stage-img{padding:20px 16px;}
   .zoom-lens,.zoom-pane{display:none !important;}
+  /* Ampliar → Compartir en la misma esquina */
   .zoom-btn{
     bottom:12px;right:12px;
-    padding:8px 10px;
+    padding:10px;
+    min-width:40px;min-height:40px;
+    justify-content:center;
+    border-radius:10px;
+  }
+  .zoom-btn__enlarge{display:none;}
+  .zoom-btn__share{display:inline-flex;}
+
+  /* Bottom sheet compartir */
+  .share-sheet{
+    display:block;
+    position:fixed;inset:0;z-index:560;
+    pointer-events:none;
+  }
+  .share-sheet[hidden]{display:none !important;}
+  .share-sheet.is-open{pointer-events:auto;}
+  .share-sheet__backdrop{
+    position:absolute;inset:0;
+    border:0;padding:0;margin:0;cursor:pointer;
+    background:rgba(20,24,32,.48);
+    opacity:0;
+    transition:opacity .28s ease;
+  }
+  .share-sheet.is-open .share-sheet__backdrop{opacity:1;}
+  .share-sheet__panel{
+    position:absolute;left:0;right:0;bottom:0;
+    background:#fff;
+    border-radius:20px 20px 0 0;
+    padding:20px 20px calc(22px + env(safe-area-inset-bottom,0px));
+    box-shadow:0 -10px 40px rgba(0,21,43,.16);
+    transform:translateY(110%);
+    transition:transform .32s cubic-bezier(.22,1,.36,1);
+  }
+  .share-sheet.is-open .share-sheet__panel{transform:translateY(0);}
+  .share-sheet__head{
+    display:flex;align-items:center;justify-content:space-between;
+    gap:12px;margin:0 0 22px;
+  }
+  .share-sheet__title{
+    margin:0;font-size:17px;font-weight:700;letter-spacing:-.02em;
+    color:#1a1f27;line-height:1.25;
+  }
+  .share-sheet__close{
+    flex:none;width:36px;height:36px;border:0;border-radius:50%;
+    background:transparent;color:#3a4150;cursor:pointer;
+    display:grid;place-items:center;
+  }
+  .share-sheet__close:active{background:rgba(0,0,0,.06);}
+  .share-sheet__grid{
+    display:flex;align-items:flex-start;justify-content:space-between;
+    gap:8px;width:100%;
+  }
+  .share-sheet__opt{
+    flex:1 1 0;min-width:0;
+    display:flex;flex-direction:column;align-items:center;gap:10px;
+    border:0;background:transparent;padding:0;cursor:pointer;
+    text-decoration:none;color:#1a1f27;
+    -webkit-tap-highlight-color:transparent;
+  }
+  .share-sheet__icon{
+    width:56px;height:56px;border-radius:50%;
+    border:1px solid #d9dde3;
+    background:#fff;
+    display:grid;place-items:center;
+    color:#1a1f27;
+    transition:background .15s ease,transform .15s ease;
+  }
+  .share-sheet__opt:active .share-sheet__icon{
+    background:#f3f5f7;transform:scale(.96);
+  }
+  .share-sheet__icon--wa{color:#25D366;}
+  .share-sheet__icon--in{color:#0A66C2;}
+  .share-sheet__label{
+    font-size:12px;font-weight:500;line-height:1.25;
+    text-align:center;color:#1a1f27;
+  }
+  .share-toast{
+    bottom:calc(28px + env(safe-area-inset-bottom,0px));
+    z-index:570;
+  }
+  body.share-sheet-open{overflow:hidden;}
+  body.share-sheet-open .share-toast{
+    bottom:min(42vh, 280px);
+  }
+  body.share-sheet-open .ai-launch,
+  body.share-sheet-open .ai-backdrop,
+  body.share-sheet-open .ai-panel{
+    z-index:1 !important;
   }
 
   .eyebrow{letter-spacing:.1em;}
@@ -2184,6 +2275,10 @@ body.assistant-open .ai-launch{
 /* —— Webflow isolation ——
    Reassert ficha type/color so Designer globals (body color, bold inheritance,
    link styles) don't alter the local design. Keep this stylesheet last in Head. */
+/* El Embed de Webflow que envuelve este código trae la clase .embed_fichas con un
+   padding-top propio desde el Designer. Se anula acá para que el espaciado real
+   lo controle solo main{padding:...} de este archivo. */
+.embed_fichas{padding-top:0 !important;}
 /* Webflow's own compiled CSS ships a bare `a{flex:1;}` rule (for some Designer
    component elsewhere on the site). Since .crumb's links are plain <a> tags
    with no Webflow classes, that rule reaches them too and stretches "Productos"
