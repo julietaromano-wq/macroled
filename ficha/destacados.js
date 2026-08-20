@@ -514,7 +514,11 @@
   /* Prioridad: misma familia dentro de la misma macrofamilia; luego completar
      solo con productos de esa macrofamilia. */
   function buildRelatedFilters(ctx, sku) {
-    const excludeParts = [];
+    /* Sin este filtro, dos variantes (color/temperatura) del mismo modelo
+       pueden ocupar dos slots del carrusel en vez de sugerir productos
+       distintos. es_principal:true deja pasar solo el SKU representante
+       de cada familia de variantes. */
+    const excludeParts = ["es_principal:=true"];
     if (sku) {
       excludeParts.push(`sku:!="${fb(sku)}"`);
       excludeParts.push(`variantes_sku:!="${fb(sku)}"`);
