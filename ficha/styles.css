@@ -316,7 +316,7 @@ main{padding:clamp(12px,2vw,24px) clamp(12px,2vw,24px) 0;}
 .info h1{
   margin:0 0 clamp(16px,2.5vw,30px);
   font-size:var(--fs-title);
-  font-weight:800;letter-spacing:-.035em;line-height:1.08;
+  font-weight:600;letter-spacing:-.02em;line-height:1.15;
   color:var(--navy);
   text-wrap:balance;
 }
@@ -1104,7 +1104,7 @@ body.assistant-open .ai-launch{
 .ml-related-products__head h2{
   margin:0;
   font-size:clamp(1.5rem,1.15rem + 1.35vw,1.85rem);
-  font-weight:800;color:var(--navy);letter-spacing:-.02em;
+  font-weight:600;color:var(--navy);letter-spacing:-.02em;line-height:1.15;
   text-wrap:balance;
 }
 .ml-related-products__head .link-more{
@@ -1536,12 +1536,18 @@ body.assistant-open .ai-launch{
     flex-basis:calc((100% - 1rem) / 2);
   }
   .ml-product-card__title{font-size:1rem;}
-  .ml-product-card__spec-label{font-size:.7rem;}
-  .ml-product-card__spec-value{font-size:.75rem;}
+  .ml-product-card__spec-label{font-size:14px;}
+  .ml-product-card__spec-value{font-size:15px;}
+}
+/* Mismo corte que .ml-home .ml-product-card en home.css: la tipografía de
+   la card se achica recién a 560px, no en el corte de layout de 640px. */
+@media (max-width:560px){
+  .ml-product-card{padding:.6rem;border-radius:.75rem;}
+  .ml-product-card__title{margin-bottom:6px;font-size:15px;}
+  .ml-product-card__spec-label{font-size:13px;}
+  .ml-product-card__spec-value{font-size:14px;}
 }
 @media (max-width:640px){
-  .ml-product-card{padding:.6rem;border-radius:.75rem;}
-  .ml-product-card__title{margin-bottom:6px;font-size:.9rem;}
   .ml-product-variant-badge{max-width:52%;padding:5px 9px;font-size:.68rem;}
   .ml-product-card .temp-dots{right:5px;bottom:5px;max-width:46%;padding:4px 6px;}
   .ml-product-card .temp-dots .luz-dot{width:8px;height:8px;}
@@ -2015,7 +2021,6 @@ body.assistant-open .ai-launch{
     padding:8px 10px;
   }
 
-  .info h1{letter-spacing:-.03em;line-height:1.1;}
   .eyebrow{letter-spacing:.1em;}
 
   .quick-specs{padding:12px 4px;border-radius:12px;}
@@ -2261,7 +2266,7 @@ body.assistant-open .ai-launch{
 }
 .compare-row:has(input:checked){font-weight:700;}
 .info h1{
-  font-weight:800;
+  font-weight:600;
   color:var(--navy);
 }
 .btn-primary,
