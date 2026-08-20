@@ -296,7 +296,7 @@ body.newsletter-open {
 
 .nl-select-option:hover,
 .nl-select-option.is-active {
-  background: #f2f4f7;
+  background-color: rgb(227, 242, 253);
 }
 
 .nl-select-option:disabled {
