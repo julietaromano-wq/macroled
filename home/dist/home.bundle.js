@@ -769,7 +769,10 @@
     const banners = [...root.querySelectorAll("[data-expand-banner]")];
     if (!banners.length) return;
 
-    if (matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    if (
+      matchMedia("(max-width: 640px)").matches ||
+      matchMedia("(prefers-reduced-motion: reduce)").matches
+    ) {
       banners.forEach(banner => banner.style.setProperty("--ml-expand-progress", "1"));
       return;
     }
@@ -1294,6 +1297,7 @@
 
   function initSectionMotion() {
     if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const isMobile = matchMedia("(max-width: 640px)").matches;
 
     const solutionsSection = root.querySelector("[data-solutions-banner]");
     const projectSection = root.querySelector("[data-project-lines-concept]");
@@ -1725,7 +1729,7 @@
       observer.observe(conversionSection);
     }
 
-    if (newsletterSection) {
+    if (newsletterSection && !isMobile) {
       let newsletterPending = false;
       newsletterSection.classList.add("ml-newsletter-motion-ready");
 
