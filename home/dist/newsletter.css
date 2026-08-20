@@ -263,6 +263,9 @@ body.newsletter-open {
   position: absolute;
   left: 0;
   right: 0;
+  width: 100%;
+  min-width: 100%;
+  max-width: none;
   top: auto;
   bottom: calc(100% + 8px);
   max-height: 220px;
