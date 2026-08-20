@@ -28,6 +28,10 @@
     menu.className = "nl-select-menu";
     menu.setAttribute("role", "listbox");
 
+    const menuViewport = document.createElement("div");
+    menuViewport.className = "nl-select-menu__viewport";
+    menu.appendChild(menuViewport);
+
     const labelText = trigger.querySelector(".nl-select-trigger-text");
 
     const syncFromSelect = () => {
@@ -43,6 +47,8 @@
     const closeMenu = () => {
       wrap.classList.remove("nl-select-open");
       trigger.setAttribute("aria-expanded", "false");
+      menu.style.removeProperty("max-height");
+      menu.style.removeProperty("--nl-menu-max-height");
     };
 
     const openMenu = () => {
@@ -51,23 +57,30 @@
       });
       wrap.classList.add("nl-select-open");
       trigger.setAttribute("aria-expanded", "true");
+
+      const popupBottom = popup.getBoundingClientRect().bottom;
+      const menuTop = menu.getBoundingClientRect().top;
+      const availableHeight = Math.max(0, Math.floor(popupBottom - menuTop - 16));
+      const menuMaxHeight = Math.min(220, availableHeight);
+      menu.style.maxHeight = `${menuMaxHeight}px`;
+      menu.style.setProperty("--nl-menu-max-height", `${menuMaxHeight}px`);
     };
 
     Array.prototype.forEach.call(select.options, opt => {
+      if (opt.disabled || opt.value === "") return;
+
       const btn = document.createElement("button");
       btn.type = "button";
       btn.className = "nl-select-option";
       btn.textContent = opt.textContent;
       btn.dataset.value = opt.value;
-      if (opt.disabled) btn.disabled = true;
       btn.addEventListener("click", () => {
-        if (opt.disabled) return;
         select.value = opt.value;
         select.dispatchEvent(new Event("change", { bubbles: true }));
         syncFromSelect();
         closeMenu();
       });
-      menu.appendChild(btn);
+      menuViewport.appendChild(btn);
     });
 
     trigger.addEventListener("click", event => {
