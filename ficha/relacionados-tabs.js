@@ -209,10 +209,33 @@
       });
   }
 
-  function readContext() {
-    const el =
+  // El chip de variantes no mueve el atributo data-hero al cambiar de SKU
+  // (ver applyProduct en script.js), así que hay que ubicar el embed del
+  // producto ACTIVO por su data-sku para no quedarnos siempre con los
+  // relacionados del producto con el que cargó la página.
+  function findActiveProductItem() {
+    const activeSku = (
+      (window.__mlProductCtx && window.__mlProductCtx.sku) ||
+      document.getElementById("ficha-sku")?.textContent ||
+      ""
+    )
+      .trim()
+      .toUpperCase();
+    if (activeSku) {
+      const match = Array.prototype.find.call(
+        document.querySelectorAll(".cms-product-item[data-sku]"),
+        (el) => (el.getAttribute("data-sku") || "").trim().toUpperCase() === activeSku
+      );
+      if (match) return match;
+    }
+    return (
       document.querySelector(".cms-product-item[data-hero][data-sku]") ||
-      document.querySelector(".cms-product-item[data-sku]");
+      document.querySelector(".cms-product-item[data-sku]")
+    );
+  }
+
+  function readContext() {
+    const el = findActiveProductItem();
     if (!el) return null;
     const ctx = { sku: (el.getAttribute("data-sku") || "").trim().toUpperCase() };
     GROUPS.forEach((group) => {
@@ -412,7 +435,16 @@
   // en el CMS): se oculta el tab en vez de mostrarlo con un estado vacío.
   function hideTab(group) {
     const tab = document.getElementById(`tab-${group.key}`);
-    if (tab) tab.hidden = true;
+    if (!tab) return;
+    const wasActive = tab.classList.contains("is-active");
+    tab.hidden = true;
+    // Si el usuario estaba parado en un tab que la nueva variante ya no
+    // tiene (ej. cambió de "Interruptor simple" a uno sin despiece), no lo
+    // dejamos viendo un panel oculto: volvemos a "Especificaciones".
+    if (wasActive) {
+      const fallback = document.querySelector('.tab[data-tab="specs"]');
+      if (fallback) fallback.click();
+    }
   }
 
   function renderGroup(group, docs) {
@@ -430,24 +462,51 @@
     if (root) setupCarousel(root, track);
   }
 
-  async function loadGroup(group, ctx) {
+  // Se re-ejecuta cada vez que cambia la variante activa (ver listener de
+  // "ml-product-changed" más abajo), así que una carga vieja que todavía
+  // está en vuelo no puede pisar el resultado de una más nueva.
+  let loadSeq = 0;
+
+  async function loadGroup(group, ctx, seq) {
     const skuList = ctx[group.key];
     if (!skuList.length) return; // tab queda oculto, tal como viene en el HTML
     try {
       const docs = await fetchBySkus(
         skuList.filter((sku) => sku !== ctx.sku)
       );
+      if (seq !== loadSeq) return; // superado por otro cambio de variante
       renderGroup(group, docs);
     } catch (err) {
       console.warn(`[relacionados-tabs] error resolviendo "${group.key}":`, err);
-      renderGroup(group, []);
+      if (seq === loadSeq) renderGroup(group, []);
     }
   }
 
   async function loadRelated() {
     const ctx = readContext();
     if (!ctx) return;
-    for (const group of GROUPS) await loadGroup(group, ctx);
+    const seq = ++loadSeq;
+
+    // Estado de carga limpio antes de traer los datos de la nueva variante:
+    // si no, mientras llega la respuesta se ven un instante (o para siempre,
+    // si el nuevo SKU no tiene ese grupo) las cards del producto anterior.
+    // Ojo: esto NO es la decisión final de "este grupo no tiene datos" (por
+    // eso no dispara el fallback a "Especificaciones" que sí hace hideTab
+    // cuando la respuesta de Typesense confirma que el tab queda vacío).
+    GROUPS.forEach((group) => {
+      const track = document.getElementById(`${group.key}-grid`);
+      if (track) {
+        track.innerHTML = "";
+        track.setAttribute("aria-busy", "true");
+      }
+      const tab = document.getElementById(`tab-${group.key}`);
+      if (tab) tab.hidden = true;
+    });
+
+    for (const group of GROUPS) {
+      if (seq !== loadSeq) return;
+      await loadGroup(group, ctx, seq);
+    }
   }
 
   if (document.readyState === "loading") {
@@ -455,4 +514,7 @@
   } else {
     loadRelated();
   }
+
+  // Disparado por applyProduct() en script.js al elegir un chip de variante.
+  window.addEventListener("ml-product-changed", loadRelated);
 })();
