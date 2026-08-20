@@ -1553,13 +1553,14 @@ body.assistant-open .ai-launch{
   .ml-product-card__spec-value{font-size:14px;}
 }
 @media (max-width:640px){
-  .ml-product-variant-badge{max-width:52%;padding:5px 9px;font-size:.68rem;}
   .ml-product-card .temp-dots{right:5px;bottom:5px;max-width:46%;padding:4px 6px;}
   .ml-product-card .temp-dots .luz-dot{width:8px;height:8px;}
   .ml-product-card .temp-dots-label{font-size:11px;}
   .ml-related-products > .wrap{
     padding-bottom:30px;
   }
+  .ml-related-products__head h2{font-size:1.2rem;}
+  .ml-related-products__head .link-more{font-size:.875rem;}
   .ml-related-products__track,
   .ml-rel-carousel__track{
     width:100%;
