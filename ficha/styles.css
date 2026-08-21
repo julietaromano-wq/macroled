@@ -2128,6 +2128,7 @@ body.assistant-open .ai-launch{
   /* CTAs en mobile: apilados en columna, ancho completo */
   .actions{flex-direction:column;}
   .btn,.btn-primary,.btn-ghost{width:100%;flex-basis:auto;flex:none;}
+  #btn-ficha{font-size:.875rem;}
 
   /* Mobile: solo comparar; el launch flotante alcanza para preguntar */
   .cta-utility{
@@ -2178,8 +2179,8 @@ body.assistant-open .ai-launch{
   }
   .tabs::-webkit-scrollbar{display:none;}
   .tab{
-    padding:12px 10px;
-    font-size:12px;
+    padding:8px;
+    font-size:.875rem;
     flex:0 0 auto;
     min-width:max-content;
     text-align:center;

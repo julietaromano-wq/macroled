@@ -32,7 +32,18 @@
   }
 
   function isInCompare(sku) {
-    return getCompareList().some((p) => p.sku === sku);
+    return getCompareList().some((p) => p.sku === sku || p.variantSku === sku);
+  }
+
+  function setCompareVariant(principalSku, variantSku, img) {
+    if (!principalSku || !variantSku) return getCompareList();
+    const list = getCompareList();
+    const item = list.find((p) => p.sku === principalSku);
+    if (!item) return list;
+    item.variantSku = variantSku;
+    if (img) item.img = img;
+    saveCompareList(list);
+    return list;
   }
 
   function addToCompare(product) {
@@ -60,6 +71,7 @@
     MAX: COMPARE_MAX,
     getCompareList,
     addToCompare,
+    setCompareVariant,
     removeFromCompare,
     clearCompare,
     isInCompare,
