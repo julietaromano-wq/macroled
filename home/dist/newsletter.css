@@ -434,3 +434,20 @@ body.newsletter-open {
     font-size: 16px;
   }
 }
+
+/* Keep the visible crop proportional to the card at every viewport width. */
+.ml-home [data-project-lines-concept-card="street"] .ml-project-lines-concept__product {
+  right: -2% !important;
+  translate: none !important;
+}
+
+.ml-home [data-project-lines-concept-card="invictus"] .ml-project-lines-concept__product {
+  right: -25% !important;
+  aspect-ratio: auto;
+  translate: none !important;
+}
+
+.ml-home [data-project-lines-concept-card="highbay"] .ml-project-lines-concept__product {
+  right: -25% !important;
+  translate: none !important;
+}

@@ -109,6 +109,64 @@ sistema de variables de Figma; los valores están verificados contra
 **Regla dura**: no introducir colores nuevos fuera de esta paleta sin
 consultarlo antes.
 
+#### Variables CSS disponibles
+
+La paleta anterior es la referencia completa. La fuente de verdad ejecutable
+para los colores que ya consume la home está en el bloque `.ml-home` de
+`home/css/home.css`. Usar siempre estos nombres exactos desde los componentes:
+
+```css
+/* Neutros */
+--ml-grey-50: #ffffff;
+--ml-grey-100: #fafafa;
+--ml-grey-200: #f5f5f5;
+--ml-grey-300: #ededed;
+--ml-grey-400: #d7d7d7;
+--ml-grey-500: #7a7a78;
+--ml-grey-600: #5d5c5c;
+--ml-grey-700: #2c2b2b;
+--ml-grey-800: #1c1c1a;
+--ml-grey-900: #0a0a0a;
+
+/* Azul oscuro */
+--ml-dark-blue-50: #e6e9ec;
+--ml-dark-blue-100: #b0b9c3;
+--ml-dark-blue-200: #8a98a5;
+--ml-dark-blue-300: #54687c;
+--ml-dark-blue-400: #334b63;
+--ml-dark-blue-500: #001e3c;
+--ml-dark-blue-600: #001b37;
+--ml-dark-blue-700: #00152b;
+--ml-dark-blue-800: #001121;
+--ml-dark-blue-900: #000d19;
+
+/* Azul luminoso: subconjunto actualmente exportado */
+--ml-light-blue-50: #e6f8ff;
+--ml-light-blue-400: #4dccff;
+--ml-light-blue-500: #00bdff;
+--ml-light-blue-600: #00ace8;
+--ml-light-blue-700: #0086b5;
+--ml-light-blue-800: #00688c;
+```
+
+Los niveles Blue y los niveles `100`, `200`, `300` y `900` de Light blue
+pertenecen a la paleta de referencia, pero todavía no están exportados como
+variables CSS. No asumir que existen hasta declararlos en el bloque canónico.
+
+Aliases semánticos disponibles:
+
+```css
+--ml-action-primary: var(--ml-light-blue-700);
+--ml-action-primary-hover: var(--ml-light-blue-800);
+--ml-text-primary: var(--ml-grey-800);
+--ml-text-secondary: var(--ml-grey-600);
+--ml-text-inverse: var(--ml-grey-100);
+```
+
+Tokens locales de sección, como `--ml-monaco-tone`, `--ml-solutions-fade`,
+`--line-bg` y `--line-color`, no forman parte de la paleta global. Se usan
+únicamente dentro del componente o contenido que los declara.
+
 ### Espaciado
 
 Usar una única escala para `gap`, `margin`, `padding` y separación
@@ -184,60 +242,96 @@ El fondo del listado cambia con `--ml-panel-theme` mediante
 Usar `"Noto Sans", Arial, sans-serif`. La home carga Noto Sans en pesos
 300, 400, 500, 600, 700 y 800.
 
-La fuente de verdad tipográfica es la sección `Canonical typography
-scale`, ubicada al final de `home/css/home.css`. Los componentes se
-mapean a roles semánticos: no definir escalas nuevas según el elemento
-HTML (`h2`, `h3`, etc.) ni depender de la especificidad de selectores
-anteriores.
+La fuente de verdad ejecutable es la sección `Canonical typography scale`
+de `home/css/home.css`. Este documento registra el contrato del sistema;
+los componentes siempre deben consumir las variables `--ml-type-*` y no
+declarar escalas tipográficas paralelas.
 
 Reglas:
 
-- El tracking negativo está reservado exclusivamente para `Display XL`
-  y `Display L`.
-- Los headings de sección usan tracking normal. Los títulos grandes de
-  card y los títulos de categoría admiten un ajuste sutil de `-0.01em`.
-- Peso 300 se reserva para los títulos editoriales `Display L`.
-- Peso 500 se usa en el hero, headings de sección y headings grandes de
-  card.
-- Peso 600 se usa en headings de card, botones, controles y énfasis.
+- La escala principal contiene H1–H6. H7 es la variante compacta reservada
+  para los títulos de category cards del carrusel de Soluciones y de las
+  subfamilias en líneas destacadas.
+- H1 se reserva para el hero y H2 para los títulos principales de sección.
+- H3 se reserva para títulos editoriales de líneas destacadas. Su texto
+  base usa peso 300 y la parte enfatizada conserva el peso fuerte definido
+  por el contenido (`--title-emphasis-weight`, con fallback 600).
+- H4 queda reservado para encabezados intermedios.
+- H5 reúne los títulos de cards; reemplaza, entre otras, la antigua variante
+  `ml-type-heading-card-large`.
+- Peso 500 se usa en H1, H2 y H4. Peso 600 se usa para énfasis y controles.
 - Pesos 700/800 quedan reservados para énfasis puntual.
 - Los cuerpos usan interlíneas entre `1.55` y `1.6`.
 - Solo existe una adaptación tipográfica exclusiva para mobile:
-  `Display XL` cambia a `clamp(2.25rem, 10vw, 2.75rem)` hasta 640px.
+  H1 cambia a `clamp(2.5rem, 10vw, 2.75rem)` hasta 640px.
 
 Escala oficial:
 
+Cada nivel expone `size`, `weight`, `leading` y `tracking` mediante esta
+nomenclatura estable:
+
+```css
+--ml-type-h1-size;       --ml-type-h1-weight;       --ml-type-h1-leading;       --ml-type-h1-tracking;
+--ml-type-h2-size;       --ml-type-h2-weight;       --ml-type-h2-leading;       --ml-type-h2-tracking;
+--ml-type-h3-size;       --ml-type-h3-weight;       --ml-type-h3-leading;       --ml-type-h3-tracking;
+--ml-type-h4-size;       --ml-type-h4-weight;       --ml-type-h4-leading;       --ml-type-h4-tracking;
+--ml-type-h5-size;       --ml-type-h5-weight;       --ml-type-h5-leading;       --ml-type-h5-tracking;
+--ml-type-h6-size;       --ml-type-h6-weight;       --ml-type-h6-leading;       --ml-type-h6-tracking;
+--ml-type-h7-size;       --ml-type-h7-weight;       --ml-type-h7-leading;       --ml-type-h7-tracking;
+--ml-type-body-l-size;   --ml-type-body-l-weight;   --ml-type-body-l-leading;
+--ml-type-body-m-size;   --ml-type-body-m-weight;   --ml-type-body-m-leading;
+--ml-type-body-s-size;   --ml-type-body-s-weight;   --ml-type-body-s-leading;
+```
+
+H3 suma `--ml-type-h3-emphasis-weight` para la parte destacada del título.
+
 | Rol | Tamaño | Peso | Interlínea | Tracking |
 |---|---|---:|---:|---:|
-| Display XL | `clamp(2.25rem, calc(1.75rem + 2vw), 4.2rem)` | 500 | `1.02` | `-0.04em` |
-| Display L | `clamp(2.2rem, calc(1.8rem + 1.7vw), 3.5rem)` | 300 | `1.08` | `-0.025em` |
-| Heading section | `clamp(2rem, calc(1.75rem + 1vw), 2.9375rem)` | 500 | `1.15` | `0` |
-| Heading card large | `clamp(1.5rem, calc(1.3rem + 0.8vw), 2rem)` | 400 | `1.2` | `-0.01em` |
-| Heading product card | `clamp(1.05rem, calc(1rem + 0.4vw), 1.2rem)` | 600 | `1.3` | `0` |
-| Heading category card | `clamp(1.05rem, calc(1rem + 0.3vw), 1.4rem)` | 500 | `1.35` | `-0.01em` |
-| Heading news card | `clamp(1.2rem, calc(1.1rem + 0.5vw), 1.4rem)` | 600 | `1.3` | `0` |
+| H1 | `clamp(2.25rem, calc(1.85rem + 2vw), 4.25rem)` | 500 | `1.02` | `-0.04em` |
+| H2 | `clamp(2rem, calc(1.4rem + 1.6vw), 3.25rem)` | 500 | `1.15` | `-0.04em` |
+| H3 | `clamp(1.8rem, calc(1.45rem + 1.5vw), 3rem)` | 300 / énfasis 600 | `1.08` | `-0.025em` |
+| H4 | `clamp(1.75rem, calc(1.5rem + 1vw), 2.25rem)` | 500 | `1.15` | `-0.01em` |
+| H5 | `clamp(1.25rem, calc(1.05rem + 0.8vw), 1.75rem)` | 400 | `1.2` | `-0.01em` |
+| H6 | `clamp(1.2rem, calc(1.1rem + 0.5vw), 1.4rem)` | 500 | `1.3` | `0` |
+| H7 | `1.05rem` | 500 | `1.25` | `-0.01em` |
 | Body L | `clamp(1rem, calc(0.95rem + 0.25vw), 1rem)` | 400 | `1.6` | `0` |
 | Body M | `1rem` | 400 | `1.6` | `0` |
 | Body S | `0.875rem` | 400 | `1.55` | `0` |
-| Label | `0.75rem` | 500 | `1.3` | `0` |
-| Button | `1rem` (`0.875rem` hasta 1360px) | 600 | `1` | `0` |
 
 Mapeo principal:
 
 | Rol | Componentes |
 |---|---|
-| Display XL | Título del hero |
-| Display L | Títulos de líneas editoriales destacadas |
-| Heading section | Productos destacados, líneas profesionales, categorías, Casa FOA, novedades, FAQ y newsletter |
-| Heading card large | Títulos de tarjetas de líneas profesionales |
-| Heading product card | Títulos de producto en Destacados y líneas editoriales |
-| Heading category card | Títulos de “Explorá nuestras categorías” y subfamilias editoriales |
-| Heading news card | Títulos de novedades |
+| H1 | Título del hero |
+| H2 | Productos destacados, líneas profesionales, soluciones, Casa FOA, novedades, FAQ y newsletter |
+| H3 | Títulos editoriales de líneas destacadas |
+| H4 | Encabezados intermedios; reservado para futuras asignaciones |
+| H5 | Títulos de tarjetas de líneas profesionales |
+| H6 | Títulos de tarjetas de novedades |
+| H7 | Títulos de category cards del carrusel de Soluciones y de subfamilias en líneas destacadas |
 | Body L | Subtítulos de sección, descripciones editoriales y textos introductorios |
 | Body M | Estados de carga y mensajes generales |
 | Body S | Descripciones de novedades, respuestas FAQ y valores de atributos |
-| Label | Labels de atributos y badges |
-| Button | Botones, tabs y acciones |
+
+Las tipografías de labels, badges, botones, tabs y acciones pertenecen a sus
+componentes y no forman parte de la escala global H1–H7 / Body L–S.
+
+El título de las cards de producto es una excepción de componente: usa
+`1.05rem`, peso `600`, interlínea `1.3` y tracking `0`. No consume H5 porque
+su escala compacta forma parte del layout interno de la card.
+
+Todas las cards de producto —tanto en Destacados como dentro de las líneas—
+comparten el mismo componente y la misma jerarquía de color, sin overrides por
+contexto:
+
+- `.ml-product-card__title`: `--ml-grey-800`.
+- `.ml-product-attr__label`: `#94989c`.
+- `.ml-product-attr__value`: `--ml-grey-600`.
+
+Las cards se estiran a la altura de su fila o track. El área de
+`.ml-product-card__title` reserva siempre dos líneas (`min-height: 2.6em`) para
+que los atributos comiencen alineados y las cards con títulos de una o dos
+líneas conserven la misma altura.
 
 ## Layout y responsive
 

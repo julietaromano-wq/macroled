@@ -15,7 +15,7 @@
       id: "invictus",
       title: "Invictus",
       subtitle: "Para grandes áreas, fachadas y espacios deportivos.",
-      productImage: "https://s3.coresagroup.com/MACROLED/WEB/HOME/invictus.png",
+      productImage: "https://s3.coresagroup.com/MACROLED/WEB/HOME/invictus.png?v=20260821-1",
       ambientImage: "https://s3.coresagroup.com/MACROLED/WEB/HOME/invictus_ambient.png",
       href: "https://macroled.webflow.io/nuevo-productos?macrofamilia=Luminarias+de+Proyecto&familia=Invictus"
     },

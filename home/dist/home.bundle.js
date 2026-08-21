@@ -177,28 +177,26 @@
     ],
     faq: [
       {
-        question: "¿Cómo elijo la iluminación adecuada?",
-        answer: "Respuesta definitiva pendiente. El equipo de Macroled puede asesorarte según el uso, las dimensiones y la atmósfera buscada."
+        question: "¿Puedo recibir asesoramiento para mi proyecto lumínico?",
+        answer: "Sí. Nuestro equipo puede asesorarte de acuerdo con las necesidades de tu espacio o proyecto, considerando aspectos como sus dimensiones, el uso, los niveles de iluminación requeridos y la atmósfera que buscás crear. Podés usar el asistente de productos Macroled, integrado con inteligencia artificial, para encontrar soluciones en la web o contactarnos desde la sección Contacto para recibir una recomendación personalizada.",
+        emphasis: ["asistente de productos Macroled", "sección Contacto"]
       },
       {
         question: "¿Dónde encuentro la información técnica?",
-        answer: "Las fichas de los productos disponibles enlazan a su ficha web. También se podrá incorporar un acceso a descargas."
+        answer: "En la página de cada producto encontrás su ficha técnica, especificaciones e información comercial. Además, en la sección Descargas podés acceder a toda la documentación técnica disponible.",
+        emphasis: ["página de cada producto", "sección Descargas"]
       },
       {
         question: "¿Macroled trabaja con proyectos profesionales?",
         answer: "Sí. Nuestro equipo puede acompañarte en la elección de soluciones de iluminación para proyectos profesionales."
       },
       {
-        question: "¿Puedo recibir asesoramiento antes de elegir un producto?",
-        answer: "Sí. Contanos las características de tu espacio o proyecto y te ayudaremos a evaluar las alternativas disponibles."
-      },
-      {
         question: "¿Cómo puedo comparar distintas alternativas?",
-        answer: "Podés revisar la información de cada producto y consultar a nuestro equipo para comparar prestaciones según tu necesidad."
+        answer: "Podés revisar la información de cada producto, seleccionar los que te interesan y utilizar la función Comparar para evaluar sus características y prestaciones. Si necesitás orientación adicional, también podés consultar a nuestro equipo para encontrar la alternativa más adecuada para tu necesidad."
       },
       {
-        question: "¿Cómo me contacto con el equipo de Macroled?",
-        answer: "Ingresá a la sección de contacto y dejanos los datos de tu consulta para que podamos orientarte."
+        question: "¿Macroled vende a profesionales y también a consumidores finales?",
+        answer: "Sí. Somos fabricantes y comercializamos nuestros productos tanto a revendedores y proveedores como a consumidores finales. Contactanos para recibir información comercial y conocer la opción de compra más adecuada para tu necesidad."
       }
     ]
   };
@@ -622,7 +620,7 @@
       id: "invictus",
       title: "Invictus",
       subtitle: "Para grandes áreas, fachadas y espacios deportivos.",
-      productImage: "https://s3.coresagroup.com/MACROLED/WEB/HOME/invictus.png",
+      productImage: "https://s3.coresagroup.com/MACROLED/WEB/HOME/invictus.png?v=20260821-1",
       ambientImage: "https://s3.coresagroup.com/MACROLED/WEB/HOME/invictus_ambient.png",
       href: "https://macroled.webflow.io/nuevo-productos?macrofamilia=Luminarias+de+Proyecto&familia=Invictus"
     },
@@ -993,7 +991,15 @@
       const defaultImageClass = item.zoomDefaultImage ? " ml-news-card__image--zoomed" : "";
       return `<${tag} class="ml-news-card"${href}><div class="ml-news-card__media"><img class="ml-news-card__image ml-news-card__image--default${defaultImageClass}" src="${esc(item.image)}" alt="${esc(item.title)}" loading="lazy" width="700" height="560"><img class="ml-news-card__image ml-news-card__image--hover" src="${esc(hoverImage)}" alt="" aria-hidden="true" loading="lazy" width="700" height="560"></div><h3><span>${esc(item.title)}</span><span class="ml-news-card__arrow" aria-hidden="true">&rarr;</span></h3><p>${esc(item.description)}</p></${tag}>`;
     }).join("");
-    root.querySelector("[data-faq]").innerHTML = config.faq.map((item, index) => `<div class="ml-faq__item"><button class="ml-faq__trigger" type="button" aria-expanded="false" aria-controls="ml-faq-answer-${index}"><span>${esc(item.question)}</span><span class="ml-faq__icon" aria-hidden="true">＋</span></button><div class="ml-faq__answer" id="ml-faq-answer-${index}"><div><p>${esc(item.answer)}</p></div></div></div>`).join("");
+    root.querySelector("[data-faq]").innerHTML = config.faq.map((item, index) => {
+      const answer = esc(item.answer);
+      const emphasis = Array.isArray(item.emphasis) ? item.emphasis : item.emphasis ? [item.emphasis] : [];
+      const answerHtml = emphasis.reduce((html, phrase) => {
+        const escapedPhrase = esc(phrase);
+        return html.replace(escapedPhrase, `<strong>${escapedPhrase}</strong>`);
+      }, answer);
+      return `<div class="ml-faq__item"><button class="ml-faq__trigger" type="button" aria-expanded="false" aria-controls="ml-faq-answer-${index}"><span>${esc(item.question)}</span><span class="ml-faq__icon" aria-hidden="true">＋</span></button><div class="ml-faq__answer" id="ml-faq-answer-${index}"><div><p>${answerHtml}</p></div></div></div>`;
+    }).join("");
     root.querySelectorAll(".ml-faq__trigger").forEach(button => button.addEventListener("click", () => {
       button.setAttribute("aria-expanded", String(button.getAttribute("aria-expanded") !== "true"));
     }));
@@ -1003,6 +1009,11 @@
     const hero = root.querySelector(".ml-hero");
     const luminarias = root.querySelector(".ml-project-lines-concept");
     if (!hero || !luminarias) return;
+
+    /* On touch layouts the project cards scroll horizontally. Keeping the
+       window-level swipe transition active makes that gesture jump back to
+       the hero when the finger drifts slightly on the vertical axis. */
+    if (matchMedia("(max-width: 990px)").matches) return;
 
     const reducedMotion = matchMedia("(prefers-reduced-motion: reduce)");
     let animating = false;

@@ -316,7 +316,15 @@
       const defaultImageClass = item.zoomDefaultImage ? " ml-news-card__image--zoomed" : "";
       return `<${tag} class="ml-news-card"${href}><div class="ml-news-card__media"><img class="ml-news-card__image ml-news-card__image--default${defaultImageClass}" src="${esc(item.image)}" alt="${esc(item.title)}" loading="lazy" width="700" height="560"><img class="ml-news-card__image ml-news-card__image--hover" src="${esc(hoverImage)}" alt="" aria-hidden="true" loading="lazy" width="700" height="560"></div><h3><span>${esc(item.title)}</span><span class="ml-news-card__arrow" aria-hidden="true">&rarr;</span></h3><p>${esc(item.description)}</p></${tag}>`;
     }).join("");
-    root.querySelector("[data-faq]").innerHTML = config.faq.map((item, index) => `<div class="ml-faq__item"><button class="ml-faq__trigger" type="button" aria-expanded="false" aria-controls="ml-faq-answer-${index}"><span>${esc(item.question)}</span><span class="ml-faq__icon" aria-hidden="true">＋</span></button><div class="ml-faq__answer" id="ml-faq-answer-${index}"><div><p>${esc(item.answer)}</p></div></div></div>`).join("");
+    root.querySelector("[data-faq]").innerHTML = config.faq.map((item, index) => {
+      const answer = esc(item.answer);
+      const emphasis = Array.isArray(item.emphasis) ? item.emphasis : item.emphasis ? [item.emphasis] : [];
+      const answerHtml = emphasis.reduce((html, phrase) => {
+        const escapedPhrase = esc(phrase);
+        return html.replace(escapedPhrase, `<strong>${escapedPhrase}</strong>`);
+      }, answer);
+      return `<div class="ml-faq__item"><button class="ml-faq__trigger" type="button" aria-expanded="false" aria-controls="ml-faq-answer-${index}"><span>${esc(item.question)}</span><span class="ml-faq__icon" aria-hidden="true">＋</span></button><div class="ml-faq__answer" id="ml-faq-answer-${index}"><div><p>${answerHtml}</p></div></div></div>`;
+    }).join("");
     root.querySelectorAll(".ml-faq__trigger").forEach(button => button.addEventListener("click", () => {
       button.setAttribute("aria-expanded", String(button.getAttribute("aria-expanded") !== "true"));
     }));
@@ -326,6 +334,11 @@
     const hero = root.querySelector(".ml-hero");
     const luminarias = root.querySelector(".ml-project-lines-concept");
     if (!hero || !luminarias) return;
+
+    /* On touch layouts the project cards scroll horizontally. Keeping the
+       window-level swipe transition active makes that gesture jump back to
+       the hero when the finger drifts slightly on the vertical axis. */
+    if (matchMedia("(max-width: 990px)").matches) return;
 
     const reducedMotion = matchMedia("(prefers-reduced-motion: reduce)");
     let animating = false;

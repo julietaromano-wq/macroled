@@ -345,7 +345,6 @@ body {
   display: grid;
   gap: 4rem;
   grid-template-columns: 1.05fr 0.95fr;
-  padding-top: 4rem;
   min-height: 30rem;
   border-radius: 1rem;
   overflow: hidden;
@@ -573,6 +572,7 @@ body {
 .ml-home .ml-product-card {
   display: flex;
   flex-direction: column;
+  align-self: stretch;
   gap: 0.8rem;
   position: relative;
   min-width: 0;
@@ -893,7 +893,7 @@ body {
 }
 .ml-product-card__title {
   margin: 0;
-  color: #1c1c1a;
+  color: var(--ml-grey-800);
   font-size: 1.05rem;
   font-weight: 600;
   line-height: 1.3;
@@ -910,7 +910,7 @@ body {
 .ml-product-attr__label,
 .ml-product-card__note {
   display: block;
-  color: #7b8389;
+  color: #94989c;
   font-size: 0.68rem;
   font-weight: 500;
   text-transform: uppercase;
@@ -922,7 +922,7 @@ body {
   display: flex;
   align-items: center;
   gap: 0.25rem;
-  color: #5d5c5c;
+  color: var(--ml-grey-600);
   font-size: 0.78rem;
   font-weight: 700;
   white-space: nowrap;
@@ -930,17 +930,6 @@ body {
   text-overflow: ellipsis;
 }
 
-/* Product copy on dark project lines. */
-.ml-featured[data-button-tone="light"] .ml-product-card__title {
-  color: #16294f;
-}
-.ml-featured[data-button-tone="light"] .ml-product-attr__value {
-  color: #474747;
-}
-.ml-featured[data-button-tone="light"] .ml-product-attr__label,
-.ml-featured[data-button-tone="light"] .ml-product-card__note {
-  color: #94989c;
-}
 .ml-product-dot {
   width: 0.45rem;
   height: 0.45rem;
@@ -1437,6 +1426,18 @@ a.ml-news-card:focus-visible .ml-news-card__arrow {
     grid-template-columns: 1fr 1fr;
   }
 }
+
+
+
+
+.ml-home #ml-project-lines-concept-title {
+  max-width: 17ch !important;
+  background-image: linear-gradient(90deg, var(--ml-dark-blue-200) 0%, #ffffff 100%) !important;
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+}
 @media (prefers-reduced-motion: reduce) {
   .ml-home * {
     scroll-behavior: auto !important;
@@ -1932,12 +1933,6 @@ a.ml-news-card:focus-visible .ml-news-card__arrow {
   box-shadow: 2px 3px 20px 2px rgba(0, 17, 33, 0.04);
   scroll-snap-align: start;
 }
-.ml-home .ml-featured-products .ml-product-card__title {
-  color: var(--ml-grey-800);
-}
-.ml-home .ml-featured-products .ml-product-attr__value {
-  color: var(--ml-grey-600);
-}
 .ml-featured-products__track .ml-product-card__media {
   background: #f5f5f5;
   transition: background-color 0.25s ease;
@@ -2094,6 +2089,9 @@ a.ml-news-card:focus-visible .ml-news-card__arrow {
     overflow-x: auto;
     scrollbar-width: none;
   }
+  .ml-featured-products__track {
+    padding: 1rem 0 2rem;
+  }
   .ml-featured-products__track .ml-product-card {
     flex-basis: calc((100% - 1rem) / 2);
   }
@@ -2107,7 +2105,6 @@ a.ml-news-card:focus-visible .ml-news-card__arrow {
   }
   .ml-featured-products__head {
     align-items: flex-start;
-    width: calc(100% - 2rem);
     margin-right: auto;
     margin-bottom: 1rem;
     margin-left: auto;
@@ -3401,8 +3398,10 @@ a.ml-news-card:focus-visible .ml-news-card__arrow {
 
 .ml-home .ml-featured[data-content-mode="static"] .ml-line-subfamilies .ml-category-card h3 {
   padding: 0.4rem 0.1rem 0.15rem;
-  font-size: clamp(0.88rem, 1.1vw, 1rem);
-  line-height: 1.25;
+  font-size: var(--ml-type-h7-size);
+  font-weight: var(--ml-type-h7-weight);
+  line-height: var(--ml-type-h7-leading);
+  letter-spacing: var(--ml-type-h7-tracking);
 }
 
 .ml-home .ml-featured[data-content-mode="static"] .ml-line-subfamilies .ml-category-card__badge {
@@ -3519,6 +3518,11 @@ a.ml-news-card:focus-visible .ml-news-card__arrow {
 
   .ml-home .ml-featured[data-content-mode="static"] .ml-line-subfamilies .ml-category-card {
     flex: 0 0 min(64%, 13.75rem);
+  }
+
+  .ml-home .ml-featured[data-content-mode="static"] .ml-line-subfamilies .ml-category-card__media img {
+    width: 60%;
+    height: 60%;
   }
 }
 
@@ -4839,7 +4843,7 @@ a.ml-news-card:focus-visible .ml-news-card__arrow {
 @media (max-width: 640px) {
   .ml-home .ml-featured-products__head,
   .ml-home .ml-news__head {
-    row-gap: 1.5rem !important;
+    row-gap: 0.5rem !important;
   }
 
   .ml-home .ml-featured-products__view-all,
@@ -4959,7 +4963,8 @@ a.ml-news-card:focus-visible .ml-news-card__arrow {
 }
 
 .ml-home .ml-conversion__card--faq .ml-faq__answer p {
-  max-width: 56ch;
+  width: 100%;
+  max-width: none;
   padding-bottom: 1.35rem;
   color: var(--ml-dark-blue-400);
   font-size: 0.9rem;
@@ -4970,7 +4975,6 @@ a.ml-news-card:focus-visible .ml-news-card__arrow {
 .ml-home .ml-newsletter-banner {
   position: relative;
   display: flex;
-  height: clamp(24rem, 32vw, 28rem);
   margin-block: 0;
   overflow: hidden;
   background: #0a0a0a;
@@ -5019,7 +5023,7 @@ a.ml-news-card:focus-visible .ml-news-card__arrow {
   align-items: flex-start;
   justify-content: center;
   gap: 1.5rem;
-  padding: clamp(3rem, 6vw, 5rem) 0;
+  padding: clamp(7rem, 6vw, 7.5rem) 0;
   text-align: left;
 }
 
@@ -5565,6 +5569,13 @@ a.ml-news-card:focus-visible .ml-news-card__arrow {
   height: 48%;
 }
 
+@media (max-width: 640px) {
+  .ml-home .ml-categories-test__grid .ml-category-card .ml-category-card__media img {
+    width: 60%;
+    height: 60%;
+  }
+}
+
 @media (hover: hover) and (pointer: fine) {
   .ml-home .ml-categories-test__grid .ml-category-card:hover,
   .ml-home .ml-featured[data-content-mode="static"] .ml-line-subfamilies .ml-category-card:hover {
@@ -5604,46 +5615,41 @@ a.ml-news-card:focus-visible .ml-news-card__arrow {
    every text style rendered by the Home.
    ========================================================================== */
 .ml-home {
-  /* Display XL â€” hero only */
-  --ml-type-display-xl-size: clamp(2.25rem, calc(1.75rem + 2vw), 4.2rem);
-  --ml-type-display-xl-weight: 500;
-  --ml-type-display-xl-leading: 1.02;
-  --ml-type-display-xl-tracking: -0.04em;
+  --ml-type-h1-size: clamp(2.25rem, calc(1.85rem + 2vw), 4.25rem);
+  --ml-type-h1-weight: 500;
+  --ml-type-h1-leading: 1.02;
+  --ml-type-h1-tracking: -0.04em;
 
-  /* Display L â€” large editorial line titles only */
-  --ml-type-display-l-size: clamp(2.2rem, calc(1.8rem + 1.7vw), 3.5rem);
-  --ml-type-display-l-weight: 300;
-  --ml-type-display-l-leading: 1.08;
-  --ml-type-display-l-tracking: -0.025em;
+  --ml-type-h2-size: clamp(2rem, calc(1.4rem + 1.6vw), 3.25rem);
+  --ml-type-h2-weight: 500;
+  --ml-type-h2-leading: 1.15;
+  --ml-type-h2-tracking: -0.04em;
 
-  /* Headings intentionally use normal tracking for readability */
-  --ml-type-heading-section-size: clamp(2rem, 3vw, 2.7rem);
-  --ml-type-heading-section-weight: 500;
-  --ml-type-heading-section-leading: 1.3;
-  --ml-type-heading-section-tracking: -0.04em;
+  --ml-type-h3-size: clamp(1.8rem, calc(1.45rem + 1.5vw), 3rem);
+  --ml-type-h3-weight: 300;
+  --ml-type-h3-emphasis-weight: 600;
+  --ml-type-h3-leading: 1.08;
+  --ml-type-h3-tracking: -0.025em;
 
-  --ml-type-heading-card-large-size: clamp(1.5rem, 3vw, 1.8rem);
-  --ml-type-heading-card-large-weight: 400;
-  --ml-type-heading-card-large-leading: 1.2;
-  --ml-type-heading-card-large-tracking: -0.01em;
+  --ml-type-h4-size: clamp(1.75rem, calc(1.5rem + 1vw), 2.25rem);
+  --ml-type-h4-weight: 500;
+  --ml-type-h4-leading: 1.15;
+  --ml-type-h4-tracking: -0.01em;
 
-  /* Product card titles */
-  --ml-type-heading-card-size: clamp(1.05rem, calc(1rem + 0.4vw), 1.2rem);
-  --ml-type-heading-card-weight: 600;
-  --ml-type-heading-card-leading: 1.3;
-  --ml-type-heading-card-tracking: 0;
+  --ml-type-h5-size: clamp(1.25rem, calc(1.05rem + 0.8vw), 1.75rem);
+  --ml-type-h5-weight: 400;
+  --ml-type-h5-leading: 1.2;
+  --ml-type-h5-tracking: -0.01em;
 
-  /* Category card titles */
-  --ml-type-heading-category-size: clamp(1.05rem, calc(1rem + 0.3vw), 1.4rem);
-  --ml-type-heading-category-weight: 500;
-  --ml-type-heading-category-leading: 1.35;
-  --ml-type-heading-category-tracking: -0.01em;
+  --ml-type-h6-size: clamp(1.2rem, calc(1.1rem + 0.5vw), 1.4rem);
+  --ml-type-h6-weight: 500;
+  --ml-type-h6-leading: 1.3;
+  --ml-type-h6-tracking: 0;
 
-  /* Editorial/news card titles */
-  --ml-type-heading-news-card-size: clamp(1.2rem, calc(1.1rem + 0.5vw), 1.4rem);
-  --ml-type-heading-news-card-weight: 600;
-  --ml-type-heading-news-card-leading: 1.3;
-  --ml-type-heading-news-card-tracking: 0;
+  --ml-type-h7-size: 1.05rem;
+  --ml-type-h7-weight: 500;
+  --ml-type-h7-leading: 1.25;
+  --ml-type-h7-tracking: -0.01em;
 
   --ml-type-body-l-size: clamp(1rem, calc(0.95rem + 0.25vw), 1rem);
   --ml-type-body-l-weight: 400;
@@ -5657,96 +5663,57 @@ a.ml-news-card:focus-visible .ml-news-card__arrow {
   --ml-type-body-s-weight: 400;
   --ml-type-body-s-leading: 1.55;
 
-  --ml-type-label-size: 0.75rem;
-  --ml-type-label-weight: 400;
-  --ml-type-label-leading: 1.3;
-  --ml-type-label-tracking: 0;
-  --ml-type-label-highlight-size: clamp(
-    0.7rem,
-    calc(0.65rem + 0.25vw),
-    0.85rem
-  );
-  --ml-type-label-highlight-weight: 500;
-  --ml-type-label-highlight-tracking: 0.04em;
-
-  --ml-type-button-size: 1rem;
-  --ml-type-button-weight: 600;
-  --ml-type-button-leading: 1;
-  --ml-type-button-tracking: 0;
 }
 
-/* Display XL */
+/* H1 — hero only */
 .ml-home #ml-hero-title {
-  font-size: var(--ml-type-display-xl-size);
-  font-weight: var(--ml-type-display-xl-weight);
-  line-height: var(--ml-type-display-xl-leading);
-  letter-spacing: var(--ml-type-display-xl-tracking);
+  font-size: var(--ml-type-h1-size);
+  font-weight: var(--ml-type-h1-weight);
+  line-height: var(--ml-type-h1-leading);
+  letter-spacing: var(--ml-type-h1-tracking);
 }
 
-/* Display L */
+/* H2 — Home section titles */
+.ml-home > .ml-hero-overlap #ml-project-lines-concept-title,
+.ml-home main h2:not(#aiTitle) {
+  font-size: var(--ml-type-h2-size) !important;
+  font-weight: var(--ml-type-h2-weight) !important;
+  line-height: var(--ml-type-h2-leading) !important;
+  letter-spacing: var(--ml-type-h2-tracking) !important;
+}
+
+/* H3 — editorial line titles */
 .ml-home .ml-featured__copy h3 {
-  font-size: var(--ml-type-display-l-size);
-  font-weight: var(--ml-type-display-l-weight);
-  line-height: var(--ml-type-display-l-leading);
-  letter-spacing: var(--ml-type-display-l-tracking);
+  font-size: var(--ml-type-h3-size);
+  font-weight: var(--ml-type-h3-weight);
+  line-height: var(--ml-type-h3-leading);
+  letter-spacing: var(--ml-type-h3-tracking);
 }
 
-/* Heading Â· section */
-.ml-home #ml-featured-products-title,
-.ml-home #ml-project-lines-concept-title,
-.ml-home #ml-categories-test-title,
-.ml-home .ml-categories-test__title,
-.ml-home #ml-news-title,
-.ml-home #ml-faq-title,
-.ml-home #ml-newsletter-title {
-  font-size: var(--ml-type-heading-section-size);
-  font-weight: var(--ml-type-heading-section-weight);
-  line-height: var(--ml-type-heading-section-leading);
-  letter-spacing: var(--ml-type-heading-section-tracking);
-}
-
-.ml-home #ml-project-lines-concept-title {
-  line-height: 1.3;
-  letter-spacing: -0.04em;
+.ml-home .ml-featured__copy h3 strong {
+  font-weight: var(--title-emphasis-weight, var(--ml-type-h3-emphasis-weight));
 }
 
 .ml-home #ml-foa-title strong {
   font-weight: 600;
 }
 
-/* Heading Â· card large */
+/* H5 — card titles (formerly heading-card-large and card variants) */
 .ml-home .ml-project-lines-concept__content,
 .ml-home .ml-project-line-card__title,
 .ml-home .ml-project-line-card__collapsed-title {
-  font-size: var(--ml-type-heading-card-large-size);
-  font-weight: var(--ml-type-heading-card-large-weight);
-  line-height: var(--ml-type-heading-card-large-leading);
-  letter-spacing: var(--ml-type-heading-card-large-tracking);
+  font-size: var(--ml-type-h5-size);
+  font-weight: var(--ml-type-h5-weight);
+  line-height: var(--ml-type-h5-leading);
+  letter-spacing: var(--ml-type-h5-tracking);
 }
 
-/* Heading Â· product card */
-.ml-home .ml-product-card__title {
-  font-size: var(--ml-type-heading-card-size);
-  font-weight: var(--ml-type-heading-card-weight);
-  line-height: var(--ml-type-heading-card-leading);
-  letter-spacing: var(--ml-type-heading-card-tracking);
-}
-
-/* Heading Â· category card */
-.ml-home .ml-category-card h3 {
-  font-size: var(--ml-type-heading-category-size);
-  font-weight: var(--ml-type-heading-category-weight);
-  line-height: var(--ml-type-heading-category-leading);
-  letter-spacing: var(--ml-type-heading-category-tracking);
-}
-
-/* Heading Â· news card */
+/* H6 — news card titles */
 .ml-home .ml-news-card h3 {
-  color: var(--ml-dark-blue-600);
-  font-size: var(--ml-type-heading-news-card-size);
-  font-weight: var(--ml-type-heading-news-card-weight);
-  line-height: var(--ml-type-heading-news-card-leading);
-  letter-spacing: var(--ml-type-heading-news-card-tracking);
+  font-size: var(--ml-type-h6-size);
+  font-weight: var(--ml-type-h6-weight);
+  line-height: var(--ml-type-h6-leading);
+  letter-spacing: var(--ml-type-h6-tracking);
 }
 
 /* Body L */
@@ -5784,10 +5751,10 @@ a.ml-news-card:focus-visible .ml-news-card__arrow {
 /* Label */
 .ml-home .ml-product-attr__label,
 .ml-home .ml-product-card__note {
-  font-size: var(--ml-type-label-size);
-  font-weight: var(--ml-type-label-weight);
-  line-height: var(--ml-type-label-leading);
-  letter-spacing: var(--ml-type-label-tracking);
+  font-size: 0.75rem;
+  font-weight: 400;
+  line-height: 1.3;
+  letter-spacing: 0;
 }
 
 /* Highlight label */
@@ -5825,12 +5792,13 @@ a.ml-news-card:focus-visible .ml-news-card__arrow {
   font-weight: 700;
   line-height: 1.3;
   letter-spacing: 0;
-  color: #5d5c5c;
+  color: var(--ml-grey-600);
 }
 
 .ml-home .ml-product-card__title {
   margin: 0;
-  color: #1c1c1a;
+  min-height: 2.6em;
+  color: var(--ml-grey-800);
   font-size: 1.05rem;
   font-weight: 600;
   line-height: 1.3;
@@ -5839,7 +5807,7 @@ a.ml-news-card:focus-visible .ml-news-card__arrow {
 
 .ml-home .ml-product-attr__label,
 .ml-home .ml-product-card__note {
-  color: #7b8389;
+  color: #94989c;
   font-size: 0.68rem;
   font-weight: 500;
   line-height: 1.2;
@@ -5853,10 +5821,10 @@ a.ml-news-card:focus-visible .ml-news-card__arrow {
 .ml-home .ml-conversion__button,
 .ml-home .ml-featured-products__tab,
 .ml-home .ml-project-line-card__cta {
-  font-size: var(--ml-type-button-size);
-  font-weight: var(--ml-type-button-weight);
-  line-height: var(--ml-type-button-leading);
-  letter-spacing: var(--ml-type-button-tracking);
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: 0;
 }
 
 .ml-home .ml-conversion__card--faq .ml-faq__trigger {
@@ -5867,14 +5835,18 @@ a.ml-news-card:focus-visible .ml-news-card__arrow {
 }
 
 @media (max-width: 1360px) {
-  .ml-home {
-    --ml-type-button-size: 0.875rem;
+  .ml-home .ml-button,
+  .ml-home .ml-button--tertiary,
+  .ml-home .ml-conversion__button,
+  .ml-home .ml-featured-products__tab,
+  .ml-home .ml-project-line-card__cta {
+    font-size: 0.875rem;
   }
 }
 
 @media (max-width: 640px) {
   .ml-home {
-    --ml-type-display-xl-size: clamp(2.25rem, 10vw, 2.75rem);
+    --ml-type-h1-size: clamp(2.5rem, 10vw, 2.75rem);
   }
 
   .ml-home .ml-featured-products__tab {
@@ -5908,7 +5880,7 @@ a.ml-news-card:focus-visible .ml-news-card__arrow {
   z-index: 2;
   width: 100%;
   margin: 0;
-  padding-top: clamp(2.75rem, 5vw, 4.25rem);
+  padding-top: clamp(3.8rem, 5vw, 4.25rem);
   padding-bottom: clamp(1.25rem, 2.5vw, 2rem);
   background: linear-gradient(
     180deg,
@@ -6056,8 +6028,10 @@ a.ml-news-card:focus-visible .ml-news-card__arrow {
 
 .ml-home .ml-solutions-banner__track .ml-category-card h3 {
   padding: 0.4rem 0.1rem 0.15rem;
-  font-size: clamp(0.88rem, 1.1vw, 1rem);
-  line-height: 1.25;
+  font-size: var(--ml-type-h7-size);
+  font-weight: var(--ml-type-h7-weight);
+  line-height: var(--ml-type-h7-leading);
+  letter-spacing: var(--ml-type-h7-tracking);
 }
 
 .ml-home .ml-solutions-banner__track .ml-category-card__media {
@@ -6332,13 +6306,7 @@ a.ml-news-card:focus-visible .ml-news-card__arrow {
     padding-inline: 0;
   }
 
-  .ml-home .ml-solutions-banner {
-    padding-top: 1.75rem;
-    padding-bottom: 0.85rem;
-  }
-
   .ml-home .ml-solutions-banner__copy {
-    gap: 1rem;
     padding: 1.5rem 0 0.75rem;
   }
 
@@ -6771,6 +6739,16 @@ a.ml-news-card:focus-visible .ml-news-card__arrow {
   box-shadow: 0 -1.5rem 3.75rem rgba(0, 0, 0, 0.42);
 }
 
+@media (max-width: 990px) {
+  .ml-hero-overlap > .ml-hero {
+    position: relative;
+  }
+
+  .ml-hero-overlap .ml-project-lines-concept {
+    box-shadow: none;
+  }
+}
+
 @media (min-width: 901px) and (max-width: 1600px) {
   .ml-home .ml-project-lines-concept {
     display: flex;
@@ -6809,10 +6787,6 @@ a.ml-news-card:focus-visible .ml-news-card__arrow {
     padding-left: 1.35rem;
   }
 
-  .ml-home #ml-hero-title {
-    font-size: clamp(2.48rem, 3.55vw, 3.48rem);
-  }
-
   .ml-home .ml-project-lines-concept__cards {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -6834,7 +6808,6 @@ a.ml-news-card:focus-visible .ml-news-card__arrow {
   .ml-home .ml-project-lines-concept__content {
     inset: 1.15rem;
     gap: 0.75rem;
-    font-size: 1.25rem;
   }
 
   .ml-home .ml-project-lines-concept__arrow {
@@ -6892,7 +6865,7 @@ a.ml-news-card:focus-visible .ml-news-card__arrow {
 /* Reserve Webflow's fixed nav inside the full-height sheet animation. */
 .ml-home .ml-project-lines-concept {
   --ml-project-lines-nav-height: 69.8px;
-  --ml-project-lines-content-offset: clamp(1.5rem, 4vw, 4rem);
+  --ml-project-lines-content-offset: clamp(1.5rem, 4vw, 5rem);
   display: flex;
   box-sizing: border-box;
   height: 100vh !important;
@@ -6916,7 +6889,7 @@ a.ml-news-card:focus-visible .ml-news-card__arrow {
 }
 
 .ml-home .ml-project-lines-concept__inner {
-  --ml-project-lines-content-gap: clamp(3rem, 6vw, 5rem);
+  --ml-project-lines-content-gap: clamp(2rem, 3vw, 4rem);
   display: flex;
   height: 100% !important;
   min-height: 0 !important;
@@ -6969,7 +6942,7 @@ a.ml-news-card:focus-visible .ml-news-card__arrow {
     flex: 1 1 auto;
     grid-template-columns: none;
     grid-template-rows: none;
-    gap: 1rem;
+    gap: 0.5rem;
     padding-right: 1rem;
     overflow-x: auto;
     overflow-y: hidden;
@@ -7007,7 +6980,7 @@ a.ml-news-card:focus-visible .ml-news-card__arrow {
 
   .ml-home .ml-project-lines-concept__explore {
     flex: 0 0 auto;
-    margin-top: 0.5rem;
+    margin-top: 2.5rem;
   }
 }
 
@@ -7888,5 +7861,75 @@ body.newsletter-open {
   .nl-pill input[type="email"],
   .nl-select-trigger {
     font-size: 16px;
+  }
+}
+
+/* Product crop: 1920px reference, progressively reduced on smaller cards. */
+.ml-home [data-project-lines-concept-card="street"] .ml-project-lines-concept__product {
+  right: -20% !important;
+  translate: none !important;
+}
+
+.ml-home [data-project-lines-concept-card="invictus"] .ml-project-lines-concept__product {
+  right: -40% !important;
+  aspect-ratio: auto;
+  translate: none !important;
+}
+
+.ml-home [data-project-lines-concept-card="highbay"] .ml-project-lines-concept__product {
+  right: -35% !important;
+  translate: none !important;
+}
+
+@media (max-width: 1599px) {
+  .ml-home [data-project-lines-concept-card="street"] .ml-project-lines-concept__product { right: -15% !important; }
+  .ml-home [data-project-lines-concept-card="invictus"] .ml-project-lines-concept__product { right: -32% !important; }
+  .ml-home [data-project-lines-concept-card="highbay"] .ml-project-lines-concept__product { right: -28% !important; }
+}
+
+@media (min-width: 1600px) and (max-width: 1919px) {
+  .ml-home [data-project-lines-concept-card="street"] .ml-project-lines-concept__product { right: -18% !important; }
+  .ml-home [data-project-lines-concept-card="invictus"] .ml-project-lines-concept__product { right: -36% !important; }
+  .ml-home [data-project-lines-concept-card="highbay"] .ml-project-lines-concept__product { right: -32% !important; }
+}
+
+@media (max-width: 1199px) {
+  .ml-home [data-project-lines-concept-card="street"] .ml-project-lines-concept__product { right: -10% !important; }
+  .ml-home [data-project-lines-concept-card="invictus"] .ml-project-lines-concept__product { right: -24% !important; }
+  .ml-home [data-project-lines-concept-card="highbay"] .ml-project-lines-concept__product { right: -21% !important; }
+}
+
+@media (max-width: 900px) {
+  .ml-home [data-project-lines-concept-card="street"] .ml-project-lines-concept__product { right: -6% !important; }
+  .ml-home [data-project-lines-concept-card="invictus"] .ml-project-lines-concept__product { right: -16% !important; }
+  .ml-home [data-project-lines-concept-card="highbay"] .ml-project-lines-concept__product { right: -14% !important; }
+}
+
+/* Narrow desktop cards need a smaller product height as well as a softer crop. */
+@media (min-width: 1100px) and (max-width: 1199px) {
+  .ml-home .ml-project-lines-concept__product {
+    height: 58% !important;
+  }
+}
+
+@media (min-width: 991px) and (max-width: 1099px) {
+  .ml-home .ml-project-lines-concept__product {
+    height: 52% !important;
+  }
+
+  .ml-home [data-project-lines-concept-card="street"] .ml-project-lines-concept__product { right: -8% !important; }
+  .ml-home [data-project-lines-concept-card="invictus"] .ml-project-lines-concept__product { right: -20% !important; }
+  .ml-home [data-project-lines-concept-card="highbay"] .ml-project-lines-concept__product { right: -18% !important; }
+}
+
+@media (min-width: 901px) and (max-width: 990px) {
+  .ml-home .ml-project-lines-concept__product {
+    height: 56% !important;
+  }
+}
+
+@media (max-width: 900px) {
+  .ml-home .ml-project-lines-concept__product {
+    height: 68% !important;
   }
 }
