@@ -1509,17 +1509,31 @@
       catalogo: files && files.catalogo,
       ies: files && files.ies,
     };
+    let visibleCount = 0;
     document.querySelectorAll("#files-list .dl-card").forEach((card) => {
       const key = card.getAttribute("data-file");
       const url = (map[key] || "").trim();
       if (url && url !== "#") {
         card.href = url;
         card.hidden = false;
+        visibleCount++;
       } else {
         card.removeAttribute("href");
         card.hidden = true;
       }
     });
+
+    // Ningún documento cargado para este SKU: se oculta el tab en vez de
+    // mostrarlo vacío (mismo criterio que armados/despiece/compatibles).
+    const tabFiles = document.getElementById("tab-files");
+    if (tabFiles) {
+      const wasActive = tabFiles.classList.contains("is-active");
+      tabFiles.hidden = visibleCount === 0;
+      if (visibleCount === 0 && wasActive) {
+        const fallback = document.querySelector('.tab[data-tab="specs"]');
+        if (fallback) fallback.click();
+      }
+    }
   }
 
   let heroItem = null;
