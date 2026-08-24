@@ -253,12 +253,10 @@
   }
   .facet-row.is-empty{opacity:.55;}
   .soon-note{font-size:12px;color:var(--ink-soft);font-style:italic;line-height:1.4;}
-  .facet-row .facet-thumb,
-  .fmn-option-row .facet-thumb{
-    width:28px;height:28px;border-radius:6px;object-fit:contain;
-    background:#f0f0f0;flex:none;
+  .facet-row.familia-row{
+    font-weight:500;
+    padding-left:22px;
   }
-  .facet-row.familia-row{font-weight:500;}
   .facet-row.familia-row.active{
     background:rgb(227,242,253);color:rgb(0,110,165);font-weight:700;
   }
@@ -296,6 +294,26 @@
   }
   @keyframes category-banner-spin{to{transform:rotate(360deg);}}
   .category-banner[hidden]{display:none;}
+  #macroled-productos .category-banner{
+    display:block !important;
+  }
+  #macroled-productos .category-banner[hidden]{
+    display:none !important;
+  }
+  #macroled-productos .category-banner.has-video{
+    display:block !important;
+  }
+  #macroled-productos .category-banner video,
+  #macroled-productos .category-banner__media{
+    display:block !important;
+    visibility:visible !important;
+    opacity:1 !important;
+    position:absolute !important;
+    inset:0 !important;
+    width:100% !important;
+    height:100% !important;
+    object-fit:cover !important;
+  }
   .category-banner__media{
     position:absolute;inset:0;
     width:100%;height:100%;
@@ -368,8 +386,9 @@
   .subfam-nav.next{right:-14px;}
 
   .macro-row{
-    display:flex;align-items:center;justify-content:space-between;gap:8px;
-    padding:6px 8px;font-size:14px;color:var(--colortext);cursor:pointer;
+    display:flex;align-items:center;justify-content:space-between;gap:10px;
+    padding:2px 6px 2px 22px;
+    font-size:14px;color:var(--colortext);cursor:pointer;
     margin:0 -6px;border-radius:6px;
     transition:color .12s,background .12s,font-weight .12s;
   }
@@ -1403,7 +1422,6 @@
     .grid.list .card-title{font-size:16px !important;}
     .grid.list .compare-row{margin:0;padding:6px 0 0;width:auto;font-size:14px;}
     .grid.list .specs{grid-template-columns:1fr;}
-    .facet-thumb{width:24px;height:24px;}
     .results-search .filters-toggle{padding:0;width:46px;min-width:46px;font-size:0;gap:0;}
     .results-search .filters-toggle svg{margin:0;}
     .pagination{margin-top:20px;gap:6px;}

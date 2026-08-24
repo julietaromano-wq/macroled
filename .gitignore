@@ -12,3 +12,32 @@ venv/
 .codex/
 ml.product-cards.html
 /home/assets/images/PRUEBAWEB4.mp4
+
+# Copias y prototipos de esta carpeta de trabajo (no van a GitHub)
+/archivos_finales/
+/Macroled_ficha/
+/ficha con video/
+/ficha sin video/
+/__MACOSX/
+/asistente.html
+/asistente-icon.png
+/asistente-icon.svg
+/cards-gaby.html
+/comparar.html
+/comparar.js
+/contacto.html
+/descargas.html
+/ficha_tecnica.html
+/index.html
+/input.html
+/input_resp.html
+/menu_responsive.html
+/op2descargas.html
+/opindex.html
+/preload.css
+/preload.js
+/variantemenu.html
+/comparar/asistente-icon.png
+/comparar/asistente-icon.svg
+/descargas/asistente-icon.png
+/descargas/asistente-icon.svg
