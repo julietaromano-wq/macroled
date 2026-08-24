@@ -372,11 +372,11 @@ const state = {
   sortBy: "",
   query: "",
   view: "grid",
-  collapsed: { macrofamilia: false, variante_temperatura_filtro: true, color: true, potencia: false, dimerizable: true, familia: false, subfamilia: true, categoria: true },
+  collapsed: { macrofamilia: false, variante_temperatura_filtro: true, color: true, potencia: false, dimerizable: true, familia: false, subfamilia: false, categoria: true },
   compareCollapsed: true
 };
-/* Ningún facet queda forzado abierto: Productos y Familia también se pueden cerrar. */
-const ALWAYS_OPEN_FACETS = new Set();
+/* Subfamilia queda siempre abierta; Productos y Familia se pueden cerrar. */
+const ALWAYS_OPEN_FACETS = new Set(["subfamilia"]);
 window.state = state;
 let currentSearchController = null;   // ← agregar esta línea
 const COMPARE_MAX = window.MacroledCompare ? window.MacroledCompare.MAX : 3;
@@ -777,10 +777,11 @@ function renderFacets(facetCounts){
 
     if(subfamCounts.length){
       const subfamGroup = document.createElement("div");
-      subfamGroup.className = "facet-group" + (state.collapsed.subfamilia ? " collapsed" : "");
+      const subfamPinned = ALWAYS_OPEN_FACETS.has(SUBFAMILIA_FIELD);
+      subfamGroup.className = "facet-group" + (subfamPinned ? " is-pinned" : state.collapsed.subfamilia ? " collapsed" : "");
       subfamGroup.innerHTML = `
         <div class="facet-title" data-field="${SUBFAMILIA_FIELD}">
-          <span class="ft-label">${FACET_ICONS.macrofamilia}<span>Subfamilia</span></span>${CHEV_HTML}
+          <span class="ft-label">${FACET_ICONS.macrofamilia}<span>Subfamilia</span></span>${subfamPinned ? "" : CHEV_HTML}
         </div>
         <div class="facet-body"></div>
       `;
@@ -1715,10 +1716,10 @@ function renderCompareBar(){
     return `
     <div class="compare-chip">
       <button type="button" class="compare-chip-remove" data-remove="${p.sku}" aria-label="Quitar">×</button>
-      <div class="thumb">${img ? `<img src="${escAttr(img)}" alt="" loading="lazy" onerror="this.remove()">` : ""}</div>
-      <div class="info">
-        <span class="name">${p.nombre}</span>
-        ${p.sku ? `<span class="sku">${p.sku}</span>` : ""}
+      <div class="compare-chip-thumb">${img ? `<img src="${escAttr(img)}" alt="" loading="lazy" onerror="this.remove()">` : ""}</div>
+      <div class="compare-chip-info">
+        <span class="compare-chip-name">${p.nombre}</span>
+        ${p.sku ? `<span class="compare-chip-sku">${p.sku}</span>` : ""}
       </div>
     </div>
   `;
@@ -2144,10 +2145,14 @@ filtersToggle.addEventListener("click", openFiltersDrawer);
 filtersClose.addEventListener("click", closeFiltersDrawer);
 filtersBackdrop.addEventListener("click", closeFiltersDrawer);
 const filtersDesktopHeading = document.querySelector(".filters-desktop-heading");
-if(filtersDesktopHeading){
+if(filtersCollapseBtn){
+  filtersCollapseBtn.addEventListener("click", (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setFiltersCollapsed(true);
+  });
+} else if(filtersDesktopHeading){
   filtersDesktopHeading.addEventListener("click", () => setFiltersCollapsed(true));
-} else if(filtersCollapseBtn){
-  filtersCollapseBtn.addEventListener("click", () => setFiltersCollapsed(true));
 }
 if(filtersExpandBtn){
   filtersExpandBtn.addEventListener("click", () => setFiltersCollapsed(false));

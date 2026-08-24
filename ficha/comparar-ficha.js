@@ -137,10 +137,10 @@
         (p) => `
       <div class="compare-chip">
         <button type="button" class="compare-chip-remove" data-remove="${p.sku}" aria-label="Quitar">×</button>
-        <div class="thumb">${p.img ? `<img src="${p.img}" alt="" loading="lazy">` : ""}</div>
-        <div class="info">
-          <span class="name">${p.nombre}</span>
-          ${p.sku ? `<span class="sku">${p.sku}</span>` : ""}
+        <div class="compare-chip-thumb">${p.img ? `<img src="${p.img}" alt="" loading="lazy">` : ""}</div>
+        <div class="compare-chip-info">
+          <span class="compare-chip-name">${p.nombre}</span>
+          ${p.sku ? `<span class="compare-chip-sku">${p.sku}</span>` : ""}
         </div>
       </div>`
       )
