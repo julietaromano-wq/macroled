@@ -206,7 +206,7 @@
     isFetching = true;
     const track = root.querySelector("[data-featured-track]");
     track.setAttribute("aria-busy", "true");
-    track.innerHTML = '<div class="ml-featured-products__state">Cargando destacados…</div>';
+    track.innerHTML = window.MacroledProducts.loadingSkeletons(5);
 
     try {
       const data = await fetchFeatured(space);

@@ -56,7 +56,8 @@
 
     const query = content.query || item;
     const filters = Array.isArray(query.typesenseFilters) ? JSON.stringify(query.typesenseFilters) : "";
-    return `<div class="ml-products-block"><div class="ml-product-grid" data-products-field="${esc(query.typesenseField)}" data-products-value="${esc(query.typesenseValue)}" data-products-filters="${esc(filters)}" data-products-count="${Number(query.productCount || 4)}" data-products-fetch-count="${Number(query.fetchCount || query.productCount || 4)}" data-products-randomize-by="${esc(query.randomizeBy || "")}"><div class="ml-product-state">Cargando productos…</div></div>${productControlsTemplate()}</div>`;
+    const skeletons = window.MacroledProducts?.loadingSkeletons(5) || "";
+    return `<div class="ml-products-block"><div class="ml-product-grid" data-products-field="${esc(query.typesenseField)}" data-products-value="${esc(query.typesenseValue)}" data-products-filters="${esc(filters)}" data-products-count="${Number(query.productCount || 4)}" data-products-fetch-count="${Number(query.fetchCount || query.productCount || 4)}" data-products-randomize-by="${esc(query.randomizeBy || "")}">${skeletons}</div>${productControlsTemplate()}</div>`;
   }
 
   function lineTemplate(item) {
@@ -309,13 +310,19 @@
   }
 
   function renderCommon() {
-    root.querySelector("[data-news]").innerHTML = config.news.map(item => {
+    const newsTrack = root.querySelector("[data-news]");
+    newsTrack.innerHTML = config.news.map(item => {
       const tag = item.href ? "a" : "article";
       const href = item.href ? ` href="${esc(item.href)}"` : "";
       const hoverImage = item.hoverImage || item.image;
       const defaultImageClass = item.zoomDefaultImage ? " ml-news-card__image--zoomed" : "";
       return `<${tag} class="ml-news-card"${href}><div class="ml-news-card__media"><img class="ml-news-card__image ml-news-card__image--default${defaultImageClass}" src="${esc(item.image)}" alt="${esc(item.title)}" loading="lazy" width="700" height="560"><img class="ml-news-card__image ml-news-card__image--hover" src="${esc(hoverImage)}" alt="" aria-hidden="true" loading="lazy" width="700" height="560"></div><h3><span>${esc(item.title)}</span><span class="ml-news-card__arrow" aria-hidden="true">&rarr;</span></h3><p>${esc(item.description)}</p></${tag}>`;
     }).join("");
+    const newsSection = newsTrack.closest(".ml-news");
+    window.MacroledFeatured?.setupTrackControls(newsSection, newsTrack, {
+      cardSelector: ".ml-news-card",
+      mobileOnly: true
+    });
     root.querySelector("[data-faq]").innerHTML = config.faq.map((item, index) => {
       const answer = esc(item.answer);
       const emphasis = Array.isArray(item.emphasis) ? item.emphasis : item.emphasis ? [item.emphasis] : [];

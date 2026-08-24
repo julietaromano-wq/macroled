@@ -496,6 +496,78 @@ body {
   text-align: center;
   opacity: 0.7;
 }
+.ml-product-loading-label {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+.ml-product-skeleton {
+  --skeleton-surface: rgba(127, 137, 148, 0.14);
+  --skeleton-shine: rgba(255, 255, 255, 0.28);
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 0.8rem;
+  padding: 0.8rem;
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, currentColor 12%, transparent);
+  border-radius: 1rem;
+  background: color-mix(in srgb, currentColor 6%, transparent);
+}
+.ml-product-skeleton__media,
+.ml-product-skeleton__line,
+.ml-product-skeleton__attrs span {
+  position: relative;
+  overflow: hidden;
+  background: var(--skeleton-surface);
+}
+.ml-product-skeleton__media {
+  width: 100%;
+  min-height: 160px;
+  aspect-ratio: 1 / 1.2;
+  border-radius: 0.75rem;
+}
+.ml-product-skeleton__line {
+  height: 1.15rem;
+  border-radius: 0.35rem;
+}
+.ml-product-skeleton__line--title {
+  width: 78%;
+}
+.ml-product-skeleton__attrs {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+  margin-top: auto;
+}
+.ml-product-skeleton__attrs span {
+  height: 1.8rem;
+  border-radius: 0.35rem;
+}
+.ml-product-skeleton__media::after,
+.ml-product-skeleton__line::after,
+.ml-product-skeleton__attrs span::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(100deg, transparent 20%, var(--skeleton-shine) 50%, transparent 80%);
+  transform: translateX(-100%);
+  animation: ml-product-skeleton-shimmer 1.45s ease-in-out infinite;
+  animation-delay: calc(var(--skeleton-order, 0) * 90ms);
+}
+@keyframes ml-product-skeleton-shimmer {
+  to { transform: translateX(100%); }
+}
+@media (max-width: 1600px) {
+  .ml-product-grid > .ml-product-skeleton:nth-of-type(5) {
+    display: none;
+  }
+}
 .ml-product-card {
   display: flex;
   flex-direction: column;
@@ -1415,6 +1487,9 @@ a.ml-news-card:focus-visible .ml-news-card__arrow {
     flex: 0 0 82vw;
     scroll-snap-align: start;
   }
+  .ml-home .ml-news__controls {
+    width: 100%;
+  }
   .ml-news-card:last-child {
     display: block;
   }
@@ -1933,6 +2008,10 @@ a.ml-news-card:focus-visible .ml-news-card__arrow {
   box-shadow: 2px 3px 20px 2px rgba(0, 17, 33, 0.04);
   scroll-snap-align: start;
 }
+.ml-featured-products__track .ml-product-skeleton {
+  flex: 0 0 calc((100% - 4rem) / 5);
+  box-sizing: border-box;
+}
 .ml-featured-products__track .ml-product-card__media {
   background: #f5f5f5;
   transition: background-color 0.25s ease;
@@ -2070,8 +2149,12 @@ a.ml-news-card:focus-visible .ml-news-card__arrow {
   background: #e9ecef;
 }
 @media (max-width: 1600px) {
-  .ml-featured-products__track .ml-product-card {
+  .ml-featured-products__track .ml-product-card,
+  .ml-featured-products__track .ml-product-skeleton {
     flex-basis: calc((100% - 3rem) / 4);
+  }
+  .ml-featured-products__track > .ml-product-skeleton:nth-of-type(5) {
+    display: none;
   }
 }
 @media (max-width: 900px) {
@@ -2092,7 +2175,8 @@ a.ml-news-card:focus-visible .ml-news-card__arrow {
   .ml-featured-products__track {
     padding: 1rem 0 2rem;
   }
-  .ml-featured-products__track .ml-product-card {
+  .ml-featured-products__track .ml-product-card,
+  .ml-featured-products__track .ml-product-skeleton {
     flex-basis: calc((100% - 1rem) / 2);
   }
 }
@@ -2122,7 +2206,8 @@ a.ml-news-card:focus-visible .ml-news-card__arrow {
   .ml-featured-products__viewport {
     --featured-track-edge: 1rem;
   }
-  .ml-featured-products__track .ml-product-card {
+  .ml-featured-products__track .ml-product-card,
+  .ml-featured-products__track .ml-product-skeleton {
     max-width: 100%;
     flex-basis: 60vw;
     box-sizing: border-box;
@@ -2168,7 +2253,8 @@ a.ml-news-card:focus-visible .ml-news-card__arrow {
     padding-right: 0;
     scroll-padding-inline: 0;
   }
-  .ml-product-grid .ml-product-card {
+  .ml-product-grid .ml-product-card,
+  .ml-product-grid .ml-product-skeleton {
     max-width: 100%;
     flex-basis: 60vw;
     box-sizing: border-box;
@@ -2182,6 +2268,14 @@ a.ml-news-card:focus-visible .ml-news-card__arrow {
   }
   .ml-featured[data-content-mode="typesense"] .ml-featured-products__progress span {
     background: #68d6ff;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ml-product-skeleton__media::after,
+  .ml-product-skeleton__line::after,
+  .ml-product-skeleton__attrs span::after {
+    animation: none;
   }
 }
 
@@ -4067,6 +4161,8 @@ a.ml-news-card:focus-visible .ml-news-card__arrow {
   min-width: 0;
   flex: 0 1 auto;
   margin: 0;
+  padding-bottom: 0.12em;
+  margin-bottom: -0.12em;
   background: linear-gradient(
     90deg,
     var(--ml-dark-blue-200) 0%,
@@ -6772,6 +6868,8 @@ a.ml-news-card:focus-visible .ml-news-card__arrow {
     flex-direction: column;
     justify-content: center;
     gap: 3.5rem;
+    padding-inline: 1.35rem;
+    box-sizing: border-box;
   }
 
   .ml-home .ml-project-lines-concept__header {
@@ -6935,11 +7033,22 @@ a.ml-news-card:focus-visible .ml-news-card__arrow {
 }
 
 @media (max-width: 990px) {
+  .ml-home .ml-project-lines-concept {
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+  }
+
+  .ml-home .ml-project-lines-concept__inner {
+    height: auto !important;
+    flex: none;
+  }
+
   .ml-home .ml-project-lines-concept__cards {
     display: flex;
     width: calc(100% + 1rem);
     min-width: 0;
-    flex: 1 1 auto;
+    flex: none;
     grid-template-columns: none;
     grid-template-rows: none;
     gap: 0.5rem;
@@ -6958,6 +7067,7 @@ a.ml-news-card:focus-visible .ml-news-card__arrow {
 
   .ml-home .ml-project-lines-concept__card {
     width: min(82vw, 20rem);
+    height: clamp(20rem, 100vw, 24rem) !important;
     flex: 0 0 min(82vw, 20rem);
     scroll-snap-align: start;
   }
@@ -6974,13 +7084,14 @@ a.ml-news-card:focus-visible .ml-news-card__arrow {
 
   .ml-home .ml-project-lines-concept__cards {
     height: auto !important;
-    flex: 1 1 auto;
+    flex: none;
     margin-top: var(--ml-project-lines-content-gap);
   }
 
   .ml-home .ml-project-lines-concept__explore {
     flex: 0 0 auto;
     margin-top: 2.5rem;
+    margin-bottom: 2.5rem;
   }
 }
 
