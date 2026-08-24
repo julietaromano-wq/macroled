@@ -337,7 +337,7 @@ body {
 .ml-featured {
   --line-bg: #fff;
   --line-color: #071521;
-  padding: clamp(1rem, 3vw, 2rem) 0 clamp(5rem, 10vw, 10rem);
+  padding: clamp(1rem, 3vw, 2rem) 0 clamp(2.5rem, 5vw, 7rem);
   color: var(--line-color);
 }
 .ml-featured__story {
@@ -464,7 +464,7 @@ body {
   max-width: 48rem;
 }
 .ml-products-block {
-  padding-top: 3rem;
+  padding-top: 0.5rem;
 }
 .ml-products-label {
   display: flex;
@@ -3440,7 +3440,7 @@ a.ml-news-card:focus-visible .ml-news-card__arrow {
   flex: 0 0 auto;
 }
 .ml-line-content--static {
-  padding-top: 3rem;
+  padding-top: 0.5rem;
   padding-inline: 3.25rem;
 }
 .ml-line-subfamilies {
@@ -7071,6 +7071,21 @@ a.ml-news-card:focus-visible .ml-news-card__arrow {
     flex: 0 0 min(82vw, 20rem);
     scroll-snap-align: start;
   }
+
+  .ml-home .ml-project-lines-concept__ambient {
+    opacity: 0.38;
+    transform: scale(1);
+  }
+
+  .ml-home .ml-project-lines-concept__shade {
+    background: linear-gradient(
+      180deg,
+      rgba(0, 0, 0, 0.46) 0%,
+      rgba(0, 0, 0, 0.14) 48%,
+      rgba(0, 0, 0, 0.42) 100%
+    );
+    opacity: 1;
+  }
 }
 
 @media (max-width: 900px) {
@@ -7542,6 +7557,8 @@ body.assistant-open .ai-launch {
 /* Product crop: 1920px reference, progressively reduced on smaller cards. */
 .ml-home [data-project-lines-concept-card="street"] .ml-project-lines-concept__product {
   right: -20% !important;
+  transform-origin: right bottom;
+  scale: 1.08;
   translate: none !important;
 }
 
