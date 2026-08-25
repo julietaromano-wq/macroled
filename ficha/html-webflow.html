@@ -535,21 +535,22 @@
 <div class="ai-backdrop" id="aiBackdrop" hidden></div>
 <aside class="ai-panel" id="aiPanel" role="dialog" aria-modal="true" aria-labelledby="aiTitle" hidden>
   <div class="ai-head">
-    <div class="ai-head-copy">
-      <h2 id="aiTitle">Asistente de producto</h2>
-      <p>Probá nuestro asistente para resolver dudas sobre este producto.</p>
-      <span class="ai-proto">Demo</span>
+    <div class="ai-head-main">
+      <div class="ai-avatar" aria-hidden="true">
+        <svg class="ai-avatar-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+          <path d="M12 3a7 7 0 0 0-4 12.7V19l4-2 4 2v-3.3A7 7 0 0 0 12 3z"/>
+          <path d="M9.5 10h.01M14.5 10h.01"/>
+        </svg>
+        <span class="ai-avatar-online"></span>
+      </div>
+      <div class="ai-head-copy">
+        <h2 id="aiTitle">Asistente de producto</h2>
+        <p class="ai-head-sub">Probá nuestro asistente para resolver dudas sobre este producto.</p>
+      </div>
     </div>
     <button type="button" class="ai-close" id="aiClose" aria-label="Cerrar asistente">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
     </button>
-  </div>
-  <div class="ai-product">
-    <img id="aiProductImg" src="" alt="">
-    <div>
-      <strong id="aiProductName">Space Blanca</strong>
-      <span id="aiProductMeta">SKU SPACE-B · Decorativas</span>
-    </div>
   </div>
   <div class="ai-messages" id="aiMessages" aria-live="polite"></div>
   <div class="ai-typing" id="aiTyping" aria-hidden="true"><span></span><span></span><span></span></div>
