@@ -624,6 +624,7 @@ if (typeof module !== "undefined") module.exports = MEGAMENU_DATA;
       if (tabsEl) tabsEl.scrollTop = 0;
       root.classList.add("is-open");
       trigger.setAttribute("aria-expanded", "true");
+      document.getElementById("macroled-menu") && document.getElementById("macroled-menu").classList.add("menu-open");
       if (window.MACROLED_MENU && window.MACROLED_MENU.lockPageScroll) {
         window.MACROLED_MENU.lockPageScroll();
       }
@@ -637,6 +638,7 @@ if (typeof module !== "undefined") module.exports = MEGAMENU_DATA;
       if (!root.classList.contains("is-open")) return;
       root.classList.remove("is-open");
       trigger.setAttribute("aria-expanded", "false");
+      document.getElementById("macroled-menu") && document.getElementById("macroled-menu").classList.remove("menu-open");
       if (window.MACROLED_MENU && window.MACROLED_MENU.unlockPageScroll) {
         window.MACROLED_MENU.unlockPageScroll();
       }
@@ -1228,124 +1230,11 @@ if (typeof module !== "undefined") module.exports = MEGAMENU_DATA;
   if (window.__macroledNavThemeInit) return;
   window.__macroledNavThemeInit = true;
 
-  function parseRgb(str) {
-    if (!str || str === "transparent") return null;
-    var m = String(str).match(/rgba?\(\s*(\d+)[,\s]+(\d+)[,\s]+(\d+)(?:\s*[,/]\s*([\d.]+))?/);
-    if (!m) return null;
-    var a = m[4] == null ? 1 : parseFloat(m[4]);
-    if (a < 0.12) return null;
-    return { r: +m[1], g: +m[2], b: +m[3], a: a };
-  }
+  var observer = null;
+  var activeDark = new Set();
 
-  function luminance(c) {
-    function lin(v) {
-      v /= 255;
-      return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4);
-    }
-    return 0.2126 * lin(c.r) + 0.7152 * lin(c.g) + 0.0722 * lin(c.b);
-  }
-
-  function themeFromAttr(el) {
-    if (!el || !el.closest) return null;
-    var node = el.closest("[data-nav-theme]");
-    if (!node) return null;
-    var t = String(node.getAttribute("data-nav-theme") || "").toLowerCase();
-    if (t === "dark" || t === "light") return t;
-    return null;
-  }
-
-  function themeFromSections(navH) {
-    var nodes = document.querySelectorAll("[data-nav-theme]");
-    var band = Math.max(navH + 32, 96);
-    var best = null;
-    var bestOverlap = 0;
-    var i, el, r, overlap, t;
-    for (i = 0; i < nodes.length; i++) {
-      el = nodes[i];
-      r = el.getBoundingClientRect();
-      overlap = Math.min(band, r.bottom) - Math.max(0, r.top);
-      if (overlap > bestOverlap) {
-        bestOverlap = overlap;
-        best = el;
-      }
-    }
-    if (!best || bestOverlap < 10) return null;
-    t = String(best.getAttribute("data-nav-theme") || "").toLowerCase();
-    if (t === "dark" || t === "light") return t;
-    return null;
-  }
-
-  function sampleTheme(menu) {
-    var navH = Math.round(menu.getBoundingClientRect().height || 72);
-    var fromSection = themeFromSections(navH);
-    if (fromSection) return fromSection;
-
-    var x = Math.round(window.innerWidth / 2);
-    var probes = [2, Math.max(8, Math.round(navH * 0.5)), navH + 8];
-    var p, stack, i, el, tagged, cs, color, tag, rect;
-    for (p = 0; p < probes.length; p++) {
-      stack = [];
-      try { stack = document.elementsFromPoint(x, probes[p]) || []; } catch (err) {}
-      for (i = 0; i < stack.length; i++) {
-        el = stack[i];
-        if (!el || menu.contains(el)) continue;
-        tagged = themeFromAttr(el);
-        if (tagged) return tagged;
-      }
-      for (i = 0; i < stack.length; i++) {
-        el = stack[i];
-        if (!el || menu.contains(el)) continue;
-        tag = el.tagName;
-        if (tag === "VIDEO" || tag === "CANVAS") return "dark";
-        if (tag === "IMG") {
-          rect = el.getBoundingClientRect();
-          if (rect.width > 80 && rect.height > 40) return "dark";
-        }
-        cs = window.getComputedStyle(el);
-        if (cs.backgroundImage && cs.backgroundImage !== "none") {
-          color = parseRgb(cs.backgroundColor);
-          if (color && color.a > 0.82 && luminance(color) > 0.62) return "light";
-          return "dark";
-        }
-        color = parseRgb(cs.backgroundColor);
-        if (color) return luminance(color) < 0.48 ? "dark" : "light";
-      }
-    }
-
-    tagged = themeFromAttr(document.body) || themeFromAttr(document.documentElement);
-    if (tagged) return tagged;
-    return "light";
-  }
-
-  function apply(menu, theme) {
-    var next = theme === "dark" ? "dark" : "light";
-    if (menu.getAttribute("data-mm-theme") === next) return;
-    menu.setAttribute("data-mm-theme", next);
-    menu.classList.toggle("is-on-dark", next === "dark");
-    menu.classList.toggle("is-on-light", next === "light");
-  }
-
-  function update() {
-    var menu = document.getElementById("macroled-menu");
-    if (!menu) return;
-    if (document.querySelector("#macroled-menu .mm-root.is-open")) {
-      apply(menu, "light");
-      return;
-    }
-    apply(menu, sampleTheme(menu));
-  }
-
-  window.MACROLED_MENU = window.MACROLED_MENU || {};
-  window.MACROLED_MENU.refreshNavTheme = update;
-
-  var ticking = false;
-  function onScroll() {
-    if (ticking) return;
-    ticking = true;
-    requestAnimationFrame(function () {
-      ticking = false;
-      update();
-    });
+  function getMenu() {
+    return document.getElementById("macroled-menu");
   }
 
   function hoistMenu(menu) {
@@ -1354,27 +1243,87 @@ if (typeof module !== "undefined") module.exports = MEGAMENU_DATA;
     document.body.insertBefore(menu, document.body.firstChild);
   }
 
-  function init() {
-    var menu = document.getElementById("macroled-menu");
-    if (menu) hoistMenu(menu);
-    update();
-    window.addEventListener("scroll", onScroll, { passive: true, capture: true });
-    window.addEventListener("resize", onScroll, { passive: true });
+  function menuIsOpen(menu) {
+    return !!(menu && menu.querySelector(".mm-root.is-open"));
   }
 
-  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init);
-  else init();
+  function apply(menu, isDark) {
+    if (menuIsOpen(menu)) isDark = false;
+    menu.classList.toggle("is-on-dark", isDark);
+    menu.classList.toggle("nav-dark", isDark);
+    menu.classList.toggle("is-on-light", !isDark);
+    menu.setAttribute("data-mm-theme", isDark ? "dark" : "light");
+  }
+
+  function update() {
+    var menu = getMenu();
+    if (!menu) return;
+    apply(menu, activeDark.size > 0);
+  }
+
+  function bindObserver() {
+    var menu = getMenu();
+    var darks = [].slice.call(document.querySelectorAll('[data-nav-theme="dark"]'));
+    if (!menu) return false;
+
+    hoistMenu(menu);
+    if (observer) {
+      observer.disconnect();
+      activeDark.clear();
+    }
+
+    var navH = Math.round(menu.getBoundingClientRect().height) || 72;
+    observer = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting) activeDark.add(entry.target);
+        else activeDark.delete(entry.target);
+      });
+      update();
+    }, {
+      root: null,
+      rootMargin: "-" + navH + "px 0px -" + Math.max(0, window.innerHeight - navH - 1) + "px 0px",
+      threshold: 0
+    });
+
+    darks.forEach(function (el) { observer.observe(el); });
+    update();
+    return darks.length > 0;
+  }
+
+  function init() {
+    if (bindObserver()) return true;
+    return false;
+  }
+
+  window.MACROLED_MENU = window.MACROLED_MENU || {};
+  window.MACROLED_MENU.refreshNavTheme = update;
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", function () {
+      if (!init()) {
+        var n = 0;
+        var iv = setInterval(function () {
+          if (init() || ++n > 30) clearInterval(iv);
+        }, 200);
+      }
+    });
+  } else if (!init()) {
+    var n = 0;
+    var iv = setInterval(function () {
+      if (init() || ++n > 30) clearInterval(iv);
+    }, 200);
+  }
+
+  var rz;
+  window.addEventListener("resize", function () {
+    clearTimeout(rz);
+    rz = setTimeout(bindObserver, 200);
+  });
+
   window.Webflow = window.Webflow || [];
   window.Webflow.push(function () {
-    var menu = document.getElementById("macroled-menu");
-    if (menu) {
-      if (menu.parentElement !== document.body) {
-        document.body.insertBefore(menu, document.body.firstChild);
-      }
-    }
-    requestAnimationFrame(update);
-    setTimeout(update, 80);
-    setTimeout(update, 400);
+    setTimeout(bindObserver, 50);
+    setTimeout(bindObserver, 400);
   });
 })();
 
