@@ -249,10 +249,17 @@
       renderCompareBar();
       syncCompareCheckboxes();
     });
-    window.addEventListener("macroled-assistant-toggle", () => {
-      requestAnimationFrame(updateComparePadding);
-      setTimeout(updateComparePadding, 320);
-    });
+    // El motor del asistente (copiado de productos/script.js) ya no manda
+    // el evento "macroled-assistant-toggle" — observamos directamente la
+    // clase "is-open" del panel para recalcular el padding igual que antes.
+    const aiPanelEl = document.getElementById("aiPanel");
+    if (aiPanelEl && window.MutationObserver) {
+      const assistantObserver = new MutationObserver(() => {
+        requestAnimationFrame(updateComparePadding);
+        setTimeout(updateComparePadding, 320);
+      });
+      assistantObserver.observe(aiPanelEl, { attributes: true, attributeFilter: ["class"] });
+    }
     window.addEventListener("storage", (e) => {
       if (e.key === "macroled_compare") {
         renderCompareBar();

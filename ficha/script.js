@@ -1999,8 +1999,9 @@
     PRODUCT_CTX.description = description;
     PRODUCT_CTX.contactoUrl = CONTACTO_URL;
 
-    if (typeof resetSuggestionsState === "function") resetSuggestionsState();
-    if (typeof renderSuggestions === "function") renderSuggestions();
+    if (typeof assistant !== "undefined" && assistant && typeof assistant.renderSuggestions === "function") {
+      assistant.renderSuggestions();
+    }
 
     heroItem = el;
     if (variantsTarget) variantsTarget.innerHTML = buildChipsHtml();
@@ -2450,16 +2451,13 @@
     return genericSpecMatch(question);
   }
 
-  /* —— Capa 2: agente con IA sobre el catálogo completo (n8n) —— */
-  const N8N_WEBHOOK_URL = "https://n8n.coresagroup.com/webhook/macroled-ia";
-  const AI_TIMEOUT_MS = 12000;
-
   /**
-   * Se usa SOLO cuando la Capa 2 no pudo responder por un problema técnico
-   * (timeout, red caída, webhook no disponible todavía) — no es un "no sé
-   * la respuesta". Por eso invita a revisar la ficha técnica en vez de
-   * mandar directo a contacto: ese salto a contacto queda reservado para
-   * precio/stock, o para lo que el propio agente de la Capa 2 decida
+   * Mensaje de fallback de la Capa 2 (se lo pasamos al motor genérico como
+   * "fallbackHtml"). Se usa SOLO cuando la IA no pudo responder por un
+   * problema técnico (timeout, red caída, webhook no disponible todavía) —
+   * no es un "no sé la respuesta". Por eso invita a revisar la ficha técnica
+   * en vez de mandar directo a contacto: ese salto a contacto queda
+   * reservado para precio/stock, o para lo que el propio agente decida
    * cuando esté conectado de verdad.
    */
   function noDataFallbackMsg() {
@@ -2468,45 +2466,6 @@
       return `No pude encontrar información sobre esa característica para este producto. Te recomendamos revisar la <a href="${ctx.ficha}" target="_blank" rel="noopener">ficha técnica (PDF)</a>, donde puede estar especificada con mayor detalle.`;
     }
     return `No pude encontrar información sobre esa característica para este producto.`;
-  }
-
-  async function askAI(question) {
-    const ctx = window.__mlProductCtx || PRODUCT_CTX;
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), AI_TIMEOUT_MS);
-
-    try {
-      const res = await fetch(N8N_WEBHOOK_URL, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        signal: controller.signal,
-        body: JSON.stringify({
-          pregunta: question,
-          sku: ctx.sku || "",
-          nombre: ctx.name || "",
-          macrofamilia: ctx.macro || "",
-          familia: ctx.family || "",
-        }),
-      });
-      clearTimeout(timeoutId);
-
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-
-      const data = await res.json();
-      // El n8n "Respond to Webhook" a veces envuelve el resultado en un
-      // array de 1 item ([{ respuesta: "..." }]) y a veces manda el
-      // objeto suelto ({ respuesta: "..." }) — aceptamos las dos formas.
-      const item = Array.isArray(data) ? data[0] : data;
-      const texto = item && (item.respuesta || item.output || item.answer);
-      if (!texto) throw new Error("Respuesta vacía del agente");
-
-      // El \n del agente -> <br> para que se vea bien en el chat
-      return String(texto).replace(/\n/g, "<br>");
-    } catch (err) {
-      clearTimeout(timeoutId);
-      console.warn("[asistente] error consultando IA:", err);
-      return noDataFallbackMsg();
-    }
   }
 
   /* —— Sugerencias dinámicas ——
@@ -2555,64 +2514,212 @@
       i++;
     }
 
-    return picks
-      .filter((q) => !usedSuggestions.has(q))
-      .slice(0, max);
+    // El filtrado de sugerencias ya usadas lo hace initAssistant() con su
+    // propio "usedSuggestions" (privado al motor) sobre lo que devuelve acá.
+    return picks.slice(0, max);
   }
 
-  const aiPanel = document.getElementById("aiPanel");
-  const aiBackdrop = document.getElementById("aiBackdrop");
-  const aiMessages = document.getElementById("aiMessages");
-  const aiTyping = document.getElementById("aiTyping");
-  const aiSuggestions = document.getElementById("aiSuggestions");
-  const aiForm = document.getElementById("aiForm");
-  const aiInput = document.getElementById("aiInput");
-  let aiBusy = false;
-  let aiLastTrigger = null;
-  const usedSuggestions = new Set();
-  let hideAllSuggestions = false;
+  /* —— Motor del asistente ——
+     Copiado tal cual de productos/script.js (window.MacroledAssistant.init)
+     para que ambas páginas usen el mismo motor: mismo webhook, mismo
+     timeout, mismo parseo de respuesta y el mismo sessionId por carga de
+     página para que n8n pueda mantener memoria de la conversación (la
+     ficha no lo mandaba antes). Lo único propio de esta página es la
+     config que se le pasa a initAssistant() más abajo (greeting,
+     localAnswer con los specs del producto, suggestions dinámicas y el
+     payload/fallback con el contexto del SKU). */
+  const N8N_WEBHOOK_URL = "https://n8n.coresagroup.com/webhook/macroled-ia";
+  const AI_TIMEOUT_MS = 12000;
 
-  function resetSuggestionsState() {
-    usedSuggestions.clear();
-    hideAllSuggestions = false;
+  window.MacroledSessionId =
+    window.MacroledSessionId ||
+    (window.crypto && crypto.randomUUID
+      ? crypto.randomUUID()
+      : `sid-${Date.now()}-${Math.random().toString(36).slice(2)}`);
+
+  function defaultFallbackHtml() {
+    return "No pude encontrar información sobre esa consulta en este momento.";
   }
 
-  function openAssistant(trigger) {
-    aiLastTrigger = trigger || document.activeElement;
-    aiPanel.hidden = false;
-    aiBackdrop.hidden = false;
-    requestAnimationFrame(() => {
-      aiPanel.classList.add("is-open");
-      aiBackdrop.classList.add("is-open");
-    });
-    document.body.classList.add("assistant-open");
-    window.dispatchEvent(new CustomEvent("macroled-assistant-toggle", { detail: { open: true } }));
-    /* En mobile el focus automático dispara zoom de iOS; el usuario toca el input. */
-    const isTouchUi =
-      window.matchMedia("(max-width: 640px)").matches ||
-      window.matchMedia("(hover: none) and (pointer: coarse)").matches;
-    if (isTouchUi) {
-      aiInput.blur();
-    } else {
-      aiInput.focus();
+  function initAssistant(options) {
+    options = options || {};
+    const getPayload = typeof options.getPayload === "function" ? options.getPayload : (q) => ({ pregunta: q });
+    const localAnswerFn = typeof options.localAnswer === "function" ? options.localAnswer : null;
+    const getSuggestions = typeof options.suggestions === "function" ? options.suggestions : () => [];
+    const fallbackHtml = typeof options.fallbackHtml === "function" ? options.fallbackHtml : defaultFallbackHtml;
+    const greeting = options.greeting || "Hola, soy el asistente de <b>productos Macroled</b>.";
+
+    const aiLaunch = document.getElementById("aiLaunch");
+    const aiPanel = document.getElementById("aiPanel");
+    const aiBackdrop = document.getElementById("aiBackdrop");
+    const aiMessages = document.getElementById("aiMessages");
+    const aiTyping = document.getElementById("aiTyping");
+    const aiSuggestions = document.getElementById("aiSuggestions");
+    const aiForm = document.getElementById("aiForm");
+    const aiInput = document.getElementById("aiInput");
+    const aiClose = document.getElementById("aiClose");
+    const openFromCta = document.getElementById("openAssistantFromCta"); // opcional, solo en ficha
+
+    if (!aiPanel || !aiForm || !aiMessages) {
+      console.warn("[asistente] Faltan elementos del widget en el DOM de esta página — no se inicializa.");
+      return null;
     }
-  }
-  function closeAssistant() {
-    aiPanel.classList.remove("is-open");
-    aiBackdrop.classList.remove("is-open");
-    document.body.classList.remove("assistant-open");
-    window.dispatchEvent(new CustomEvent("macroled-assistant-toggle", { detail: { open: false } }));
-    setTimeout(() => {
-      aiPanel.hidden = true;
-      aiBackdrop.hidden = true;
-      if (aiLastTrigger && typeof aiLastTrigger.focus === "function") aiLastTrigger.focus();
-    }, 280);
-  }
 
-  document.getElementById("aiLaunch").addEventListener("click", (e) => openAssistant(e.currentTarget));
-  document.getElementById("openAssistantFromCta").addEventListener("click", (e) => openAssistant(e.currentTarget));
-  document.getElementById("aiClose").addEventListener("click", closeAssistant);
-  aiBackdrop.addEventListener("click", closeAssistant);
+    let aiBusy = false;
+    let aiLastTrigger = null;
+    const usedSuggestions = new Set();
+
+    function openAssistant(trigger) {
+      aiLastTrigger = trigger || document.activeElement;
+      if (aiBackdrop) {
+        aiBackdrop.hidden = false;
+        aiBackdrop.removeAttribute("hidden");
+      }
+      aiPanel.hidden = false;
+      aiPanel.removeAttribute("hidden");
+      // Doble rAF para que el browser pinte el estado cerrado antes de animar
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          aiPanel.classList.add("is-open");
+          if (aiBackdrop) aiBackdrop.classList.add("is-open");
+        });
+      });
+      document.body.classList.add("assistant-open");
+      try {
+        const isTouchUi =
+          window.matchMedia("(max-width: 640px)").matches ||
+          window.matchMedia("(hover: none) and (pointer: coarse)").matches;
+        if (aiInput) {
+          if (isTouchUi) aiInput.blur();
+          else aiInput.focus();
+        }
+      } catch (_) {}
+    }
+
+    function closeAssistant() {
+      aiPanel.classList.remove("is-open");
+      if (aiBackdrop) aiBackdrop.classList.remove("is-open");
+      document.body.classList.remove("assistant-open");
+      setTimeout(() => {
+        aiPanel.hidden = true;
+        if (aiBackdrop) aiBackdrop.hidden = true;
+        if (aiLastTrigger && typeof aiLastTrigger.focus === "function") aiLastTrigger.focus();
+      }, 280);
+    }
+
+    function addMsg(role, html) {
+      const el = document.createElement("div");
+      el.className = `ai-msg ${role}`;
+      el.innerHTML = `<div class="ai-bubble">${html}</div>`;
+      aiMessages.appendChild(el);
+      aiMessages.scrollTop = aiMessages.scrollHeight;
+    }
+
+    function renderSuggestions() {
+      if (!aiSuggestions) return;
+      aiSuggestions.innerHTML = getSuggestions()
+        .filter((s) => !usedSuggestions.has(s))
+        .map((s) => `<button type="button" class="ai-chip">${s}</button>`)
+        .join("");
+    }
+
+    async function askAI(question) {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), AI_TIMEOUT_MS);
+
+      try {
+        const res = await fetch(N8N_WEBHOOK_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          signal: controller.signal,
+          body: JSON.stringify({
+            ...getPayload(question),
+            sessionId: window.MacroledSessionId,
+          }),
+        });
+        clearTimeout(timeoutId);
+
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+        const data = await res.json();
+        // El "Respond to Webhook" de n8n a veces envuelve el resultado en
+        // un array de 1 item ([{ respuesta: "..." }]) y a veces manda el
+        // objeto suelto ({ respuesta: "..." }) — aceptamos las dos formas.
+        const item = Array.isArray(data) ? data[0] : data;
+        const texto = item && (item.respuesta || item.output || item.answer);
+        if (!texto) throw new Error("Respuesta vacía del agente");
+
+        // El \n del agente -> <br> para que se vea bien en el chat
+        return String(texto).replace(/\n/g, "<br>");
+      } catch (err) {
+        clearTimeout(timeoutId);
+        console.warn("[asistente] error consultando IA:", err);
+        return fallbackHtml();
+      }
+    }
+
+    /**
+     * Flujo principal: si la página dio un localAnswer (Capa 1, gratis e
+     * instantánea), se prueba primero; si no hay dato o la página no la
+     * definió, va directo a la Capa 2 (agente con IA sobre el catálogo
+     * completo).
+     */
+    async function ask(question) {
+      const q = question.trim();
+      if (!q || aiBusy) return;
+      aiBusy = true;
+      if (getSuggestions().includes(q)) usedSuggestions.add(q);
+      if (aiSuggestions) aiSuggestions.innerHTML = "";
+      addMsg("user", q.replace(/</g, "&lt;"));
+      aiTyping.classList.add("is-on");
+      aiForm.querySelector(".ai-send").disabled = true;
+
+      let respuesta = localAnswerFn ? localAnswerFn(q) : null;
+
+      if (respuesta) {
+        // Capa 1: gratis e instantánea, pero dejamos un pequeño delay
+        // para que no se sienta robótico / demasiado abrupto.
+        await new Promise((r) => setTimeout(r, 300 + Math.random() * 250));
+      } else {
+        // Capa 2: agente con IA sobre el catálogo completo
+        respuesta = await askAI(q);
+      }
+
+      aiTyping.classList.remove("is-on");
+      addMsg("bot", respuesta);
+      renderSuggestions();
+      aiForm.querySelector(".ai-send").disabled = false;
+      aiBusy = false;
+    }
+
+    if (aiLaunch) aiLaunch.addEventListener("click", (e) => openAssistant(e.currentTarget));
+    if (openFromCta) openFromCta.addEventListener("click", (e) => openAssistant(e.currentTarget));
+    if (aiClose) aiClose.addEventListener("click", closeAssistant);
+    if (aiBackdrop) aiBackdrop.addEventListener("click", closeAssistant);
+
+    if (aiSuggestions) {
+      aiSuggestions.addEventListener("click", (e) => {
+        const chip = e.target.closest(".ai-chip");
+        if (chip) ask(chip.textContent);
+      });
+    }
+    aiForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const q = aiInput.value;
+      aiInput.value = "";
+      ask(q);
+    });
+
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && aiPanel.classList.contains("is-open")) closeAssistant();
+    });
+
+    addMsg("bot", greeting);
+    renderSuggestions();
+
+    window.MacroledAssistantOpen = openAssistant;
+    return { openAssistant, closeAssistant, renderSuggestions, ask };
+  }
 
   /* Webflow pisa button/label con width:100% / display:block; forzamos la fila en runtime. */
   function hardenCtaUtility() {
@@ -2648,86 +2755,25 @@
   }
   window.addEventListener("load", hardenCtaUtility);
 
-  function addMsg(role, html) {
-    const el = document.createElement("div");
-    el.className = `ai-msg ${role}`;
-    el.innerHTML = `<div class="ai-bubble">${html}</div>`;
-    aiMessages.appendChild(el);
-    aiMessages.scrollTop = aiMessages.scrollHeight;
-  }
-
-  function renderSuggestions() {
-    if (!aiSuggestions) return;
-    if (hideAllSuggestions) {
-      aiSuggestions.innerHTML = "";
-      aiSuggestions.hidden = true;
-      return;
-    }
-    const list = buildSuggestions();
-    aiSuggestions.hidden = list.length === 0;
-    aiSuggestions.innerHTML = list
-      .map((s) => `<button type="button" class="ai-chip">${s}</button>`)
-      .join("");
-  }
-
-  /**
-   * Flujo principal: Capa 1 (reglas locales, gratis e instantánea) primero;
-   * si no hay dato local para lo que preguntaron, recién ahí se llama a la
-   * Capa 2 (agente con IA sobre el catálogo completo).
-   */
-  async function ask(question) {
-    const q = question.trim();
-    if (!q || aiBusy) return;
-    aiBusy = true;
-    aiSuggestions.innerHTML = "";
-    addMsg("user", q.replace(/</g, "&lt;"));
-    aiTyping.classList.add("is-on");
-    aiForm.querySelector(".ai-send").disabled = true;
-
-    let respuesta = localAnswer(q);
-
-    if (respuesta) {
-      // Capa 1: gratis e instantánea, pero dejamos un pequeño delay
-      // para que no se sienta robótico / demasiado abrupto.
-      await new Promise((r) => setTimeout(r, 300 + Math.random() * 250));
-    } else {
-      // Capa 2: agente con IA sobre el catálogo completo
-      respuesta = await askAI(q);
-    }
-
-    aiTyping.classList.remove("is-on");
-    addMsg("bot", respuesta);
-    renderSuggestions();
-    aiForm.querySelector(".ai-send").disabled = false;
-    aiBusy = false;
-  }
-
-  aiSuggestions.addEventListener("click", (e) => {
-    const chip = e.target.closest(".ai-chip");
-    if (!chip) return;
-    const text = chip.textContent.trim();
-    if (window.matchMedia("(max-width: 640px)").matches) {
-      /* Mobile: al elegir una, se ocultan todas (molestan mucho en pantalla chica) */
-      hideAllSuggestions = true;
-      aiSuggestions.innerHTML = "";
-      aiSuggestions.hidden = true;
-    } else {
-      usedSuggestions.add(text);
-    }
-    ask(text);
-  });
-  aiForm.addEventListener("submit", (e) => {
-    e.preventDefault();
-    const q = aiInput.value;
-    aiInput.value = "";
-    ask(q);
-  });
-
-  addMsg("bot", `Hola, soy el asistente de <b>productos Macroled</b>. Estoy para ayudarte con la información técnica de este producto.`);
-  renderSuggestions();
-
-  document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape" && aiPanel.classList.contains("is-open")) closeAssistant();
+  /* Config propia de la ficha: Capa 1 con los specs del producto actual
+     (localAnswer/buildSuggestions ya definidos más arriba) + Capa 2 con el
+     contexto del SKU en el payload y el fallback que linkea a la ficha
+     técnica en PDF. */
+  const assistant = initAssistant({
+    greeting: `Hola, soy el asistente de <b>productos Macroled</b>. Estoy para ayudarte con la información técnica de este producto.`,
+    localAnswer: localAnswer,
+    suggestions: buildSuggestions,
+    fallbackHtml: noDataFallbackMsg,
+    getPayload: (q) => {
+      const ctx = window.__mlProductCtx || PRODUCT_CTX;
+      return {
+        pregunta: q,
+        sku: ctx.sku || "",
+        nombre: ctx.name || "",
+        macrofamilia: ctx.macro || "",
+        familia: ctx.family || "",
+      };
+    },
   });
 
   /* —— Share —— */
