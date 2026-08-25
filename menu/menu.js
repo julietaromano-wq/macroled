@@ -1254,6 +1254,9 @@ if (typeof module !== "undefined") module.exports = MEGAMENU_DATA;
   }
 
   function apply(menu, isDark) {
+    if (menu.querySelector(".mm-root.is-open") || menu.classList.contains("menu-open")) {
+      isDark = false;
+    }
     menu.classList.toggle("is-on-dark", isDark);
     menu.classList.toggle("nav-dark", isDark);
     menu.classList.toggle("is-on-light", !isDark);
