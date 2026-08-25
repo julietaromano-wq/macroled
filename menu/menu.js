@@ -1254,37 +1254,62 @@ if (typeof module !== "undefined") module.exports = MEGAMENU_DATA;
     return null;
   }
 
-  function sampleTheme(menu) {
-    var y = Math.max(10, Math.round((menu.getBoundingClientRect().height || 72) * 0.55));
-    var x = Math.round(window.innerWidth / 2);
-    var stack = [];
-    try { stack = document.elementsFromPoint(x, y) || []; } catch (err) {}
-
-    var i, el, tagged, cs, color, tag, rect;
-    for (i = 0; i < stack.length; i++) {
-      el = stack[i];
-      if (!el || menu.contains(el)) continue;
-      tagged = themeFromAttr(el);
-      if (tagged) return tagged;
+  function themeFromSections(navH) {
+    var nodes = document.querySelectorAll("[data-nav-theme]");
+    var band = Math.max(navH + 32, 96);
+    var best = null;
+    var bestOverlap = 0;
+    var i, el, r, overlap, t;
+    for (i = 0; i < nodes.length; i++) {
+      el = nodes[i];
+      r = el.getBoundingClientRect();
+      overlap = Math.min(band, r.bottom) - Math.max(0, r.top);
+      if (overlap > bestOverlap) {
+        bestOverlap = overlap;
+        best = el;
+      }
     }
+    if (!best || bestOverlap < 10) return null;
+    t = String(best.getAttribute("data-nav-theme") || "").toLowerCase();
+    if (t === "dark" || t === "light") return t;
+    return null;
+  }
 
-    for (i = 0; i < stack.length; i++) {
-      el = stack[i];
-      if (!el || menu.contains(el)) continue;
-      tag = el.tagName;
-      if (tag === "VIDEO" || tag === "CANVAS") return "dark";
-      if (tag === "IMG") {
-        rect = el.getBoundingClientRect();
-        if (rect.width > 80 && rect.height > 40) return "dark";
+  function sampleTheme(menu) {
+    var navH = Math.round(menu.getBoundingClientRect().height || 72);
+    var fromSection = themeFromSections(navH);
+    if (fromSection) return fromSection;
+
+    var x = Math.round(window.innerWidth / 2);
+    var probes = [2, Math.max(8, Math.round(navH * 0.5)), navH + 8];
+    var p, stack, i, el, tagged, cs, color, tag, rect;
+    for (p = 0; p < probes.length; p++) {
+      stack = [];
+      try { stack = document.elementsFromPoint(x, probes[p]) || []; } catch (err) {}
+      for (i = 0; i < stack.length; i++) {
+        el = stack[i];
+        if (!el || menu.contains(el)) continue;
+        tagged = themeFromAttr(el);
+        if (tagged) return tagged;
       }
-      cs = window.getComputedStyle(el);
-      if (cs.backgroundImage && cs.backgroundImage !== "none") {
+      for (i = 0; i < stack.length; i++) {
+        el = stack[i];
+        if (!el || menu.contains(el)) continue;
+        tag = el.tagName;
+        if (tag === "VIDEO" || tag === "CANVAS") return "dark";
+        if (tag === "IMG") {
+          rect = el.getBoundingClientRect();
+          if (rect.width > 80 && rect.height > 40) return "dark";
+        }
+        cs = window.getComputedStyle(el);
+        if (cs.backgroundImage && cs.backgroundImage !== "none") {
+          color = parseRgb(cs.backgroundColor);
+          if (color && color.a > 0.82 && luminance(color) > 0.62) return "light";
+          return "dark";
+        }
         color = parseRgb(cs.backgroundColor);
-        if (color && color.a > 0.82 && luminance(color) > 0.62) return "light";
-        return "dark";
+        if (color) return luminance(color) < 0.48 ? "dark" : "light";
       }
-      color = parseRgb(cs.backgroundColor);
-      if (color) return luminance(color) < 0.48 ? "dark" : "light";
     }
 
     tagged = themeFromAttr(document.body) || themeFromAttr(document.documentElement);
@@ -1323,7 +1348,15 @@ if (typeof module !== "undefined") module.exports = MEGAMENU_DATA;
     });
   }
 
+  function hoistMenu(menu) {
+    if (!menu || !document.body) return;
+    if (menu.parentElement === document.body) return;
+    document.body.insertBefore(menu, document.body.firstChild);
+  }
+
   function init() {
+    var menu = document.getElementById("macroled-menu");
+    if (menu) hoistMenu(menu);
     update();
     window.addEventListener("scroll", onScroll, { passive: true, capture: true });
     window.addEventListener("resize", onScroll, { passive: true });
@@ -1333,6 +1366,12 @@ if (typeof module !== "undefined") module.exports = MEGAMENU_DATA;
   else init();
   window.Webflow = window.Webflow || [];
   window.Webflow.push(function () {
+    var menu = document.getElementById("macroled-menu");
+    if (menu) {
+      if (menu.parentElement !== document.body) {
+        document.body.insertBefore(menu, document.body.firstChild);
+      }
+    }
     requestAnimationFrame(update);
     setTimeout(update, 80);
     setTimeout(update, 400);
