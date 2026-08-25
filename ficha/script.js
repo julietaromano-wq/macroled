@@ -2468,55 +2468,14 @@
     return `No pude encontrar información sobre esa característica para este producto.`;
   }
 
-  /* —— Sugerencias dinámicas ——
-     Antes eran 4 fijas para todos los productos (autonomía, IP44, ficha,
-     potencia), así que en un producto sin batería o sin datos eléctricos
-     sugerían preguntas que no tenían respuesta. Ahora se arman según los
-     specs que el producto actual realmente tiene cargados. */
-  const SUGGESTION_CANDIDATES = [
-    { key: "Autonomía", q: "¿Cuál es la autonomía?" },
-    { key: "Potencia", q: "¿Qué potencia tiene?" },
-    { key: "Tensión", q: "¿Con qué tensión funciona?" },
-    { key: "Flujo luminoso", q: "¿Cuántos lúmenes tiene?" },
-    { key: "Temperatura del color", q: "¿Qué temperatura de color tiene?" },
-    { key: "Dimerizable", q: "¿Es dimerizable?" },
-    { key: "Tiempo de carga", q: "¿Cuánto tarda en cargar?" },
-    { key: "Ángulo de apertura", q: "¿Cuál es el ángulo de apertura?" },
-    { key: "Material del cuerpo", q: "¿De qué material es?" },
-    { key: "Garantía", q: "¿Cuánto dura la garantía?" },
-  ];
-
-  const UNIVERSAL_SUGGESTIONS = [
-    "¿Dónde bajo la ficha técnica?",
-    "¿En qué colores viene?",
-  ];
-
+  /* —— Sugerencias ——
+     Copia fiel de las 2 sugerencias fijas de productos/script.js
+     (asistente-catalogo.js): mismo texto en ambas páginas. */
   function buildSuggestions() {
-    const ctx = window.__mlProductCtx || PRODUCT_CTX;
-    const specs = ctx.specs || {};
-    const picks = [];
-    const max = window.matchMedia("(max-width: 640px)").matches ? 2 : 4;
-
-    // La protección (IP/IK) va primero y como pregunta genérica, no atada
-    // a un código puntual como "IP44" (que puede no aplicar a otro SKU).
-    if (hasSpecValue(specs["Protección IP"]) || hasSpecValue(specs["Protección IK"])) {
-      picks.push("¿Qué protección tiene?");
-    }
-
-    SUGGESTION_CANDIDATES.forEach((c) => {
-      if (picks.length >= max) return;
-      if (hasSpecValue(specs[c.key])) picks.push(c.q);
-    });
-
-    let i = 0;
-    while (picks.length < max && i < UNIVERSAL_SUGGESTIONS.length) {
-      if (picks.indexOf(UNIVERSAL_SUGGESTIONS[i]) === -1) picks.push(UNIVERSAL_SUGGESTIONS[i]);
-      i++;
-    }
-
-    // El filtrado de sugerencias ya usadas lo hace initAssistant() con su
-    // propio "usedSuggestions" (privado al motor) sobre lo que devuelve acá.
-    return picks.slice(0, max);
+    return [
+      "¿Qué luz me conviene para un living?",
+      "Busco algo para iluminar un local comercial",
+    ];
   }
 
   /* —— Motor del asistente ——
@@ -2755,25 +2714,15 @@
   }
   window.addEventListener("load", hardenCtaUtility);
 
-  /* Config propia de la ficha: Capa 1 con los specs del producto actual
-     (localAnswer/buildSuggestions ya definidos más arriba) + Capa 2 con el
-     contexto del SKU en el payload y el fallback que linkea a la ficha
-     técnica en PDF. */
+  /* Copia fiel de productos/script.js: mismo greeting, mismas sugerencias
+     y mismo payload/fallback por defecto del motor (sin datos del SKU).
+     Lo único propio de la ficha es localAnswer (Capa 1 con los specs del
+     producto actual, definido más arriba) — no se ve en el panel, solo
+     responde más rápido cuando puede. */
   const assistant = initAssistant({
-    greeting: `Hola, soy el asistente de <b>productos Macroled</b>. Estoy para ayudarte con la información técnica de este producto.`,
+    greeting: `Hola, soy el asistente de <b>productos Macroled</b>. Estoy para ayudarte a encontrar productos y soluciones según tus necesidades de iluminación.`,
     localAnswer: localAnswer,
     suggestions: buildSuggestions,
-    fallbackHtml: noDataFallbackMsg,
-    getPayload: (q) => {
-      const ctx = window.__mlProductCtx || PRODUCT_CTX;
-      return {
-        pregunta: q,
-        sku: ctx.sku || "",
-        nombre: ctx.name || "",
-        macrofamilia: ctx.macro || "",
-        familia: ctx.family || "",
-      };
-    },
   });
 
   /* —— Share —— */
