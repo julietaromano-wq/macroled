@@ -25,9 +25,12 @@
   font-family: var(--font);
   color: var(--ink);
   -webkit-font-smoothing: antialiased;
-  position: sticky;
+  position: fixed;
   top: 0;
-  z-index: 5000;
+  left: 0;
+  right: 0;
+  width: 100%;
+  z-index: 2147483647;
 }
 #macroled-menu *,
 #macroled-menu *::before,
@@ -42,14 +45,59 @@ html.mm-scroll-lock body {
   overscroll-behavior: none !important;
 }
 
+#macroled-menu.is-on-dark .mm-site-nav {
+  background: rgba(0, 21, 43, 0.16);
+  border-bottom-color: transparent;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+#macroled-menu.is-on-dark .mm-site-nav .mm-links a,
+#macroled-menu.is-on-dark .mm-trigger {
+  color: #fff;
+}
+#macroled-menu.is-on-dark .mm-site-nav .mm-links a:hover,
+#macroled-menu.is-on-dark .mm-root.is-open .mm-trigger {
+  color: #e8f7ff;
+}
+#macroled-menu.is-on-dark #mm-mobile .mm-mobile-bar {
+  background: rgba(0, 21, 43, 0.2);
+  border-bottom: none;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  color: #fff;
+}
+#macroled-menu.is-on-dark #mm-mobile .mm-logo,
+#macroled-menu.is-on-dark #mm-mobile .mm-logo svg {
+  color: #fff;
+}
+#macroled-menu.is-on-dark #mm-mobile .burger span { background: #fff; }
+#macroled-menu.is-on-dark #mm-mobile .search-trigger { color: #fff; }
+
+#macroled-menu.is-on-light .mm-site-nav {
+  background: #fff;
+  border-bottom-color: var(--line, #e6e6e6);
+}
+#macroled-menu.is-on-light #mm-mobile .mm-mobile-bar {
+  background: #fff;
+  color: #16294f;
+  border-bottom: 1px solid #e6e6e6;
+}
+#macroled-menu.is-on-light #mm-mobile .mm-logo,
+#macroled-menu.is-on-light #mm-mobile .mm-logo svg {
+  color: #00bdff;
+}
+#macroled-menu.is-on-light #mm-mobile .burger span { background: #16294f; }
+#macroled-menu.is-on-light #mm-mobile .search-trigger { color: #16294f; }
+
 /* Si el navbar nativo de Webflow queda visible, descomentá:
 .w-nav { display: none !important; }
 */
 #macroled-menu {
 .mm-site-nav {
     height:72px; border-bottom:1px solid var(--line);
-    position: sticky; top:0; background:#fff; z-index: 920;
+    position: relative; background:#fff; z-index: 920;
     overflow: visible;
+    transition: background .22s ease, border-color .22s ease, backdrop-filter .22s ease;
   }
   .mm-site-nav-inner {
     display:flex; align-items:center;
@@ -771,10 +819,11 @@ html.mm-scroll-lock body {
 }
 
 #mm-mobile .mm-mobile-bar {
-  position: sticky; top: 0; z-index: 100;
+  position: relative; z-index: 100;
   display: flex; align-items: center; justify-content: space-between;
   padding: 14px 20px; background: var(--mm-navy, #00152b); color: #fff;
   height: 62px; box-sizing: border-box;
+  transition: background .22s ease, border-color .22s ease, color .22s ease, backdrop-filter .22s ease;
 }
 #mm-mobile .mm-logo { width: 90px; max-width: 90px; color: #fff; line-height: 0; }
 #mm-mobile .mm-logo svg,
