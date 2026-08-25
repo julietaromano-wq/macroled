@@ -774,13 +774,14 @@ if (typeof module !== "undefined") module.exports = MEGAMENU_DATA;
     return "";
   }
 
-  /* ---- Desktop Typesense (píldora siempre abierta) ---- */
+  /* ---- Desktop Typesense (lupa que se desliza al abrir) ---- */
   (function () {
     var wrapper = document.getElementById("mm-ts-search-wrapper");
     var input = document.getElementById("mm-ts-search-input");
     var btn = document.getElementById("mm-ts-search-btn");
     var resultsBox = document.getElementById("mm-ts-search-results");
     if (!wrapper || !input || !btn || !resultsBox) return;
+    var searchBox = wrapper.closest(".mm-nav-search");
 
     var tsClient = null;
     try {
@@ -800,22 +801,40 @@ if (typeof module !== "undefined") module.exports = MEGAMENU_DATA;
       return PRODUCTS_PAGE_URL + "?q=" + encodeURIComponent(query);
     }
 
-    function setResultsOpen(open) {
-      wrapper.classList.toggle("has-results", open);
-      btn.setAttribute("aria-label", open ? "Cerrar búsqueda" : "Buscar");
+    function isOpen() {
+      return wrapper.classList.contains("is-open");
+    }
+
+    function openSearch() {
+      wrapper.classList.add("is-open");
+      if (searchBox) searchBox.classList.add("is-open");
+      input.setAttribute("aria-expanded", "true");
+      btn.setAttribute("aria-label", "Cerrar búsqueda");
+      setTimeout(function () { input.focus(); }, 220);
+    }
+
+    function closeSearch() {
+      wrapper.classList.remove("is-open");
+      wrapper.classList.remove("has-results");
+      if (searchBox) searchBox.classList.remove("is-open");
+      input.setAttribute("aria-expanded", "false");
+      btn.setAttribute("aria-label", "Abrir búsqueda");
+      input.value = "";
+      resultsBox.style.display = "none";
+      resultsBox.innerHTML = "";
+      input.blur();
     }
 
     function hideResults() {
-      resultsBox.style.display = "";
+      resultsBox.style.display = "none";
       resultsBox.innerHTML = "";
-      input.setAttribute("aria-expanded", "false");
-      setResultsOpen(false);
+      wrapper.classList.remove("has-results");
     }
 
     function showResults() {
-      resultsBox.style.display = "";
-      input.setAttribute("aria-expanded", "true");
-      setResultsOpen(true);
+      if (!isOpen()) return;
+      resultsBox.style.display = "block";
+      wrapper.classList.add("has-results");
     }
 
     function runSearch(query) {
@@ -839,6 +858,7 @@ if (typeof module !== "undefined") module.exports = MEGAMENU_DATA;
     }
 
     function renderResults(hits, found, query) {
+      if (!isOpen()) return;
       if (hits.length === 0) {
         resultsBox.innerHTML =
           '<div style="padding:16px;">' +
@@ -852,7 +872,7 @@ if (typeof module !== "undefined") module.exports = MEGAMENU_DATA;
               '<line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline>' +
             "</svg></span>" +
           "</a>";
-        resultsBox.style.display = "";
+        resultsBox.style.display = "block";
         showResults();
         return;
       }
@@ -919,28 +939,19 @@ if (typeof module !== "undefined") module.exports = MEGAMENU_DATA;
 
     btn.addEventListener("click", function (e) {
       e.preventDefault();
-      if (wrapper.classList.contains("has-results")) {
-        clearTimeout(debounceTimer);
-        hideResults();
-        input.value = "";
-        input.focus();
-        return;
-      }
-      var query = input.value.trim();
-      if (query) {
-        clearTimeout(debounceTimer);
-        runSearch(query);
-      } else {
-        input.focus();
-      }
+      e.stopPropagation();
+      if (isOpen()) closeSearch();
+      else openSearch();
     });
 
     document.addEventListener("click", function (e) {
-      if (!wrapper.contains(e.target)) hideResults();
+      if (wrapper.contains(e.target)) return;
+      resultsBox.style.display = "none";
+      if (isOpen() && !input.value.trim()) closeSearch();
     });
 
     document.addEventListener("keydown", function (e) {
-      if (e.key === "Escape") hideResults();
+      if (e.key === "Escape" && isOpen()) closeSearch();
     });
   })();
 
@@ -1010,9 +1021,9 @@ if (typeof module !== "undefined") module.exports = MEGAMENU_DATA;
             items: data.map(familyToItem),
           },
         },
-        { label: "Proyectos", href: "/proyectos" },
-        { label: "Descargas", href: "/descargas" },
+        { label: "Proyectos Lumínicos", href: "/proyectos" },
         { label: "Novedades", href: "/novedades" },
+        { label: "Descargas", href: "/descargas" },
         { label: "Contacto", href: "/contacto" },
       ],
     };

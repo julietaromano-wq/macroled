@@ -7155,7 +7155,7 @@ body.assistant-open .ai-launch {
   right: max(16px, env(safe-area-inset-right, 0px));
   left: auto;
   bottom: max(20px, env(safe-area-inset-bottom, 0px));
-  z-index: 10050;
+  z-index: 2147483645 !important;
   display: inline-flex;
   align-items: center;
   gap: 10px;
@@ -7223,7 +7223,7 @@ body.assistant-open .ai-launch {
 .ai-backdrop {
   position: fixed;
   inset: 0;
-  z-index: 10060;
+  z-index: 2147483646 !important;
   background: rgba(6, 12, 22, 0.35);
   opacity: 0;
   pointer-events: none;
@@ -7239,7 +7239,7 @@ body.assistant-open .ai-launch {
   position: fixed;
   top: 0;
   right: 0;
-  z-index: 10070;
+  z-index: 2147483647 !important;
   width: min(400px, 100%);
   height: 100%;
   background: var(--white);
