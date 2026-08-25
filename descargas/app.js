@@ -15,10 +15,16 @@ const PRODUCT_DOWNLOAD_FIELDS = [
   { field: "ies_link",      tipo_descarga: "IES",            tipo_archivo: "IES" },
 ];
 
-// Valor real de tipo_registro para los documentos de catálogos/manuales
-// (todavía sin subir a Typesense — hoy esta rama no trae resultados, pero
-// queda lista para cuando existan esos documentos).
+const TIPO_DESCARGA_CATALOGO = "Catálogo";
 const TIPO_REGISTRO_CATALOGO = "catalogo";
+const CATALOG_QUERY_BY = "nombre_typesense,descripcion,sku";
+const CATALOG_INCLUDE_FIELDS = [
+  "id", "nombre_typesense", "nombre", "descripcion", "sku",
+  "macrofamilia", "subfamilia", "nuevo", "tipo_registro", "tipo_descarga", "tipo_archivo",
+  "archivo", "catalogo", "catalogo_link", "ficha_tecnica", "pdf", "url", "link",
+  "paginas", "mb", "multiimagen", "multiimage", "imagen", "imagen_portada"
+].join(",");
+const TIPO_DESCARGA_ORDER = ["Catálogo", "Ficha técnica", "Manual", "Garantía", "IES"];
 
 const ICON_CHECK = `<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`;
 const ICON_DOWNLOAD = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>`;
@@ -26,10 +32,171 @@ const ICON_FILE = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" s
 const ICON_GRID = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>`;
 const ICON_CHEVRON = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>`;
 
+/* Mismo pipeline que productos/comparar: multiimagen a veces viene como JSON
+   anidado, a veces como objetos {url}, y el primer ítem puede ser un video.
+   Las URLs de CloudFront con fit-in/filters se reescriben a S3 (el archivo
+   real) y después se vuelven a pasar por el CDN para el thumbnail. */
+const CDN_HOST = "https://d1zltvqju4u8ql.cloudfront.net";
+
+function escAttr(s){
+  return String(s == null ? "" : s).replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;");
+}
+
+function encodeS3Path(path){
+  return String(path || "").split("/").map(seg => {
+    try { return encodeURIComponent(decodeURIComponent(seg)); }
+    catch(_) { return encodeURIComponent(seg); }
+  }).join("/");
+}
+
+function sourceImg(url){
+  const u = String(url || "").trim();
+  if(!u) return "";
+  const m = u.match(/cloudfront\.net\/(?:fit-in\/[^/]+\/)?(?:filters:[^/]+\/)?(.+)$/i);
+  return m ? `https://s3.coresagroup.com/${m[1]}` : u;
+}
+
+function optimizeImg(url, size = "500x500"){
+  if(!url) return url;
+  if(url.includes("cloudfront.net")) return url;
+  const match = url.match(/^https?:\/\/s3\.coresagroup\.com\/(.+)$/);
+  if(!match) return url;
+  return `${CDN_HOST}/fit-in/${size}/filters:format(webp)/${encodeS3Path(match[1])}`;
+}
+
+function imageUrlFromItem(item){
+  if(item && typeof item === "object"){
+    item = item.url || item.src || item.imagen || item.image || item.href || "";
+  }
+  let u = String(item || "").trim().replace(/^["'\[]+|["'\]]+$/g, "").trim();
+  if(!u || /^null$/i.test(u) || u === "#") return "";
+  if(/\.(mp4|webm|mov|m3u8)(\?|#|$)/i.test(u)) return "";
+  if(u.startsWith("//")) u = "https:" + u;
+  if(!/^https?:\/\//i.test(u)) return "";
+  return sourceImg(u);
+}
+
+function parseImages(doc){
+  if(!doc) return [];
+  let raw = doc.multiimagen || doc.multiimage || doc.imagen || doc.imagen_portada;
+  for(let i = 0; i < 3 && typeof raw === "string"; i++){
+    const t = raw.trim();
+    if(!(t.startsWith("[") || t.startsWith("{") || t.startsWith('"'))) break;
+    try { raw = JSON.parse(t); } catch(_){ break; }
+  }
+  let items = [];
+  if(Array.isArray(raw)) items = raw;
+  else if(raw && typeof raw === "object") items = [raw];
+  else if(typeof raw === "string" && raw.trim()){
+    items = raw.split(/[;,|]/).map(s => s.trim()).filter(Boolean);
+  }
+  const urls = [];
+  items.forEach(item => {
+    const u = imageUrlFromItem(item);
+    if(u && !urls.includes(u)) urls.push(u);
+  });
+  return urls;
+}
+
 let allItems = []; // productos + catálogos, ya expandidos a nivel "un descargable = un ítem"
 
 const FACET_FIELDS_UI = ["tipo_descarga", "tipo_archivo", "macrofamilia"];
 const FACET_LABELS_UI = { tipo_descarga: "Tipo de descarga", tipo_archivo: "Tipo de archivo", macrofamilia: "Macrofamilia" };
+
+function isCatalogoTipo(value){
+  return /^cat[aá]logos?$/i.test(String(value || "").trim());
+}
+
+function isCatalogoItem(it){
+  if(!it) return false;
+  if(it.origen === "catalogo") return true;
+  return (it.descargas || []).some(d => isCatalogoTipo(d.tipo_descarga));
+}
+
+function isGeneralItem(it){
+  const macro = String((it && it.macrofamilia) || "").trim();
+  const nombre = String((it && it.nombre) || "").trim();
+  return /^general$/i.test(macro) || /\bgeneral\b/i.test(nombre);
+}
+
+function isCatalogDoc(doc){
+  if(!doc) return false;
+  const registro = String(doc.tipo_registro || "").trim().toLowerCase();
+  if(registro === "catalogo" || registro === "catálogo") return true;
+  const tipo = doc.tipo_descarga;
+  if(Array.isArray(tipo)) return tipo.some(isCatalogoTipo);
+  return isCatalogoTipo(tipo);
+}
+
+function catalogFileUrl(doc){
+  const candidates = [
+    doc.archivo, doc.catalogo, doc.catalogo_link, doc.ficha_tecnica,
+    doc.pdf, doc.url, doc.link
+  ];
+  for(const raw of candidates){
+    const url = String(raw || "").trim();
+    if(url && url !== "#" && url.toLowerCase() !== "null") return url;
+  }
+  return "";
+}
+
+function fileTypeFromUrl(url, fallback){
+  const m = String(url || "").toLowerCase().match(/\.([a-z0-9]+)(?:\?|#|$)/);
+  if(!m) return fallback || "PDF";
+  if(m[1] === "ies") return "IES";
+  if(m[1] === "pdf") return "PDF";
+  return m[1].toUpperCase();
+}
+
+function sortDescargables(list){
+  return [...list].sort((a, b) => {
+    const ac = isCatalogoItem(a) ? 0 : 1;
+    const bc = isCatalogoItem(b) ? 0 : 1;
+    if(ac !== bc) return ac - bc;
+    if(ac === 0){
+      const ag = isGeneralItem(a) ? 0 : 1;
+      const bg = isGeneralItem(b) ? 0 : 1;
+      if(ag !== bg) return ag - bg;
+      return String(a.nombre || "").localeCompare(String(b.nombre || ""), "es", { sensitivity: "base" });
+    }
+    return 0;
+  });
+}
+
+function sortFacetEntries(field, entries){
+  if(field === "tipo_descarga"){
+    return entries.sort((a, b) => {
+      const ia = TIPO_DESCARGA_ORDER.indexOf(a[0]);
+      const ib = TIPO_DESCARGA_ORDER.indexOf(b[0]);
+      const da = ia === -1 ? 99 : ia;
+      const db = ib === -1 ? 99 : ib;
+      if(da !== db) return da - db;
+      return b[1] - a[1];
+    });
+  }
+  if(field === "macrofamilia"){
+    return entries.sort((a, b) => {
+      const ag = /^general$/i.test(a[0]) ? 0 : 1;
+      const bg = /^general$/i.test(b[0]) ? 0 : 1;
+      if(ag !== bg) return ag - bg;
+      return b[1] - a[1];
+    });
+  }
+  return entries.sort((a, b) => b[1] - a[1]);
+}
+
+function mergeUniqueDocs(groups){
+  const seen = new Set();
+  const out = [];
+  groups.flat().forEach(doc => {
+    if(!doc) return;
+    const id = String(doc.id || doc.sku || doc.nombre_typesense || JSON.stringify(doc));
+    if(seen.has(id)) return;
+    seen.add(id);
+    out.push(doc);
+  });
+  return out;
+}
 
 const state = {
   query: "",
@@ -37,24 +204,28 @@ const state = {
   pending: { tipo_descarga: new Set(), tipo_archivo: new Set(), macrofamilia: new Set() },
   pendingSortBy: "",
   sortBy: "",
-  view: "grid",
+  view: "list",
   page: 1,
   facetOpen: { tipo_descarga: true, tipo_archivo: false, macrofamilia: false }
 };
 
 // Trae TODOS los documentos que matcheen el filtro, paginando automáticamente.
-async function fetchAllDocs(filterBy, queryBy){
+async function fetchAllDocs(filterBy, queryBy, includeFields){
   const perPage = 250;
   let page = 1;
   let allDocs = [];
   while(true){
-    const res = await fetch(`${TS_HOST}/collections/${COLLECTION}/documents/search?` + new URLSearchParams({
+    const params = {
       q: "*",
       query_by: queryBy,
       filter_by: filterBy,
       per_page: String(perPage),
       page: String(page)
-    }), { headers: { "X-TYPESENSE-API-KEY": TS_API_KEY } });
+    };
+    if(includeFields) params.include_fields = includeFields;
+    const res = await fetch(`${TS_HOST}/collections/${COLLECTION}/documents/search?` + new URLSearchParams(params), {
+      headers: { "X-TYPESENSE-API-KEY": TS_API_KEY }
+    });
 
     if(!res.ok) throw new Error(`Typesense (${filterBy}) página ${page}: ${res.status}`);
     const data = await res.json();
@@ -67,21 +238,54 @@ async function fetchAllDocs(filterBy, queryBy){
   return allDocs;
 }
 
+async function fetchAllDocsSafe(filterBy, queryBy, includeFields){
+  try{
+    return await fetchAllDocs(filterBy, queryBy, includeFields);
+  }catch(err){
+    if(includeFields){
+      try{ return await fetchAllDocs(filterBy, queryBy); }
+      catch(_){ /* sigue al warn de abajo */ }
+    }
+    console.warn("Descargas: no se pudo cargar", filterBy, err);
+    return [];
+  }
+}
+
+let initialPreloadDone = false;
+function finishInitialPreload(){
+  if(initialPreloadDone) return;
+  initialPreloadDone = true;
+  if(window.MacroledPreload) window.MacroledPreload.done();
+}
+
 async function loadAllDescargables(){
   document.getElementById("showingLabel").textContent = "Cargando…";
   try{
-    const [productos, catalogos] = await Promise.all([
+    const [productosRaw, porRegistro, porTipo] = await Promise.all([
       fetchAllDocs("tipo_registro:=producto", "nombre_typesense,descripcion,sku"),
-      fetchAllDocs(`tipo_registro:=${TIPO_REGISTRO_CATALOGO}`, "nombre_typesense")
+      fetchAllDocsSafe(`tipo_registro:=${TIPO_REGISTRO_CATALOGO}`, CATALOG_QUERY_BY, CATALOG_INCLUDE_FIELDS),
+      fetchAllDocsSafe(`tipo_descarga:=${TIPO_DESCARGA_CATALOGO}`, CATALOG_QUERY_BY, CATALOG_INCLUDE_FIELDS)
     ]);
 
-    allItems = [...expandCatalogos(catalogos), ...expandProductos(productos)];
+    const catalogos = mergeUniqueDocs([
+      porRegistro,
+      porTipo,
+      productosRaw.filter(isCatalogDoc)
+    ]);
+    const productos = productosRaw.filter(doc => !isCatalogDoc(doc));
+
+    allItems = sortDescargables([
+      ...expandCatalogos(catalogos),
+      ...expandProductos(productos)
+    ]);
     render();
   }catch(err){
     console.error("Error cargando descargables:", err);
     document.getElementById("grid").innerHTML = `<div class="state-msg">No se pudo conectar con Typesense. ${err.message}</div>`;
     document.getElementById("grid").setAttribute("aria-busy", "false");
     document.getElementById("showingLabel").textContent = "Error al cargar";
+  }finally{
+    finishInitialPreload();
   }
 }
 
@@ -127,6 +331,14 @@ function fusionarGrupoDeVariantes(docs){
     });
   });
 
+  const ordenados = [...docs].sort((a, b) => (b.esPrincipal ? 1 : 0) - (a.esPrincipal ? 1 : 0));
+  const imagenes = [];
+  ordenados.forEach(doc => {
+    (doc.imagenes || (doc.imagen ? [doc.imagen] : [])).forEach(u => {
+      if(u && !imagenes.includes(u)) imagenes.push(u);
+    });
+  });
+
   return {
     origen: "producto",
     nombre: base.nombre,
@@ -136,7 +348,8 @@ function fusionarGrupoDeVariantes(docs){
     macrofamilia: base.macrofamilia,
     subfamilia: base.subfamilia,
     nuevo: docs.some(d => d.nuevo),
-    imagen: base.imagen,
+    imagen: imagenes[0] || null,
+    imagenes,
     descargas: Object.values(descargasPorTipo),
     _active: 0
   };
@@ -155,25 +368,17 @@ function expandProductos(productos){
       })
       .filter(Boolean);
 
-    // multiimagen es un string con un array JSON adentro (o una lista separada
-    // por comas/pipes) — no hay campo "imagen" suelto en el schema.
-    let imgs = [];
-    if(doc.multiimagen){
-      try{
-        const parsed = JSON.parse(doc.multiimagen);
-        if(Array.isArray(parsed)) imgs = parsed;
-      }catch(_){
-        imgs = doc.multiimagen.split(/[,|]/).map(s => s.trim()).filter(Boolean);
-      }
-    }
+    const imgs = parseImages(doc);
 
     return {
       origen: "producto",
       nombre: doc.nombre_typesense, descripcion: doc.descripcion || "",
       sku: doc.sku, macrofamilia: doc.macrofamilia, subfamilia: doc.subfamilia || null,
       variantesSku: parseVariantesSku(doc.variantes_sku, doc.sku),
+      esPrincipal: doc.es_principal === true || doc.es_principal === "true",
       nuevo: !!doc.nuevo,
       imagen: imgs[0] || null,
+      imagenes: imgs,
       descargas,
       _active: 0
     };
@@ -182,27 +387,39 @@ function expandProductos(productos){
   return agruparPorVariantes(items).filter(it => it.descargas.length > 0);
 }
 
-// NOTA: los documentos de catálogos/manuales todavía no están en Typesense.
-// Los nombres de campo de abajo (imagen_portada, tipo_descarga, tipo_archivo,
-// archivo, paginas, mb) son un supuesto de diseño, sin confirmar contra un
-// schema real — hay que revisarlos junto con el mapeo Airtable → Typesense
-// cuando se suba esa hoja, antes de asumir que van a funcionar tal cual.
+// NOTA: los documentos de catálogo se identifican por tipo_descarga = Catálogo
+// o tipo_registro = catalogo. El archivo puede venir en varios campos (archivo,
+// catalogo, ficha_tecnica, etc.) según cómo esté mapeado Airtable → Typesense.
 function expandCatalogos(catalogos){
-  return catalogos.map(doc => ({
-    origen: "catalogo",
-    nombre: doc.nombre_typesense, descripcion: doc.descripcion || "",
-    sku: null, macrofamilia: doc.macrofamilia, subfamilia: doc.subfamilia || null,
-    nuevo: !!doc.nuevo,
-    imagen: doc.imagen_portada || null,
-    descargas: [{
-      tipo_descarga: doc.tipo_descarga,
-      tipo_archivo: doc.tipo_archivo || "PDF",
-      url: doc.archivo,
-      paginas: doc.paginas || null,
-      mb: doc.mb || null
-    }],
-    _active: 0
-  }));
+  return catalogos.map(doc => {
+    const url = catalogFileUrl(doc);
+    if(!url) return null;
+    const imgs = parseImages(doc);
+    const portada = imageUrlFromItem(doc.imagen_portada);
+    const imagenes = [portada, ...imgs].filter((u, i, arr) => u && arr.indexOf(u) === i);
+    const tipo = Array.isArray(doc.tipo_descarga)
+      ? (doc.tipo_descarga.find(isCatalogoTipo) || doc.tipo_descarga[0])
+      : doc.tipo_descarga;
+    return {
+      origen: "catalogo",
+      nombre: doc.nombre_typesense || doc.nombre || "Catálogo",
+      descripcion: doc.descripcion || "",
+      sku: doc.sku || null,
+      macrofamilia: doc.macrofamilia || "General",
+      subfamilia: doc.subfamilia || null,
+      nuevo: !!doc.nuevo,
+      imagen: imagenes[0] || null,
+      imagenes,
+      descargas: [{
+        tipo_descarga: (isCatalogoTipo(tipo) || !tipo) ? TIPO_DESCARGA_CATALOGO : String(tipo).trim(),
+        tipo_archivo: doc.tipo_archivo || fileTypeFromUrl(url, "PDF"),
+        url,
+        paginas: doc.paginas || null,
+        mb: doc.mb || null
+      }],
+      _active: 0
+    };
+  }).filter(Boolean);
 }
 
 function getSearchFilteredItems(){
@@ -221,9 +438,9 @@ function getSearchFilteredItems(){
   const subfamsEncontradas = new Set(directMatches.filter(it => it.origen === "producto" && it.subfamilia).map(it => it.subfamilia));
 
   const catalogosRelacionados = allItems.filter(it =>
-    it.origen === "catalogo" &&
-    it.descargas[0].tipo_descarga === "Catálogo" &&
-    it.macrofamilia !== "General" &&
+    isCatalogoItem(it) &&
+    isCatalogoTipo((it.descargas[0] || {}).tipo_descarga) &&
+    !isGeneralItem(it) &&
     macrosEncontradas.has(it.macrofamilia)
   );
   const macrosConSubfamMatch = new Set(
@@ -257,7 +474,14 @@ function getFilteredItems(){
     : applyFacetFilters(getSearchFilteredItems(), null);
 
   if(state.sortBy === "nuevo"){
-    list = [...list].sort((a, b) => (b.nuevo ? 1 : 0) - (a.nuevo ? 1 : 0));
+    list = [...list].sort((a, b) => {
+      const ac = isCatalogoItem(a) ? 0 : 1;
+      const bc = isCatalogoItem(b) ? 0 : 1;
+      if(ac !== bc) return ac - bc;
+      return (b.nuevo ? 1 : 0) - (a.nuevo ? 1 : 0);
+    });
+  }else{
+    list = sortDescargables(list);
   }
 
   return list;
@@ -281,7 +505,7 @@ function computeFacetCounts(field, baseList){
       counts[v] = (counts[v] || 0) + 1;
     }
   });
-  return Object.entries(counts).sort((a, b) => b[1] - a[1]);
+  return sortFacetEntries(field, Object.entries(counts));
 }
 
 function renderFacets(searchFilteredList){
@@ -386,22 +610,33 @@ function cardTemplate(it, idx){
 
   const seccionTipo = it.descargas.length > 1
     ? `<div class="type-tabs">${it.descargas.map((d, i) =>
-        `<button type="button" class="type-tab${i === activeIdx ? " active" : ""}" data-tab="${i}">${d.tipo_descarga}</button>`
+        `<button type="button" class="type-tab${i === activeIdx ? " active" : ""}" data-tab="${i}">${escAttr(d.tipo_descarga)}</button>`
       ).join("")}</div>`
     : "";
 
+  const origs = it.imagenes && it.imagenes.length ? it.imagenes : (it.imagen ? [it.imagen] : []);
+  const thumb = origs[0] ? optimizeImg(origs[0]) : "";
+  const esCatalogo = isCatalogoItem(it);
+  const desc = esCatalogo ? String(it.descripcion || "").trim() : "";
+  const descHtml = desc && desc.toLowerCase() !== String(it.nombre || "").trim().toLowerCase()
+    ? `<p class="card-desc">${escAttr(desc)}</p>`
+    : "";
+
   return `
-    <div class="card" data-idx="${idx}">
+    <div class="card${esCatalogo ? " card-catalogo" : ""}" data-idx="${idx}">
       <div class="media">
         ${it.nuevo ? `<span class="badge-nuevo">NUEVO</span>` : ""}
-        ${it.imagen ? `<img src="${it.imagen}" alt="${it.nombre}">` : `<span class="file-icon">${ICON_FILE}</span>`}
+        ${thumb
+          ? `<img src="${escAttr(thumb)}" alt="${escAttr(it.nombre)}" loading="lazy" decoding="async" data-idx="0" data-origs="${escAttr(JSON.stringify(origs))}">`
+          : `<span class="file-icon">${ICON_FILE}</span>`}
       </div>
       <div class="card-body">
         <div class="card-info">
-          <div class="card-title">${it.nombre}</div>
+          <div class="card-title">${escAttr(it.nombre)}</div>
+          ${descHtml}
           ${seccionTipo}
         </div>
-        <a class="btn-download" href="${activa.url}" target="_blank"><span class="btn-icon">${ICON_DOWNLOAD}</span> Descargar ${activa.tipo_archivo}</a>
+        <a class="btn-download" href="${escAttr(activa.url)}" target="_blank" rel="noopener"><span class="btn-icon">${ICON_DOWNLOAD}</span> ${esCatalogo ? "Descargar" : `Descargar ${escAttr(activa.tipo_archivo)}`}</a>
       </div>
     </div>
   `;
@@ -421,7 +656,46 @@ function renderCards(list){
     return;
   }
   grid.innerHTML = pageItems.map((it, i) => cardTemplate(it, i)).join("");
+  grid.querySelectorAll(".media img").forEach(bindImgFallback);
   grid.setAttribute("aria-busy", "false");
+}
+
+function bindImgFallback(img){
+  if(!img || img.dataset.fbBound) return;
+  img.dataset.fbBound = "1";
+
+  const showFileIcon = () => {
+    const icon = document.createElement("span");
+    icon.className = "file-icon";
+    icon.setAttribute("aria-hidden", "true");
+    icon.innerHTML = ICON_FILE;
+    img.replaceWith(icon);
+  };
+
+  const fail = () => {
+    let origs = [];
+    try { origs = JSON.parse(img.dataset.origs || "[]"); } catch(_){ origs = []; }
+    let idx = Number(img.dataset.idx || 0);
+    if(img.dataset.usingOrig !== "1"){
+      const orig = origs[idx];
+      if(orig && orig !== img.getAttribute("src")){
+        img.dataset.usingOrig = "1";
+        img.src = orig;
+        return;
+      }
+    }
+    idx += 1;
+    if(idx < origs.length){
+      img.dataset.idx = String(idx);
+      img.dataset.usingOrig = "0";
+      img.src = optimizeImg(origs[idx]) || origs[idx];
+      return;
+    }
+    showFileIcon();
+  };
+
+  img.addEventListener("error", fail);
+  if(img.complete && img.naturalWidth === 0 && img.getAttribute("src")) fail();
 }
 
 function updateCardActiveTab(cardEl, item){
@@ -430,7 +704,7 @@ function updateCardActiveTab(cardEl, item){
   const d = item.descargas[activeIdx];
   const btn = cardEl.querySelector(".btn-download");
   btn.href = d.url;
-  btn.innerHTML = `<span class="btn-icon">${ICON_DOWNLOAD}</span> Descargar ${d.tipo_archivo}`;
+  btn.innerHTML = `<span class="btn-icon">${ICON_DOWNLOAD}</span> ${isCatalogoItem(item) ? "Descargar" : `Descargar ${d.tipo_archivo}`}`;
 }
 
 document.getElementById("grid").addEventListener("click", (e) => {

@@ -33,14 +33,13 @@ export async function build() {
   const css = await readFile(resolve(homeDirectory, "css", "home.css"), "utf8");
   await writeFile(resolve(distDirectory, "home.css"), css, "utf8");
 
-  const newsletterMarker = "/* Newsletter popup — contact form field language */";
-  const newsletterStart = css.indexOf(newsletterMarker);
-  if (newsletterStart === -1) {
-    throw new Error("No se pudo encontrar el bloque CSS del popup de newsletter.");
-  }
+  const newsletterCss = await readFile(
+    resolve(homeDirectory, "css", "newsletter.css"),
+    "utf8",
+  );
   await writeFile(
     resolve(distDirectory, "newsletter.css"),
-    `${css.slice(newsletterStart).trim()}\n`,
+    newsletterCss,
     "utf8",
   );
 

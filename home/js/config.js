@@ -174,28 +174,26 @@
     ],
     faq: [
       {
-        question: "¿Cómo elijo la iluminación adecuada?",
-        answer: "Respuesta definitiva pendiente. El equipo de Macroled puede asesorarte según el uso, las dimensiones y la atmósfera buscada."
+        question: "¿Puedo recibir asesoramiento para mi proyecto lumínico?",
+        answer: "Sí. Nuestro equipo puede asesorarte de acuerdo con las necesidades de tu espacio o proyecto, considerando aspectos como sus dimensiones, el uso, los niveles de iluminación requeridos y la atmósfera que buscás crear. Podés usar el asistente de productos Macroled, integrado con inteligencia artificial, para encontrar soluciones en la web o contactarnos desde la sección Contacto para recibir una recomendación personalizada.",
+        emphasis: ["asistente de productos Macroled", "sección Contacto"]
       },
       {
         question: "¿Dónde encuentro la información técnica?",
-        answer: "Las fichas de los productos disponibles enlazan a su ficha web. También se podrá incorporar un acceso a descargas."
+        answer: "En la página de cada producto encontrás su ficha técnica, especificaciones e información comercial. Además, en la sección Descargas podés acceder a toda la documentación técnica disponible.",
+        emphasis: ["página de cada producto", "sección Descargas"]
       },
       {
         question: "¿Macroled trabaja con proyectos profesionales?",
         answer: "Sí. Nuestro equipo puede acompañarte en la elección de soluciones de iluminación para proyectos profesionales."
       },
       {
-        question: "¿Puedo recibir asesoramiento antes de elegir un producto?",
-        answer: "Sí. Contanos las características de tu espacio o proyecto y te ayudaremos a evaluar las alternativas disponibles."
-      },
-      {
         question: "¿Cómo puedo comparar distintas alternativas?",
-        answer: "Podés revisar la información de cada producto y consultar a nuestro equipo para comparar prestaciones según tu necesidad."
+        answer: "Podés revisar la información de cada producto, seleccionar los que te interesan y utilizar la función Comparar para evaluar sus características y prestaciones. Si necesitás orientación adicional, también podés consultar a nuestro equipo para encontrar la alternativa más adecuada para tu necesidad."
       },
       {
-        question: "¿Cómo me contacto con el equipo de Macroled?",
-        answer: "Ingresá a la sección de contacto y dejanos los datos de tu consulta para que podamos orientarte."
+        question: "¿Macroled vende a profesionales y también a consumidores finales?",
+        answer: "Sí. Somos fabricantes y comercializamos nuestros productos tanto a revendedores y proveedores como a consumidores finales. Contactanos para recibir información comercial y conocer la opción de compra más adecuada para tu necesidad."
       }
     ]
   };

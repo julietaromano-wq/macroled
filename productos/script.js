@@ -44,7 +44,7 @@ function getPerPage(){
 const FACET_FIELDS = ["macrofamilia", "variante_temperatura_filtro", "color", "dimerizable"];
 const SUBFAMILIA_FIELD = "subfamilia";
 const FAMILIA_FIELD = "familia";
-// Categoría solo se muestra/filtra cuando ya hay una Familia elegida.
+// Categoría solo se muestra/filtra cuando ya hay una Subfamilia elegida.
 const CATEGORIA_FIELD = "categoria";
 const POTENCIA_RAW_FIELD = "potencia";
 const EXTRA_FACET_FIELDS = [CATEGORIA_FIELD];
@@ -86,139 +86,6 @@ function escAttr(s){
 }
 
 /* ---------------------------------------------------------
-   IMÁGENES DE SUBFAMILIA, agrupadas por macrofamilia.
-   Ojo: nombres de subfamilia como "Solar", "COB", "Sensores", "Smart" o
-   "Accesorios" se repiten en varias macrofamilias con fotos distintas —
-   por eso el mapa está anidado por macrofamilia y no es un objeto plano.
-   Los nombres de macrofamilia de acá abajo son los que se ven en el sitio
-   público; si en Typesense el campo `macrofamilia` viene con otra
-   grafía (mayúsculas, sin tilde, etc.) hay que ajustarlos para que
-   matcheen — la consola tira un warning si alguno no encuentra imágenes.
-   --------------------------------------------------------- */
-const SUBFAMILIA_IMAGES = {
-  "Lámparas": {
-    "Bulbos": `${CDN_HOST}/fit-in/100x100/filters:format(webp)/MACROLED/250/bulbosnew.png`,
-    "Bulbones": `${CDN_HOST}/fit-in/100x100/filters:format(webp)/MACROLED/250/bulbonesnew.png`,
-    "Filamento": `${CDN_HOST}/fit-in/100x100/filters:format(webp)/MACROLED/250/filamentonewn.png`,
-    "Bipin": `${CDN_HOST}/fit-in/100x100/filters:format(webp)/MACROLED/250/bipinnewn.png`,
-    "AR111": `${CDN_HOST}/fit-in/100x100/filters:format(webp)/MACROLED/250/ar111new.png`,
-    "Dicroicas": `${CDN_HOST}/fit-in/100x100/filters:format(webp)/MACROLED/250/dricoicasnewn.png`,
-    "Par LED": `${CDN_HOST}/fit-in/100x100/filters:format(webp)/MACROLED/250/par-lednewn.png`,
-    "PAR": `${CDN_HOST}/fit-in/100x100/filters:format(webp)/MACROLED/250/par-lednewn.png`,
-    "Tubos LED": `${CDN_HOST}/fit-in/100x100/filters:format(webp)/MACROLED/250/tubos.png`,
-    "Tubos": `${CDN_HOST}/fit-in/100x100/filters:format(webp)/MACROLED/250/tubos.png`,
-    "Smart": `${CDN_HOST}/fit-in/100x100/filters:format(webp)/MACROLED/250/smartnew.png`
-  },
-  "Artefactos para Lámparas": {
-    "Embutir Dicroica": `${CDN_HOST}/fit-in/100x100/filters:format(webp)/MACROLED/250/policarbonato-embutir-dicroica.png`,
-    "Embutir AR111": `${CDN_HOST}/fit-in/100x100/filters:format(webp)/MACROLED/250/policarbonato-embutir-ar111.png`,
-    "Aplicar Dicroica": `${CDN_HOST}/fit-in/100x100/filters:format(webp)/MACROLED/250/policarbonato-aplicar-dicroica.png`,
-    "Exterior Dicroica": `${CDN_HOST}/fit-in/100x100/filters:format(webp)/MACROLED/250/policarbonato-exterior-dicroica.png`,
-    "Aplicar AR111": `${CDN_HOST}/fit-in/100x100/filters:format(webp)/MACROLED/250/acero-aplicar-ar111.png`,
-    "Estacas Móviles": `${CDN_HOST}/fit-in/100x100/filters:format(webp)/MACROLED/250/estacas-moviles.png`,
-    "Guirnaldas": `${CDN_HOST}/fit-in/100x100/filters:format(webp)/MACROLED/250/guirnaldas.png`,
-    "Portalámparas": `${CDN_HOST}/fit-in/100x100/filters:format(webp)/MACROLED/250/portalamparas.png`,
-    "Artefactos Tubos": `${CDN_HOST}/fit-in/100x100/filters:format(webp)/MACROLED/250/artefactos-tubos.png`
-  },
-  "Lineales PRO": {
-    "Lineales": `${CDN_HOST}/fit-in/100x100/filters:format(webp)/MACROLED/WEB/PORTADA-LINEALES-PRO.webp`,
-    "Conectores": `${CDN_HOST}/fit-in/100x100/filters:format(webp)/MACROLED/WEB/PORTADA-CONECTORES-LINEALES-PRO.webp`,
-    "Lentes Difusor": `${CDN_HOST}/fit-in/100x100/filters:format(webp)/MACROLED/WEB/PORTADA-DIFUSORES-LINEALES-PRO.webp`,
-    "Accesorios": `${CDN_HOST}/fit-in/100x100/filters:format(webp)/MACROLED/WEB/LP-SUSP_PERS.webp`,
-    "Driver": `${CDN_HOST}/fit-in/100x100/filters:format(webp)/MACROLED/WEB/PORTADA-DRIVERS-LINEALES-PRO.webp`
-  },
-  "Luminaria interior": {
-    "de Pie": `${CDN_HOST}/fit-in/100x100/filters:format(webp)/MACROLED/250/veladores-de-pie.png`,
-    "de Mesa": `${CDN_HOST}/fit-in/100x100/filters:format(webp)/MACROLED/250/veladores2.png`,
-    "Inalámbricas": `${CDN_HOST}/fit-in/100x100/filters:format(webp)/MACROLED/250/veladores-inalambricos.png`,
-    "Emergencia": `${CDN_HOST}/fit-in/100x100/filters:format(webp)/MACROLED/250/emergencia.png`,
-    "Listones": `${CDN_HOST}/fit-in/100x100/filters:format(webp)/MACROLED/250/liston-led.png`
-  },
-  "Skyline": {
-    "Rieles y Accesorios": `${CDN_HOST}/fit-in/100x100/filters:format(webp)/MACROLED/250/skyline-rieles.png`,
-    "Luminarias": `${CDN_HOST}/fit-in/100x100/filters:format(webp)/MACROLED/250/skyline.png`,
-    "Fuentes": `${CDN_HOST}/fit-in/100x100/filters:format(webp)/MACROLED/250/skyline-fuentes.png`
-  },
-  "Luminaria exterior": {
-    "Solar": `${CDN_HOST}/fit-in/100x100/filters:format(webp)/MACROLED/250/solar.png`,
-    "Tortugas": `${CDN_HOST}/fit-in/100x100/filters:format(webp)/MACROLED/250/tortugas.png`,
-    "Lineales": `${CDN_HOST}/fit-in/100x100/filters:format(webp)/MACROLED/250/lineales.png`,
-    "Estacas": `${CDN_HOST}/fit-in/100x100/filters:format(webp)/MACROLED/250/estacas-led-integrado.png`
-  },
-  "Luminarias de Proyecto": {
-    "INVICTUS": `${CDN_HOST}/fit-in/100x100/filters:format(webp)/MACROLED/250/INVICTUS-1500W-10D-857.png`,
-    "TITAN": `${CDN_HOST}/fit-in/100x100/filters:format(webp)/MACROLED/250/titan.png`,
-    "FOCUS": `${CDN_HOST}/fit-in/100x100/filters:format(webp)/MACROLED/250/focus.png`,
-    "OLIMPUS": `${CDN_HOST}/fit-in/100x100/filters:format(webp)/MACROLED/250/olimpus.png`,
-    "INDUSTRIAL": `${CDN_HOST}/fit-in/100x100/filters:format(webp)/MACROLED/250/industrial.png`,
-    "HIGHBAY PRO": `${CDN_HOST}/fit-in/100x100/filters:format(webp)/MACROLED/250/PHB-200W-90D-857-CW.png`,
-    "HIGHBAY STANDARD": `${CDN_HOST}/fit-in/100x100/filters:format(webp)/MACROLED/250/SHB-200W.png`,
-    "HIGHBAY CLASSIC": `${CDN_HOST}/fit-in/100x100/filters:format(webp)/MACROLED/250/galponeras-eco.webp`,
-    "LUZ DE CALLE STANDARD": `${CDN_HOST}/fit-in/100x100/filters:format(webp)/MACROLED/WEB/SLG2-100W-757-CW_FRONT.webp`,
-    "LUMAX": `${CDN_HOST}/fit-in/100x100/filters:format(webp)/MACROLED/250/lumax.png`,
-    "PÚBLICA": `${CDN_HOST}/fit-in/100x100/filters:format(webp)/MACROLED/250/luz-de-calle.png`,
-    "Solar Proyecto": `${CDN_HOST}/fit-in/100x100/filters:format(webp)/MACROLED/250/proyectoSolar.png`,
-    "Farolas PRO": `${CDN_HOST}/fit-in/100x100/filters:format(webp)/MACROLED/250/farolas.png`
-  },
-  "Paneles LED": {
-    "Embutir Blanco": `${CDN_HOST}/fit-in/100x100/filters:format(webp)/MACROLED/250/embutir-blanco.png`,
-    "Embutir Negro": `${CDN_HOST}/fit-in/100x100/filters:format(webp)/MACROLED/250/embutir-negro.png`,
-    "Plafón Blanco": `${CDN_HOST}/fit-in/100x100/filters:format(webp)/MACROLED/250/plafon-blanco.png`,
-    "Plafón Negro": `${CDN_HOST}/fit-in/100x100/filters:format(webp)/MACROLED/250/plafon-negro.png`,
-    "Plafón Platil": `${CDN_HOST}/fit-in/100x100/filters:format(webp)/MACROLED/250/plafon-platil.png`,
-    "Gran Formato 40W": `${CDN_HOST}/fit-in/100x100/filters:format(webp)/MACROLED/WEB/GRAN-FORMATO-P40.webp`,
-    "Gran Formato 48W": `${CDN_HOST}/fit-in/100x100/filters:format(webp)/MACROLED/WEB/GRAN-FORMATO-P48.webp`,
-    "Gran Formato Backlight": `${CDN_HOST}/fit-in/100x100/filters:format(webp)/MACROLED/WEB/GRAN-FORMATO-BACKLIGHT.webp`,
-    "6 a 36 Backlight CCT": `${CDN_HOST}/fit-in/100x100/filters:format(webp)/MACROLED/1000/backlight.png`,
-    "Móviles": `${CDN_HOST}/fit-in/100x100/filters:format(webp)/MACROLED/250/moviles.png`,
-    "COB": `${CDN_HOST}/fit-in/100x100/filters:format(webp)/MACROLED/250/premium.png`,
-    "Drivers": `${CDN_HOST}/fit-in/100x100/filters:format(webp)/MACROLED/WEB/DRIVERS.webp`,
-    "Accesorios": `${CDN_HOST}/fit-in/100x100/filters:format(webp)/MACROLED/250/accesorios-paneles.png`
-  },
-  "Reflectores LED": {
-    "PRO 2026": `${CDN_HOST}/fit-in/100x100/filters:format(webp)/MACROLED/WEB/REFLECTORES-PRO.webp`,
-    "PRO 2025": `${CDN_HOST}/fit-in/100x100/filters:format(webp)/MACROLED/250/reflectores-pro.png`,
-    "PRO Smart": `${CDN_HOST}/fit-in/100x100/filters:format(webp)/MACROLED/250/reflectores-smart.png`,
-    "Standard": `${CDN_HOST}/fit-in/100x100/filters:format(webp)/MACROLED/WEB/REFLECTORES-STANDARD.webp`,
-    "Classic": `${CDN_HOST}/fit-in/100x100/filters:format(webp)/MACROLED/WEB/REFLECTORES-CLASSIC.webp`,
-    "Solar": `${CDN_HOST}/fit-in/100x100/filters:format(webp)/MACROLED/250/reflector-solar.png`
-  },
-  "Interruptores y Tomas": {
-    "LIMA": `${CDN_HOST}/fit-in/100x100/filters:format(webp)/MACROLED/250/lima.webp`,
-    "MONACO Armadas": `${CDN_HOST}/fit-in/100x100/filters:format(webp)/MACROLED/250/milan.png`,
-    "MONACO Bastidor + Módulos": `${CDN_HOST}/fit-in/100x100/filters:format(webp)/MACROLED/250/milan-bastidores.png`,
-    "MONACO Tapas": `${CDN_HOST}/fit-in/100x100/filters:format(webp)/MACROLED/250/milan-tapas.png`,
-    "MONACO Luz de pasillo": `${CDN_HOST}/fit-in/100x100/filters:format(webp)/MACROLED/WEB/portada_luz_pasillo.webp`,
-    "MONACO Tapas exterior": `${CDN_HOST}/fit-in/100x100/filters:format(webp)/MACROLED/WEB/M-CR-EXT-B_FRONT.webp`,
-    "ROMA": `${CDN_HOST}/fit-in/100x100/filters:format(webp)/MACROLED/250/roma.png`,
-    "TOKIO": `${CDN_HOST}/fit-in/100x100/filters:format(webp)/MACROLED/250/tokio.png`,
-    "KINETIC": `${CDN_HOST}/fit-in/100x100/filters:format(webp)/MACROLED/250/kinetic.png`
-  },
-  "Tiras LED": {
-    "2835": `${CDN_HOST}/fit-in/100x100/filters:format(webp)/MACROLED/250/smd2835.png`,
-    "5050": `${CDN_HOST}/fit-in/100x100/filters:format(webp)/MACROLED/250/smd5050a.png`,
-    "2216": `${CDN_HOST}/fit-in/100x100/filters:format(webp)/MACROLED/250/smd2216.png`,
-    "COB": `${CDN_HOST}/fit-in/100x100/filters:format(webp)/MACROLED/250/cob.png`,
-    "NEON": `${CDN_HOST}/fit-in/100x100/filters:format(webp)/MACROLED/250/neon.png`,
-    "Perfilería": `${CDN_HOST}/fit-in/100x100/filters:format(webp)/MACROLED/250/perfileria.png`,
-    "Sensores": `${CDN_HOST}/fit-in/100x100/filters:format(webp)/MACROLED/250/sensores.png`,
-    "Accesorios": `${CDN_HOST}/fit-in/100x100/filters:format(webp)/MACROLED/250/conectores-tiras-LED-2.png`,
-    "Controladoras": `${CDN_HOST}/fit-in/100x100/filters:format(webp)/MACROLED/250/controladoras.png`,
-    "Fuentes": `${CDN_HOST}/fit-in/100x100/filters:format(webp)/MACROLED/250/fuentes.png`
-  },
-  "Sensores": {
-    "Smart": `${CDN_HOST}/fit-in/100x100/filters:format(webp)/MACROLED/250/sensores-smart.png`,
-    "Sensores": `${CDN_HOST}/fit-in/100x100/filters:format(webp)/MACROLED/250/sensores-y-fotocelulas.png`,
-    "Fotocélulas": `${CDN_HOST}/fit-in/100x100/filters:format(webp)/MACROLED/250/fotocelulas.png`
-  },
-  "Luces de Autos": {
-    "Lámparas Principales": `${CDN_HOST}/fit-in/100x100/filters:format(webp)/MACROLED/WEB/luces-auto/principales/principales_portada.png`,
-    "Lámparas Auxiliares": `${CDN_HOST}/fit-in/100x100/filters:format(webp)/MACROLED/WEB/luces-auto/auxiliares/auxiliares-portada.png`,
-    "Faros y Barras": `${CDN_HOST}/fit-in/100x100/filters:format(webp)/MACROLED/WEB/luces-auto/farosybarras/portada_faros.png`
-  }
-};
-
-/* ---------------------------------------------------------
    BANNERS DE PORTADA — arriba de la grilla de productos.
    Prioridad: familia > macrofamilia. Sin match = sin banner.
    "video" opcional; si no hay, usa "poster"; si tampoco, no hay media.
@@ -230,15 +97,15 @@ const MACROFAMILIA_BANNERS = {
   // },
 };
 
+const HIGHBAY_PRO_BANNER = {
+  video: "https://s3.coresagroup.com/MACROLED/video/productos/HIGHBAYPRO_HORIZONTAL_EXPORT.mp4",
+  poster: `${CDN_HOST}/fit-in/1600x500/filters:format(webp)/MACROLED/250/PHB-200W-90D-857-CW.png`,
+};
 const FAMILIA_BANNERS = {
-  "Monaco": {
-    video: "https://s3.us-east-1.amazonaws.com/s3.coresagroup.com/VIDEOS/MILAN%20BANNER.mp4",
-    poster: `${CDN_HOST}/fit-in/1600x500/filters:format(webp)/MACROLED/250/milan.png`,
-  },
-  "Highbay PRO 2026": {
-    video: "https://s3.coresagroup.com/MACROLED/video/productos/HIGHBAYPRO_HORIZONTAL_EXPORT.mp4",
-    poster: `${CDN_HOST}/fit-in/1600x500/filters:format(webp)/MACROLED/250/PHB-200W-90D-857-CW.png`,
-  },
+};
+const SUBFAMILIA_BANNERS = {
+  "Highbay PRO 2026": HIGHBAY_PRO_BANNER,
+  "HIGHBAY PRO 2026": HIGHBAY_PRO_BANNER,
 };
 
 const BANNER_ICON_PAUSE = `<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg>`;
@@ -248,7 +115,7 @@ const _bannerVideoPrefetch = Object.create(null);
 
 function allBannerVideoUrls(){
   const urls = [];
-  [FAMILIA_BANNERS, MACROFAMILIA_BANNERS].forEach(map => {
+  [FAMILIA_BANNERS, SUBFAMILIA_BANNERS, MACROFAMILIA_BANNERS].forEach(map => {
     Object.keys(map).forEach(k => {
       if(map[k] && map[k].video) urls.push(map[k].video);
     });
@@ -282,13 +149,44 @@ function prefetchAllBannerVideos(){
   allBannerVideoUrls().forEach(prefetchBannerVideo);
 }
 
-function lookupBannerData(familia, macro){
-  if(familia && FAMILIA_BANNERS[familia]) return FAMILIA_BANNERS[familia];
-  if(macro && MACROFAMILIA_BANNERS[macro]) return MACROFAMILIA_BANNERS[macro];
-  if(familia){
-    const key = Object.keys(FAMILIA_BANNERS).find(k => k.toLowerCase() === String(familia).toLowerCase());
-    if(key) return FAMILIA_BANNERS[key];
+function normalizeBannerKey(value){
+  return String(value || "")
+    .trim()
+    .toLowerCase()
+    .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9]+/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function isHighbayPro2026(name){
+  const n = normalizeBannerKey(name);
+  return n.includes("highbay") && n.includes("pro") && n.includes("2026");
+}
+
+function isHighbayProFamilia(name){
+  const n = normalizeBannerKey(name);
+  return n.includes("highbay") && n.includes("pro") && !n.includes("standard") && !n.includes("classic");
+}
+
+function lookupBannerKey(map, name){
+  if(!name || !map) return "";
+  if(map[name]) return name;
+  const nName = normalizeBannerKey(name);
+  return Object.keys(map).find(k => normalizeBannerKey(k) === nName) || "";
+}
+
+function lookupBannerData(familia, macro, subfamilias){
+  const subList = [...(subfamilias || [])];
+  if(subList.length === 1){
+    const sub = subList[0];
+    const subKey = lookupBannerKey(SUBFAMILIA_BANNERS, sub);
+    if(subKey) return SUBFAMILIA_BANNERS[subKey];
   }
+  const famKey = lookupBannerKey(FAMILIA_BANNERS, familia);
+  if(famKey) return FAMILIA_BANNERS[famKey];
+  const macroKey = lookupBannerKey(MACROFAMILIA_BANNERS, macro);
+  if(macroKey) return MACROFAMILIA_BANNERS[macroKey];
   return null;
 }
 
@@ -327,14 +225,16 @@ function renderCategoryBanner(){
   if(!holder) return;
   const activeMacro = [...state.selected.macrofamilia][0];
   const activeFamilia = [...state.selected.familia][0];
-  const data = lookupBannerData(activeFamilia, activeMacro);
+  const activeSubfamilias = [...state.selected.subfamilia];
+  const data = lookupBannerData(activeFamilia, activeMacro, activeSubfamilias);
   const bannerKey = data
-    ? `${activeFamilia || ""}|${activeMacro || ""}|${data.video || data.poster || ""}`
+    ? `${activeFamilia || ""}|${activeSubfamilias.sort().join(",")}|${activeMacro || ""}|${data.video || data.poster || ""}`
     : "";
 
-  /* Si ya eligió macrofamilia relacionada, anticipar descarga del video. */
-  if(activeMacro === "Interruptores y Tomas") prefetchBannerVideo(FAMILIA_BANNERS.Monaco && FAMILIA_BANNERS.Monaco.video);
-  if(activeMacro === "Luminarias de Proyecto") prefetchBannerVideo(FAMILIA_BANNERS["Highbay PRO 2026"] && FAMILIA_BANNERS["Highbay PRO 2026"].video);
+  /* Si ya eligió familia/subfamilia relacionada, anticipar descarga del video. */
+  if(isHighbayProFamilia(activeFamilia) || activeSubfamilias.some(isHighbayPro2026)){
+    prefetchBannerVideo(HIGHBAY_PRO_BANNER.video);
+  }
 
   if(!data){
     _activeBannerKey = "";
@@ -351,9 +251,8 @@ function renderCategoryBanner(){
   if(data.video){
     prefetchBannerVideo(data.video);
     mediaHtml = `
-      <video class="category-banner__media" autoplay muted loop playsinline preload="auto"
+      <video class="category-banner__media" src="${data.video}" autoplay muted loop playsinline preload="auto"
         ${data.poster ? `poster="${data.poster}"` : ""}>
-        <source src="${data.video}" type="video/mp4">
       </video>
       <button type="button" class="category-banner__toggle" aria-label="Pausar video" title="Pausar">
         ${BANNER_ICON_PAUSE}
@@ -394,6 +293,7 @@ const FACET_ICONS = {
   color: `<svg ${ICON_SIZE}><path d="M12 2a10 10 0 1 0 0 20 3 3 0 0 0 0-6h-1a2 2 0 0 1 0-4h3a2 2 0 0 0 2-2 10 10 0 0 0-4-8z"/><circle cx="7.5" cy="10.5" r="1" fill="currentColor" stroke="none"/><circle cx="12" cy="7" r="1" fill="currentColor" stroke="none"/><circle cx="16.5" cy="10.5" r="1" fill="currentColor" stroke="none"/></svg>`,
   potencia: `<svg ${ICON_SIZE}><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>`,
   dimerizable: `<svg width="16" height="16" ${ICON_DIMMER_VB} aria-hidden="true">${ICON_DIMMER_INNER}</svg>`,
+  smart: `<svg ${ICON_SIZE}><path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/></svg>`,
   categoria: `<svg ${ICON_SIZE}><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>`
 };
 const ICON_CHECK = `<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`;
@@ -469,15 +369,17 @@ const state = {
   potenciaMax: null,
   pendingPotenciaMin: null,
   pendingPotenciaMax: null,
+  smartOnly: false,
+  pendingSmartOnly: false,
   page: 1,
   sortBy: "",
   query: "",
   view: "grid",
-  collapsed: { macrofamilia: false, variante_temperatura_filtro: true, color: true, potencia: false, dimerizable: true, familia: false, subfamilia: true, categoria: true },
+  collapsed: { macrofamilia: false, variante_temperatura_filtro: true, color: true, potencia: false, dimerizable: true, familia: false, subfamilia: false, categoria: true },
   compareCollapsed: true
 };
-/* Macrofamilia y Familia quedan siempre abiertos (no se pueden colapsar). */
-const ALWAYS_OPEN_FACETS = new Set(["macrofamilia", "familia"]);
+/* Subfamilia queda siempre abierta; Productos y Familia se pueden cerrar. */
+const ALWAYS_OPEN_FACETS = new Set(["subfamilia"]);
 window.state = state;
 let currentSearchController = null;   // ← agregar esta línea
 const COMPARE_MAX = window.MacroledCompare ? window.MacroledCompare.MAX : 3;
@@ -512,6 +414,70 @@ function potenciaFilterClause(min, max){
   if(!matched.length) return `sku:=[\`__sin_resultados_potencia__\`]`;
   const escaped = matched.map(v => `\`${String(v).replace(/`/g, "")}\``).join(",");
   return `${POTENCIA_RAW_FIELD}:=[${escaped}]`;
+}
+
+/* Campo `smart` en Typesense: "Si"/"No" o boolean. La pastilla recorta y
+   acepta true; el filtro tiene que cubrir las dos formas o no encuentra nada. */
+const SMART_ATTR_FIELD = "smart";
+const SMART_YES_VALUES = ["Si", "Sí", "SI", "si", "sí", "true", "True", "TRUE", "1", "Yes", "yes"];
+const SMART_ATTR2_VALUES = ["Si", "Sí", "SI", "si", "sí", "Smart", "smart", "SMART"];
+
+function isSmartYesValue(value){
+  if(value === true || value === 1) return true;
+  const v = String(value == null ? "" : value).trim().toLowerCase()
+    .normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+  return v === "si" || v === "true" || v === "1" || v === "yes" || v === "smart";
+}
+
+function isProductSmart(doc){
+  if(!doc) return false;
+  if(isSmartYesValue(doc.smart) || isSmartYesValue(doc.es_smart)) return true;
+  return isSmartYesValue(doc.attr2);
+}
+
+function smartFilterClause(enabled){
+  if(!enabled) return null;
+  const smartVals = SMART_YES_VALUES.map(v => `\`${v}\``).join(",");
+  const attr2Vals = SMART_ATTR2_VALUES.map(v => `\`${v}\``).join(",");
+  // Pastilla: lee smart / es_smart / attr2 (true o "Si"). Typesense exige
+  // match exacto; si el campo es boolean, :=Si no encuentra ninguno.
+  return `(${SMART_ATTR_FIELD}:true || ${SMART_ATTR_FIELD}:=[${smartVals}] || attr2:=[${attr2Vals}])`;
+}
+
+function smartSwitchHtml(checked, ariaLabel){
+  const on = !!checked;
+  return `
+    <span class="ft-label">${FACET_ICONS.smart}<span>Smart</span></span>
+    <span class="switch-ui">
+      <input type="checkbox" class="smart-switch-input" role="switch" aria-label="${ariaLabel || "Filtrar productos Smart"}" aria-checked="${on ? "true" : "false"}"${on ? " checked" : ""}>
+      <span class="switch-track" aria-hidden="true"><span class="switch-thumb"></span></span>
+    </span>
+  `;
+}
+
+function wireSmartSwitch(input, pending){
+  if(!input) return;
+  input.addEventListener("change", () => {
+    const next = input.checked;
+    input.setAttribute("aria-checked", next ? "true" : "false");
+    if(pending){
+      state.pendingSmartOnly = next;
+      updatePendingResultsCount();
+      return;
+    }
+    state.smartOnly = next;
+    state.pendingSmartOnly = next;
+    state.page = 1;
+    loadAndRender();
+  });
+}
+
+function appendSmartSwitchFacet(panel){
+  const group = document.createElement("div");
+  group.className = "facet-group facet-switch-group is-pinned";
+  group.innerHTML = `<label class="facet-switch">${smartSwitchHtml(state.smartOnly)}</label>`;
+  wireSmartSwitch(group.querySelector(".smart-switch-input"), false);
+  panel.appendChild(group);
 }
 
 function ensurePotenciaSelectionDefaults(){
@@ -563,10 +529,11 @@ async function loadPotenciaOptions(){
   }
 }
 
-/* Orden alfabético (es) de opciones de facet por value */
-function sortFacetCounts(counts){
+/* Orden alfabético (es) de opciones de facet. Usa el texto visible. */
+function sortFacetCounts(counts, labelFn){
+  const getLabel = labelFn || (v => String(v || "").trim());
   return [...(counts || [])].sort((a, b) =>
-    String(a.value || "").localeCompare(String(b.value || ""), "es", { sensitivity: "base" })
+    getLabel(a.value).localeCompare(getLabel(b.value), "es", { sensitivity: "base", numeric: true })
   );
 }
 
@@ -624,7 +591,7 @@ async function searchTypesense(){
   const facetFields = searchingAll
     ? FACET_FIELDS
     : (activeMacro
-      ? [...FACET_FIELDS, FAMILIA_FIELD, ...(activeFamilia ? [SUBFAMILIA_FIELD, ...EXTRA_FACET_FIELDS] : [])]
+      ? [...FACET_FIELDS, FAMILIA_FIELD, ...(activeFamilia ? [SUBFAMILIA_FIELD, ...(state.selected.subfamilia.size ? EXTRA_FACET_FIELDS : [])] : [])]
       : FACET_FIELDS);
 
   const filterParts = [BASE_FILTER];
@@ -650,7 +617,7 @@ async function searchTypesense(){
       const escaped = [...state.selected.subfamilia].map(v => `\`${v}\``).join(",");
       filterParts.push(`${SUBFAMILIA_FIELD}:=[${escaped}]`);
     }
-    if(activeFamilia){
+    if(activeFamilia && state.selected.subfamilia.size){
       for(const field of EXTRA_FACET_FIELDS){
         const vals = [...state.selected[field]];
         if(vals.length){
@@ -662,6 +629,8 @@ async function searchTypesense(){
   }
   const potClause = potenciaFilterClause(state.potenciaMin, state.potenciaMax);
   if(potClause) filterParts.push(potClause);
+  const smartClause = smartFilterClause(state.smartOnly);
+  if(smartClause) filterParts.push(smartClause);
   const params = new URLSearchParams({
     q: state.query || "*",
     query_by: "nombre_typesense,sku,descripcion",
@@ -841,25 +810,19 @@ function renderFacets(facetCounts){
   panel.innerHTML = "";
   const searching = Boolean(state.query);
   const activeMacro = searching ? "" : [...state.selected.macrofamilia][0];
-  const activeFamilia = searching ? "" : [...state.selected.familia][0];
+  const hasFamilia = !searching && state.selected.familia.size > 0;
+  const familiaKey = [...state.selected.familia].sort().join(",");
 
-  if(activeMacro && !activeFamilia){
-    cacheFamiliaImagesFromHits(window._lastHits || []);
-
+  if(activeMacro && !hasFamilia){
     /* Familia — solo mientras no haya una elegida */
-    const familiaData = (facetCounts || []).find(f => f.field_name === FAMILIA_FIELD);
-    const freshFamilia = sortFacetCounts(familiaData ? familiaData.counts : []);
-    if(freshFamilia.length){
-      familiaOptionsCache[activeMacro] = freshFamilia;
-    }
-    const familiaCounts = familiaOptionsCache[activeMacro] || freshFamilia;
+    const familiaCounts = resolveFamiliaCounts(facetCounts, activeMacro, state.selected.familia);
 
     if(familiaCounts.length){
       const famGroup = document.createElement("div");
-      famGroup.className = "facet-group is-pinned";
+      famGroup.className = "facet-group" + (state.collapsed.familia ? " collapsed" : "");
       famGroup.innerHTML = `
         <div class="facet-title" data-field="${FAMILIA_FIELD}">
-          <span class="ft-label">${FACET_ICONS.macrofamilia}<span>Familia</span></span>
+          <span class="ft-label">${FACET_ICONS.macrofamilia}<span>Familia</span></span>${CHEV_HTML}
         </div>
         <div class="facet-body"></div>
       `;
@@ -868,9 +831,7 @@ function renderFacets(facetCounts){
         const row = document.createElement("div");
         row.className = "facet-row familia-row";
         row.dataset.familia = c.value;
-        const img = getFamiliaImage(activeMacro, c.value);
         row.innerHTML = `
-          ${img ? `<img class="facet-thumb" src="${img}" alt="">` : ""}
           <span>${c.value}</span>${c.count !== null && c.count !== undefined ? `<span class="count">${c.count}</span>` : ""}
         `;
         famBody.appendChild(row);
@@ -879,17 +840,17 @@ function renderFacets(facetCounts){
     }
   }
 
-  if(activeMacro && activeFamilia){
-    /* Subfamilia — aparece al elegir Familia */
-    const subfamData = (facetCounts || []).find(f => f.field_name === SUBFAMILIA_FIELD);
-    let subfamCounts = sortFacetCounts(subfamData ? subfamData.counts : []);
+  if(activeMacro && hasFamilia){
+    /* Subfamilia — aparece al elegir Familia (selección múltiple) */
+    let subfamCounts = resolveSubfamiliaCounts(facetCounts, activeMacro, familiaKey, state.selected.subfamilia);
 
     if(subfamCounts.length){
       const subfamGroup = document.createElement("div");
-      subfamGroup.className = "facet-group" + (state.collapsed.subfamilia ? " collapsed" : "");
+      const subfamPinned = ALWAYS_OPEN_FACETS.has(SUBFAMILIA_FIELD);
+      subfamGroup.className = "facet-group" + (subfamPinned ? " is-pinned" : state.collapsed.subfamilia ? " collapsed" : "");
       subfamGroup.innerHTML = `
         <div class="facet-title" data-field="${SUBFAMILIA_FIELD}">
-          <span class="ft-label">${FACET_ICONS.macrofamilia}<span>Subfamilia</span></span>${CHEV_HTML}
+          <span class="ft-label">${FACET_ICONS.macrofamilia}<span>Subfamilia</span></span>${subfamPinned ? "" : CHEV_HTML}
         </div>
         <div class="facet-body"></div>
       `;
@@ -910,8 +871,12 @@ function renderFacets(facetCounts){
       panel.appendChild(subfamGroup);
     }
 
-    /* Categoría — solo con Familia filtrada */
-    for(const field of EXTRA_FACET_FIELDS){
+    /* Categoría — aparece al elegir Subfamilia */
+    if(!state.selected.subfamilia.size){
+      state.selected.categoria.clear();
+    }
+    if(state.selected.subfamilia.size){
+      for(const field of EXTRA_FACET_FIELDS){
       const facetData = (facetCounts || []).find(f => f.field_name === field);
       const counts = sortFacetCounts(facetData ? facetData.counts : []);
       if(!counts.length) continue;
@@ -939,11 +904,20 @@ function renderFacets(facetCounts){
         body.appendChild(row);
       });
       panel.appendChild(group);
+      }
     }
   }
 
+  let smartSwitchInserted = false;
+  const ensureSmartSwitch = () => {
+    if(smartSwitchInserted) return;
+    appendSmartSwitchFacet(panel);
+    smartSwitchInserted = true;
+  };
+
   for(const field of FACET_FIELDS){
     if(field === "macrofamilia" && activeMacro) continue;
+    if(field !== "macrofamilia") ensureSmartSwitch();
     if(field === "dimerizable"){
       appendPotenciaRangeFacet(panel, false);
       if(!shouldShowDimerizable(facetCounts)){
@@ -1016,6 +990,7 @@ function renderFacets(facetCounts){
   if(!panel.querySelector("[data-field=\"potencia\"]")){
     appendPotenciaRangeFacet(panel, false);
   }
+  if(!smartSwitchInserted) appendSmartSwitchFacet(panel);
 
   panel.querySelectorAll(".facet-title").forEach(title => {
     title.addEventListener("click", () => {
@@ -1052,10 +1027,13 @@ function renderFacets(facetCounts){
     });
   });
 
-  panel.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+  panel.querySelectorAll('input[type="checkbox"][data-field]').forEach(cb => {
     cb.addEventListener("change", () => {
       const { field, value } = cb.dataset;
       if(cb.checked) state.selected[field].add(value); else state.selected[field].delete(value);
+      if(field === "subfamilia" && !state.selected.subfamilia.size){
+        state.selected.categoria.clear();
+      }
       state.page = 1;
       loadAndRender();
     });
@@ -1063,43 +1041,51 @@ function renderFacets(facetCounts){
 }
 
 /* =========================================================
-   FAMILIA — imágenes + cache de opciones (sidebar)
+   FAMILIA — cache de opciones (sidebar)
    ========================================================= */
-const familiaImageCache = Object.create(null);
 /* Lista completa de familias por macrofamilia — se guarda cuando aún no
    hay filtro de familia, así al elegir una las demás siguen visibles. */
 const familiaOptionsCache = Object.create(null);
+/* Lista completa de subfamilias por familia — se guarda la versión más
+   amplia (antes de filtrar) para poder marcar varias a la vez. */
+const subfamiliaOptionsCache = Object.create(null);
 
-function getFamiliaImage(macro, familiaName){
-  if(!familiaName) return "";
-  if(familiaImageCache[familiaName]) return familiaImageCache[familiaName];
-
-  const macroImages = (macro && SUBFAMILIA_IMAGES[macro]) || {};
-  if(macroImages[familiaName]){
-    familiaImageCache[familiaName] = macroImages[familiaName];
-    return familiaImageCache[familiaName];
-  }
-
-  // Typesense a veces manda "Titan" y el mapa tiene "TITAN"
-  const key = Object.keys(macroImages).find(k => k.toLowerCase() === String(familiaName).toLowerCase());
-  if(key){
-    familiaImageCache[familiaName] = macroImages[key];
-    return familiaImageCache[familiaName];
-  }
-  return "";
+function mergeFacetCounts(fresh, cached, selectedSet){
+  const liveByVal = {};
+  (fresh || []).forEach(c => { liveByVal[c.value] = c.count; });
+  const seen = new Set();
+  const merged = (cached || fresh || []).map(c => {
+    seen.add(c.value);
+    const live = liveByVal[c.value];
+    return { value: c.value, count: live != null ? live : c.count };
+  });
+  (selectedSet || new Set()).forEach(v => {
+    if(seen.has(v)) return;
+    merged.push({ value: v, count: liveByVal[v] != null ? liveByVal[v] : null });
+  });
+  return sortFacetCounts(merged);
 }
 
-function cacheFamiliaImagesFromHits(hits){
-  (hits || []).forEach(hit => {
-    const doc = hit.document || hit;
-    const familia = doc.familia;
-    const names = Array.isArray(familia) ? familia : (familia ? [familia] : []);
-    names.forEach(name => {
-      if(!name || familiaImageCache[name]) return;
-      const imgs = parseImages(doc);
-      if(imgs[0]) familiaImageCache[name] = optimizeImg(imgs[0], "120x120");
-    });
-  });
+function resolveFamiliaCounts(facetCounts, macro, selectedSet){
+  const key = macro || "";
+  const facetData = (facetCounts || []).find(f => f.field_name === FAMILIA_FIELD);
+  const fresh = sortFacetCounts(facetData ? facetData.counts : []);
+  const cached = familiaOptionsCache[key];
+  if(fresh.length && (!cached || fresh.length > cached.length)){
+    familiaOptionsCache[key] = fresh;
+  }
+  return mergeFacetCounts(fresh, familiaOptionsCache[key] || fresh, selectedSet);
+}
+
+function resolveSubfamiliaCounts(facetCounts, macro, familia, selectedSet){
+  const key = `${macro || ""}|${familia || ""}`;
+  const facetData = (facetCounts || []).find(f => f.field_name === SUBFAMILIA_FIELD);
+  const fresh = sortFacetCounts(facetData ? facetData.counts : []);
+  const cached = subfamiliaOptionsCache[key];
+  if(fresh.length && (!cached || fresh.length > cached.length)){
+    subfamiliaOptionsCache[key] = fresh;
+  }
+  return mergeFacetCounts(fresh, subfamiliaOptionsCache[key] || fresh, selectedSet);
 }
 
 /* =========================================================
@@ -1112,11 +1098,14 @@ function renderChips(){
   for(const field of CHIP_FIELDS){
     state.selected[field].forEach(v => chips.push({ field, value: v }));
   }
-  state.selected.subfamilia.forEach(v => chips.push({ field: "subfamilia", value: v }));
+  // Subfamilia no tiene chip: el título y el filtro del sidebar ya lo muestran
   // Familia no tiene chip: se sale volviendo desde el breadcrumb / título
   state.selected.categoria.forEach(v => chips.push({ field: "categoria", value: v }));
   if(isPotenciaRangeActive(state.potenciaMin, state.potenciaMax)){
     chips.push({ field: "potencia_range", value: `${state.potenciaMin}W – ${state.potenciaMax}W` });
+  }
+  if(state.smartOnly){
+    chips.push({ field: "smart", value: "Smart" });
   }
   if(!chips.length){ bar.style.display = "none"; bar.innerHTML = ""; return; }
   bar.style.display = "flex";
@@ -1138,6 +1127,8 @@ function clearAppliedFilters(){
   state.selected.familia.clear();
   state.selected.categoria.clear();
   resetPotenciaRange();
+  state.smartOnly = false;
+  state.pendingSmartOnly = false;
   syncPendingFromCommitted();
   state.page = 1;
   loadAndRender();
@@ -1160,8 +1151,14 @@ if(chipsBarEl){
     e.preventDefault();
     if(chip.dataset.field === "potencia_range"){
       resetPotenciaRange();
+    } else if(chip.dataset.field === "smart"){
+      state.smartOnly = false;
+      state.pendingSmartOnly = false;
     } else {
       state.selected[chip.dataset.field].delete(chip.dataset.value);
+      if(chip.dataset.field === "subfamilia" && !state.selected.subfamilia.size){
+        state.selected.categoria.clear();
+      }
     }
     syncPendingFromCommitted();
     state.page = 1;
@@ -1258,10 +1255,9 @@ function buildVariantesBadge(doc){
   return `<span class="count-badge">${num} variantes</span>`;
 }
 
-// Tag "SMART" arriba a la derecha cuando ATTR 2 dice "Smart"
+// Tag "SMART" arriba a la derecha cuando el campo smart es Sí/Si
 function buildSmartBadge(doc){
-  const val = (doc.attr2 || "").toString().trim().toLowerCase();
-  if(val !== "smart") return "";
+  if(!isProductSmart(doc)) return "";
   return `<span class="smart-badge">${ICON_WIFI}SMART</span>`;
 }
 
@@ -1390,7 +1386,7 @@ function mergeColorFacetCounts(counts){
     if(!colorRawByKey.has(key)) colorRawByKey.set(key, new Set());
     colorRawByKey.get(key).add(c.value);
   });
-  return [...map.values()].sort((a, b) => b.count - a.count || colorLabel(a.value).localeCompare(colorLabel(b.value), "es"));
+  return sortFacetCounts([...map.values()], colorLabel);
 }
 
 function resolveColorFacetList(counts){
@@ -1411,10 +1407,10 @@ function resolveColorFacetList(counts){
   if(state.pending && state.pending.color){
     state.pending.color.forEach(k => { if(k && !keys.includes(k)) keys.push(k); });
   }
-  return keys.map(value => ({
+  return sortFacetCounts(keys.map(value => ({
     value,
     count: current.has(value) ? current.get(value) : 0
-  }));
+  })), colorLabel);
 }
 
 function expandColorFilterValues(selected){
@@ -1737,15 +1733,14 @@ function wireCarousels(){
 /* =========================================================
    COMPARAR: link con contexto de origen
    ========================================================= */
-/* Página local de comparación (carpeta /comparar).
-   - En GitHub/Webflow (productos/ y comparar/ al mismo nivel): ../comparar/
-   - En prototipo archivos_finales/productos/: ../../comparar/ */
+/* Página de comparación en Webflow: /nuevo-comparativa
+   - En prototipo local archivos_finales/productos/: ../../comparar/ */
 const COMPARE_PAGE_URL = (() => {
   try{
     const path = (location.pathname || "").replace(/\\/g, "/");
     if(/\/archivos_finales\/productos(\/|$)/i.test(path)) return "../../comparar/";
   }catch(_){}
-  return "../comparar/";
+  return "/nuevo-comparativa";
 })();
 
 // Arma la URL a la página de comparación con dos query params:
@@ -1790,9 +1785,9 @@ function renderCompareBar(){
     updateComparePadding();
     return;
   }
-  // Al agregar el primer producto, la barra arranca cerrada (desktop y mobile).
-  if(compareBarPrevCount === 0){
-    state.compareCollapsed = true;
+  // Al agregar un producto, la barra se abre para mostrar la selección.
+  if(list.length > compareBarPrevCount){
+    state.compareCollapsed = false;
   }
   compareBarPrevCount = list.length;
 
@@ -1805,10 +1800,10 @@ function renderCompareBar(){
     return `
     <div class="compare-chip">
       <button type="button" class="compare-chip-remove" data-remove="${p.sku}" aria-label="Quitar">×</button>
-      <div class="thumb">${img ? `<img src="${escAttr(img)}" alt="" loading="lazy" onerror="this.remove()">` : ""}</div>
-      <div class="info">
-        <span class="name">${p.nombre}</span>
-        ${p.sku ? `<span class="sku">${p.sku}</span>` : ""}
+      <div class="compare-chip-thumb">${img ? `<img src="${escAttr(img)}" alt="" loading="lazy" onerror="this.remove()">` : ""}</div>
+      <div class="compare-chip-info">
+        <span class="compare-chip-name">${p.nombre}</span>
+        ${p.sku ? `<span class="compare-chip-sku">${p.sku}</span>` : ""}
       </div>
     </div>
   `;
@@ -1917,7 +1912,9 @@ function isHighbayAccessory(doc){
 }
 
 function prioritizeHighbayHits(hits){
-  if([...state.selected.familia][0] !== "Highbay PRO 2026") return hits;
+  const fromSub = [...state.selected.subfamilia].some(isHighbayPro2026);
+  const fromFam = [...state.selected.familia].some(isHighbayProFamilia);
+  if(!fromSub && !fromFam) return hits;
   if(!hits || hits.length < 2) return hits;
   return [...hits].sort((a, b) => {
     const aAcc = isHighbayAccessory(a.document) ? 1 : 0;
@@ -1984,6 +1981,8 @@ function renderBreadcrumb(){
     state.selected.variante_temperatura_filtro.clear();
     state.selected.dimerizable.clear();
     resetPotenciaRange();
+    state.smartOnly = false;
+    state.pendingSmartOnly = false;
     state.sortBy = "";
     const sortSelect = document.getElementById("sortSelect");
     if(sortSelect) sortSelect.value = "";
@@ -2028,8 +2027,11 @@ function renderCategoryHeading(){
   const holder = document.getElementById("categoryHeading");
   const active = [...state.selected.macrofamilia][0];
   const activeFamilia = [...state.selected.familia][0];
+  const subfamilias = [...state.selected.subfamilia];
   let title = "Productos";
   if(state.query) title = `Resultados para "${state.query}"`;
+  else if(subfamilias.length === 1) title = subfamilias[0];
+  else if(subfamilias.length >= 2) title = "Galponeras";
   else if(activeFamilia) title = activeFamilia;
   else if(active) title = active;
 
@@ -2072,7 +2074,6 @@ async function loadAndRender(){
     }
 
     window._lastHits = data.hits;
-    cacheFamiliaImagesFromHits(data.hits);
     renderFacets(data.facet_counts);
     renderMobileFilters(data.facet_counts);
     renderBreadcrumb();
@@ -2230,10 +2231,14 @@ filtersToggle.addEventListener("click", openFiltersDrawer);
 filtersClose.addEventListener("click", closeFiltersDrawer);
 filtersBackdrop.addEventListener("click", closeFiltersDrawer);
 const filtersDesktopHeading = document.querySelector(".filters-desktop-heading");
-if(filtersDesktopHeading){
+if(filtersCollapseBtn){
+  filtersCollapseBtn.addEventListener("click", (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setFiltersCollapsed(true);
+  });
+} else if(filtersDesktopHeading){
   filtersDesktopHeading.addEventListener("click", () => setFiltersCollapsed(true));
-} else if(filtersCollapseBtn){
-  filtersCollapseBtn.addEventListener("click", () => setFiltersCollapsed(true));
 }
 if(filtersExpandBtn){
   filtersExpandBtn.addEventListener("click", () => setFiltersCollapsed(false));
@@ -2245,6 +2250,7 @@ filtersApply.addEventListener("click", async () => {
   state.sortBy = state.pendingSortBy;
   state.potenciaMin = state.pendingPotenciaMin;
   state.potenciaMax = state.pendingPotenciaMax;
+  state.smartOnly = state.pendingSmartOnly;
   document.getElementById("sortSelect").value = state.sortBy;
   state.page = 1;
   await loadAndRender();
@@ -2277,6 +2283,7 @@ function syncPendingFromCommitted(){
   ensurePotenciaSelectionDefaults();
   state.pendingPotenciaMin = state.potenciaMin;
   state.pendingPotenciaMax = state.potenciaMax;
+  state.pendingSmartOnly = state.smartOnly;
 }
 
 function fmnSummary(field){
@@ -2306,7 +2313,10 @@ function renderMobileFilters(facetCounts){
   const listEl = document.getElementById("fmnList");
   const activeMacro = [...state.pending.macrofamilia][0];
 
-  const rows = [{ field: "sort", label: "Ordenar por", summary: currentSortLabel() }];
+  const rows = [
+    { field: "sort", label: "Ordenar por", summary: currentSortLabel() },
+    { field: "smart", type: "switch", label: "Smart" }
+  ];
 
   FMN_ORDER.forEach(field => {
     const searching = Boolean(state.query);
@@ -2314,7 +2324,7 @@ function renderMobileFilters(facetCounts){
     if(searching && (field === "familia" || field === "subfamilia" || field === "categoria")) return;
     if(field === "familia" && (!activeMacro || hasFamilia)) return;
     if(field === "subfamilia" && !hasFamilia) return;
-    if(field === "categoria" && !hasFamilia) return;
+    if(field === "categoria" && (!hasFamilia || !state.pending.subfamilia.size)) return;
     if((field === "familia" || field === "subfamilia" || field === "categoria") && !activeMacro) return;
     if(field === "potencia"){
       rows.push({ field, label: FMN_LABELS[field], summary: fmnSummary(field), counts: [] });
@@ -2332,16 +2342,22 @@ function renderMobileFilters(facetCounts){
     rows.push({ field, label: FMN_LABELS[field], summary: fmnSummary(field), counts });
   });
 
-  listEl.innerHTML = rows.map(r => `
+  listEl.innerHTML = rows.map(r => {
+    if(r.type === "switch"){
+      return `<label class="fmn-row fmn-switch-row">${smartSwitchHtml(state.pendingSmartOnly)}</label>`;
+    }
+    return `
     <div class="fmn-row" data-field="${r.field}">
       <span>${r.label}</span>
       <span class="fmn-row-meta">${r.summary ? `<span>${r.summary}</span>` : ""}<span class="fmn-chev" aria-hidden="true">${ICON_FACET_CHEV}</span></span>
     </div>
-  `).join("");
+  `;
+  }).join("");
 
-  listEl.querySelectorAll(".fmn-row").forEach(row => {
+  listEl.querySelectorAll(".fmn-row[data-field]").forEach(row => {
     row.addEventListener("click", () => openDetailScreen(row.dataset.field));
   });
+  wireSmartSwitch(listEl.querySelector(".smart-switch-input"), true);
 }
 
 function fmnCheckboxRowHtml(field, c){
@@ -2351,22 +2367,10 @@ function fmnCheckboxRowHtml(field, c){
   const colorDot = field === "color"
     ? `<span class="dot color-dot${isLightColorKey(c.value) ? " light" : ""}" style="background:${colorSwatchBg(c.value)}" title="${colorLabel(c.value)}"></span>` : "";
   const label = field === "color" ? colorLabel(c.value) : c.value;
-  const activeMacro = [...state.pending.macrofamilia][0];
-  const thumb = field === "familia" && activeMacro
-    ? (() => { const src = getFamiliaImage(activeMacro, c.value); return src ? `<img class="facet-thumb" src="${src}" alt="">` : ""; })()
-    : "";
-  if(field === "familia"){
-    return `
-      <div class="fmn-option-row${checked ? " active" : ""}" data-value="${c.value}">
-        ${thumb}<span>${label}</span>
-        ${c.count !== null && c.count !== undefined ? `<span class="fmn-count">${c.count}</span>` : ""}
-      </div>
-    `;
-  }
   return `
     <div class="fmn-option-row${checked ? " active" : ""}${field === "color" && !c.count && !checked ? " is-empty" : ""}" data-value="${c.value}">
       <span class="fmn-checkbox">${checked ? ICON_CHECK : ""}</span>
-      ${thumb}${tempDot}${colorDot}<span>${label}</span>
+      ${tempDot}${colorDot}<span>${label}</span>
       ${c.count !== null && c.count !== undefined ? `<span class="fmn-count">${c.count}</span>` : ""}
     </div>
   `;
@@ -2380,6 +2384,9 @@ function fmnWireCheckboxRows(bodyEl, field){
       const val = row.dataset.value;
       if(state.pending[field].has(val)) state.pending[field].delete(val);
       else state.pending[field].add(val);
+      if(field === "subfamilia" && !state.pending.subfamilia.size){
+        state.pending.categoria.clear();
+      }
       renderMobileFilters(lastFacetCounts);
       openDetailScreen(field);
       updatePendingResultsCount();
@@ -2410,7 +2417,7 @@ async function updatePendingResultsCount(){
     const escaped = [...state.pending.subfamilia].map(v => `\`${v}\``).join(",");
     filterParts.push(`${SUBFAMILIA_FIELD}:=[${escaped}]`);
   }
-  if(activeMacro && state.pending.familia.size){
+  if(activeMacro && state.pending.familia.size && state.pending.subfamilia.size){
     for(const field of EXTRA_FACET_FIELDS){
       const vals = [...state.pending[field]];
       if(vals.length){
@@ -2421,6 +2428,8 @@ async function updatePendingResultsCount(){
   }
   const potClause = potenciaFilterClause(state.pendingPotenciaMin, state.pendingPotenciaMax);
   if(potClause) filterParts.push(potClause);
+  const smartClause = smartFilterClause(state.pendingSmartOnly);
+  if(smartClause) filterParts.push(smartClause);
   const params = new URLSearchParams({ q: state.query || "*", query_by: "nombre_typesense,sku,descripcion", per_page: "1", page: "1" });
   if(filterParts.length) params.set("filter_by", filterParts.join(" && "));
   const url = `${TS_HOST}/collections/${COLLECTION}/documents/search?${params.toString()}`;
@@ -2501,12 +2510,16 @@ function openDetailScreen(field){
   } else if(field === "familia"){
     titleEl.textContent = FMN_LABELS.familia;
     const activeMacro = [...state.pending.macrofamilia][0];
-    const data = lastFacetCounts.find(f => f.field_name === "familia");
-    let counts = sortFacetCounts(data ? data.counts : []);
-    if(activeMacro && familiaOptionsCache[activeMacro]){
-      counts = familiaOptionsCache[activeMacro];
-    }
-    bodyEl.innerHTML = counts.map(c => fmnCheckboxRowHtml("familia", c)).join("");
+    const counts = resolveFamiliaCounts(lastFacetCounts, activeMacro, state.pending.familia);
+    bodyEl.innerHTML = counts.map(c => {
+      const checked = state.pending.familia.has(c.value);
+      return `
+        <div class="fmn-option-row${checked ? " active" : ""}" data-value="${c.value}">
+          <span>${c.value}</span>
+          ${c.count !== null && c.count !== undefined ? `<span class="fmn-count">${c.count}</span>` : ""}
+        </div>
+      `;
+    }).join("");
     bodyEl.querySelectorAll(".fmn-option-row").forEach(row => {
       row.addEventListener("click", () => {
         const val = row.dataset.value;
@@ -2521,8 +2534,9 @@ function openDetailScreen(field){
     });
   } else if(field === "subfamilia"){
     titleEl.textContent = "Subfamilia";
-    const data = lastFacetCounts.find(f => f.field_name === "subfamilia");
-    const counts = sortFacetCounts(data ? data.counts : []);
+    const activeMacro = [...state.pending.macrofamilia][0];
+    const familiaKey = [...state.pending.familia].sort().join(",");
+    const counts = resolveSubfamiliaCounts(lastFacetCounts, activeMacro, familiaKey, state.pending.subfamilia);
     bodyEl.innerHTML = counts.map(c => fmnCheckboxRowHtml("subfamilia", c)).join("");
     fmnWireCheckboxRows(bodyEl, "subfamilia");
   } else if(field === "potencia"){
@@ -2595,6 +2609,8 @@ function applyStateFromURL(){
   state.pendingPotenciaMin = null;
   state.pendingPotenciaMax = null;
   pendingUrlPotencia = null;
+  state.smartOnly = false;
+  state.pendingSmartOnly = false;
 
   const q = (params.get("q") || "").trim();
   state.query = q;
@@ -2632,6 +2648,11 @@ function applyStateFromURL(){
     if(pendingUrlPotencia.min != null) state.potenciaMin = pendingUrlPotencia.min;
     if(pendingUrlPotencia.max != null) state.potenciaMax = pendingUrlPotencia.max;
   }
+
+  const smartParam = (params.get("smart") || "").trim().toLowerCase()
+    .normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+  state.smartOnly = smartParam === "1" || smartParam === "si" || smartParam === "true" || smartParam === "yes";
+  state.pendingSmartOnly = state.smartOnly;
 }
 
 function applyPendingUrlPotencia(){
@@ -2668,6 +2689,7 @@ function syncFiltersToURL(){
     params.set("pot_min", String(state.potenciaMin));
     params.set("pot_max", String(state.potenciaMax));
   }
+  if(state.smartOnly) params.set("smart", "1");
   if(state.sortBy) params.set("sort", state.sortBy);
   if(state.page > 1) params.set("page", String(state.page));
 

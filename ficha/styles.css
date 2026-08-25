@@ -817,14 +817,14 @@ main{padding:clamp(12px,2vw,24px) clamp(12px,2vw,24px) 0;}
   cursor:pointer;flex:none;box-shadow:0 1px 3px rgba(10,14,25,.15);transition:background .12s,color .12s;
 }
 .compare-chip-remove:hover{background:#fbeceb;color:#d1453b;}
-.compare-chip .thumb{
+.compare-chip-thumb{
   width:48px;height:48px;border-radius:8px;background:transparent;
   display:flex;align-items:center;justify-content:center;flex:none;overflow:hidden;
 }
-.compare-chip .thumb img{width:100%;height:100%;object-fit:contain;}
-.compare-chip .info{display:flex;flex-direction:column;align-items:flex-start;text-align:left;gap:2px;min-width:0;flex:1;}
-.compare-chip .name{font-size:13px;font-weight:700;color:var(--ink);line-height:1.3;}
-.compare-chip .sku{font-size:11px;color:var(--ink-soft);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.compare-chip-thumb img{width:100%;height:100%;object-fit:contain;}
+.compare-chip-info{display:flex;flex-direction:column;align-items:flex-start;text-align:left;gap:2px;min-width:0;flex:1;}
+.compare-chip-name{font-size:13px;font-weight:700;color:var(--ink);line-height:1.3;}
+.compare-chip-sku{font-size:11px;color:var(--ink-soft);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .compare-slot-empty{
   width:64px;height:64px;border-radius:12px;border:1.5px dashed #d8dce1;
   display:flex;align-items:center;justify-content:center;color:#c3c9d1;flex:none;font-size:20px;
@@ -869,8 +869,8 @@ body.assistant-open .ai-launch{
   .compare-cta{
     font-size:16px;
   }
-  .compare-chip .name{font-size:16px;}
-  .compare-chip .sku{font-size:13px;}
+  .compare-chip-name{font-size:16px;}
+  .compare-chip-sku{font-size:13px;}
   .compare-chip-remove{font-size:16px;}
   .compare-checkbox{font-size:16px;}
   .compare-row{font-size:12px;}

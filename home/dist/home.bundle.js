@@ -177,28 +177,26 @@
     ],
     faq: [
       {
-        question: "¿Cómo elijo la iluminación adecuada?",
-        answer: "Respuesta definitiva pendiente. El equipo de Macroled puede asesorarte según el uso, las dimensiones y la atmósfera buscada."
+        question: "¿Puedo recibir asesoramiento para mi proyecto lumínico?",
+        answer: "Sí. Nuestro equipo puede asesorarte de acuerdo con las necesidades de tu espacio o proyecto, considerando aspectos como sus dimensiones, el uso, los niveles de iluminación requeridos y la atmósfera que buscás crear. Podés usar el asistente de productos Macroled, integrado con inteligencia artificial, para encontrar soluciones en la web o contactarnos desde la sección Contacto para recibir una recomendación personalizada.",
+        emphasis: ["asistente de productos Macroled", "sección Contacto"]
       },
       {
         question: "¿Dónde encuentro la información técnica?",
-        answer: "Las fichas de los productos disponibles enlazan a su ficha web. También se podrá incorporar un acceso a descargas."
+        answer: "En la página de cada producto encontrás su ficha técnica, especificaciones e información comercial. Además, en la sección Descargas podés acceder a toda la documentación técnica disponible.",
+        emphasis: ["página de cada producto", "sección Descargas"]
       },
       {
         question: "¿Macroled trabaja con proyectos profesionales?",
         answer: "Sí. Nuestro equipo puede acompañarte en la elección de soluciones de iluminación para proyectos profesionales."
       },
       {
-        question: "¿Puedo recibir asesoramiento antes de elegir un producto?",
-        answer: "Sí. Contanos las características de tu espacio o proyecto y te ayudaremos a evaluar las alternativas disponibles."
-      },
-      {
         question: "¿Cómo puedo comparar distintas alternativas?",
-        answer: "Podés revisar la información de cada producto y consultar a nuestro equipo para comparar prestaciones según tu necesidad."
+        answer: "Podés revisar la información de cada producto, seleccionar los que te interesan y utilizar la función Comparar para evaluar sus características y prestaciones. Si necesitás orientación adicional, también podés consultar a nuestro equipo para encontrar la alternativa más adecuada para tu necesidad."
       },
       {
-        question: "¿Cómo me contacto con el equipo de Macroled?",
-        answer: "Ingresá a la sección de contacto y dejanos los datos de tu consulta para que podamos orientarte."
+        question: "¿Macroled vende a profesionales y también a consumidores finales?",
+        answer: "Sí. Somos fabricantes y comercializamos nuestros productos tanto a revendedores y proveedores como a consumidores finales. Contactanos para recibir información comercial y conocer la opción de compra más adecuada para tu necesidad."
       }
     ]
   };
@@ -336,19 +334,23 @@
     const linkAttrs=link?` href="${escapeHTML(link)}" data-href="${escapeHTML(link)}"`:"";
     return `<${tag} class="ml-product-card${link?"":" ml-product-card--disabled"}"${linkAttrs} data-id="${escapeHTML(doc.id||doc.sku||"")}"><div class="ml-product-card__media">${buildSmartBadge(doc)}${buildVariantBadge(doc)}${buildTempBadge(doc)}${image}</div><div class="ml-product-card__title">${escapeHTML(doc.nombre_typesense||"Producto sin nombre")}</div><div class="ml-product-card__attrs">${attrs}</div></${tag}>`;
   }
+  function loadingSkeletons(count=5){
+    const total=Math.max(1,Number(count)||5);
+    return `<span class="ml-product-loading-label">Cargando productos…</span>${Array.from({length:total},(_,index)=>`<div class="ml-product-skeleton" aria-hidden="true" style="--skeleton-order:${index}"><div class="ml-product-skeleton__media"></div><div class="ml-product-skeleton__line ml-product-skeleton__line--title"></div><div class="ml-product-skeleton__attrs"><span></span><span></span></div></div>`).join("")}`;
+  }
   function wireCarousels(grid){
     grid.querySelectorAll(".ml-product-card__media").forEach(media=>{const img=media.querySelector("img[data-images]");if(!img)return;let images=[];try{images=JSON.parse(img.dataset.images)}catch(_){return}const move=direction=>{let index=Number(img.dataset.index||0);index=(index+direction+images.length)%images.length;img.dataset.index=String(index);img.src=images[index]};media.querySelector(".ml-product-card__nav--prev")?.addEventListener("click",event=>{event.preventDefault();event.stopPropagation();move(-1)});media.querySelector(".ml-product-card__nav--next")?.addEventListener("click",event=>{event.preventDefault();event.stopPropagation();move(1)})});
   }
   async function renderGrid(grid){
     const field=grid.dataset.productsField,value=grid.dataset.productsValue,configuredCount=Number(grid.dataset.productsCount||4);
-    const count=matchMedia("(max-width: 640px), (min-width: 1601px)").matches?Math.max(configuredCount,5):configuredCount,fetchCount=Math.max(count,Number(grid.dataset.productsFetchCount||count)),randomizeBy=grid.dataset.productsRandomizeBy||"";let filters=[];
+    const count=matchMedia("(min-width: 1601px)").matches?Math.max(configuredCount,5):configuredCount,fetchCount=Math.max(count,Number(grid.dataset.productsFetchCount||count)),randomizeBy=grid.dataset.productsRandomizeBy||"";let filters=[];
     try{filters=JSON.parse(grid.dataset.productsFilters||"[]")}catch(_){filters=[]}
     grid.setAttribute("aria-busy","true");
     const label=filters.length?filters.map(filter=>filter.value).join(" / "):value;
     try{const data=await fetchProducts(field,value,fetchCount,filters);if(!data.hits?.length){grid.innerHTML=`<div class="ml-product-state">No hay productos para “${escapeHTML(label)}”.</div>`;return}const hits=pickRandomByField(data.hits,randomizeBy,count);grid.innerHTML=hits.map(hit=>cardTemplate(hit.document)).join("");wireCarousels(grid);const block=grid.closest(".ml-products-block");if(block)window.MacroledFeatured?.setupTrackControls(block,grid,{mobileOnly:true})}catch(error){console.error(`Macroled Home · Error consultando Typesense (${buildFilter(field,value,filters)})`,error);grid.innerHTML=`<div class="ml-product-state">No se pudieron cargar los productos. Verificá la configuración de Typesense y que “${escapeHTML(label)}” exista.</div>`}finally{grid.setAttribute("aria-busy","false")}
   }
   function init(root=document){root.querySelectorAll(".ml-product-grid:not([data-products-ready])").forEach(grid=>{grid.dataset.productsReady="true";renderGrid(grid)})}
-  window.MacroledProducts={init,parseImages,mergeVariantValue,buildSpecs,cardTemplate,wireCarousels,pickRandomByField};
+  window.MacroledProducts={init,parseImages,mergeVariantValue,buildSpecs,cardTemplate,loadingSkeletons,wireCarousels,pickRandomByField};
 })(window);
 
 /* Source: home/js/featured.js */
@@ -560,7 +562,7 @@
     isFetching = true;
     const track = root.querySelector("[data-featured-track]");
     track.setAttribute("aria-busy", "true");
-    track.innerHTML = '<div class="ml-featured-products__state">Cargando destacados…</div>';
+    track.innerHTML = window.MacroledProducts.loadingSkeletons(5);
 
     try {
       const data = await fetchFeatured(space);
@@ -622,7 +624,7 @@
       id: "invictus",
       title: "Invictus",
       subtitle: "Para grandes áreas, fachadas y espacios deportivos.",
-      productImage: "https://s3.coresagroup.com/MACROLED/WEB/HOME/invictus.png",
+      productImage: "https://s3.coresagroup.com/MACROLED/WEB/HOME/invictus.png?v=20260821-1",
       ambientImage: "https://s3.coresagroup.com/MACROLED/WEB/HOME/invictus_ambient.png",
       href: "https://macroled.webflow.io/nuevo-productos?macrofamilia=Luminarias+de+Proyecto&familia=Invictus"
     },
@@ -733,7 +735,8 @@
 
     const query = content.query || item;
     const filters = Array.isArray(query.typesenseFilters) ? JSON.stringify(query.typesenseFilters) : "";
-    return `<div class="ml-products-block"><div class="ml-product-grid" data-products-field="${esc(query.typesenseField)}" data-products-value="${esc(query.typesenseValue)}" data-products-filters="${esc(filters)}" data-products-count="${Number(query.productCount || 4)}" data-products-fetch-count="${Number(query.fetchCount || query.productCount || 4)}" data-products-randomize-by="${esc(query.randomizeBy || "")}"><div class="ml-product-state">Cargando productos…</div></div>${productControlsTemplate()}</div>`;
+    const skeletons = window.MacroledProducts?.loadingSkeletons(5) || "";
+    return `<div class="ml-products-block"><div class="ml-product-grid" data-products-field="${esc(query.typesenseField)}" data-products-value="${esc(query.typesenseValue)}" data-products-filters="${esc(filters)}" data-products-count="${Number(query.productCount || 4)}" data-products-fetch-count="${Number(query.fetchCount || query.productCount || 4)}" data-products-randomize-by="${esc(query.randomizeBy || "")}">${skeletons}</div>${productControlsTemplate()}</div>`;
   }
 
   function lineTemplate(item) {
@@ -986,14 +989,28 @@
   }
 
   function renderCommon() {
-    root.querySelector("[data-news]").innerHTML = config.news.map(item => {
+    const newsTrack = root.querySelector("[data-news]");
+    newsTrack.innerHTML = config.news.map(item => {
       const tag = item.href ? "a" : "article";
       const href = item.href ? ` href="${esc(item.href)}"` : "";
       const hoverImage = item.hoverImage || item.image;
       const defaultImageClass = item.zoomDefaultImage ? " ml-news-card__image--zoomed" : "";
       return `<${tag} class="ml-news-card"${href}><div class="ml-news-card__media"><img class="ml-news-card__image ml-news-card__image--default${defaultImageClass}" src="${esc(item.image)}" alt="${esc(item.title)}" loading="lazy" width="700" height="560"><img class="ml-news-card__image ml-news-card__image--hover" src="${esc(hoverImage)}" alt="" aria-hidden="true" loading="lazy" width="700" height="560"></div><h3><span>${esc(item.title)}</span><span class="ml-news-card__arrow" aria-hidden="true">&rarr;</span></h3><p>${esc(item.description)}</p></${tag}>`;
     }).join("");
-    root.querySelector("[data-faq]").innerHTML = config.faq.map((item, index) => `<div class="ml-faq__item"><button class="ml-faq__trigger" type="button" aria-expanded="false" aria-controls="ml-faq-answer-${index}"><span>${esc(item.question)}</span><span class="ml-faq__icon" aria-hidden="true">＋</span></button><div class="ml-faq__answer" id="ml-faq-answer-${index}"><div><p>${esc(item.answer)}</p></div></div></div>`).join("");
+    const newsSection = newsTrack.closest(".ml-news");
+    window.MacroledFeatured?.setupTrackControls(newsSection, newsTrack, {
+      cardSelector: ".ml-news-card",
+      mobileOnly: true
+    });
+    root.querySelector("[data-faq]").innerHTML = config.faq.map((item, index) => {
+      const answer = esc(item.answer);
+      const emphasis = Array.isArray(item.emphasis) ? item.emphasis : item.emphasis ? [item.emphasis] : [];
+      const answerHtml = emphasis.reduce((html, phrase) => {
+        const escapedPhrase = esc(phrase);
+        return html.replace(escapedPhrase, `<strong>${escapedPhrase}</strong>`);
+      }, answer);
+      return `<div class="ml-faq__item"><button class="ml-faq__trigger" type="button" aria-expanded="false" aria-controls="ml-faq-answer-${index}"><span>${esc(item.question)}</span><span class="ml-faq__icon" aria-hidden="true">＋</span></button><div class="ml-faq__answer" id="ml-faq-answer-${index}"><div><p>${answerHtml}</p></div></div></div>`;
+    }).join("");
     root.querySelectorAll(".ml-faq__trigger").forEach(button => button.addEventListener("click", () => {
       button.setAttribute("aria-expanded", String(button.getAttribute("aria-expanded") !== "true"));
     }));
@@ -1003,6 +1020,11 @@
     const hero = root.querySelector(".ml-hero");
     const luminarias = root.querySelector(".ml-project-lines-concept");
     if (!hero || !luminarias) return;
+
+    /* On touch layouts the project cards scroll horizontally. Keeping the
+       window-level swipe transition active makes that gesture jump back to
+       the hero when the finger drifts slightly on the vertical axis. */
+    if (matchMedia("(max-width: 990px)").matches) return;
 
     const reducedMotion = matchMedia("(prefers-reduced-motion: reduce)");
     let animating = false;

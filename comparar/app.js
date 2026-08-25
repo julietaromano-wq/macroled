@@ -140,7 +140,7 @@ const FIELD_MAP = {
 // Campos que Typesense necesita devolver en cada búsqueda/resolución (además
 // de query_by): tienen index:false en el schema, así que si no se piden a
 // mano en include_fields, Typesense no los trae aunque estén store:true.
-const COMPARE_FIELDS = "nombre_typesense,sku,descripcion,macrofamilia,familia,multiimagen,ficha_tecnica,link_ficha_web,variantes_sku,nombre_attr_variantes,attr_variantes,es_principal,potencia,factor_potencia,corriente,tension,frecuencia,anti_high_volt,driver,conector,base_conector,conductores,conexion,conectividad,clase,panel_solar,autonomia,lumenes_w,flujo_luminoso,rango_temperatura,angulo_apertura,cri,tipo_led,eficiencia_energetica,cantidad_luces,dimerizable,color,material_cuerpo,material_lente,ip,ik,temperatura_operacion,compatibilidad,vida_util,garantia_tiempo";
+const COMPARE_FIELDS = "nombre_typesense,sku,descripcion,macrofamilia,familia,multiimagen,link_ficha_web,variantes_sku,nombre_attr_variantes,attr_variantes,es_principal,potencia,factor_potencia,corriente,tension,frecuencia,anti_high_volt,driver,conector,base_conector,conductores,conexion,conectividad,clase,panel_solar,autonomia,lumenes_w,flujo_luminoso,rango_temperatura,angulo_apertura,cri,tipo_led,eficiencia_energetica,cantidad_luces,dimerizable,color,material_cuerpo,material_lente,ip,ik,temperatura_operacion,compatibilidad,vida_util,garantia_tiempo";
 const BASE_FILTER = "tipo_registro:=producto && es_principal:true";
 
 function parseImages(doc){
@@ -517,7 +517,6 @@ function mapDocToCompared(doc, extras){
     name: doc.nombre_typesense || extras.nombre || "Producto sin nombre",
     img,
     ficha: doc.link_ficha_web || "#",
-    ficha_pdf: doc.ficha_tecnica || "#",
     specs: mapAtributosToSpecs(doc),
     variants,
     axes
@@ -653,7 +652,6 @@ async function searchTypesenseModal(query){
 const COMPARE_MAX = 3;
 const ICON_CHECK = `<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`;
 const ICON_LINK = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>`;
-const ICON_DOWNLOAD = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>`;
 const ICON_BULB = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18h6M10 22h4"/><path d="M12 2a7 7 0 0 0-4 12.9V17h8v-2.1A7 7 0 0 0 12 2z"/></svg>`;
 const SPEC_TIP_MARK = `<svg class="spec-tip__mark" viewBox="0 0 16 16" fill="none" aria-hidden="true"><circle cx="8" cy="8" r="6.25" stroke="currentColor" stroke-width="1.4"/><path d="M8 7.2v4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><circle cx="8" cy="5.1" r="0.9" fill="currentColor"/></svg>`;
 
@@ -795,7 +793,6 @@ function render(){
           ${variantPickerHtml(p)}
           <div class="phead-btns">
             <a class="btn btn-primary" href="${p.ficha}">${ICON_LINK} Ver producto</a>
-            <a class="btn btn-ghost" href="${p.ficha_pdf}" target="_blank" rel="noopener">${ICON_DOWNLOAD} Ficha técnica</a>
           </div>
         </div>`;
     }else{
@@ -990,38 +987,88 @@ window.addEventListener("afterprint", cleanupComparePrint);
 
 /* =========================================================
    BOTÓN "VOLVER" DINÁMICO
-   Prioridad:
-   1) si el catálogo linkeó hasta acá con ?from=<url> (y opcionalmente
-      &fromLabel=<texto>), volvemos exactamente a esa URL — esto es lo único
-      100% confiable, porque conserva cualquier filtro/macrofamilia/búsqueda
-      que el usuario tenía aplicado en el catálogo, sin depender del historial
-      del navegador (que puede fallar si abrió el link en pestaña nueva, si
-      hubo un redirect en el medio, etc.)
-   2) si no vino ese parámetro, probamos history.back() (funciona bien en la
-      mayoría de los casos dentro de la misma pestaña)
-   3) como último recurso, mandamos al catálogo general
-   NOTA: para que el punto 1 funcione, hay que sumar ese query param del lado
-   del catálogo cuando arma el link/redirect hacia comparar.html, ej.:
-   `comparar.html?from=${encodeURIComponent(location.href)}&fromLabel=${encodeURIComponent(macrofamiliaNombre)}`
+   Prioridad de destino (siempre una URL concreta, no history.back):
+   1) ?from=<url> que mandó el catálogo/ficha — conserva filtros/búsqueda
+   2) document.referrer — la página desde la que se abrió la comparativa
+   3) lo guardado en sessionStorage (sobrevive un refresh de esta página)
+   4) catálogo de productos
    ========================================================= */
-const PRODUCTS_PAGE_FALLBACK = "https://macroled.webflow.io/home-nuevo";
+const FROM_STORAGE_KEY = "macroledCompareFrom";
+const FROM_LABEL_STORAGE_KEY = "macroledCompareFromLabel";
+const PRODUCTS_PAGE_FALLBACK = (() => {
+  try{
+    const path = (location.pathname || "").replace(/\\/g, "/");
+    if(/\/comparar(\/|$)/i.test(path) && !/\.webflow\.io$/i.test(location.hostname)){
+      return "../productos/";
+    }
+  }catch(_){}
+  return "/nuevo-productos";
+})();
 const urlParams = new URLSearchParams(location.search);
-const fromUrl = urlParams.get("from");
-const fromLabel = urlParams.get("fromLabel");
 
-if(fromLabel){
-  document.getElementById("backLinkText").textContent = `Volver a ${fromLabel}`;
+function isComparePath(pathname){
+  const path = String(pathname || "").replace(/\/+$/, "").toLowerCase();
+  return /nuevo-comparativa$/.test(path) || /\/comparar$/.test(path) || /comparar\.html$/.test(path);
 }
 
-document.getElementById("backLink").addEventListener("click", () => {
-  if(fromUrl){
-    location.href = fromUrl;
-  }else if(document.referrer){
-    window.history.back();
-  }else{
-    location.href = PRODUCTS_PAGE_FALLBACK;
+function isSafeBackUrl(url){
+  try{
+    const u = new URL(url, location.href);
+    if(u.protocol !== "http:" && u.protocol !== "https:") return false;
+    if(isComparePath(u.pathname)) return false;
+    const host = u.hostname.toLowerCase();
+    if(host === location.hostname.toLowerCase()) return true;
+    return host === "macroled.com"
+      || host === "www.macroled.com"
+      || host.endsWith(".macroled.com")
+      || host === "macroled.webflow.io"
+      || host.endsWith(".webflow.io");
+  }catch(_){
+    return false;
   }
-});
+}
+
+function labelFromUrl(url){
+  try{
+    const u = new URL(url, location.href);
+    const q = u.searchParams.get("q");
+    if(q) return `Resultados para "${q}"`;
+    const mf = u.searchParams.get("macrofamilia");
+    if(mf) return mf;
+    const path = u.pathname.replace(/\/+$/, "").toLowerCase();
+    if(path.includes("nuevo-productos") || /\/productos$/.test(path)) return "productos";
+    return "la página anterior";
+  }catch(_){
+    return "productos";
+  }
+}
+
+function persistBackOrigin(url, label){
+  try{
+    if(url && isSafeBackUrl(url)) sessionStorage.setItem(FROM_STORAGE_KEY, url);
+    if(label) sessionStorage.setItem(FROM_LABEL_STORAGE_KEY, label);
+  }catch(_){}
+}
+
+function readStored(key){
+  try{ return sessionStorage.getItem(key); }catch(_){ return null; }
+}
+
+const fromParam = urlParams.get("from");
+const fromLabelParam = urlParams.get("fromLabel");
+if(fromParam && isSafeBackUrl(fromParam)) persistBackOrigin(fromParam, fromLabelParam);
+else if(document.referrer && isSafeBackUrl(document.referrer) && !readStored(FROM_STORAGE_KEY)){
+  persistBackOrigin(document.referrer, fromLabelParam);
+}
+
+const fromUrl = [fromParam, document.referrer, readStored(FROM_STORAGE_KEY)]
+  .find(url => url && isSafeBackUrl(url)) || PRODUCTS_PAGE_FALLBACK;
+const fromLabel = fromLabelParam || readStored(FROM_LABEL_STORAGE_KEY) || labelFromUrl(fromUrl);
+
+const backLink = document.getElementById("backLink");
+const backLinkText = document.getElementById("backLinkText");
+if(fromLabel) backLinkText.textContent = `Volver a ${fromLabel}`;
+backLink.href = fromUrl;
 
 // una vez que el usuario deslizó, ocultamos el banner
 document.getElementById("compareShell").addEventListener("scroll", function onFirstScroll(){
@@ -1103,7 +1150,7 @@ async function resolveProductsFromStorage(){
     comparedProducts = stored.map(p => {
       const principal = bySku[p.sku];
       if(!principal){
-        return { id: p.sku, principalSku: p.sku, sku: p.sku, family: "", name: p.nombre || p.sku, img: p.img || "", ficha: "#", ficha_pdf: "#", specs: {}, variants: [] };
+        return { id: p.sku, principalSku: p.sku, sku: p.sku, family: "", name: p.nombre || p.sku, img: p.img || "", ficha: "#", specs: {}, variants: [] };
       }
       const skuSet = new Set(parseSkuList(principal.variantes_sku));
       skuSet.add(principal.sku);
@@ -1120,7 +1167,7 @@ async function resolveProductsFromStorage(){
     });
   }catch(err){
     console.error("No se pudieron resolver los productos guardados contra Typesense:", err);
-    comparedProducts = stored.map(p => ({ id: p.sku, principalSku: p.sku, sku: p.sku, family: "", name: p.nombre || p.sku, img: p.img || "", ficha: "#", ficha_pdf: "#", specs: {}, variants: [] }));
+    comparedProducts = stored.map(p => ({ id: p.sku, principalSku: p.sku, sku: p.sku, family: "", name: p.nombre || p.sku, img: p.img || "", ficha: "#", specs: {}, variants: [] }));
   }
   render();
 }

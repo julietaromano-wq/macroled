@@ -129,17 +129,21 @@
     const linkAttrs=link?` href="${escapeHTML(link)}" data-href="${escapeHTML(link)}"`:"";
     return `<${tag} class="ml-product-card${link?"":" ml-product-card--disabled"}"${linkAttrs} data-id="${escapeHTML(doc.id||doc.sku||"")}"><div class="ml-product-card__media">${buildSmartBadge(doc)}${buildVariantBadge(doc)}${buildTempBadge(doc)}${image}</div><div class="ml-product-card__title">${escapeHTML(doc.nombre_typesense||"Producto sin nombre")}</div><div class="ml-product-card__attrs">${attrs}</div></${tag}>`;
   }
+  function loadingSkeletons(count=5){
+    const total=Math.max(1,Number(count)||5);
+    return `<span class="ml-product-loading-label">Cargando productos…</span>${Array.from({length:total},(_,index)=>`<div class="ml-product-skeleton" aria-hidden="true" style="--skeleton-order:${index}"><div class="ml-product-skeleton__media"></div><div class="ml-product-skeleton__line ml-product-skeleton__line--title"></div><div class="ml-product-skeleton__attrs"><span></span><span></span></div></div>`).join("")}`;
+  }
   function wireCarousels(grid){
     grid.querySelectorAll(".ml-product-card__media").forEach(media=>{const img=media.querySelector("img[data-images]");if(!img)return;let images=[];try{images=JSON.parse(img.dataset.images)}catch(_){return}const move=direction=>{let index=Number(img.dataset.index||0);index=(index+direction+images.length)%images.length;img.dataset.index=String(index);img.src=images[index]};media.querySelector(".ml-product-card__nav--prev")?.addEventListener("click",event=>{event.preventDefault();event.stopPropagation();move(-1)});media.querySelector(".ml-product-card__nav--next")?.addEventListener("click",event=>{event.preventDefault();event.stopPropagation();move(1)})});
   }
   async function renderGrid(grid){
     const field=grid.dataset.productsField,value=grid.dataset.productsValue,configuredCount=Number(grid.dataset.productsCount||4);
-    const count=matchMedia("(max-width: 640px), (min-width: 1601px)").matches?Math.max(configuredCount,5):configuredCount,fetchCount=Math.max(count,Number(grid.dataset.productsFetchCount||count)),randomizeBy=grid.dataset.productsRandomizeBy||"";let filters=[];
+    const count=matchMedia("(min-width: 1601px)").matches?Math.max(configuredCount,5):configuredCount,fetchCount=Math.max(count,Number(grid.dataset.productsFetchCount||count)),randomizeBy=grid.dataset.productsRandomizeBy||"";let filters=[];
     try{filters=JSON.parse(grid.dataset.productsFilters||"[]")}catch(_){filters=[]}
     grid.setAttribute("aria-busy","true");
     const label=filters.length?filters.map(filter=>filter.value).join(" / "):value;
     try{const data=await fetchProducts(field,value,fetchCount,filters);if(!data.hits?.length){grid.innerHTML=`<div class="ml-product-state">No hay productos para “${escapeHTML(label)}”.</div>`;return}const hits=pickRandomByField(data.hits,randomizeBy,count);grid.innerHTML=hits.map(hit=>cardTemplate(hit.document)).join("");wireCarousels(grid);const block=grid.closest(".ml-products-block");if(block)window.MacroledFeatured?.setupTrackControls(block,grid,{mobileOnly:true})}catch(error){console.error(`Macroled Home · Error consultando Typesense (${buildFilter(field,value,filters)})`,error);grid.innerHTML=`<div class="ml-product-state">No se pudieron cargar los productos. Verificá la configuración de Typesense y que “${escapeHTML(label)}” exista.</div>`}finally{grid.setAttribute("aria-busy","false")}
   }
   function init(root=document){root.querySelectorAll(".ml-product-grid:not([data-products-ready])").forEach(grid=>{grid.dataset.productsReady="true";renderGrid(grid)})}
-  window.MacroledProducts={init,parseImages,mergeVariantValue,buildSpecs,cardTemplate,wireCarousels,pickRandomByField};
+  window.MacroledProducts={init,parseImages,mergeVariantValue,buildSpecs,cardTemplate,loadingSkeletons,wireCarousels,pickRandomByField};
 })(window);

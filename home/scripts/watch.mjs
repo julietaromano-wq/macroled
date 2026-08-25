@@ -4,11 +4,11 @@ import { build } from "./build.mjs";
 
 const homeDirectory = resolve(import.meta.dirname, "..");
 const javascriptDirectory = resolve(homeDirectory, "js");
-const cssFile = resolve(homeDirectory, "css", "home.css");
+const cssDirectory = resolve(homeDirectory, "css");
 const htmlFile = resolve(homeDirectory, "index.html");
 const watchedPaths = [
   javascriptDirectory,
-  cssFile,
+  cssDirectory,
   htmlFile,
 ];
 
@@ -56,7 +56,7 @@ const watcher = chokidar.watch(watchedPaths, {
 });
 
 watcher.on("all", (_event, changedPath) => {
-  if (changedPath !== cssFile && changedPath !== htmlFile && !changedPath.endsWith(".js")) return;
+  if (changedPath !== htmlFile && !changedPath.endsWith(".css") && !changedPath.endsWith(".js")) return;
   console.log(`Cambio detectado: ${changedPath}`);
   void rebuild();
 });
@@ -65,4 +65,4 @@ watcher.on("error", (error) => {
   console.error("Error del watcher:", error);
 });
 
-console.log("Vigilando home/index.html, home/js/*.js y home/css/home.css (Ctrl+C para salir)");
+console.log("Vigilando home/index.html, home/js/*.js y home/css/*.css (Ctrl+C para salir)");

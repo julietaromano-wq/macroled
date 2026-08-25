@@ -2,7 +2,7 @@
   "use strict";
 
   // Misma lógica/barra que index.html, adaptada a la ficha.
-  const COMPARE_PAGE_URL = "https://macroled.webflow.io/nuevo-comparativa";
+  const COMPARE_PAGE_URL = "/nuevo-comparativa";
   const COMPARE_MAX = (window.MacroledCompare && window.MacroledCompare.MAX) || 3;
   const ICON_COMPARE = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 3 21 3 21 7"/><line x1="21" y1="3" x2="10" y2="14"/><path d="M21 14v5a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h5"/></svg>`;
 
@@ -137,10 +137,10 @@
         (p) => `
       <div class="compare-chip">
         <button type="button" class="compare-chip-remove" data-remove="${p.sku}" aria-label="Quitar">×</button>
-        <div class="thumb">${p.img ? `<img src="${p.img}" alt="" loading="lazy">` : ""}</div>
-        <div class="info">
-          <span class="name">${p.nombre}</span>
-          ${p.sku ? `<span class="sku">${p.sku}</span>` : ""}
+        <div class="compare-chip-thumb">${p.img ? `<img src="${p.img}" alt="" loading="lazy">` : ""}</div>
+        <div class="compare-chip-info">
+          <span class="compare-chip-name">${p.nombre}</span>
+          ${p.sku ? `<span class="compare-chip-sku">${p.sku}</span>` : ""}
         </div>
       </div>`
       )
