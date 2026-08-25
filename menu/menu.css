@@ -50,7 +50,7 @@ html.mm-scroll-lock body {
 #macroled-menu.is-on-dark .mm-site-nav,
 #macroled-menu.nav-dark .mm-site-nav {
   background: rgba(0, 21, 43, 0.16) !important;
-  border-bottom-color: transparent !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.16) !important;
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
 }
@@ -66,7 +66,7 @@ html.mm-scroll-lock body {
 }
 #macroled-menu.is-on-dark #mm-mobile .mm-mobile-bar {
   background: rgba(0, 21, 43, 0.2);
-  border-bottom: none;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.16);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   color: #fff;
