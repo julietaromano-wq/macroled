@@ -36,6 +36,12 @@
 #macroled-menu input { font-family: inherit; }
 #macroled-menu a { text-decoration: none; color: inherit; }
 
+html.mm-scroll-lock,
+html.mm-scroll-lock body {
+  overflow: hidden !important;
+  overscroll-behavior: none !important;
+}
+
 /* Si el navbar nativo de Webflow queda visible, descomentá:
 .w-nav { display: none !important; }
 */
@@ -339,10 +345,16 @@
   padding-left: var(--mm-side-pad);
 }
 
+.mm-overlay,
+.mm-panel,
+.mm-body {
+  overscroll-behavior: contain;
+}
 .mm-tabs {
   flex: 0 0 280px;
   border-right: 1px solid var(--mm-border);
   overflow-y: auto;
+  overscroll-behavior: contain;
   padding: 28px 20px 28px 0;
   scrollbar-width: none;
 }

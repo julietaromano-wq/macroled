@@ -390,6 +390,44 @@ if (typeof module !== "undefined") module.exports = MEGAMENU_DATA;
 })();
 
 (function () {
+  var lockY = 0;
+  var lockCount = 0;
+  function lockPageScroll() {
+    if (lockCount === 0) {
+      lockY = window.scrollY || window.pageYOffset || 0;
+      document.documentElement.classList.add("mm-scroll-lock");
+      document.body.classList.add("mm-scroll-lock");
+      document.body.style.setProperty("position", "fixed", "important");
+      document.body.style.setProperty("top", -lockY + "px", "important");
+      document.body.style.setProperty("left", "0", "important");
+      document.body.style.setProperty("right", "0", "important");
+      document.body.style.setProperty("width", "100%", "important");
+      document.body.style.setProperty("overflow", "hidden", "important");
+      document.documentElement.style.setProperty("overflow", "hidden", "important");
+    }
+    lockCount++;
+  }
+  function unlockPageScroll() {
+    lockCount = Math.max(0, lockCount - 1);
+    if (lockCount === 0) {
+      document.documentElement.classList.remove("mm-scroll-lock");
+      document.body.classList.remove("mm-scroll-lock");
+      document.body.style.removeProperty("position");
+      document.body.style.removeProperty("top");
+      document.body.style.removeProperty("left");
+      document.body.style.removeProperty("right");
+      document.body.style.removeProperty("width");
+      document.body.style.removeProperty("overflow");
+      document.documentElement.style.removeProperty("overflow");
+      window.scrollTo(0, lockY);
+    }
+  }
+  window.MACROLED_MENU = window.MACROLED_MENU || {};
+  window.MACROLED_MENU.lockPageScroll = lockPageScroll;
+  window.MACROLED_MENU.unlockPageScroll = unlockPageScroll;
+})();
+
+(function () {
   if (window.__macroledMegamenuInit) return;
   window.__macroledMegamenuInit = true;
 
@@ -581,17 +619,38 @@ if (typeof module !== "undefined") module.exports = MEGAMENU_DATA;
     }
 
     function open() {
+      if (root.classList.contains("is-open")) return;
       root.classList.add("is-open");
       trigger.setAttribute("aria-expanded", "true");
-      document.documentElement.style.overflow = "hidden";
+      if (window.MACROLED_MENU && window.MACROLED_MENU.lockPageScroll) {
+        window.MACROLED_MENU.lockPageScroll();
+      }
       requestAnimationFrame(updateScrollChrome);
     }
 
     function close() {
+      if (!root.classList.contains("is-open")) return;
       root.classList.remove("is-open");
       trigger.setAttribute("aria-expanded", "false");
-      document.documentElement.style.overflow = "";
+      if (window.MACROLED_MENU && window.MACROLED_MENU.unlockPageScroll) {
+        window.MACROLED_MENU.unlockPageScroll();
+      }
     }
+
+    function stopPageScroll(e) {
+      if (!root.classList.contains("is-open")) return;
+      var area = e.target.closest(".mm-content, .mm-tabs");
+      if (!area) {
+        e.preventDefault();
+        return;
+      }
+      if (e.type !== "wheel") return;
+      var atTop = area.scrollTop <= 0 && e.deltaY < 0;
+      var atBottom = area.scrollTop + area.clientHeight >= area.scrollHeight - 1 && e.deltaY > 0;
+      if (atTop || atBottom) e.preventDefault();
+    }
+    document.addEventListener("wheel", stopPageScroll, { passive: false });
+    document.addEventListener("touchmove", stopPageScroll, { passive: false });
 
     trigger.addEventListener("click", () => {
       root.classList.contains("is-open") ? close() : open();
@@ -942,6 +1001,10 @@ if (typeof module !== "undefined") module.exports = MEGAMENU_DATA;
   var scrollLockY = 0;
   var scrollLockCount = 0;
   function lockBodyScroll() {
+    if (window.MACROLED_MENU && window.MACROLED_MENU.lockPageScroll) {
+      window.MACROLED_MENU.lockPageScroll();
+      return;
+    }
     if (scrollLockCount === 0) {
       scrollLockY = window.scrollY || window.pageYOffset || 0;
       document.body.style.position = "fixed";
@@ -953,6 +1016,10 @@ if (typeof module !== "undefined") module.exports = MEGAMENU_DATA;
     scrollLockCount++;
   }
   function unlockBodyScroll() {
+    if (window.MACROLED_MENU && window.MACROLED_MENU.unlockPageScroll) {
+      window.MACROLED_MENU.unlockPageScroll();
+      return;
+    }
     scrollLockCount = Math.max(0, scrollLockCount - 1);
     if (scrollLockCount === 0) {
       document.body.style.position = "";
