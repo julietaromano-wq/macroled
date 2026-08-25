@@ -1733,15 +1733,14 @@ function wireCarousels(){
 /* =========================================================
    COMPARAR: link con contexto de origen
    ========================================================= */
-/* Página local de comparación (carpeta /comparar).
-   - En GitHub/Webflow (productos/ y comparar/ al mismo nivel): ../comparar/
-   - En prototipo archivos_finales/productos/: ../../comparar/ */
+/* Página de comparación en Webflow: /nuevo-comparativa
+   - En prototipo local archivos_finales/productos/: ../../comparar/ */
 const COMPARE_PAGE_URL = (() => {
   try{
     const path = (location.pathname || "").replace(/\\/g, "/");
     if(/\/archivos_finales\/productos(\/|$)/i.test(path)) return "../../comparar/";
   }catch(_){}
-  return "../comparar/";
+  return "/nuevo-comparativa";
 })();
 
 // Arma la URL a la página de comparación con dos query params:
