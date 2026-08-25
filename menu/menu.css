@@ -54,13 +54,13 @@ html.mm-scroll-lock body {
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
 }
-#macroled-menu.is-on-dark .mm-site-nav .mm-links a,
+#macroled-menu.is-on-dark .mm-site-nav .mm-links > a,
 #macroled-menu.is-on-dark .mm-trigger,
-#macroled-menu.nav-dark .mm-site-nav .mm-links a,
+#macroled-menu.nav-dark .mm-site-nav .mm-links > a,
 #macroled-menu.nav-dark .mm-trigger {
   color: #fff !important;
 }
-#macroled-menu.is-on-dark .mm-site-nav .mm-links a:hover,
+#macroled-menu.is-on-dark .mm-site-nav .mm-links > a:hover,
 #macroled-menu.is-on-dark .mm-root.is-open .mm-trigger {
   color: #e8f7ff;
 }
@@ -101,11 +101,11 @@ html.mm-scroll-lock body {
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
 }
-#macroled-menu:has(.mm-root.is-open) .mm-site-nav .mm-links a,
-#macroled-menu.menu-open .mm-site-nav .mm-links a {
+#macroled-menu:has(.mm-root.is-open) .mm-site-nav .mm-links > a,
+#macroled-menu.menu-open .mm-site-nav .mm-links > a {
   color: #16294f !important;
 }
-#macroled-menu:has(.mm-root.is-open) .mm-site-nav .mm-links a:hover,
+#macroled-menu:has(.mm-root.is-open) .mm-site-nav .mm-links > a:hover,
 #macroled-menu:has(.mm-root.is-open) .mm-root.is-open .mm-trigger,
 #macroled-menu.menu-open .mm-root.is-open .mm-trigger {
   color: rgb(0, 110, 165) !important;
@@ -143,11 +143,11 @@ html.mm-scroll-lock body {
     flex: 1;
     display:flex; align-items:center; justify-content:center; gap:28px;
   }
-  .mm-site-nav .mm-links a {
+  .mm-site-nav .mm-links > a {
     color: var(--ink); text-decoration:none; font-weight:500; font-size:14px;
     transition: color .12s;
   }
-  .mm-site-nav .mm-links a:hover { color: var(--tint-text); }
+  .mm-site-nav .mm-links > a:hover { color: var(--tint-text); }
 
   .mm-nav-search { flex-shrink: 0; width: 280px; }
   #mm-ts-search-wrapper {
@@ -686,17 +686,17 @@ html.mm-scroll-lock body {
   align-items: center;
   justify-content: center;
 }
-.mm-all-products-bar a {
+#macroled-menu .mm-all-products-bar a {
   font-size: 14px;
   font-weight: 700;
-  color: var(--mm-tint-text);
+  color: rgb(0, 110, 165) !important;
   text-decoration: none;
   display: inline-flex;
   align-items: center;
   gap: 8px;
 }
-.mm-all-products-bar a:hover {
-  color: var(--mm-blue-dark);
+#macroled-menu .mm-all-products-bar a:hover {
+  color: #005f87 !important;
 }
 .mm-all-products-bar a svg {
   width: 15px;
@@ -792,7 +792,7 @@ html.mm-scroll-lock body {
   border: 1px solid var(--mm-blue);
   white-space: nowrap;
 }
-.mm-promo-cta:not(.mm-promo-cta-secondary) {
+#macroled-menu .mm-promo-cta:not(.mm-promo-cta-secondary) {
   color: #fff !important;
 }
 .mm-promo-cta:hover {
