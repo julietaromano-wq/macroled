@@ -620,10 +620,15 @@ if (typeof module !== "undefined") module.exports = MEGAMENU_DATA;
 
     function open() {
       if (root.classList.contains("is-open")) return;
+      setActive("lamparas");
+      if (tabsEl) tabsEl.scrollTop = 0;
       root.classList.add("is-open");
       trigger.setAttribute("aria-expanded", "true");
       if (window.MACROLED_MENU && window.MACROLED_MENU.lockPageScroll) {
         window.MACROLED_MENU.lockPageScroll();
+      }
+      if (window.MACROLED_MENU && window.MACROLED_MENU.refreshNavTheme) {
+        window.MACROLED_MENU.refreshNavTheme();
       }
       requestAnimationFrame(updateScrollChrome);
     }
@@ -634,6 +639,9 @@ if (typeof module !== "undefined") module.exports = MEGAMENU_DATA;
       trigger.setAttribute("aria-expanded", "false");
       if (window.MACROLED_MENU && window.MACROLED_MENU.unlockPageScroll) {
         window.MACROLED_MENU.unlockPageScroll();
+      }
+      if (window.MACROLED_MENU && window.MACROLED_MENU.refreshNavTheme) {
+        window.MACROLED_MENU.refreshNavTheme();
       }
     }
 
@@ -1295,8 +1303,15 @@ if (typeof module !== "undefined") module.exports = MEGAMENU_DATA;
   function update() {
     var menu = document.getElementById("macroled-menu");
     if (!menu) return;
+    if (document.querySelector("#macroled-menu .mm-root.is-open")) {
+      apply(menu, "light");
+      return;
+    }
     apply(menu, sampleTheme(menu));
   }
+
+  window.MACROLED_MENU = window.MACROLED_MENU || {};
+  window.MACROLED_MENU.refreshNavTheme = update;
 
   var ticking = false;
   function onScroll() {
