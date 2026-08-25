@@ -1732,16 +1732,22 @@
   }
 
   /**
-   * Una hermana "matchea" un valor si, además de tener ese valor en `key`, coincide
-   * con la selección actual en TODAS las demás dimensiones. Si ninguna hermana matchea,
-   * ese valor es una combinación inexistente para el resto de la selección vigente.
+   * Disponibilidad en cascada: un valor de `key` se tacha solo si no hay ninguna
+   * hermana que lo tenga Y coincida con la selección actual en las dimensiones QUE
+   * VIENEN ANTES en dimensionKeys (nunca contra las que vienen después).
+   *
+   * Esto evita el candado cruzado: si Potencia es la primera dimensión declarada,
+   * sus chips nunca se tachan por culpa de un Ángulo ya elegido (100W existe, solo
+   * que con otro ángulo). El Ángulo sí se filtra por la Potencia/Temperatura ya
+   * elegidas, porque es la dimensión más específica y depende de las anteriores.
    */
   function isCombinationAvailable(currentSpecs, key, value) {
-    const otherKeys = dimensionKeys.filter((k) => k !== key);
+    const idx = dimensionKeys.indexOf(key);
+    const priorKeys = idx > 0 ? dimensionKeys.slice(0, idx) : [];
     return siblings.some((el) => {
       const specs = parseSpecs(el);
       if ((specs[key] || "").trim() !== value) return false;
-      return otherKeys.every((k) => (specs[k] || "").trim() === (currentSpecs[k] || "").trim());
+      return priorKeys.every((k) => (specs[k] || "").trim() === (currentSpecs[k] || "").trim());
     });
   }
 
