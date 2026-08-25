@@ -649,18 +649,28 @@ if (typeof module !== "undefined") module.exports = MEGAMENU_DATA;
 
     function stopPageScroll(e) {
       if (!root.classList.contains("is-open")) return;
-      var area = e.target.closest(".mm-content, .mm-tabs");
+      var target = e.target;
+      if (!target || !target.closest) return;
+      var area = target.closest(".mm-content, .mm-tabs");
       if (!area) {
         e.preventDefault();
         return;
       }
       if (e.type !== "wheel") return;
-      var atTop = area.scrollTop <= 0 && e.deltaY < 0;
-      var atBottom = area.scrollTop + area.clientHeight >= area.scrollHeight - 1 && e.deltaY > 0;
-      if (atTop || atBottom) e.preventDefault();
+      var delta = e.deltaY;
+      if (e.deltaMode === 1) delta *= 16;
+      if (e.deltaMode === 2) delta *= area.clientHeight;
+      var maxScroll = Math.max(0, area.scrollHeight - area.clientHeight);
+      if (maxScroll < 8) {
+        e.preventDefault();
+        return;
+      }
+      var next = Math.max(0, Math.min(maxScroll, area.scrollTop + delta));
+      e.preventDefault();
+      area.scrollTop = next;
     }
-    document.addEventListener("wheel", stopPageScroll, { passive: false });
-    document.addEventListener("touchmove", stopPageScroll, { passive: false });
+    document.addEventListener("wheel", stopPageScroll, { passive: false, capture: true });
+    document.addEventListener("touchmove", stopPageScroll, { passive: false, capture: true });
 
     trigger.addEventListener("click", () => {
       root.classList.contains("is-open") ? close() : open();
@@ -1243,12 +1253,7 @@ if (typeof module !== "undefined") module.exports = MEGAMENU_DATA;
     document.body.insertBefore(menu, document.body.firstChild);
   }
 
-  function menuIsOpen(menu) {
-    return !!(menu && menu.querySelector(".mm-root.is-open"));
-  }
-
   function apply(menu, isDark) {
-    if (menuIsOpen(menu)) isDark = false;
     menu.classList.toggle("is-on-dark", isDark);
     menu.classList.toggle("nav-dark", isDark);
     menu.classList.toggle("is-on-light", !isDark);

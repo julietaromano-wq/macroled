@@ -94,20 +94,22 @@ html.mm-scroll-lock body {
 #macroled-menu.is-on-light #mm-mobile .burger span { background: #16294f; }
 #macroled-menu.is-on-light #mm-mobile .search-trigger { color: #16294f; }
 
-#macroled-menu:has(.mm-root.is-open) .mm-site-nav,
-#macroled-menu.menu-open .mm-site-nav {
-  background: #fff !important;
-  border-bottom-color: var(--line, #e6e6e6) !important;
-  backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
-}
 #macroled-menu:has(.mm-root.is-open) .mm-site-nav .mm-links a,
 #macroled-menu.menu-open .mm-site-nav .mm-links a {
-  color: #16294f !important;
+  color: #fff !important;
 }
 #macroled-menu:has(.mm-root.is-open) .mm-site-nav .mm-links a:hover,
-#macroled-menu:has(.mm-root.is-open) .mm-root.is-open .mm-trigger {
-  color: rgb(0, 110, 165);
+#macroled-menu:has(.mm-root.is-open) .mm-root.is-open .mm-trigger,
+#macroled-menu.menu-open .mm-root.is-open .mm-trigger {
+  color: #fff !important;
+}
+#macroled-menu.is-on-light.menu-open .mm-site-nav .mm-links a,
+#macroled-menu.is-on-light:has(.mm-root.is-open) .mm-site-nav .mm-links a {
+  color: #16294f !important;
+}
+#macroled-menu.is-on-light.menu-open .mm-root.is-open .mm-trigger,
+#macroled-menu.is-on-light:has(.mm-root.is-open) .mm-root.is-open .mm-trigger {
+  color: rgb(0, 110, 165) !important;
 }
 
 /* Si el navbar nativo de Webflow queda visible, descomentá:
@@ -533,9 +535,11 @@ html.mm-scroll-lock body {
 .mm-content {
   flex: 1;
   min-width: 0;
+  min-height: 0;
   overflow-y: auto;
   overflow-x: hidden;
   overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
   padding: 32px 40px 40px 40px;
   display: flex;
   flex-direction: column;
@@ -610,7 +614,7 @@ html.mm-scroll-lock body {
 
 .mm-tile-grid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 28px 32px;
 }
 
@@ -814,10 +818,10 @@ html.mm-scroll-lock body {
   .mm-panel,
   .mm-overlay { display: none !important; }
 }
-@media (max-width: 1299px) {
+@media (max-width: 1439px) {
   .mm-promo { display: none; }
 }
-@media (min-width: 1300px) {
+@media (min-width: 1440px) {
   .mm-tile-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 }
 
