@@ -742,6 +742,20 @@
 @media (max-width: 1100px) {
   .mm-site-nav { display: none !important; }
   #mm-mobile { display: block; }
+  #mm-mobile .mm-logo {
+    width: 90px;
+    max-width: 90px;
+    color: #fff;
+    line-height: 0;
+  }
+  #mm-mobile .mm-logo svg,
+  #mm-mobile .mm-logo-svg {
+    display: block;
+    width: 90px;
+    max-width: 100%;
+    height: auto;
+    color: #fff;
+  }
 }
 
 #mm-mobile .mm-mobile-bar {
@@ -750,8 +764,11 @@
   padding: 14px 20px; background: var(--mm-navy, #00152b); color: #fff;
   height: 62px; box-sizing: border-box;
 }
-#mm-mobile .mm-logo { width: 128px; color: #00bdff; }
-#mm-mobile .mm-logo svg { display: block; width: 100%; height: auto; }
+#mm-mobile .mm-logo { width: 90px; max-width: 90px; color: #fff; line-height: 0; }
+#mm-mobile .mm-logo svg,
+#mm-mobile .mm-logo-svg {
+  display: block; width: 90px; max-width: 100%; height: auto; color: #fff;
+}
 #mm-mobile .mm-header-actions { display: flex; align-items: center; gap: 10px; }
 #mm-mobile .burger {
   width: 34px; height: 34px; display: flex; flex-direction: column;
