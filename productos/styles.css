@@ -262,6 +262,33 @@
     background:rgb(227,242,253);color:rgb(0,110,165);font-weight:700;
   }
 
+  .facet-switch-group{padding:12px 0;}
+  .facet-switch{
+    display:flex;align-items:center;justify-content:space-between;gap:12px;
+    cursor:pointer;user-select:none;margin:0;font-weight:600;font-size:16px;
+    color:var(--dark-blue--700);
+  }
+  .facet-switch .ft-label{min-width:0;}
+  .switch-ui{position:relative;flex:none;display:inline-flex;align-items:center;}
+  .smart-switch-input{
+    position:absolute;inset:0;opacity:0;margin:0;width:100%;height:100%;cursor:pointer;z-index:1;
+  }
+  .switch-track{
+    width:40px;height:22px;border-radius:999px;background:#d5d9e0;
+    position:relative;display:block;transition:background .18s var(--ease);
+    pointer-events:none;
+  }
+  .switch-thumb{
+    position:absolute;top:2px;left:2px;width:18px;height:18px;border-radius:50%;
+    background:#fff;box-shadow:0 1px 3px rgba(20,24,33,.22);
+    transition:transform .18s var(--ease);
+  }
+  .smart-switch-input:checked + .switch-track{background:var(--dark-blue--700);}
+  .smart-switch-input:checked + .switch-track .switch-thumb{transform:translateX(18px);}
+  .smart-switch-input:focus-visible + .switch-track{
+    outline:2px solid var(--brand);outline-offset:2px;
+  }
+
   /* Banner de video arriba de la grilla (familia / macrofamilia). */
   .category-banner{
     position:relative;
@@ -1252,6 +1279,9 @@
       padding:15px 4px;border-bottom:1px solid var(--line);cursor:pointer;
       font-size:15px;font-weight:600;color:var(--ink);
     }
+    .fmn-row.fmn-switch-row{cursor:pointer;}
+    .fmn-switch-row .ft-label{font-size:15px;font-weight:600;color:var(--ink);}
+    .fmn-switch-row .ft-label svg{color:rgb(0,110,165);}
     .fmn-row-meta{display:flex;align-items:center;gap:8px;font-weight:400;color:var(--ink-soft);font-size:13px;min-width:0;}
     .fmn-row-meta span:first-child{max-width:min(160px,42vw);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
     .fmn-chev{
@@ -1923,6 +1953,15 @@ body.filters-open button.ai-launch{
   align-items:center !important;
   font-weight:400 !important;
   margin:0 -6px !important;
+}
+#macroled-productos label.facet-switch,
+#macroled-productos label.fmn-switch-row{
+  display:flex !important;
+  align-items:center !important;
+  justify-content:space-between !important;
+  margin:0 !important;
+  font-weight:600 !important;
+  width:100% !important;
 }
 #macroled-productos label.potencia-field{
   display:flex !important;

@@ -88,10 +88,10 @@
   </div>
 </div>
 
-<button type="button" class="ai-launch" id="aiLaunch" aria-label="Asistente" aria-haspopup="dialog" aria-controls="aiPanel" onclick="if(window.MacroledAssistantOpen){window.MacroledAssistantOpen(this);return false;}">
+<button type="button" class="ai-launch is-visible" id="aiLaunch" aria-label="Asistente" aria-haspopup="dialog" aria-controls="aiPanel" onclick="if(window.MacroledAssistantOpen){window.MacroledAssistantOpen(this);return false;}">
   <span class="ai-launch-dot" aria-hidden="true"></span>
-  <svg class="ai-launch-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.85" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8.05 6.35h9.15c2.1 0 3.8 1.65 3.8 3.7v5.2c0 2.05-1.7 3.7-3.8 3.7h-3.45l-2.2 2.45.95-2.45H8.05c-2.1 0-3.8-1.65-3.8-3.7V10.05c0-2.05 1.7-3.7 3.8-3.7z"/><path class="ai-icon-spark" fill="currentColor" stroke="none" d="M5.15 1.15 6.05 3.35 8.25 4.25 6.05 5.15 5.15 7.35 4.25 5.15 2.05 4.25 4.25 3.35z"/><path class="ai-icon-spark" fill="currentColor" stroke="none" d="M10.25 1.25 10.78 2.55 12.08 3.08 10.78 3.61 10.25 4.91 9.72 3.61 8.42 3.08 9.72 2.55z"/></svg>
-  <span class="ai-launch-label">Asistente</span>
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M12 3a7 7 0 0 0-4 12.7V19l4-2 4 2v-3.3A7 7 0 0 0 12 3z"/><path d="M9.5 10h.01M14.5 10h.01"/></svg>
+  <span>Asistente</span>
 </button>
 
 <div class="ai-backdrop" id="aiBackdrop" hidden></div>
@@ -99,7 +99,7 @@
   <div class="ai-head">
     <div class="ai-head-main">
       <div class="ai-avatar" aria-hidden="true">
-        <svg class="ai-avatar-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.85" stroke-linecap="round" stroke-linejoin="round"><path d="M8.05 6.35h9.15c2.1 0 3.8 1.65 3.8 3.7v5.2c0 2.05-1.7 3.7-3.8 3.7h-3.45l-2.2 2.45.95-2.45H8.05c-2.1 0-3.8-1.65-3.8-3.7V10.05c0-2.05 1.7-3.7 3.8-3.7z"/><path class="ai-icon-spark" fill="currentColor" stroke="none" d="M5.15 1.15 6.05 3.35 8.25 4.25 6.05 5.15 5.15 7.35 4.25 5.15 2.05 4.25 4.25 3.35z"/><path class="ai-icon-spark" fill="currentColor" stroke="none" d="M10.25 1.25 10.78 2.55 12.08 3.08 10.78 3.61 10.25 4.91 9.72 3.61 8.42 3.08 9.72 2.55z"/></svg>
+        <svg class="ai-avatar-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M12 3a7 7 0 0 0-4 12.7V19l4-2 4 2v-3.3A7 7 0 0 0 12 3z"/><path d="M9.5 10h.01M14.5 10h.01"/></svg>
         <span class="ai-avatar-online"></span>
       </div>
       <div class="ai-head-copy">

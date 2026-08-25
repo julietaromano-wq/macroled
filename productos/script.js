@@ -293,6 +293,7 @@ const FACET_ICONS = {
   color: `<svg ${ICON_SIZE}><path d="M12 2a10 10 0 1 0 0 20 3 3 0 0 0 0-6h-1a2 2 0 0 1 0-4h3a2 2 0 0 0 2-2 10 10 0 0 0-4-8z"/><circle cx="7.5" cy="10.5" r="1" fill="currentColor" stroke="none"/><circle cx="12" cy="7" r="1" fill="currentColor" stroke="none"/><circle cx="16.5" cy="10.5" r="1" fill="currentColor" stroke="none"/></svg>`,
   potencia: `<svg ${ICON_SIZE}><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>`,
   dimerizable: `<svg width="16" height="16" ${ICON_DIMMER_VB} aria-hidden="true">${ICON_DIMMER_INNER}</svg>`,
+  smart: `<svg ${ICON_SIZE}><path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/></svg>`,
   categoria: `<svg ${ICON_SIZE}><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>`
 };
 const ICON_CHECK = `<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`;
@@ -368,6 +369,8 @@ const state = {
   potenciaMax: null,
   pendingPotenciaMin: null,
   pendingPotenciaMax: null,
+  smartOnly: false,
+  pendingSmartOnly: false,
   page: 1,
   sortBy: "",
   query: "",
@@ -411,6 +414,70 @@ function potenciaFilterClause(min, max){
   if(!matched.length) return `sku:=[\`__sin_resultados_potencia__\`]`;
   const escaped = matched.map(v => `\`${String(v).replace(/`/g, "")}\``).join(",");
   return `${POTENCIA_RAW_FIELD}:=[${escaped}]`;
+}
+
+/* Campo `smart` en Typesense: "Si"/"No" o boolean. La pastilla recorta y
+   acepta true; el filtro tiene que cubrir las dos formas o no encuentra nada. */
+const SMART_ATTR_FIELD = "smart";
+const SMART_YES_VALUES = ["Si", "Sí", "SI", "si", "sí", "true", "True", "TRUE", "1", "Yes", "yes"];
+const SMART_ATTR2_VALUES = ["Si", "Sí", "SI", "si", "sí", "Smart", "smart", "SMART"];
+
+function isSmartYesValue(value){
+  if(value === true || value === 1) return true;
+  const v = String(value == null ? "" : value).trim().toLowerCase()
+    .normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+  return v === "si" || v === "true" || v === "1" || v === "yes" || v === "smart";
+}
+
+function isProductSmart(doc){
+  if(!doc) return false;
+  if(isSmartYesValue(doc.smart) || isSmartYesValue(doc.es_smart)) return true;
+  return isSmartYesValue(doc.attr2);
+}
+
+function smartFilterClause(enabled){
+  if(!enabled) return null;
+  const smartVals = SMART_YES_VALUES.map(v => `\`${v}\``).join(",");
+  const attr2Vals = SMART_ATTR2_VALUES.map(v => `\`${v}\``).join(",");
+  // Pastilla: lee smart / es_smart / attr2 (true o "Si"). Typesense exige
+  // match exacto; si el campo es boolean, :=Si no encuentra ninguno.
+  return `(${SMART_ATTR_FIELD}:true || ${SMART_ATTR_FIELD}:=[${smartVals}] || attr2:=[${attr2Vals}])`;
+}
+
+function smartSwitchHtml(checked, ariaLabel){
+  const on = !!checked;
+  return `
+    <span class="ft-label">${FACET_ICONS.smart}<span>Smart</span></span>
+    <span class="switch-ui">
+      <input type="checkbox" class="smart-switch-input" role="switch" aria-label="${ariaLabel || "Filtrar productos Smart"}" aria-checked="${on ? "true" : "false"}"${on ? " checked" : ""}>
+      <span class="switch-track" aria-hidden="true"><span class="switch-thumb"></span></span>
+    </span>
+  `;
+}
+
+function wireSmartSwitch(input, pending){
+  if(!input) return;
+  input.addEventListener("change", () => {
+    const next = input.checked;
+    input.setAttribute("aria-checked", next ? "true" : "false");
+    if(pending){
+      state.pendingSmartOnly = next;
+      updatePendingResultsCount();
+      return;
+    }
+    state.smartOnly = next;
+    state.pendingSmartOnly = next;
+    state.page = 1;
+    loadAndRender();
+  });
+}
+
+function appendSmartSwitchFacet(panel){
+  const group = document.createElement("div");
+  group.className = "facet-group facet-switch-group is-pinned";
+  group.innerHTML = `<label class="facet-switch">${smartSwitchHtml(state.smartOnly)}</label>`;
+  wireSmartSwitch(group.querySelector(".smart-switch-input"), false);
+  panel.appendChild(group);
 }
 
 function ensurePotenciaSelectionDefaults(){
@@ -562,6 +629,8 @@ async function searchTypesense(){
   }
   const potClause = potenciaFilterClause(state.potenciaMin, state.potenciaMax);
   if(potClause) filterParts.push(potClause);
+  const smartClause = smartFilterClause(state.smartOnly);
+  if(smartClause) filterParts.push(smartClause);
   const params = new URLSearchParams({
     q: state.query || "*",
     query_by: "nombre_typesense,sku,descripcion",
@@ -839,8 +908,16 @@ function renderFacets(facetCounts){
     }
   }
 
+  let smartSwitchInserted = false;
+  const ensureSmartSwitch = () => {
+    if(smartSwitchInserted) return;
+    appendSmartSwitchFacet(panel);
+    smartSwitchInserted = true;
+  };
+
   for(const field of FACET_FIELDS){
     if(field === "macrofamilia" && activeMacro) continue;
+    if(field !== "macrofamilia") ensureSmartSwitch();
     if(field === "dimerizable"){
       appendPotenciaRangeFacet(panel, false);
       if(!shouldShowDimerizable(facetCounts)){
@@ -913,6 +990,7 @@ function renderFacets(facetCounts){
   if(!panel.querySelector("[data-field=\"potencia\"]")){
     appendPotenciaRangeFacet(panel, false);
   }
+  if(!smartSwitchInserted) appendSmartSwitchFacet(panel);
 
   panel.querySelectorAll(".facet-title").forEach(title => {
     title.addEventListener("click", () => {
@@ -949,7 +1027,7 @@ function renderFacets(facetCounts){
     });
   });
 
-  panel.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+  panel.querySelectorAll('input[type="checkbox"][data-field]').forEach(cb => {
     cb.addEventListener("change", () => {
       const { field, value } = cb.dataset;
       if(cb.checked) state.selected[field].add(value); else state.selected[field].delete(value);
@@ -1026,6 +1104,9 @@ function renderChips(){
   if(isPotenciaRangeActive(state.potenciaMin, state.potenciaMax)){
     chips.push({ field: "potencia_range", value: `${state.potenciaMin}W – ${state.potenciaMax}W` });
   }
+  if(state.smartOnly){
+    chips.push({ field: "smart", value: "Smart" });
+  }
   if(!chips.length){ bar.style.display = "none"; bar.innerHTML = ""; return; }
   bar.style.display = "flex";
   bar.innerHTML = `<span class="label">Filtros aplicados</span>` +
@@ -1046,6 +1127,8 @@ function clearAppliedFilters(){
   state.selected.familia.clear();
   state.selected.categoria.clear();
   resetPotenciaRange();
+  state.smartOnly = false;
+  state.pendingSmartOnly = false;
   syncPendingFromCommitted();
   state.page = 1;
   loadAndRender();
@@ -1068,6 +1151,9 @@ if(chipsBarEl){
     e.preventDefault();
     if(chip.dataset.field === "potencia_range"){
       resetPotenciaRange();
+    } else if(chip.dataset.field === "smart"){
+      state.smartOnly = false;
+      state.pendingSmartOnly = false;
     } else {
       state.selected[chip.dataset.field].delete(chip.dataset.value);
       if(chip.dataset.field === "subfamilia" && !state.selected.subfamilia.size){
@@ -1169,10 +1255,9 @@ function buildVariantesBadge(doc){
   return `<span class="count-badge">${num} variantes</span>`;
 }
 
-// Tag "SMART" arriba a la derecha cuando ATTR 2 dice "Smart"
+// Tag "SMART" arriba a la derecha cuando el campo smart es Sí/Si
 function buildSmartBadge(doc){
-  const val = (doc.attr2 || "").toString().trim().toLowerCase();
-  if(val !== "smart") return "";
+  if(!isProductSmart(doc)) return "";
   return `<span class="smart-badge">${ICON_WIFI}SMART</span>`;
 }
 
@@ -1897,6 +1982,8 @@ function renderBreadcrumb(){
     state.selected.variante_temperatura_filtro.clear();
     state.selected.dimerizable.clear();
     resetPotenciaRange();
+    state.smartOnly = false;
+    state.pendingSmartOnly = false;
     state.sortBy = "";
     const sortSelect = document.getElementById("sortSelect");
     if(sortSelect) sortSelect.value = "";
@@ -2164,6 +2251,7 @@ filtersApply.addEventListener("click", async () => {
   state.sortBy = state.pendingSortBy;
   state.potenciaMin = state.pendingPotenciaMin;
   state.potenciaMax = state.pendingPotenciaMax;
+  state.smartOnly = state.pendingSmartOnly;
   document.getElementById("sortSelect").value = state.sortBy;
   state.page = 1;
   await loadAndRender();
@@ -2196,6 +2284,7 @@ function syncPendingFromCommitted(){
   ensurePotenciaSelectionDefaults();
   state.pendingPotenciaMin = state.potenciaMin;
   state.pendingPotenciaMax = state.potenciaMax;
+  state.pendingSmartOnly = state.smartOnly;
 }
 
 function fmnSummary(field){
@@ -2225,7 +2314,10 @@ function renderMobileFilters(facetCounts){
   const listEl = document.getElementById("fmnList");
   const activeMacro = [...state.pending.macrofamilia][0];
 
-  const rows = [{ field: "sort", label: "Ordenar por", summary: currentSortLabel() }];
+  const rows = [
+    { field: "sort", label: "Ordenar por", summary: currentSortLabel() },
+    { field: "smart", type: "switch", label: "Smart" }
+  ];
 
   FMN_ORDER.forEach(field => {
     const searching = Boolean(state.query);
@@ -2251,16 +2343,22 @@ function renderMobileFilters(facetCounts){
     rows.push({ field, label: FMN_LABELS[field], summary: fmnSummary(field), counts });
   });
 
-  listEl.innerHTML = rows.map(r => `
+  listEl.innerHTML = rows.map(r => {
+    if(r.type === "switch"){
+      return `<label class="fmn-row fmn-switch-row">${smartSwitchHtml(state.pendingSmartOnly)}</label>`;
+    }
+    return `
     <div class="fmn-row" data-field="${r.field}">
       <span>${r.label}</span>
       <span class="fmn-row-meta">${r.summary ? `<span>${r.summary}</span>` : ""}<span class="fmn-chev" aria-hidden="true">${ICON_FACET_CHEV}</span></span>
     </div>
-  `).join("");
+  `;
+  }).join("");
 
-  listEl.querySelectorAll(".fmn-row").forEach(row => {
+  listEl.querySelectorAll(".fmn-row[data-field]").forEach(row => {
     row.addEventListener("click", () => openDetailScreen(row.dataset.field));
   });
+  wireSmartSwitch(listEl.querySelector(".smart-switch-input"), true);
 }
 
 function fmnCheckboxRowHtml(field, c){
@@ -2331,6 +2429,8 @@ async function updatePendingResultsCount(){
   }
   const potClause = potenciaFilterClause(state.pendingPotenciaMin, state.pendingPotenciaMax);
   if(potClause) filterParts.push(potClause);
+  const smartClause = smartFilterClause(state.pendingSmartOnly);
+  if(smartClause) filterParts.push(smartClause);
   const params = new URLSearchParams({ q: state.query || "*", query_by: "nombre_typesense,sku,descripcion", per_page: "1", page: "1" });
   if(filterParts.length) params.set("filter_by", filterParts.join(" && "));
   const url = `${TS_HOST}/collections/${COLLECTION}/documents/search?${params.toString()}`;
@@ -2510,6 +2610,8 @@ function applyStateFromURL(){
   state.pendingPotenciaMin = null;
   state.pendingPotenciaMax = null;
   pendingUrlPotencia = null;
+  state.smartOnly = false;
+  state.pendingSmartOnly = false;
 
   const q = (params.get("q") || "").trim();
   state.query = q;
@@ -2547,6 +2649,11 @@ function applyStateFromURL(){
     if(pendingUrlPotencia.min != null) state.potenciaMin = pendingUrlPotencia.min;
     if(pendingUrlPotencia.max != null) state.potenciaMax = pendingUrlPotencia.max;
   }
+
+  const smartParam = (params.get("smart") || "").trim().toLowerCase()
+    .normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+  state.smartOnly = smartParam === "1" || smartParam === "si" || smartParam === "true" || smartParam === "yes";
+  state.pendingSmartOnly = state.smartOnly;
 }
 
 function applyPendingUrlPotencia(){
@@ -2583,6 +2690,7 @@ function syncFiltersToURL(){
     params.set("pot_min", String(state.potenciaMin));
     params.set("pot_max", String(state.potenciaMax));
   }
+  if(state.smartOnly) params.set("smart", "1");
   if(state.sortBy) params.set("sort", state.sortBy);
   if(state.page > 1) params.set("page", String(state.page));
 
