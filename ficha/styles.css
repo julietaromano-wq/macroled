@@ -387,9 +387,11 @@ main{padding:clamp(12px,2vw,24px) clamp(12px,2vw,24px) 0;}
 .variant-chip.is-unavailable{
   color:var(--muted);border-color:#edecec;background:var(--white);
   text-decoration:line-through;text-decoration-thickness:1px;text-decoration-color:currentColor;
-  cursor:not-allowed;pointer-events:none;
 }
 .variant-chip.is-unavailable .variant-swatch{opacity:.35;filter:grayscale(.4);}
+.variant-chip.is-unavailable:hover{
+  border-color:#edecec;background:var(--white);color:var(--muted);
+}
 .cms-product-source,
 .cms-variants-source{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);}
 

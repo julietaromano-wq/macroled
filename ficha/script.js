@@ -1690,14 +1690,13 @@
       html +=
         `<label for="${inputId}" class="${chipClass}"` +
         (isUnavailable
-          ? ` title="${escapeHtml(entry.value)}: no disponible con la combinación actual" aria-disabled="true"`
+          ? ` title="${escapeHtml(entry.value)}: no disponible con la combinación actual — se reacomodan las otras opciones"`
           : "") +
         `>` +
         `<input type="radio" class="variant-chip-radio" id="${inputId}" name="${groupName}"` +
         ` data-dim="${escapeHtml(entry.dim || "")}" data-val="${escapeHtml(entry.value)}"` +
         (entry.sku ? ` data-sku="${escapeHtml(entry.sku)}"` : "") +
         (isActive ? " checked" : "") +
-        (isUnavailable ? " disabled" : "") +
         `>` +
         swatch +
         escapeHtml(entry.value) +
