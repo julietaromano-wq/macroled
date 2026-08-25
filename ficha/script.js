@@ -1680,16 +1680,24 @@
       `<div class="variant-chips" role="radiogroup" aria-label="${escapeHtml(label)}">`;
     entries.forEach((entry) => {
       const isActive = entry.value === activeValue;
+      const isUnavailable = !!entry.unavailable && !isActive;
       const inputId = groupName + "--" + slugify(entry.value);
       const swatch = entry.swatch
         ? `<span class="variant-swatch" style="background:${entry.swatch}" aria-hidden="true"></span>`
         : "";
+      const chipClass =
+        "variant-chip" + (isActive ? " active" : "") + (isUnavailable ? " is-unavailable" : "");
       html +=
-        `<label for="${inputId}" class="variant-chip${isActive ? " active" : ""}">` +
+        `<label for="${inputId}" class="${chipClass}"` +
+        (isUnavailable
+          ? ` title="${escapeHtml(entry.value)}: no disponible con la combinación actual" aria-disabled="true"`
+          : "") +
+        `>` +
         `<input type="radio" class="variant-chip-radio" id="${inputId}" name="${groupName}"` +
         ` data-dim="${escapeHtml(entry.dim || "")}" data-val="${escapeHtml(entry.value)}"` +
         (entry.sku ? ` data-sku="${escapeHtml(entry.sku)}"` : "") +
         (isActive ? " checked" : "") +
+        (isUnavailable ? " disabled" : "") +
         `>` +
         swatch +
         escapeHtml(entry.value) +
@@ -1724,6 +1732,20 @@
       .sort((a, b) => variantSort(a.value, b.value));
   }
 
+  /**
+   * Una hermana "matchea" un valor si, además de tener ese valor en `key`, coincide
+   * con la selección actual en TODAS las demás dimensiones. Si ninguna hermana matchea,
+   * ese valor es una combinación inexistente para el resto de la selección vigente.
+   */
+  function isCombinationAvailable(currentSpecs, key, value) {
+    const otherKeys = dimensionKeys.filter((k) => k !== key);
+    return siblings.some((el) => {
+      const specs = parseSpecs(el);
+      if ((specs[key] || "").trim() !== value) return false;
+      return otherKeys.every((k) => (specs[k] || "").trim() === (currentSpecs[k] || "").trim());
+    });
+  }
+
   function buildChipsHtml() {
     if (!variantsTarget || !heroItem) return "";
     const currentSpecs = parseSpecs(heroItem);
@@ -1744,7 +1766,13 @@
         html += renderChipGroup(
           CHIP_LABELS[key] || key,
           "variant-" + slugify(key),
-          values.map((value) => ({ value, dim: key, swatch: swatchFor(value) })),
+          values.map((value) => ({
+            value,
+            dim: key,
+            swatch: swatchFor(value),
+            unavailable:
+              dimensionKeys.length > 1 && !isCombinationAvailable(currentSpecs, key, value),
+          })),
           (currentSpecs[key] || "").trim()
         );
       });
