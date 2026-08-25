@@ -201,7 +201,9 @@
   .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;}
   .card-skel{pointer-events:none;}
   .card-skel:hover{transform:none;box-shadow:2px 3px 20px 2px rgba(0,17,33,.04);}
-  .card-skel .card-body{gap:0;padding-top:10px;}
+  .card-skel .card-body{
+    display:flex;flex-direction:column;gap:0;padding:.85rem .15rem .15rem;flex:1;min-width:0;
+  }
   .card-skel .card-info{display:flex;flex-direction:column;justify-content:center;gap:0;min-width:0;flex:1;}
   .card-skel .skel-title{margin:0;padding-bottom:24px;}
   .skel-tabs{display:flex;flex-wrap:wrap;gap:8px;}
@@ -215,15 +217,24 @@
   .skel-media{
     position:absolute;inset:0;border-radius:.75rem;width:auto;height:auto;
   }
-  .skel-title{height:16px;width:72%;}
+  .skel-title{height:18px;width:72%;border-radius:6px;}
   .skel-tab{height:32px;width:78px;border-radius:8px;flex:none;}
-  .skel-btn{height:40px;width:100%;border-radius:10px;margin-top:auto;}
+  .skel-tabs .skel-tab:nth-child(2){width:92px;}
+  .skel-tabs .skel-tab:nth-child(3){width:70px;}
+  .skel-btn{height:40px;width:100%;border-radius:10px;margin-top:auto;flex:none;}
   @keyframes skel-shimmer{
     0%{background-position:100% 0;}
     100%{background-position:-100% 0;}
   }
   @media (prefers-reduced-motion:reduce){
     .skel{animation:none;background:#eee;background-image:none;}
+  }
+  .grid.list .card-skel .card-body{padding:0;}
+  .grid.list .card-skel .skel-title{height:22px;width:min(280px,70%);padding-bottom:24px;}
+  .grid.list .skel-tab{height:30px;}
+  .grid.list .skel-btn{
+    width:148px;min-width:148px;max-width:148px;height:40px;
+    margin-top:auto;flex:none;align-self:flex-start;padding:0;
   }
   .grid.list{grid-template-columns:1fr;}
   .grid.list .card{
@@ -270,8 +281,7 @@
     display:flex;flex-direction:row;flex-wrap:wrap;
     align-items:center;gap:6px;margin:0;
   }
-  .grid.list .btn-download,
-  .grid.list .skel-btn{
+  .grid.list .btn-download{
     width:auto;margin-top:auto;flex:none;align-self:flex-start;
   }
 
@@ -521,8 +531,8 @@
     .card-title{font-size:.88rem;margin:0;padding-bottom:16px;line-height:1.3;}
     .type-tab{font-size:10.5px;padding:5px 8px;}
     .btn-download{font-size:11.5px;padding:9px 8px;}
-    .grid.list .btn-download,
-    .grid.list .skel-btn{width:auto;align-self:flex-start;margin-top:auto;padding:9px 16px;}
+    .grid.list .btn-download{width:auto;align-self:flex-start;margin-top:auto;padding:9px 16px;}
+    .grid.list .skel-btn{width:120px;min-width:120px;max-width:120px;height:36px;padding:0;}
     .pagination{flex-wrap:wrap;row-gap:8px;}
     .pagination button{padding:8px 12px;min-height:40px;}
     footer.site{padding:36px 20px 20px;}
@@ -1060,6 +1070,26 @@ select.sort{
   gap:8px !important;
   margin:0 !important;
 }
+.card-skel .skel-btn{
+  flex:none !important;
+}
+.grid.list .card-skel .card-body{
+  padding:0 !important;
+}
+.grid.list .card-skel .skel-title{
+  height:22px !important;
+  width:min(280px,70%) !important;
+}
+.grid.list .card-skel .skel-btn,
+.grid.list .skel-btn{
+  width:148px !important;
+  min-width:148px !important;
+  max-width:148px !important;
+  height:40px !important;
+  padding:0 !important;
+  margin-top:auto !important;
+  align-self:flex-start !important;
+}
 
 .grid.list,
 .layout.filters-collapsed .grid.list{
@@ -1155,8 +1185,7 @@ select.sort{
   white-space:nowrap !important;
 }
 .grid.list .btn-download,
-.grid.list a.btn-download,
-.grid.list .skel-btn{
+.grid.list a.btn-download{
   grid-column:auto !important;
   width:auto !important;
   max-width:none !important;

@@ -987,38 +987,88 @@ window.addEventListener("afterprint", cleanupComparePrint);
 
 /* =========================================================
    BOTÓN "VOLVER" DINÁMICO
-   Prioridad:
-   1) si el catálogo linkeó hasta acá con ?from=<url> (y opcionalmente
-      &fromLabel=<texto>), volvemos exactamente a esa URL — esto es lo único
-      100% confiable, porque conserva cualquier filtro/macrofamilia/búsqueda
-      que el usuario tenía aplicado en el catálogo, sin depender del historial
-      del navegador (que puede fallar si abrió el link en pestaña nueva, si
-      hubo un redirect en el medio, etc.)
-   2) si no vino ese parámetro, probamos history.back() (funciona bien en la
-      mayoría de los casos dentro de la misma pestaña)
-   3) como último recurso, mandamos al catálogo general
-   NOTA: para que el punto 1 funcione, hay que sumar ese query param del lado
-   del catálogo cuando arma el link/redirect hacia comparar.html, ej.:
-   `comparar.html?from=${encodeURIComponent(location.href)}&fromLabel=${encodeURIComponent(macrofamiliaNombre)}`
+   Prioridad de destino (siempre una URL concreta, no history.back):
+   1) ?from=<url> que mandó el catálogo/ficha — conserva filtros/búsqueda
+   2) document.referrer — la página desde la que se abrió la comparativa
+   3) lo guardado en sessionStorage (sobrevive un refresh de esta página)
+   4) catálogo de productos
    ========================================================= */
-const PRODUCTS_PAGE_FALLBACK = "https://macroled.webflow.io/home-nuevo";
+const FROM_STORAGE_KEY = "macroledCompareFrom";
+const FROM_LABEL_STORAGE_KEY = "macroledCompareFromLabel";
+const PRODUCTS_PAGE_FALLBACK = (() => {
+  try{
+    const path = (location.pathname || "").replace(/\\/g, "/");
+    if(/\/comparar(\/|$)/i.test(path) && !/\.webflow\.io$/i.test(location.hostname)){
+      return "../productos/";
+    }
+  }catch(_){}
+  return "/nuevo-productos";
+})();
 const urlParams = new URLSearchParams(location.search);
-const fromUrl = urlParams.get("from");
-const fromLabel = urlParams.get("fromLabel");
 
-if(fromLabel){
-  document.getElementById("backLinkText").textContent = `Volver a ${fromLabel}`;
+function isComparePath(pathname){
+  const path = String(pathname || "").replace(/\/+$/, "").toLowerCase();
+  return /nuevo-comparativa$/.test(path) || /\/comparar$/.test(path) || /comparar\.html$/.test(path);
 }
 
-document.getElementById("backLink").addEventListener("click", () => {
-  if(fromUrl){
-    location.href = fromUrl;
-  }else if(document.referrer){
-    window.history.back();
-  }else{
-    location.href = PRODUCTS_PAGE_FALLBACK;
+function isSafeBackUrl(url){
+  try{
+    const u = new URL(url, location.href);
+    if(u.protocol !== "http:" && u.protocol !== "https:") return false;
+    if(isComparePath(u.pathname)) return false;
+    const host = u.hostname.toLowerCase();
+    if(host === location.hostname.toLowerCase()) return true;
+    return host === "macroled.com"
+      || host === "www.macroled.com"
+      || host.endsWith(".macroled.com")
+      || host === "macroled.webflow.io"
+      || host.endsWith(".webflow.io");
+  }catch(_){
+    return false;
   }
-});
+}
+
+function labelFromUrl(url){
+  try{
+    const u = new URL(url, location.href);
+    const q = u.searchParams.get("q");
+    if(q) return `Resultados para "${q}"`;
+    const mf = u.searchParams.get("macrofamilia");
+    if(mf) return mf;
+    const path = u.pathname.replace(/\/+$/, "").toLowerCase();
+    if(path.includes("nuevo-productos") || /\/productos$/.test(path)) return "productos";
+    return "la página anterior";
+  }catch(_){
+    return "productos";
+  }
+}
+
+function persistBackOrigin(url, label){
+  try{
+    if(url && isSafeBackUrl(url)) sessionStorage.setItem(FROM_STORAGE_KEY, url);
+    if(label) sessionStorage.setItem(FROM_LABEL_STORAGE_KEY, label);
+  }catch(_){}
+}
+
+function readStored(key){
+  try{ return sessionStorage.getItem(key); }catch(_){ return null; }
+}
+
+const fromParam = urlParams.get("from");
+const fromLabelParam = urlParams.get("fromLabel");
+if(fromParam && isSafeBackUrl(fromParam)) persistBackOrigin(fromParam, fromLabelParam);
+else if(document.referrer && isSafeBackUrl(document.referrer) && !readStored(FROM_STORAGE_KEY)){
+  persistBackOrigin(document.referrer, fromLabelParam);
+}
+
+const fromUrl = [fromParam, document.referrer, readStored(FROM_STORAGE_KEY)]
+  .find(url => url && isSafeBackUrl(url)) || PRODUCTS_PAGE_FALLBACK;
+const fromLabel = fromLabelParam || readStored(FROM_LABEL_STORAGE_KEY) || labelFromUrl(fromUrl);
+
+const backLink = document.getElementById("backLink");
+const backLinkText = document.getElementById("backLinkText");
+if(fromLabel) backLinkText.textContent = `Volver a ${fromLabel}`;
+backLink.href = fromUrl;
 
 // una vez que el usuario deslizó, ocultamos el banner
 document.getElementById("compareShell").addEventListener("scroll", function onFirstScroll(){

@@ -76,7 +76,7 @@
      de la tabla ya no se ve, para no perder de vista quÃ© columna es cada
      producto mientras seguÃ­s mirando specs mÃ¡s abajo */
   .mini-compare-bar{
-    position:fixed;top:0;left:0;right:0;z-index:10020;background:#fff;
+    position:fixed;top:0;left:0;right:0;z-index:100010;background:#fff;
     box-shadow:0 4px 16px rgba(10,14,25,.1);border-bottom:1px solid var(--line);
     transform:translateY(-100%);transition:transform .2s ease;
   }
@@ -154,7 +154,7 @@
     position:sticky;left:0;min-height:48px;
   }
   .cell.section .section-title{
-    display:inline-flex;align-items:center;gap:10px;min-width:0;
+    display:inline-flex;flex-direction:row;flex-wrap:nowrap;align-items:center;gap:10px;min-width:0;
   }
   .cell.section .section-title svg{
     width:18px;height:18px;flex:none;color:var(--btn-blue);
@@ -584,6 +584,8 @@
     }
     .cell.section .section-title{
       display:inline-flex !important;
+      flex-direction:row !important;
+      flex-wrap:nowrap !important;
       align-items:center !important;
       gap:10px !important;
       writing-mode:horizontal-tb !important;
@@ -886,7 +888,7 @@
     right:max(16px,env(safe-area-inset-right,0px));
     left:auto;
     bottom:max(20px,env(safe-area-inset-bottom,0px));
-    z-index:10050;
+    z-index:2147483645;
     display:inline-flex;align-items:center;justify-content:center;gap:10px;
     width:auto;height:48px;padding:8px 18px 8px 14px;border:none;border-radius:999px;
     background:#00152B !important;color:#fff !important;
@@ -937,14 +939,14 @@
   }
 
   .ai-backdrop{
-    position:fixed;inset:0;z-index:10060;
+    position:fixed;inset:0;z-index:2147483646;
     background:rgba(6,12,22,.35);
     opacity:0;pointer-events:none;transition:opacity .25s;
   }
   .ai-backdrop.is-open{opacity:1;pointer-events:auto;}
 
   .ai-panel{
-    position:fixed;top:0;right:0;z-index:10070;
+    position:fixed;top:0;right:0;z-index:2147483647;
     width:min(400px,100%);height:100%;
     background:var(--white);
     border-left:1px solid var(--line);
@@ -1141,10 +1143,12 @@
   max-width:100%;
 }
 
-/* Asistente: texto blanco + encima del nav Webflow (va al final) */
+/* Capas fijas en Webflow: menú (100000) < mini-comparativa < modal < asistente */
+.mini-compare-bar{z-index:100010 !important;}
+.modal-overlay{z-index:100020 !important;}
 button.ai-launch,
 .ai-launch{
-  z-index:10050 !important;
+  z-index:2147483645 !important;
   width:auto !important;
   height:48px !important;
   padding:8px 18px 8px 14px !important;
@@ -1206,9 +1210,8 @@ button.ai-launch svg .ai-icon-spark,
   fill:#fff !important;
   stroke:none !important;
 }
-.ai-backdrop{z-index:10060 !important;}
-.ai-panel{z-index:10070 !important;}
-.modal-overlay{z-index:10080 !important;}
+.ai-backdrop{z-index:2147483646 !important;}
+.ai-panel{z-index:2147483647 !important;}
 @media screen and (max-width:900px){
   .page-head h1{font-size:30px !important;}
 }

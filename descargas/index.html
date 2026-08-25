@@ -1,11 +1,17 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" class="ml-loading" data-ml-preload="typesense">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Descargas - Macroled</title>
+<link rel="stylesheet" href="../global/preload.css">
+<script src="../global/preload.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://typesense.coresagroup.com" crossorigin>
+<link rel="dns-prefetch" href="https://typesense.coresagroup.com">
+<link rel="preconnect" href="https://s3.coresagroup.com">
+<link rel="preconnect" href="https://d1zltvqju4u8ql.cloudfront.net" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles.css">
 </head>
@@ -71,7 +77,7 @@
     <div class="grid list" id="grid" aria-busy="true"></div>
     <script>
       (function(){
-        var card = '<div class="card card-skel" aria-hidden="true"><div class="media"><span class="skel skel-media"></span></div><div class="card-body"><div class="card-info"><span class="skel skel-title"></span><div class="skel-tabs"><span class="skel skel-tab"></span><span class="skel skel-tab"></span></div></div><span class="skel skel-btn"></span></div></div>';
+        var card = '<div class="card card-skel" aria-hidden="true"><div class="media"><span class="skel skel-media"></span></div><div class="card-body"><div class="card-info"><span class="skel skel-title"></span><div class="skel-tabs"><span class="skel skel-tab"></span><span class="skel skel-tab"></span><span class="skel skel-tab"></span></div></div><span class="skel skel-btn"></span></div></div>';
         document.getElementById("grid").innerHTML = new Array(19).join(card);
       })();
     </script>

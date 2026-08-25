@@ -251,6 +251,13 @@ async function fetchAllDocsSafe(filterBy, queryBy, includeFields){
   }
 }
 
+let initialPreloadDone = false;
+function finishInitialPreload(){
+  if(initialPreloadDone) return;
+  initialPreloadDone = true;
+  if(window.MacroledPreload) window.MacroledPreload.done();
+}
+
 async function loadAllDescargables(){
   document.getElementById("showingLabel").textContent = "Cargando…";
   try{
@@ -277,6 +284,8 @@ async function loadAllDescargables(){
     document.getElementById("grid").innerHTML = `<div class="state-msg">No se pudo conectar con Typesense. ${err.message}</div>`;
     document.getElementById("grid").setAttribute("aria-busy", "false");
     document.getElementById("showingLabel").textContent = "Error al cargar";
+  }finally{
+    finishInitialPreload();
   }
 }
 
