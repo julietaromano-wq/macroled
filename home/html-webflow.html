@@ -1,10 +1,16 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Contacto | Macroled</title>
+<!--
+  HTML para pegar en el Embed de Webflow de /nuevo-contacto.
+  Generado a partir de home/contacto.html — SIN <!DOCTYPE>/<html>/<head>/<body>,
+  porque ese código va DENTRO del <body> real de la página de Webflow (que ya
+  trae navbar y footer). Pegar un documento completo ahí crea un <body> anidado
+  dentro de un <div>, que es HTML inválido y rompe el layout de forma errática.
 
+  También se aisló todo el CSS que antes apuntaba a `body` / `*` (afectaba a
+  TODA la página, navbar y footer incluidos) para que ahora solo afecte a
+  `.mc-contact-page` y sus descendientes. El bloque final de estilos del
+  footer SÍ usa `body:has(...)` a propósito — necesita ver el <body> real
+  de Webflow para scopear el footer global solo a esta página.
+-->
 <style>
   :root{
     --mc-bg: #050505;
@@ -27,11 +33,16 @@
     --mc-radius-pill: 8px;
     --mc-radius-card: 24px;
   }
-  * { box-sizing: border-box; }
-  html, body, input, select, textarea, button{
+  .mc-contact-page,
+  .mc-contact-page *{ box-sizing: border-box; }
+  .mc-contact-page,
+  .mc-contact-page input,
+  .mc-contact-page select,
+  .mc-contact-page textarea,
+  .mc-contact-page button{
     font-family: "Noto Sans", -apple-system, "Segoe UI", Helvetica, Arial, sans-serif;
   }
-  body{
+  .mc-contact-page{
     margin: 0;
     padding: 64px 24px;
     color: #fff;
@@ -583,7 +594,7 @@
 
   /* ================= RESPONSIVE ================= */
   @media (max-width: 1024px){
-    body{ padding: 40px 16px; }
+    .mc-contact-page{ padding: 40px 16px; }
     .mc-shell{
       grid-template-columns: 1fr;
       grid-template-rows: auto auto auto;
@@ -600,7 +611,7 @@
   }
 
   @media (max-width: 860px){
-    body{ padding: 24px 12px; }
+    .mc-contact-page{ padding: 24px 12px; }
     .mc-hero-bottom a{
       min-height: 32px;
       display: flex;
@@ -648,7 +659,7 @@
   }
 
   @media (max-width: 560px){
-    body{ padding: 20px 16px; }
+    .mc-contact-page{ padding: 20px 16px; }
     .mc-hero-title{
       font-size: clamp(24px, 8vw, 30px);
       line-height: 1.15;
@@ -730,9 +741,8 @@
     color: #ababab !important;
   }
 </style>
-</head>
-<body>
 
+<div class="mc-contact-page">
 <main class="mc-shell" aria-labelledby="mc-contact-title">
 
   <!-- ================= HERO ================= -->
@@ -939,6 +949,7 @@
   </div>
 
 </main>
+</div>
 
 <script>
   (function(){
@@ -1281,7 +1292,3 @@
     });
   })();
 </script>
-
-</body>
-
-</html>

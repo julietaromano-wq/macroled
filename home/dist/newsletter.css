@@ -345,7 +345,7 @@ body.newsletter-open {
   padding: 16px;
   border: none;
   border-radius: 8px;
-  background: #001121;
+  background: #0086b5;
   color: #fff;
   font-size: 14.5px;
   font-weight: 600;
@@ -355,7 +355,7 @@ body.newsletter-open {
 }
 
 .nl-submit:hover {
-  background: #001b37;
+  background: #004f6b;
 }
 
 .nl-submit:active {
