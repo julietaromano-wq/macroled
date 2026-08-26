@@ -74,10 +74,7 @@ img{max-width:100%;display:block;}
 :focus-visible{outline:none;box-shadow:var(--focus-ring);}
 
 /* Card blanca sobre fondo gris (cambio local). Padding fluido para mobile. */
-/* padding-top suma la altura del navbar fijo (72px, ver mm-site-nav en menu.css)
-   porque #macroled-menu queda position:fixed y si no se descuenta acá, el
-   contenido del embed queda tapado/pegado contra la navbar. */
-main{padding:calc(72px + clamp(12px,2vw,24px)) clamp(12px,2vw,24px) 0;}
+main{padding:calc(48px + clamp(12px,2vw,24px)) clamp(12px,2vw,24px) 0;}
 .wrap{
   max-width:var(--max);
   margin:0 auto 30px;
@@ -553,25 +550,24 @@ main{padding:calc(72px + clamp(12px,2vw,24px)) clamp(12px,2vw,24px) 0;}
 .smart-store-btn{
   display:inline-flex;align-items:center;gap:11px;
   flex:0 1 auto; /* Webflow ships a bare a{flex:1;} rule; sin esto se estira full-width */
-  min-height:52px;padding:10px 20px;
+  min-height:52px;padding:10px 22px;
   border-radius:var(--radius-sm);
-  background:rgba(255,255,255,.5);
-  backdrop-filter:blur(10px);
-  -webkit-backdrop-filter:blur(10px);
-  border:1px solid rgba(255,255,255,.6);
-  color:var(--ink);
+  background:var(--navy);
+  border:1px solid var(--navy);
+  color:#fff;
   font-size:12px;font-weight:700;line-height:1.2;
+  box-shadow:0 8px 20px -6px rgba(0,21,43,.45);
   transition:background .15s,border-color .15s,transform .15s,box-shadow .15s;
 }
 .smart-store-btn svg{flex:none;width:24px;height:24px;}
 .smart-store-btn:hover{
-  background:rgba(255,255,255,.75);
-  border-color:rgba(255,255,255,.85);
-  box-shadow:0 8px 18px rgba(20,40,80,.1);
+  background:var(--brand-dark);
+  border-color:var(--brand-dark);
+  box-shadow:0 10px 24px -6px rgba(0,144,199,.5);
   transform:translateY(-2px);
 }
-.smart-store-btn__sub{display:block;opacity:.7;font-weight:500;font-size:10px;}
-.smart-store-btn strong{display:block;font-size:14px;font-weight:800;letter-spacing:.01em;}
+.smart-store-btn__sub{display:block;opacity:.75;font-weight:500;font-size:10px;color:#fff;}
+.smart-store-btn strong{display:block;font-size:14px;font-weight:800;letter-spacing:.01em;color:#fff;}
 .smart-banner__media{
   position:absolute;
   z-index:1;
@@ -1967,8 +1963,6 @@ body.assistant-open .ai-launch{
   .gallery{grid-template-columns:72px minmax(0,1fr);}
   .hero .info{max-width:none;padding:0;}
   .compat-grid{grid-template-columns:repeat(3,1fr);}
-  /* Debajo de 1100px el navbar pasa a la barra mobile de 62px (ver #mm-mobile en menu.css) */
-  main{padding-top:calc(62px + clamp(12px,2vw,24px));}
 }
 
 /* Tablet: stack hero, hide nav */
@@ -2011,7 +2005,7 @@ body.assistant-open .ai-launch{
 /* Mobile */
 @media (max-width:640px){
   :root{--pad-x:12px;}
-  main{padding:calc(62px + 8px) 8px 0;}
+  main{padding:calc(48px + 8px) 8px 0;}
   .wrap{
     padding:10px 12px;
     margin-bottom:16px;
