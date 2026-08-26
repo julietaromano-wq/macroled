@@ -25,7 +25,7 @@ body.newsletter-open {
 .nl-backdrop {
   position: fixed;
   inset: 0;
-  z-index: 10080;
+  z-index: 100080;
   background: rgba(6, 12, 22, 0.48);
   opacity: 0;
   pointer-events: none;
@@ -39,10 +39,13 @@ body.newsletter-open {
 
 .nl-popup {
   position: fixed;
-  z-index: 10090;
+  z-index: 100090;
   top: 50%;
   left: 50%;
+  display: flex;
+  flex-direction: column;
   width: min(544px, calc(100vw - 32px));
+  min-height: min(700px, calc(100dvh - 32px));
   max-height: calc(100dvh - 32px);
   overflow-x: hidden;
   overflow-y: auto;
@@ -121,7 +124,9 @@ body.newsletter-open {
 
 .nl-form {
   display: grid;
+  flex: 1 0 auto;
   grid-template-columns: 1fr;
+  align-content: center;
   gap: 20px 16px;
   margin-top: 28px;
 }
@@ -345,7 +350,7 @@ body.newsletter-open {
   padding: 16px;
   border: none;
   border-radius: 8px;
-  background: #0086b5;
+  background: #001121;
   color: #fff;
   font-size: 14.5px;
   font-weight: 600;
@@ -355,7 +360,7 @@ body.newsletter-open {
 }
 
 .nl-submit:hover {
-  background: #004f6b;
+  background: #001b37;
 }
 
 .nl-submit:active {
@@ -407,6 +412,7 @@ body.newsletter-open {
 @media (max-width: 640px) {
   .nl-popup {
     width: calc(100vw - 20px);
+    min-height: min(700px, calc(100dvh - 20px));
     max-height: calc(100dvh - 20px);
     padding: 48px 32px;
     border-radius: 18px;

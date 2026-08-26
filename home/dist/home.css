@@ -4715,6 +4715,13 @@ a.ml-news-card:focus-visible .ml-news-card__arrow {
     padding-inline: 0;
   }
 
+  .ml-home .ml-featured-products__viewport {
+    --featured-track-edge: max(
+      clamp(1rem, 4vw, 2rem),
+      calc((100% - 1180px) / 2)
+    );
+  }
+
   .ml-home .ml-foa,
   .ml-home .ml-newsletter-banner {
     --ml-expand-start: min(100% - clamp(2rem, 8vw, 4rem), 1180px);
@@ -6122,12 +6129,75 @@ a.ml-news-card:focus-visible .ml-news-card__arrow {
     0 10px 22px rgba(0, 21, 43, 0.09);
 }
 
+/* New releases start like the other cards; the light effect begins on section entry. */
+.ml-home .ml-solutions-banner__track .ml-category-card[data-editorial-id="lineales-pro"],
+.ml-home .ml-solutions-banner__track .ml-category-card[data-editorial-id="luminarias-skyline"],
+.ml-home .ml-solutions-banner__track .ml-category-card[data-editorial-id="proyectos-luz-calle-standard"] {
+  border: 0;
+  background: #fff;
+}
+
+.ml-home .ml-solutions-banner.is-motion-visible
+  .ml-category-card[data-editorial-id="lineales-pro"],
+.ml-home .ml-solutions-banner.is-motion-visible
+  .ml-category-card[data-editorial-id="luminarias-skyline"],
+.ml-home .ml-solutions-banner.is-motion-visible
+  .ml-category-card[data-editorial-id="proyectos-luz-calle-standard"] {
+  background: #fff;
+  animation: ml-new-release-breathe 5.5s ease-in-out infinite;
+}
+
+.ml-home .ml-solutions-banner.is-motion-visible
+  .ml-category-card[data-editorial-id="lineales-pro"]:hover,
+.ml-home .ml-solutions-banner.is-motion-visible
+  .ml-category-card[data-editorial-id="luminarias-skyline"]:hover,
+.ml-home .ml-solutions-banner.is-motion-visible
+  .ml-category-card[data-editorial-id="proyectos-luz-calle-standard"]:hover {
+  animation-duration: 3.8s;
+}
+
+@keyframes ml-new-release-breathe {
+  0%,
+  100% {
+    background-color: #fff;
+    box-shadow:
+      inset -3rem 0 5rem -2rem rgba(0, 174, 239, 0),
+      0 6px 16px rgba(0, 21, 43, 0.06);
+  }
+  48% {
+    background-color: #fff;
+    box-shadow:
+      inset -5.5rem 0 7rem -2.5rem rgba(0, 174, 239, 0.15),
+      0 10px 24px rgba(0, 111, 152, 0.12);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ml-home .ml-solutions-banner.is-motion-visible
+    .ml-category-card[data-editorial-id="lineales-pro"],
+  .ml-home .ml-solutions-banner.is-motion-visible
+    .ml-category-card[data-editorial-id="luminarias-skyline"],
+  .ml-home .ml-solutions-banner.is-motion-visible
+    .ml-category-card[data-editorial-id="proyectos-luz-calle-standard"] {
+    animation: none;
+    background: #fff;
+    box-shadow:
+      inset -5.5rem 0 7rem -2.5rem rgba(0, 174, 239, 0.1),
+      0 6px 16px rgba(0, 21, 43, 0.06);
+  }
+}
+
 .ml-home .ml-solutions-banner__track .ml-category-card h3 {
   padding: 0.4rem 0.1rem 0.15rem;
   font-size: var(--ml-type-h7-size);
   font-weight: var(--ml-type-h7-weight);
   line-height: var(--ml-type-h7-leading);
   letter-spacing: var(--ml-type-h7-tracking);
+}
+
+.ml-home .ml-solutions-banner__track
+  .ml-category-card[data-editorial-id="proyectos-luz-calle-standard"] h3 {
+  white-space: pre-line;
 }
 
 .ml-home .ml-solutions-banner__track .ml-category-card__media {
@@ -6144,8 +6214,8 @@ a.ml-news-card:focus-visible .ml-news-card__arrow {
 }
 
 .ml-home .ml-solutions-banner__track .ml-category-card img {
-  width: 52%;
-  height: 52%;
+  width: 60%;
+  height: 60%;
   object-fit: contain;
   object-position: center;
   transform-origin: center center;
@@ -6191,10 +6261,6 @@ a.ml-news-card:focus-visible .ml-news-card__arrow {
     opacity: 1;
     transform: translate(-50%, 0);
   }
-
-  .ml-home .ml-solutions-banner__track .ml-category-card:hover .ml-category-card__badge {
-    opacity: 0;
-  }
 }
 
 .ml-home .ml-solutions-banner__track .ml-category-card:focus-visible .ml-category-card__cta-wrap {
@@ -6223,7 +6289,18 @@ a.ml-news-card:focus-visible .ml-news-card__arrow {
   justify-content: center;
   align-items: flex-start;
   gap: 1.25rem;
-  padding: clamp(2.5rem, 5.5vw, 4.5rem) clamp(1.5rem, 4vw, 3.5rem) clamp(1.25rem, 2.5vw, 2rem);
+  padding: clamp(2rem, 3.5vw, 3rem) clamp(1.5rem, 4vw, 3.5rem) clamp(1.25rem, 2.5vw, 2rem);
+}
+
+@media (max-width: 1600px) {
+  .ml-home .ml-solutions-banner__copy {
+    padding-left: 0;
+  }
+
+  .ml-home .ml-solutions-banner__categories {
+    padding-right: 0;
+    padding-left: 0;
+  }
 }
 
 .ml-home .ml-solutions-banner__copy h2,
@@ -6427,7 +6504,99 @@ a.ml-news-card:focus-visible .ml-news-card__arrow {
 
   .ml-home .ml-solutions-banner__track.ml-categories-test__grid {
     width: calc(100% + 1rem);
+    gap: 0.5rem;
     padding-right: 1rem;
+  }
+}
+
+/* Featured lines follow the same stacked story + horizontal rail pattern on tablet. */
+@media (max-width: 980px) {
+  .ml-home .ml-featured__story {
+    display: flex !important;
+    min-height: 0;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .ml-home .ml-featured__media {
+    position: relative !important;
+    order: 0 !important;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+  }
+
+  .ml-home .ml-featured__copy {
+    min-height: auto;
+    padding: 2rem 1rem;
+  }
+
+  .ml-home .ml-featured .ml-products-block,
+  .ml-home .ml-featured .ml-line-content--static {
+    margin-top: 2rem;
+    padding-top: 0;
+    padding-inline: 0;
+  }
+
+  .ml-home .ml-featured .ml-product-grid,
+  .ml-home .ml-featured[data-content-mode="static"] .ml-line-subfamilies {
+    display: flex;
+    width: 100%;
+    gap: 1rem;
+    overflow-x: auto;
+    overflow-y: visible;
+    overscroll-behavior-inline: contain;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .ml-home .ml-featured .ml-product-grid::-webkit-scrollbar,
+  .ml-home .ml-featured[data-content-mode="static"] .ml-line-subfamilies::-webkit-scrollbar {
+    display: none;
+  }
+
+  .ml-home .ml-featured .ml-product-grid .ml-product-card,
+  .ml-home .ml-featured .ml-product-grid .ml-product-skeleton,
+  .ml-home .ml-featured[data-content-mode="static"] .ml-line-subfamilies .ml-category-card {
+    max-width: none;
+    flex: 0 0 calc((100% - 3rem) / 4);
+    box-sizing: border-box;
+    scroll-snap-align: start;
+  }
+}
+
+@media (max-width: 900px) {
+  .ml-home .ml-featured .ml-product-grid .ml-product-card,
+  .ml-home .ml-featured .ml-product-grid .ml-product-skeleton,
+  .ml-home .ml-featured[data-content-mode="static"] .ml-line-subfamilies .ml-category-card {
+    flex-basis: calc((100% - 1rem) / 2);
+  }
+}
+
+@media (max-width: 640px) {
+  .ml-home .ml-featured__media {
+    aspect-ratio: 1.15;
+  }
+
+  .ml-home .ml-featured__copy {
+    padding: 0 1rem;
+  }
+
+  .ml-home .ml-featured[data-content-mode="static"] .ml-line-subfamilies {
+    gap: 0.5rem;
+  }
+
+  .ml-home .ml-featured .ml-product-grid,
+  .ml-home .ml-featured[data-content-mode="static"] .ml-line-subfamilies {
+    width: calc(100% + 1rem);
+    padding-right: 1rem;
+    scroll-padding-inline: 0;
+  }
+
+  .ml-home .ml-featured .ml-product-grid .ml-product-card,
+  .ml-home .ml-featured .ml-product-grid .ml-product-skeleton,
+  .ml-home .ml-featured[data-content-mode="static"] .ml-line-subfamilies .ml-category-card {
+    flex-basis: min(64%, 13.75rem);
   }
 }
 
@@ -7556,9 +7725,10 @@ body.assistant-open .ai-launch {
 
 /* Product crop: 1920px reference, progressively reduced on smaller cards. */
 .ml-home [data-project-lines-concept-card="street"] .ml-project-lines-concept__product {
-  right: -20% !important;
+  right: -24% !important;
   transform-origin: right bottom;
-  scale: 1.08;
+  /* Same visual height as the other two products; the close-up comes from the crop. */
+  scale: 1;
   translate: none !important;
 }
 
@@ -7574,25 +7744,25 @@ body.assistant-open .ai-launch {
 }
 
 @media (max-width: 1599px) {
-  .ml-home [data-project-lines-concept-card="street"] .ml-project-lines-concept__product { right: -15% !important; }
+  .ml-home [data-project-lines-concept-card="street"] .ml-project-lines-concept__product { right: -20% !important; }
   .ml-home [data-project-lines-concept-card="invictus"] .ml-project-lines-concept__product { right: -32% !important; }
   .ml-home [data-project-lines-concept-card="highbay"] .ml-project-lines-concept__product { right: -28% !important; }
 }
 
 @media (min-width: 1600px) and (max-width: 1919px) {
-  .ml-home [data-project-lines-concept-card="street"] .ml-project-lines-concept__product { right: -18% !important; }
+  .ml-home [data-project-lines-concept-card="street"] .ml-project-lines-concept__product { right: -22% !important; }
   .ml-home [data-project-lines-concept-card="invictus"] .ml-project-lines-concept__product { right: -36% !important; }
   .ml-home [data-project-lines-concept-card="highbay"] .ml-project-lines-concept__product { right: -32% !important; }
 }
 
 @media (max-width: 1199px) {
-  .ml-home [data-project-lines-concept-card="street"] .ml-project-lines-concept__product { right: -10% !important; }
+  .ml-home [data-project-lines-concept-card="street"] .ml-project-lines-concept__product { right: -15% !important; }
   .ml-home [data-project-lines-concept-card="invictus"] .ml-project-lines-concept__product { right: -24% !important; }
   .ml-home [data-project-lines-concept-card="highbay"] .ml-project-lines-concept__product { right: -21% !important; }
 }
 
 @media (max-width: 900px) {
-  .ml-home [data-project-lines-concept-card="street"] .ml-project-lines-concept__product { right: -6% !important; }
+  .ml-home [data-project-lines-concept-card="street"] .ml-project-lines-concept__product { right: -10% !important; }
   .ml-home [data-project-lines-concept-card="invictus"] .ml-project-lines-concept__product { right: -16% !important; }
   .ml-home [data-project-lines-concept-card="highbay"] .ml-project-lines-concept__product { right: -14% !important; }
 }
@@ -7609,7 +7779,7 @@ body.assistant-open .ai-launch {
     height: 52% !important;
   }
 
-  .ml-home [data-project-lines-concept-card="street"] .ml-project-lines-concept__product { right: -8% !important; }
+  .ml-home [data-project-lines-concept-card="street"] .ml-project-lines-concept__product { right: -13% !important; }
   .ml-home [data-project-lines-concept-card="invictus"] .ml-project-lines-concept__product { right: -20% !important; }
   .ml-home [data-project-lines-concept-card="highbay"] .ml-project-lines-concept__product { right: -18% !important; }
 }

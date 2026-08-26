@@ -27,34 +27,32 @@
    */
   const MANUAL_CATEGORIES = {
     interior: [
-      { ...category("Tiras LED", "tiras-led"), href: "http://127.0.0.1:5500/productos/?macrofamilia=Tiras+LED&pot_min=0&pot_max=1800", image: "https://d1zltvqju4u8ql.cloudfront.net/fit-in/250x250/filters:format(png)/MACROLED/1000/0742832556316a.png", badge: "Nuevo" },
-      { ...category("Luminarias", "luminarias"), image: "https://d1zltvqju4u8ql.cloudfront.net/fit-in/2000x2000/filters:format(webp)/MACROLED/2000/7428325586000a.png" },
-      { ...category("Lámparas", "lamparas"), href: "https://macroled.webflow.io/nuevo-productos?macrofamilia=L%C3%A1mparas", image: "https://d1zltvqju4u8ql.cloudfront.net/fit-in/250x250/filters:format(png)/MACROLED/1000/7428325565203a.png" },
-      { ...category("Artefactos para lámparas", "artefactos-para-lamparas"), href: "https://macroled.webflow.io/nuevo-productos?macrofamilia=Artefactos+para+L%C3%A1mparas", image: "https://d1zltvqju4u8ql.cloudfront.net/fit-in/250x250/filters:format(png)/MACROLED/1000/7428325574748a.png" },
-      { ...category("Interruptores y tomas", "interruptores-y-tomas"), href: "https://macroled.webflow.io/nuevo-productos?macrofamilia=Interruptores+y+Tomas", image: "https://d1zltvqju4u8ql.cloudfront.net/fit-in/250x250/MACROLED/WEB/LIMA-1CN-USB-CC-30W-B_FRONT.webp" },
-      { ...category("Paneles", "paneles"), image: "https://d1zltvqju4u8ql.cloudfront.net/fit-in/2000x2000/filters:format(webp)/MACROLED/2000/7428325570962a.png" }
+      { ...category("Lineales PRO", "lineales-pro"), href: "https://macroled.webflow.io/nuevo-productos?macrofamilia=Lineales+PRO", image: "https://d1zltvqju4u8ql.cloudfront.net/fit-in/180x180/MACROLED/WEB/PORTADA-LINEALES-PRO.webp", badge: "Nuevo" },
+      { ...category("Skyline", "luminarias-skyline"), href: "https://macroled.webflow.io/nuevo-productos?macrofamilia=Rieles+Magn%C3%A9ticos&familia=Luminarias", image: "https://s3.coresagroup.com/MACROLED/250/skyline.png", badge: "Nuevo" },
+      { ...category("Artefactos para lámparas", "artefactos-para-lamparas"), href: "https://macroled.webflow.io/nuevo-productos?macrofamilia=Artefactos+para+L%C3%A1mparas", image: "https://s3.coresagroup.com/MACROLED/250/policarbonato-embutir-ar111.png" },
+      { ...category("Paneles", "paneles"), href: "https://macroled.webflow.io/nuevo-productos?macrofamilia=Paneles", image: "https://d1zltvqju4u8ql.cloudfront.net/fit-in/250x250/MACROLED/WEB/GRAN-FORMATO-BACKLIGHT.webp" },
+      { ...category("Tiras Led", "tiras-led"), href: "https://macroled.webflow.io/nuevo-productos?macrofamilia=Tiras+LED", image: "https://d1zltvqju4u8ql.cloudfront.net/fit-in/250x250/filters:format(png)/MACROLED/1000/0742832556316a.png" },
+      { ...category("Lámparas", "lamparas"), href: "https://macroled.webflow.io/nuevo-productos?macrofamilia=L%C3%A1mparas", image: "https://d1zltvqju4u8ql.cloudfront.net/fit-in/250x250/filters:format(png)/MACROLED/1000/7428325565203a.png" }
     ],
     monaco: [
       { ...category("Armadas", "monaco-armadas"), image: "https://s3.coresagroup.com/MACROLED/250/milan.png" },
-      { ...category("Bastidor + Módulos", "monaco-bastidor-modulos"), image: "https://s3.coresagroup.com/MACROLED/250/milan-bastidores.png" },
-      { ...category("Tapas", "monaco-tapas"), image: "https://s3.coresagroup.com/MACROLED/250/milan-tapas.png" },
-      { ...category("Luz de pasillo", "monaco-luz-pasillo"), image: "https://d1zltvqju4u8ql.cloudfront.net/fit-in/2000x2000/MACROLED/WEB/portada_luz_pasillo.webp" }
+      { ...category("Despiece", "monaco-bastidor-modulos"), image: "https://s3.coresagroup.com/MACROLED/250/milan-bastidores.png" },
+      { ...category("Luz guía", "monaco-luz-pasillo"), image: "https://d1zltvqju4u8ql.cloudfront.net/fit-in/2000x2000/MACROLED/WEB/portada_luz_pasillo.webp" },
+      { ...category("Tapas", "monaco-tapas"), image: "https://s3.coresagroup.com/MACROLED/250/milan-tapas.png" }
     ],
     exterior: [
-      { ...category("Reflectores", "reflectores"), href: "https://macroled.webflow.io/nuevo-productos?macrofamilia=Reflectores", image: "https://d1zltvqju4u8ql.cloudfront.net/fit-in/250x250/MACROLED/WEB/PFL-400W-060D-857-CW_PERS.webp" },
-      { ...category("Solar", "solar"), href: "https://macroled.webflow.io/nuevo-productos?macrofamilia=Luminarias+Integradas+Exterior&familia=Solar", image: "https://d1zltvqju4u8ql.cloudfront.net/fit-in/250x250/filters:format(png)/MACROLED/1000/7428325578388a.png" },
-      { ...category("Tortugas", "tortugas"), href: "https://macroled.webflow.io/nuevo-productos?macrofamilia=Luminarias+Integradas+Exterior&familia=Tortugas", image: "https://d1zltvqju4u8ql.cloudfront.net/fit-in/250x250/filters:format(png)/MACROLED/1000/7428325571648a.png" },
-      { ...category("Estacas", "estacas"), href: "https://macroled.webflow.io/nuevo-productos?macrofamilia=Luminarias+Integradas+Exterior&familia=Estacas", image: "https://d1zltvqju4u8ql.cloudfront.net/fit-in/250x250/filters:format(png)/MACROLED/1000/7428325575684a.png" },
-      { ...category("Reflectores Standard", "reflectores-standard"), href: "https://macroled.webflow.io/nuevo-productos?macrofamilia=Reflectores&familia=Reflectores+Standard", image: "https://d1zltvqju4u8ql.cloudfront.net/fit-in/2000x2000/MACROLED/WEB/SFL-400W-090D-857-CW_FRONT.webp" },
-      { ...category("Reflectores PRO", "reflectores-pro"), href: "https://macroled.webflow.io/nuevo-productos?macrofamilia=Reflectores&familia=Reflectores+PRO&pot_min=0&pot_max=1800", image: "https://d1zltvqju4u8ql.cloudfront.net/fit-in/2000x2000/filters:format(webp)/MACROLED/2000/7428325567023a.png" }
+      { ...category("Reflectores", "reflectores"), href: "https://macroled.webflow.io/nuevo-productos?macrofamilia=Reflectores", image: "https://s3.coresagroup.com/MACROLED/250/reflectores-smart.png" },
+      { ...category("Tortugas", "tortugas"), href: "https://macroled.webflow.io/nuevo-productos?macrofamilia=Luminarias+Integradas+Exterior&familia=Tortugas", image: "https://s3.coresagroup.com/MACROLED/250/tortugas.png" },
+      { ...category("Estacas", "estacas"), href: "https://macroled.webflow.io/nuevo-productos?macrofamilia=Luminarias+Integradas+Exterior&familia=Estacas+M%C3%B3viles", image: "https://s3.coresagroup.com/MACROLED/250/estacas-led-integrado.png" },
+      { ...category("Guirnaldas", "guirnaldas"), href: "https://macroled.webflow.io/nuevo-productos?macrofamilia=Artefactos+para+L%C3%A1mparas&familia=Guirnaldas", image: "https://d1zltvqju4u8ql.cloudfront.net/fit-in/250x250/filters:format(png)/MACROLED/1000/7428325574946a.png" }
     ],
     proyectos: [
-      { ...category("Luz de calle", "proyectos-01"), href: "https://macroled.webflow.io/nuevo-productos?macrofamilia=Luminarias+de+Proyecto&familia=Luz+de+Calle+Standard", image: "https://d1zltvqju4u8ql.cloudfront.net/fit-in/250x250/MACROLED/WEB/SLG2-100W-757-CW_FRONT.webp", badge: "Nuevo" },
-      { ...category("Lumax", "proyectos-02"), href: "https://macroled.webflow.io/nuevo-productos?macrofamilia=Luminarias+de+Proyecto&familia=Luz+de+Calle+LUMAX", image: "https://s3.coresagroup.com/MACROLED/250/lumax.png", badge: "Nuevo" },
-      { ...category("Highbay Classic", "proyectos-03"), href: "https://macroled.webflow.io/nuevo-productos?macrofamilia=Luminarias+de+Proyecto&familia=Highbay+Classic", image: "https://s3.coresagroup.com/MACROLED/250/galponeras-eco.webp" },
-      { ...category("Highbay Pro", "proyectos-04"), href: "https://macroled.webflow.io/nuevo-productos?macrofamilia=Luminarias+de+Proyecto&familia=Highbay+PRO", image: "https://s3.coresagroup.com/MACROLED/250/PHB-200W-90D-857-CW.png" },
-      { ...category("Invictus", "proyectos-05"), href: "https://macroled.webflow.io/nuevo-productos?macrofamilia=Luminarias+de+Proyecto&familia=Invictus", image: "assets/images/project-invictus-product.png" },
-      { ...category("Titan", "proyectos-06"), href: "https://macroled.webflow.io/nuevo-productos?macrofamilia=Luminarias+de+Proyecto&familia=TITAN", image: "https://d1zltvqju4u8ql.cloudfront.net/fit-in/2000x2000/filters:format(webp)/MACROLED/2000/7428325587205a.png" }
+      { ...category("Luz de calle\nStandard", "proyectos-luz-calle-standard"), href: "https://macroled.webflow.io/nuevo-productos?macrofamilia=Luminarias+de+Proyecto&familia=Luz+de+Calle&subfamilia=Luz+de+Calle+Standard", image: "https://d1zltvqju4u8ql.cloudfront.net/fit-in/250x250/MACROLED/WEB/SLG2-100W-757-CW_FRONT.webp", badge: "Nuevo" },
+      { ...category("Highbay PRO", "proyectos-highbay-pro"), href: "https://macroled.webflow.io/nuevo-productos?macrofamilia=Luminarias+de+Proyecto&familia=Galponeras&subfamilia=Highbay+PRO+2026", image: "https://s3.coresagroup.com/MACROLED/250/PHB-200W-90D-857-CW.png" },
+      { ...category("Reflectores PRO", "proyectos-reflectores-pro"), href: "https://macroled.webflow.io/nuevo-productos?macrofamilia=Reflectores&familia=Reflectores+PRO+2026&pot_min=0&pot_max=1800", image: "https://d1zltvqju4u8ql.cloudfront.net/fit-in/250x250//MACROLED/WEB/PFL-400W-030D-857-CW_FRONT.webp" },
+      { ...category("Olimpus", "proyectos-olimpus"), href: "https://macroled.webflow.io/nuevo-productos?macrofamilia=Luminarias+de+Proyecto&familia=Reflectores&subfamilia=OLIMPUS", image: "https://s3.coresagroup.com/MACROLED/250/olimpus.png" },
+      { ...category("Highbay Standard", "proyectos-highbay-standard"), href: "https://macroled.webflow.io/nuevo-productos?macrofamilia=Luminarias+de+Proyecto&familia=Galponeras&subfamilia=Highbay+Standard", image: "https://s3.coresagroup.com/MACROLED/250/SHB-200W.png" },
+      { ...category("Focus", "proyectos-focus"), href: "https://macroled.webflow.io/nuevo-productos?macrofamilia=Luminarias+de+Proyecto&familia=Reflectores&subfamilia=Focus", image: "https://s3.coresagroup.com/MACROLED/250/focus.png" }
     ].map((item) => ({
       ...item,
       subtitle: "Proyecto lumínico"
@@ -90,13 +88,13 @@
             ...line("Reflectores PRO", "La combinación ideal entre rendimiento y practicidad. Reflectores para exterior pensados para iluminar accesos, fachadas, patios y áreas abiertas con una instalación versátil y una luz confiable.", "#16283a", "#e4ebf0", "image-right"),
             image: "https://cdn.prod.website-files.com/65f1fdd7248b6709fdebe904/699cb28af6cdd53e774759f0_FAMILIA%20REFLECTORES%20PRO.webp",
             imageFit: "contain-right",
-            href: "https://macroled.webflow.io/nuevo-productos?macrofamilia=Reflectores&familia=Reflectores+PRO",
+            href: "https://macroled.webflow.io/nuevo-productos?macrofamilia=Reflectores&familia=Reflectores+PRO+2026",
             titleEmphasis: "PRO",
             content: {
               mode: "typesense",
               query: {
                 typesenseField: "familia",
-                typesenseValue: "Reflectores PRO",
+                typesenseValue: "Reflectores PRO 2026",
                 productCount: 4,
                 fetchCount: 80,
                 randomizeBy: "nombre_typesense"
@@ -358,6 +356,7 @@
   "use strict";
 
   const FEATURED_FIELD = "destacados_en";
+  const FEATURED_GROUPS = ["01", "02", "03", "04", "05"];
   const FEATURED_COUNT = 250;
   let currentSpace = null;
   let isFetching = false;
@@ -367,9 +366,7 @@
     const params = new URLSearchParams({
       q: "*",
       query_by: cfg.queryBy || "nombre_typesense,descripcion",
-      filter_by: space
-        ? `${FEATURED_FIELD}:=${space}`
-        : `${FEATURED_FIELD}:=[interior,exterior,proyectos]`,
+      filter_by: `${FEATURED_FIELD}:=[${FEATURED_GROUPS.join(",")}]`,
       per_page: String(FEATURED_COUNT),
       page: "1"
     });
@@ -377,6 +374,25 @@
     const response = await fetch(url, { headers: { "X-TYPESENSE-API-KEY": cfg.apiKey } });
     if (!response.ok) throw new Error(`Typesense ${response.status}: ${await response.text()}`);
     return response.json();
+  }
+
+  function featuredGroup(document) {
+    const raw = document?.[FEATURED_FIELD];
+    const values = Array.isArray(raw) ? raw : [raw];
+    return values
+      .map(value => String(value ?? "").trim().padStart(2, "0"))
+      .find(value => FEATURED_GROUPS.includes(value)) || "";
+  }
+
+  function orderFeatured(hits) {
+    return FEATURED_GROUPS.flatMap(group => {
+      const groupHits = hits.filter(hit => featuredGroup(hit.document) === group);
+      return window.MacroledProducts.pickRandomByField(
+        groupHits,
+        "nombre_typesense",
+        groupHits.length
+      );
+    });
   }
 
   function setupTrackControls(root, track, options = {}) {
@@ -570,12 +586,12 @@
         track.innerHTML = '<div class="ml-featured-products__state">Todavía no hay productos destacados cargados.</div>';
         return;
       }
-      track.innerHTML = window.MacroledProducts.pickRandomByField(data.hits, "nombre_typesense", data.hits.length).map(hit => window.MacroledProducts.cardTemplate(hit.document)).join("");
+      track.innerHTML = orderFeatured(data.hits).map(hit => window.MacroledProducts.cardTemplate(hit.document)).join("");
       window.MacroledProducts.wireCarousels(track);
       track.scrollLeft = 0;
       setupTrackControls(root, track);
     } catch (error) {
-      const filter = space ? `${FEATURED_FIELD}=${space}` : `${FEATURED_FIELD} no vacío`;
+      const filter = `${FEATURED_FIELD} en ${FEATURED_GROUPS.join(", ")}`;
       console.error(`Macroled Home · Error consultando Typesense (${filter})`, error);
       track.innerHTML = `<div class="ml-featured-products__state">No se pudieron cargar los productos destacados. Revisá que el campo “${FEATURED_FIELD}” exista.</div>`;
     } finally {
@@ -616,9 +632,9 @@
       title: "Luz de calle Standard",
       subtitle: "Para proyectos, vías, parques y espacios públicos.",
       badge: "Nueva línea",
-      productImage: "https://s3.coresagroup.com/MACROLED/WEB/HOME/streetlight.png",
+      productImage: "https://d1zltvqju4u8ql.cloudfront.net/fit-in/1000x1000/MACROLED/WEB/SLG2-200W-757-NM3-CW_FRONT.webp",
       ambientImage: "https://s3.coresagroup.com/MACROLED/WEB/HOME/streetlight_ambient.png",
-      href: "https://macroled.webflow.io/nuevo-productos?macrofamilia=Luminarias+de+Proyecto&familia=Luz+de+Calle+Standard,"
+      href: "https://macroled.webflow.io/nuevo-productos?macrofamilia=Luminarias+de+Proyecto&familia=Luz+de+Calle&subfamilia=Luz+de+Calle+Standard"
     },
     {
       id: "invictus",
@@ -626,7 +642,7 @@
       subtitle: "Para grandes áreas, fachadas y espacios deportivos.",
       productImage: "https://s3.coresagroup.com/MACROLED/WEB/HOME/invictus.png?v=20260821-1",
       ambientImage: "https://s3.coresagroup.com/MACROLED/WEB/HOME/invictus_ambient.png",
-      href: "https://macroled.webflow.io/nuevo-productos?macrofamilia=Luminarias+de+Proyecto&familia=Invictus"
+      href: "https://macroled.webflow.io/nuevo-productos?macrofamilia=Luminarias+de+Proyecto&familia=Reflectores&subfamilia=Invictus"
     },
     {
       id: "highbay",
@@ -634,7 +650,7 @@
       subtitle: "Para naves industriales y espacios de gran altura.",
       productImage: "https://d1zltvqju4u8ql.cloudfront.net/fit-in/1000x1000/MACROLED/WEB/PHB-100W-90D-857-CW_FRONT.webp",
       ambientImage: "https://s3.coresagroup.com/MACROLED/WEB/HOME/highbay_ambient.png",
-      href: "https://macroled.webflow.io/nuevo-productos?macrofamilia=Luminarias+de+Proyecto&familia=Highbay+PRO+2026"
+      href: "https://macroled.webflow.io/nuevo-productos?macrofamilia=Luminarias+de+Proyecto&familia=Galponeras&subfamilia=Highbay+PRO+2026"
     }
   ];
 

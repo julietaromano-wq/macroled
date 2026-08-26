@@ -2,6 +2,7 @@
   "use strict";
 
   const FEATURED_FIELD = "destacados_en";
+  const FEATURED_GROUPS = ["01", "02", "03", "04", "05"];
   const FEATURED_COUNT = 250;
   let currentSpace = null;
   let isFetching = false;
@@ -11,9 +12,7 @@
     const params = new URLSearchParams({
       q: "*",
       query_by: cfg.queryBy || "nombre_typesense,descripcion",
-      filter_by: space
-        ? `${FEATURED_FIELD}:=${space}`
-        : `${FEATURED_FIELD}:=[interior,exterior,proyectos]`,
+      filter_by: `${FEATURED_FIELD}:=[${FEATURED_GROUPS.join(",")}]`,
       per_page: String(FEATURED_COUNT),
       page: "1"
     });
@@ -21,6 +20,25 @@
     const response = await fetch(url, { headers: { "X-TYPESENSE-API-KEY": cfg.apiKey } });
     if (!response.ok) throw new Error(`Typesense ${response.status}: ${await response.text()}`);
     return response.json();
+  }
+
+  function featuredGroup(document) {
+    const raw = document?.[FEATURED_FIELD];
+    const values = Array.isArray(raw) ? raw : [raw];
+    return values
+      .map(value => String(value ?? "").trim().padStart(2, "0"))
+      .find(value => FEATURED_GROUPS.includes(value)) || "";
+  }
+
+  function orderFeatured(hits) {
+    return FEATURED_GROUPS.flatMap(group => {
+      const groupHits = hits.filter(hit => featuredGroup(hit.document) === group);
+      return window.MacroledProducts.pickRandomByField(
+        groupHits,
+        "nombre_typesense",
+        groupHits.length
+      );
+    });
   }
 
   function setupTrackControls(root, track, options = {}) {
@@ -214,12 +232,12 @@
         track.innerHTML = '<div class="ml-featured-products__state">Todavía no hay productos destacados cargados.</div>';
         return;
       }
-      track.innerHTML = window.MacroledProducts.pickRandomByField(data.hits, "nombre_typesense", data.hits.length).map(hit => window.MacroledProducts.cardTemplate(hit.document)).join("");
+      track.innerHTML = orderFeatured(data.hits).map(hit => window.MacroledProducts.cardTemplate(hit.document)).join("");
       window.MacroledProducts.wireCarousels(track);
       track.scrollLeft = 0;
       setupTrackControls(root, track);
     } catch (error) {
-      const filter = space ? `${FEATURED_FIELD}=${space}` : `${FEATURED_FIELD} no vacío`;
+      const filter = `${FEATURED_FIELD} en ${FEATURED_GROUPS.join(", ")}`;
       console.error(`Macroled Home · Error consultando Typesense (${filter})`, error);
       track.innerHTML = `<div class="ml-featured-products__state">No se pudieron cargar los productos destacados. Revisá que el campo “${FEATURED_FIELD}” exista.</div>`;
     } finally {
