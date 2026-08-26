@@ -96,16 +96,8 @@
   }
 
   function updateComparePadding() {
-    if (getComputedStyle(bar).display === "none") {
-      document.body.style.paddingBottom = "";
-      document.body.style.removeProperty("--compare-bar-offset");
-      document.body.classList.remove("has-compare-bar");
-      return;
-    }
-    const offset = bar.offsetHeight + 28;
-    document.body.style.paddingBottom = `${offset}px`;
-    document.body.style.setProperty("--compare-bar-offset", `${offset}px`);
-    document.body.classList.add("has-compare-bar");
+    const isVisible = getComputedStyle(bar).display !== "none";
+    document.body.classList.toggle("has-compare-bar", isVisible);
   }
 
   function renderCompareBar() {
