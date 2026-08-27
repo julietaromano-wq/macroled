@@ -943,7 +943,7 @@ body.assistant-open .ai-launch{
 .tabs{
   display:flex;gap:4px;border-bottom:1px solid var(--line);
   margin-bottom:8px;
-  touch-action:pan-x;
+  touch-action:pan-x pan-y;
 }
 .tab{
   appearance:none;border:none;background:transparent;
@@ -1191,7 +1191,7 @@ body.assistant-open .ai-launch{
   cursor:grab;
   user-select:none;
   -webkit-overflow-scrolling:touch;
-  touch-action:pan-x;
+  touch-action:pan-x pan-y;
 }
 .ml-related-products__track.is-dragging{
   cursor:grabbing;
@@ -1489,7 +1489,7 @@ body.assistant-open .ai-launch{
   cursor:grab;
   user-select:none;
   -webkit-overflow-scrolling:touch;
-  touch-action:pan-x;
+  touch-action:pan-x pan-y;
 }
 .ml-rel-carousel__track.is-dragging{cursor:grabbing;scroll-behavior:auto;scroll-snap-type:none;}
 .ml-rel-carousel__track.is-dragging .ml-product-card{pointer-events:none;}
@@ -1600,7 +1600,7 @@ body.assistant-open .ai-launch{
     scroll-snap-type:x proximity;
     scroll-behavior:auto;
     scroll-padding-inline:0;
-    touch-action:pan-x;
+    touch-action:pan-x pan-y;
     -webkit-overflow-scrolling:touch;
   }
   .ml-related-products__track .ml-product-card,
@@ -2021,7 +2021,7 @@ body.assistant-open .ai-launch{
 /* Mobile */
 @media (max-width:640px){
   :root{--pad-x:12px;}
-  main{padding:calc(48px + 8px) 8px 0;}
+  main{padding:calc(6px + 8px) 8px 0;}
   .wrap{
     padding:10px 12px;
     margin-bottom:16px;
@@ -2150,7 +2150,7 @@ body.assistant-open .ai-launch{
     z-index:1 !important;
   }
 
-  .eyebrow{letter-spacing:.1em;}
+  .eyebrow{letter-spacing:.1em;font-size:12px;}
 
   .quick-specs{padding:12px 4px;border-radius:12px;}
   .quick-specs[data-count="3"]{grid-template-columns:repeat(3,minmax(0,1fr));}
@@ -2160,7 +2160,9 @@ body.assistant-open .ai-launch{
   }
   .quick-specs[data-count="3"] .qspec{padding:0 6px;}
   .qspec:not([hidden]) + .qspec:not([hidden]){border-left:1px solid var(--line);border-top:none;}
-  .qspec .label{margin-bottom:2px;}
+  .qspec .label{margin-bottom:2px;font-size:13px;}
+  .qspec .val{font-size:16px;}
+  .meta{font-size:13px;}
 
   /* CTAs en mobile: apilados en columna, ancho completo */
   .actions{flex-direction:column;}
@@ -2289,9 +2291,9 @@ body.assistant-open .ai-launch{
   .pcard h3{font-size:13px;}
   .btn{font-size:12px;padding:11px 12px;}
   .btn-ai{font-size:12px;padding:6px 0;}
-  .meta{font-size:12px;}
+  .meta{font-size:13px;}
   .crumb{font-size:13px;}
-  .tab{padding:12px 4px;font-size:11.5px;}
+  .tab{padding:12px 4px;font-size:13px;}
 }
 
 /* Landscape phones: keep gallery usable */

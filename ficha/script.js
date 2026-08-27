@@ -355,7 +355,74 @@
     stopZoom();
     openFancy(activeIndex);
   }
+
+  /* Swipe horizontal sobre la imagen principal (mobile/touch): cambia de
+     foto sin abrir el visor. Un tap simple (sin arrastre) sigue abriendo
+     el visor vía el click handler de más abajo. La imagen sigue al dedo
+     mientras se arrastra, para que se note que "hay más fotos" del lado
+     al que se está deslizando. */
+  const STAGE_SWIPE_THRESHOLD = 40;
+  const STAGE_SLIDE_MS = 150;
+  let stageSwipeStartX = 0;
+  let stageSwipeDx = 0;
+  let stageSwipeDragging = false;
+  let stageSwipeSettling = false;
+  let stageJustSwiped = false;
+
+  function setStageDrag(px, animate) {
+    stageImg.style.transition = animate
+      ? `transform ${STAGE_SLIDE_MS}ms cubic-bezier(.22,.8,.32,1)`
+      : "none";
+    stageImg.style.transform = px ? `translateX(${px}px)` : "";
+  }
+
+  stageEl.addEventListener("pointerdown", (e) => {
+    if (e.pointerType !== "touch" || e.target.closest(".zoom-btn") || stageSwipeSettling) return;
+    stageSwipeStartX = e.clientX;
+    stageSwipeDx = 0;
+    stageSwipeDragging = false;
+  });
+  stageEl.addEventListener("pointermove", (e) => {
+    if (e.pointerType !== "touch" || GALLERY.length < 2 || stageSwipeSettling) return;
+    stageSwipeDx = e.clientX - stageSwipeStartX;
+    if (!stageSwipeDragging && Math.abs(stageSwipeDx) > 10) stageSwipeDragging = true;
+    if (stageSwipeDragging) setStageDrag(stageSwipeDx, false);
+  });
+  function finishStageSwipe(e) {
+    if (e.pointerType !== "touch" || !stageSwipeDragging) return;
+    stageSwipeDragging = false;
+    const stageWidth = stageEl.clientWidth || 1;
+    if (Math.abs(stageSwipeDx) >= STAGE_SWIPE_THRESHOLD && GALLERY.length > 1) {
+      stageJustSwiped = true;
+      stageSwipeSettling = true;
+      const dir = stageSwipeDx < 0 ? 1 : -1; // swipe a la izquierda -> foto siguiente
+      setStageDrag(-dir * stageWidth, true);
+      window.setTimeout(() => {
+        setActive(activeIndex + dir);
+        setStageDrag(dir * stageWidth, false);
+        void stageImg.offsetWidth; // fuerza reflow antes de animar la entrada
+        setStageDrag(0, true);
+        window.setTimeout(() => {
+          stageSwipeSettling = false;
+        }, STAGE_SLIDE_MS);
+      }, STAGE_SLIDE_MS);
+    } else {
+      setStageDrag(0, true);
+    }
+  }
+  stageEl.addEventListener("pointerup", finishStageSwipe);
+  stageEl.addEventListener("pointercancel", () => {
+    if (stageSwipeDragging) setStageDrag(0, true);
+    stageSwipeDragging = false;
+  });
+
   stageEl.addEventListener("click", (e) => {
+    if (stageJustSwiped) {
+      stageJustSwiped = false;
+      e.preventDefault();
+      e.stopPropagation();
+      return;
+    }
     if (e.target.closest(".zoom-btn")) return;
     // Controles nativos del video visible: no abrir lightbox
     if (e.target.closest("video") && stageVideo && !stageVideo.hidden) return;
