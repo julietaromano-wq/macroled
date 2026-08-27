@@ -2021,7 +2021,7 @@ body.assistant-open .ai-launch{
 /* Mobile */
 @media (max-width:640px){
   :root{--pad-x:12px;}
-  main{padding:calc(48px + 8px) 8px 0;}
+  main{padding:calc(6px + 8px) 8px 0;}
   .wrap{
     padding:10px 12px;
     margin-bottom:16px;

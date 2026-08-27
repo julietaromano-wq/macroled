@@ -355,7 +355,46 @@
     stopZoom();
     openFancy(activeIndex);
   }
+
+  /* Swipe horizontal sobre la imagen principal (mobile/touch): cambia de
+     foto sin abrir el visor. Un tap simple (sin arrastre) sigue abriendo
+     el visor vía el click handler de más abajo. */
+  const STAGE_SWIPE_THRESHOLD = 40;
+  let stageSwipeStartX = 0;
+  let stageSwipeDx = 0;
+  let stageSwipeDragging = false;
+  let stageJustSwiped = false;
+  stageEl.addEventListener("pointerdown", (e) => {
+    if (e.pointerType !== "touch" || e.target.closest(".zoom-btn")) return;
+    stageSwipeStartX = e.clientX;
+    stageSwipeDx = 0;
+    stageSwipeDragging = false;
+  });
+  stageEl.addEventListener("pointermove", (e) => {
+    if (e.pointerType !== "touch" || GALLERY.length < 2) return;
+    stageSwipeDx = e.clientX - stageSwipeStartX;
+    if (!stageSwipeDragging && Math.abs(stageSwipeDx) > 10) stageSwipeDragging = true;
+  });
+  function finishStageSwipe(e) {
+    if (e.pointerType !== "touch" || !stageSwipeDragging) return;
+    stageSwipeDragging = false;
+    if (Math.abs(stageSwipeDx) >= STAGE_SWIPE_THRESHOLD && GALLERY.length > 1) {
+      stageJustSwiped = true;
+      setActive(activeIndex + (stageSwipeDx < 0 ? 1 : -1));
+    }
+  }
+  stageEl.addEventListener("pointerup", finishStageSwipe);
+  stageEl.addEventListener("pointercancel", () => {
+    stageSwipeDragging = false;
+  });
+
   stageEl.addEventListener("click", (e) => {
+    if (stageJustSwiped) {
+      stageJustSwiped = false;
+      e.preventDefault();
+      e.stopPropagation();
+      return;
+    }
     if (e.target.closest(".zoom-btn")) return;
     // Controles nativos del video visible: no abrir lightbox
     if (e.target.closest("video") && stageVideo && !stageVideo.hidden) return;
