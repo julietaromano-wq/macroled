@@ -1831,6 +1831,19 @@
     return best;
   }
 
+  function setCrumbFamilyLink(macro, family) {
+    const familyLink = document.getElementById("crumb-family");
+    if (!familyLink) return;
+    const params = new URLSearchParams();
+    if (macro) params.set("macrofamilia", macro);
+    if (family) params.set("familia", family);
+    if ([...params].length) {
+      familyLink.setAttribute("href", "/nuevo-productos?" + params.toString());
+    } else {
+      familyLink.removeAttribute("href");
+    }
+  }
+
   function applyProduct(el, opts) {
     opts = opts || {};
     const specs = parseSpecs(el);
@@ -1869,6 +1882,7 @@
       setText("#ficha-eyebrow", [macro, family].filter(Boolean).join(" · "));
     }
     setText("#crumb-family", family);
+    setCrumbFamilyLink(macro, family);
     setText("#aiProductName", name);
     setText("#aiProductMeta", `SKU ${sku}${macro ? " · " + macro : ""}`);
 
