@@ -957,6 +957,35 @@ document.getElementById("viewAllLink").addEventListener("click", () => {
 /* =========================================================
    TOOLBAR — imprimir
    ========================================================= */
+const PRINT_CHROME_SELECTORS = [
+  "#macroled-menu",
+  ".footer-wrap",
+  ".w-nav",
+  ".nl-backdrop",
+  ".nl-popup",
+  ".compare-bar",
+  ".w-webflow-badge"
+];
+
+function setComparePrintChrome(hidden){
+  document.documentElement.classList.toggle("is-printing-compare", hidden);
+  PRINT_CHROME_SELECTORS.forEach(sel => {
+    document.querySelectorAll(sel).forEach(el => {
+      if(hidden){
+        if(!el.hasAttribute("data-print-prev-display")){
+          el.setAttribute("data-print-prev-display", el.style.getPropertyValue("display"));
+        }
+        el.style.setProperty("display", "none", "important");
+      } else if(el.hasAttribute("data-print-prev-display")){
+        const prev = el.getAttribute("data-print-prev-display");
+        el.removeAttribute("data-print-prev-display");
+        if(prev) el.style.setProperty("display", prev);
+        else el.style.removeProperty("display");
+      }
+    });
+  });
+}
+
 function prepareComparePrint(){
   const shell = document.getElementById("compareShell");
   if(shell) shell.scrollLeft = 0;
@@ -972,10 +1001,12 @@ function prepareComparePrint(){
   if(backdrop){ backdrop.classList.remove("is-open"); backdrop.hidden = true; }
   const modal = document.getElementById("modalOverlay");
   if(modal) modal.classList.remove("open");
+  setComparePrintChrome(true);
 }
 
 function cleanupComparePrint(){
   document.body.classList.remove("print-cols-1", "print-cols-2", "print-cols-3");
+  setComparePrintChrome(false);
 }
 
 document.getElementById("printBtn").addEventListener("click", () => {

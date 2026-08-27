@@ -404,6 +404,18 @@
 
   .print-logo{display:none;}
 
+  /* Chrome de Webflow (menú + footer) fuera del prototipo local */
+  html.is-printing-compare #macroled-menu,
+  html.is-printing-compare .footer-wrap,
+  html.is-printing-compare .w-nav,
+  html.is-printing-compare .nl-backdrop,
+  html.is-printing-compare .nl-popup,
+  html.is-printing-compare .compare-bar,
+  html.is-printing-compare .w-webflow-badge{
+    display:none !important;
+    visibility:hidden !important;
+  }
+
   /* ImpresiÃ³n: orientaciÃ³n vertical + look cercano al desktop */
   @media print{
     .back-link,
@@ -420,7 +432,14 @@
     .ai-panel,
     .ai-backdrop,
     .mini-compare-bar,
-    #headerSentinel{display:none !important;}
+    #headerSentinel,
+    #macroled-menu,
+    .footer-wrap,
+    .w-nav,
+    .nl-backdrop,
+    .nl-popup,
+    .compare-bar,
+    .w-webflow-badge{display:none !important;}
 
     *{-webkit-print-color-adjust:exact;print-color-adjust:exact;}
     html, body{
