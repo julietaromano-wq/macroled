@@ -93,8 +93,8 @@ const MEGAMENU_DATA = [
     groups: [
       { group: null, items: [
         { name: "LIMA", count: "61 Productos", img: "https://s3.coresagroup.com/MACROLED/250/lima.webp", href: "#", isNew: true },
-        { name: "ROMA", count: "13 Productos", img: `${CDN}/filters:format(webp)/MACROLED/250/milan.png`, href: "#" },
-        { name: "TOKIO", count: "9 Productos", img: `${CDN}/filters:format(webp)/MACROLED/250/milan-bastidores.png`, href: "#" },
+        { name: "ROMA", count: "13 Productos", img: "https://s3.coresagroup.com/MACROLED/250/roma.png", href: "#" },
+        { name: "TOKIO", count: "9 Productos", img: "https://s3.coresagroup.com/MACROLED/250/tokio.png", href: "#" },
         { name: "KINETIC", count: "6 Productos", img: `${CDN}/filters:format(webp)/MACROLED/250/kinetic.png`, href: "#", isSmart: true },
       ]},
       { group: "Monaco", items: [
@@ -213,27 +213,24 @@ const MEGAMENU_DATA = [
     layout: "grouped",
     groups: [
       { group: "Paneles de 6 a 24W", items: [
-        { name: "Embutir Blanco", count: "28 Productos", img: `${CDN}/filters:format(webp)/MACROLED/250/embutir-blanco.png`, href: "#" },
-        { name: "Embutir Negro", count: "28 Productos", img: `${CDN}/filters:format(webp)/MACROLED/250/embutir-negro.png`, href: "#" },
-        { name: "Plafón Blanco", count: "28 Productos", img: `${CDN}/filters:format(webp)/MACROLED/250/plafon-blanco.png`, href: "#" },
-        { name: "Plafón Negro", count: "28 Productos", img: `${CDN}/filters:format(webp)/MACROLED/250/plafon-negro.png`, href: "#" },
-        { name: "Plafón Platil", count: "28 Productos", img: `${CDN}/filters:format(webp)/MACROLED/250/plafon-platil.png`, href: "#" },
+        { name: "Embutir", count: "28 Productos", img: `${CDN}/filters:format(webp)/MACROLED/250/embutir-negro.png`, href: "https://macroled.webflow.io/nuevo-productos?macrofamilia=Paneles&familia=6+a+24W&subfamilia=Embutir" },
+        { name: "Plafón", count: "28 Productos", img: `${CDN}/filters:format(webp)/MACROLED/250/plafon-platil.png`, href: "https://macroled.webflow.io/nuevo-productos?macrofamilia=Paneles&familia=6+a+24W&subfamilia=Plaf%C3%B3n" },
       ]},
       { group: "Paneles de 6 a 36W", isNew: true, items: [
-        { name: "6 a 36 Backlight CCT", count: "28 Productos", img: `${CDN}/250x250/MACROLED/WEB/GRAN-FORMATO-P40.webp`, href: "#" },
+        { name: "6 a 36 Backlight CCT", count: "28 Productos", img: `${CDN}/250x250/MACROLED/WEB/GRAN-FORMATO-P40.webp`, href: "https://macroled.webflow.io/nuevo-productos?macrofamilia=Paneles&familia=6+a+36+Backlight+CCT" },
       ]},
       { group: "Gran Formato", items: [
-        { name: "Gran Formato 40W", count: "28 Productos", img: `${CDN}/250x250/MACROLED/WEB/GRAN-FORMATO-P40.webp`, href: "#" },
-        { name: "Gran Formato 48W", count: "28 Productos", img: `${CDN}/250x250/MACROLED/WEB/GRAN-FORMATO-P40.webp`, href: "#" },
-        { name: "Gran Formato Backlight", count: "28 Productos", img: `${CDN}/250x250/MACROLED/WEB/GRAN-FORMATO-P40.webp`, href: "#", isNew: true },
+        { name: "Gran Formato 40W", count: "28 Productos", img: `${CDN}/250x250/MACROLED/WEB/GRAN-FORMATO-P40.webp`, href: "https://macroled.webflow.io/nuevo-productos?macrofamilia=Paneles&familia=Gran+Formato&subfamilia=Gran+Formato+40W" },
+        { name: "Gran Formato 48W", count: "28 Productos", img: `${CDN}/250x250/MACROLED/WEB/GRAN-FORMATO-P40.webp`, href: "https://macroled.webflow.io/nuevo-productos?macrofamilia=Paneles&familia=Gran+Formato&subfamilia=Gran+Formato+48W" },
+        { name: "Gran Formato Backlight", count: "28 Productos", img: `${CDN}/250x250/MACROLED/WEB/GRAN-FORMATO-P40.webp`, href: "https://macroled.webflow.io/nuevo-productos?macrofamilia=Paneles&familia=Gran+Formato+Backlight", isNew: true },
       ]},
       { group: "Móviles y COB", items: [
-        { name: "Móviles", count: "28 Productos", img: `${CDN}/filters:format(webp)/MACROLED/250/moviles.png`, href: "#" },
-        { name: "COB", count: "28 Productos", img: `${CDN}/filters:format(webp)/MACROLED/250/premium.png`, href: "#" },
+        { name: "Móviles", count: "28 Productos", img: `${CDN}/filters:format(webp)/MACROLED/250/moviles.png`, href: "https://macroled.webflow.io/nuevo-productos?macrofamilia=Paneles&familia=M%C3%B3viles" },
+        { name: "COB", count: "28 Productos", img: `${CDN}/filters:format(webp)/MACROLED/250/premium.png`, href: "https://macroled.webflow.io/nuevo-productos?macrofamilia=Paneles&familia=COB" },
       ]},
       { group: "Otros", items: [
-        { name: "Drivers", count: "28 Productos", img: `${CDN}/250x250/MACROLED/WEB/DRIVERS.webp`, href: "#" },
-        { name: "Accesorios", count: "28 Productos", img: `${CDN}/filters:format(webp)/MACROLED/250/accesorios-paneles.png`, href: "#" },
+        { name: "Drivers", count: "28 Productos", img: `${CDN}/250x250/MACROLED/WEB/DRIVERS.webp`, href: "https://macroled.webflow.io/nuevo-productos?macrofamilia=Paneles&familia=Drivers" },
+        { name: "Accesorios", count: "28 Productos", img: `${CDN}/filters:format(webp)/MACROLED/250/accesorios-paneles.png`, href: "https://macroled.webflow.io/nuevo-productos?macrofamilia=Paneles&familia=Accesorios" },
       ]},
     ],
   },
@@ -287,7 +284,7 @@ const MEGAMENU_DATA = [
     },
     layout: "flat",
     items: [
-      { name: "Smart", count: "8 Productos", img: `${CDN}/filters:format(webp)/MACROLED/250/sensores-smart.png`, href: "#", isSmart: true },
+      { name: "Smart", count: "8 Productos", img: `${CDN}/filters:format(webp)/MACROLED/250/sensores-smart.png`, href: "https://macroled.webflow.io/nuevo-productos?macrofamilia=Sensores+y+Fotoc%C3%A9lulas&smart=1", isSmart: true },
       { name: "Sensores", count: "9 Productos", img: `${CDN}/filters:format(webp)/MACROLED/250/sensores-y-fotocelulas.png`, href: "https://macroled.webflow.io/nuevo-productos?macrofamilia=Sensores+y+Fotoc%C3%A9lulas&familia=Sensores" },
       { name: "Fotocélulas", count: "5 Productos", img: `${CDN}/filters:format(webp)/MACROLED/250/fotocelulas.png`, href: "https://macroled.webflow.io/nuevo-productos?macrofamilia=Sensores+y+Fotoc%C3%A9lulas&familia=Fotoc%C3%A9lulas" },
     ],
@@ -340,7 +337,6 @@ if (typeof module !== "undefined") module.exports = MEGAMENU_DATA;
   var ALL_PRODUCTS_URL = "https://macroled.webflow.io/nuevo-productos";
   var GROUP_AS_FAMILIA = {
     "interruptores-tomas": true,
-    "paneles": true,
     "luminarias-proyecto": true
   };
   // En artefactos el grupo es la materialidad (subfamilia), no la familia.
@@ -686,20 +682,43 @@ if (typeof module !== "undefined") module.exports = MEGAMENU_DATA;
       if (e.key === "Escape") close();
     });
 
-    // Cambiar de familia al pasar el mouse (desktop) o click (touch)
+    // Cambiar de familia al pasar el mouse (desktop) o click (touch).
+    // El hover espera un rato para no saltar de sección al cruzar las pestañas.
+    var hoverTimer = null;
+    var pendingHoverId = "";
+    var HOVER_DELAY_MS = 120;
+    function clearHoverTimer() {
+      if (hoverTimer) {
+        clearTimeout(hoverTimer);
+        hoverTimer = null;
+      }
+      pendingHoverId = "";
+    }
     tabsEl.addEventListener("click", (e) => {
       const btn = e.target.closest(".mm-tab");
-      if (btn) setActive(btn.dataset.id);
+      if (!btn) return;
+      clearHoverTimer();
+      setActive(btn.dataset.id);
     });
     tabsEl.addEventListener(
       "mouseover",
       (e) => {
         if (!window.matchMedia("(hover: hover) and (pointer: fine)").matches) return;
         const btn = e.target.closest(".mm-tab");
-        if (btn && btn.dataset.id !== activeId) setActive(btn.dataset.id);
+        if (!btn || btn.dataset.id === activeId) return;
+        var nextId = btn.dataset.id;
+        if (pendingHoverId === nextId) return;
+        clearHoverTimer();
+        pendingHoverId = nextId;
+        hoverTimer = setTimeout(function () {
+          hoverTimer = null;
+          pendingHoverId = "";
+          if (nextId !== activeId) setActive(nextId);
+        }, HOVER_DELAY_MS);
       },
       true
     );
+    tabsEl.addEventListener("mouseleave", clearHoverTimer);
 
     window.addEventListener("resize", updateScrollChrome, { passive: true });
 
@@ -970,9 +989,10 @@ if (typeof module !== "undefined") module.exports = MEGAMENU_DATA;
 
   function leafFromItem(item, extra) {
     extra = extra || {};
+    var href = item && item.href && item.href !== "#" ? item.href : "#";
     return {
       label: item.name,
-      href: item.href && item.href !== "#" ? item.href : "#",
+      href: href,
       isNew: !!(item.isNew || extra.isNew),
       isSmart: !!(item.isSmart || extra.isSmart),
     };
@@ -983,17 +1003,12 @@ if (typeof module !== "undefined") module.exports = MEGAMENU_DATA;
     if (family.layout === "grouped") {
       (family.groups || []).forEach(function (g) {
         var flags = { isNew: g.isNew, isSmart: g.isSmart };
-        if (!g.group) {
-          (g.items || []).forEach(function (it) { items.push(leafFromItem(it, flags)); });
-        } else {
-          items.push({
-            label: g.group,
-            children: {
-              title: g.group,
-              items: (g.items || []).map(function (it) { return leafFromItem(it, flags); }),
-            },
-          });
+        if (g.group) {
+          items.push({ label: g.group, isGroupLabel: true });
         }
+        (g.items || []).forEach(function (it) {
+          items.push(leafFromItem(it, flags));
+        });
       });
     } else {
       items = (family.items || []).map(function (it) {
@@ -1006,11 +1021,27 @@ if (typeof module !== "undefined") module.exports = MEGAMENU_DATA;
       isSmart: !!family.isSmart,
       children: {
         title: family.label,
-        viewAllHref: family.viewAllHref || ALL_PRODUCTS_URL,
+        viewAllHref: family.viewAllHref && family.viewAllHref !== "#" ? family.viewAllHref : ALL_PRODUCTS_URL,
         viewAllLabel: "Ver todo",
         items: items,
       },
     };
+  }
+
+  function desktopNavLinks() {
+    var links = [];
+    document.querySelectorAll("#macroled-menu .mm-links > a").forEach(function (a) {
+      var label = (a.textContent || "").trim();
+      var href = a.getAttribute("href") || "#";
+      if (label) links.push({ label: label, href: href });
+    });
+    if (links.length) return links;
+    return [
+      { label: "Proyectos Lumínicos", href: "https://macroled.webflow.io/proyectos" },
+      { label: "Novedades", href: "https://macroled.webflow.io/nuevo-novedades" },
+      { label: "Descargas", href: "https://macroled.webflow.io/nuevo-descargas" },
+      { label: "Contacto", href: "https://macroled.webflow.io/nuevo-contacto" },
+    ];
   }
 
   function buildMenuTree() {
@@ -1027,11 +1058,7 @@ if (typeof module !== "undefined") module.exports = MEGAMENU_DATA;
             items: data.map(familyToItem),
           },
         },
-        { label: "Proyectos Lumínicos", href: "/proyectos" },
-        { label: "Novedades", href: "/novedades" },
-        { label: "Descargas", href: "/descargas" },
-        { label: "Contacto", href: "/contacto" },
-      ],
+      ].concat(desktopNavLinks()),
     };
   }
 
@@ -1090,6 +1117,10 @@ if (typeof module !== "undefined") module.exports = MEGAMENU_DATA;
     var debounceTimer = null;
     if (!searchTrigger || !searchOverlay || !input) return;
 
+    function searchResultsPageUrl(query) {
+      return ALL_PRODUCTS_URL + "?q=" + encodeURIComponent(query);
+    }
+
     function openSearch() {
       searchOverlay.classList.add("open");
       lockBodyScroll();
@@ -1105,9 +1136,25 @@ if (typeof module !== "undefined") module.exports = MEGAMENU_DATA;
     searchTrigger.addEventListener("click", openSearch);
     searchBackBtn.addEventListener("click", closeSearch);
 
+    function moreResultsRow(query, found) {
+      return (
+        '<a href="' + searchResultsPageUrl(query) + '" class="ts-row ts-row-more">' +
+          '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">' +
+            '<circle cx="11" cy="11" r="7"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line>' +
+          "</svg>" +
+          '<span class="ts-meta">Ver todos los resultados (' + found + ') para <strong>&quot;' + esc(query) + '&quot;</strong></span>' +
+          '<span class="ts-arrow" aria-hidden="true">' +
+            '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">' +
+              '<line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline>' +
+            "</svg>" +
+          "</span>" +
+        "</a>"
+      );
+    }
+
     function runSearch(query) {
       if (!tsClient) {
-        resultsBox.innerHTML = '<div class="ts-empty" style="padding:40px 20px;text-align:center;color:#8a94a0;font-size:14px;">Buscador no disponible</div>';
+        resultsBox.innerHTML = '<div class="ts-empty">Buscador no disponible</div>';
         return;
       }
       tsClient.collections("Macroled_Prueba").documents().search({
@@ -1116,24 +1163,32 @@ if (typeof module !== "undefined") module.exports = MEGAMENU_DATA;
         var hits = result.hits || [];
         var found = result.found || 0;
         if (!hits.length) {
-          resultsBox.innerHTML = '<div class="ts-empty" style="padding:40px 20px;text-align:center;color:#8a94a0;font-size:14px;">No se encontraron resultados</div>';
+          resultsBox.innerHTML =
+            '<div class="ts-empty">No se encontraron resultados para <strong>&quot;' + esc(query) + '&quot;</strong></div>' +
+            '<a href="' + searchResultsPageUrl(query) + '" class="ts-row ts-row-footer">Explorá nuestros productos' +
+              '<span class="ts-arrow" aria-hidden="true"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg></span>' +
+            "</a>";
           return;
         }
-        resultsBox.innerHTML = hits.map(function (hit) {
+        var rows = hits.map(function (hit) {
           var doc = hit.document;
           var href = doc.link_ficha_web || "";
           var tag = href ? "a" : "div";
           var hrefAttr = href ? ' href="' + esc(href) + '"' : "";
           var imgSrc = firstImage(doc);
-          return "<" + tag + hrefAttr + ' class="ts-row" style="display:flex;align-items:center;gap:12px;padding:12px 16px;text-decoration:none;color:inherit;border-bottom:1px solid #ececef;">' +
+          var nuevo = doc.nuevo ? '<span class="ts-nuevo">nuevo</span>' : "";
+          return "<" + tag + hrefAttr + ' class="ts-row">' +
             (imgSrc
-              ? '<img src="' + esc(imgSrc) + '" alt="" style="width:48px;height:48px;object-fit:contain;border-radius:6px;flex-shrink:0;background:#f4f6f8;" />'
-              : '<span style="width:48px;height:48px;border-radius:6px;flex-shrink:0;background:#f4f6f8;"></span>') +
-            '<div style="flex:1;min-width:0;"><div style="font-size:14px;font-weight:600;color:#1c2530;">' + esc(productName(doc)) + "</div>" +
-            '<div style="font-size:12px;color:#8a94a0;margin-top:2px;">' + esc(doc.sku || "") + "</div></div></" + tag + ">";
+              ? '<img src="' + esc(imgSrc) + '" alt="" />'
+              : '<span class="ts-thumb" aria-hidden="true"></span>') +
+            '<div class="ts-meta"><div class="ts-name">' + esc(productName(doc)) + nuevo + "</div>" +
+            '<div class="ts-sku">' + esc(doc.sku || "") + "</div></div>" +
+            '<span class="ts-arrow" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg></span>' +
+            "</" + tag + ">";
         }).join("");
+        resultsBox.innerHTML = rows + moreResultsRow(query, found);
       }).catch(function () {
-        resultsBox.innerHTML = '<div class="ts-empty" style="padding:40px 20px;text-align:center;color:#8a94a0;font-size:14px;">Error al buscar</div>';
+        resultsBox.innerHTML = '<div class="ts-empty">Error al buscar</div>';
       });
     }
 
@@ -1142,6 +1197,13 @@ if (typeof module !== "undefined") module.exports = MEGAMENU_DATA;
       var query = input.value.trim();
       if (!query) { resultsBox.innerHTML = ""; return; }
       debounceTimer = setTimeout(function () { runSearch(query); }, 400);
+    });
+
+    input.addEventListener("keydown", function (e) {
+      if (e.key !== "Enter") return;
+      e.preventDefault();
+      var query = input.value.trim();
+      if (query) window.location.href = searchResultsPageUrl(query);
     });
   })();
 
@@ -1173,6 +1235,9 @@ if (typeof module !== "undefined") module.exports = MEGAMENU_DATA;
       )) +
       '<div class="screen-body"><ul class="menu-list">' +
         (node.items || []).map(function (item, i) {
+          if (item.isGroupLabel) {
+            return '<li class="mm-mobile-group-label">' + esc(item.label) + "</li>";
+          }
           var label = '<span class="item-label">' + esc(item.label) + badgesHtml(item) + "</span>";
           if (item.children) {
             return "<li><button type=\"button\" data-action=\"forward\" data-idx=\"" + i + "\">" + label + '<span class="chevron"></span></button></li>';
