@@ -1690,7 +1690,7 @@
       html +=
         `<label for="${inputId}" class="${chipClass}"` +
         (isUnavailable
-          ? ` title="${escapeHtml(entry.value)}: no disponible con la combinación actual — se reacomodan las otras opciones"`
+          ? ` title="${escapeHtml(entry.value)}: no disponible en esta combinación"`
           : "") +
         `>` +
         `<input type="radio" class="variant-chip-radio" id="${inputId}" name="${groupName}"` +
