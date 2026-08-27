@@ -181,6 +181,25 @@
     zoomPane.style.backgroundImage = `url("${g.full}")`;
   }
 
+  /* Fade mínimo al cambiar de foto (swipe/thumbs/lightbox): la nueva
+     imagen entra con un opacity fade en vez de aparecer de golpe. */
+  const STAGE_FADE_MS = 130;
+  let stageFadeTimer = null;
+  function setStageImage(src, alt) {
+    if (!stageImg.src || src === stageImg.src) {
+      stageImg.src = src;
+      stageImg.alt = alt;
+      return;
+    }
+    clearTimeout(stageFadeTimer);
+    stageImg.classList.add("is-switching");
+    stageFadeTimer = window.setTimeout(() => {
+      stageImg.src = src;
+      stageImg.alt = alt;
+      requestAnimationFrame(() => stageImg.classList.remove("is-switching"));
+    }, STAGE_FADE_MS);
+  }
+
   function setActive(i) {
     if (!GALLERY.length || !stageImg) return;
     activeIndex = (i + GALLERY.length) % GALLERY.length;
@@ -208,8 +227,7 @@
     } else {
       if (stageVideo) stageVideo.hidden = true;
       stageImg.hidden = false;
-      stageImg.src = video ? g.thumb || g.poster || g.display : g.display;
-      stageImg.alt = g.alt;
+      setStageImage(video ? g.thumb || g.poster || g.display : g.display, g.alt);
       if (stagePlay) stagePlay.hidden = !(video && (g.type === "youtube" || g.type === "vimeo"));
     }
 

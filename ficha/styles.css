@@ -212,6 +212,11 @@ main{padding:calc(48px + clamp(12px,2vw,24px)) clamp(12px,2vw,24px) 0;}
   object-fit:contain;padding:clamp(20px,4vw,36px) clamp(16px,3vw,28px);
   pointer-events:none;user-select:none;
   position:relative;z-index:0;
+  opacity:1;transition:opacity .16s ease;
+}
+.stage-img.is-switching{animation:none;opacity:0;}
+@media (prefers-reduced-motion:reduce){
+  .stage-img{transition:none;}
 }
 .stage-play{
   position:absolute;inset:0;margin:auto;
