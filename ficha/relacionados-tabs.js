@@ -49,7 +49,14 @@
   function safeUrl(value) {
     try {
       const url = new URL(String(value), window.location.href);
-      return ["http:", "https:"].includes(url.protocol) ? url.href : "";
+      if (!["http:", "https:"].includes(url.protocol)) return "";
+      // El CMS a veces guarda links apuntando al staging de Webflow;
+      // el sitio real es macroled.com.ar.
+      if (/(^|\.)macroled\.webflow\.io$/i.test(url.hostname)) {
+        url.protocol = "https:";
+        url.hostname = "macroled.com.ar";
+      }
+      return url.href;
     } catch (_) {
       return "";
     }
@@ -337,7 +344,14 @@
       }px)`;
     };
 
-    track.onscroll = update;
+    let updateRaf = null;
+    track.onscroll = () => {
+      if (updateRaf) return;
+      updateRaf = requestAnimationFrame(() => {
+        updateRaf = null;
+        update();
+      });
+    };
     const moveToCard = (direction) => {
       if (!cards.length) return;
       const firstLeft = cards[0].getBoundingClientRect().left;
