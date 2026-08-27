@@ -362,7 +362,7 @@
      mientras se arrastra, para que se note que "hay más fotos" del lado
      al que se está deslizando. */
   const STAGE_SWIPE_THRESHOLD = 40;
-  const STAGE_SLIDE_MS = 220;
+  const STAGE_SLIDE_MS = 150;
   let stageSwipeStartX = 0;
   let stageSwipeDx = 0;
   let stageSwipeDragging = false;

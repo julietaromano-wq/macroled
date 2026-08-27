@@ -943,7 +943,7 @@ body.assistant-open .ai-launch{
 .tabs{
   display:flex;gap:4px;border-bottom:1px solid var(--line);
   margin-bottom:8px;
-  touch-action:pan-x;
+  touch-action:pan-x pan-y;
 }
 .tab{
   appearance:none;border:none;background:transparent;
@@ -1191,7 +1191,7 @@ body.assistant-open .ai-launch{
   cursor:grab;
   user-select:none;
   -webkit-overflow-scrolling:touch;
-  touch-action:pan-x;
+  touch-action:pan-x pan-y;
 }
 .ml-related-products__track.is-dragging{
   cursor:grabbing;
@@ -1489,7 +1489,7 @@ body.assistant-open .ai-launch{
   cursor:grab;
   user-select:none;
   -webkit-overflow-scrolling:touch;
-  touch-action:pan-x;
+  touch-action:pan-x pan-y;
 }
 .ml-rel-carousel__track.is-dragging{cursor:grabbing;scroll-behavior:auto;scroll-snap-type:none;}
 .ml-rel-carousel__track.is-dragging .ml-product-card{pointer-events:none;}
@@ -1600,7 +1600,7 @@ body.assistant-open .ai-launch{
     scroll-snap-type:x proximity;
     scroll-behavior:auto;
     scroll-padding-inline:0;
-    touch-action:pan-x;
+    touch-action:pan-x pan-y;
     -webkit-overflow-scrolling:touch;
   }
   .ml-related-products__track .ml-product-card,
