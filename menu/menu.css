@@ -1020,4 +1020,10 @@ html.mm-scroll-lock body {
 .ai-backdrop { z-index: 2147483646 !important; }
 .ai-panel { z-index: 2147483647 !important; }
 
+@media print {
+  #macroled-menu {
+    display: none !important;
+  }
+}
+
 

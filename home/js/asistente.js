@@ -171,7 +171,10 @@
           method: "POST",
           headers: { "Content-Type": "application/json" },
           signal: controller.signal,
-          body: JSON.stringify(getPayload(question)),
+          body: JSON.stringify({
+            ...getPayload(question),
+            sessionId: window.MacroledSessionId,
+          }),
         });
         clearTimeout(timeoutId);
         if (!res.ok) throw new Error(`HTTP ${res.status}`);

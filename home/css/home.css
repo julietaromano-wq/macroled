@@ -7327,8 +7327,11 @@ body.assistant-open .ai-launch {
   z-index: 2147483645 !important;
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 10px;
-  padding: 16px 20px;
+  width: auto;
+  height: 48px;
+  padding: 8px 18px 8px 14px;
   border: none;
   border-radius: 999px;
   background: #00152b !important;
@@ -7367,8 +7370,8 @@ body.assistant-open .ai-launch {
 
 .ai-launch svg {
   flex: none;
-  width: 20px;
-  height: 20px;
+  width: 18px;
+  height: 18px;
   color: #fff !important;
   stroke: #fff !important;
 }
@@ -7567,6 +7570,9 @@ body.assistant-open .ai-launch {
   overflow-wrap: anywhere;
   word-break: break-word;
 }
+.ai-msg.user a {
+  color: #9fe0ff;
+}
 
 .ai-typing {
   display: none;
@@ -7688,25 +7694,17 @@ body.assistant-open .ai-launch {
 }
 
 @media (max-width: 640px) {
-  .ai-launch span:last-child {
-    display: none;
-  }
-
   .ai-launch {
-    width: 60px;
-    height: 60px;
-    padding: 0;
-    border-radius: 50%;
+    width: auto;
+    height: 44px;
+    padding: 8px 16px 8px 11px;
+    border-radius: 999px;
     justify-content: center;
   }
 
   .ai-launch svg {
-    width: 22px;
-    height: 22px;
-  }
-
-  .ai-launch-dot {
-    display: none;
+    width: 18px;
+    height: 18px;
   }
 
   .ai-panel {
