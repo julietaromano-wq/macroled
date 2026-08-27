@@ -628,12 +628,21 @@ if (typeof module !== "undefined") module.exports = MEGAMENU_DATA;
       requestAnimationFrame(updateScrollChrome);
     }
 
+    function setMegaOpenState(isOpen) {
+      var menu = document.getElementById("macroled-menu");
+      if (menu) menu.classList.toggle("mm-mega-open", !!isOpen);
+      if (window.MACROLED_MENU && typeof window.MACROLED_MENU.refreshNavTheme === "function") {
+        window.MACROLED_MENU.refreshNavTheme();
+      }
+    }
+
     function open() {
       if (root.classList.contains("is-open")) return;
       setActive("lamparas");
       if (tabsEl) tabsEl.scrollTop = 0;
       root.classList.add("is-open");
       trigger.setAttribute("aria-expanded", "true");
+      setMegaOpenState(true);
       if (window.MACROLED_MENU && window.MACROLED_MENU.lockPageScroll) {
         window.MACROLED_MENU.lockPageScroll();
       }
@@ -644,6 +653,7 @@ if (typeof module !== "undefined") module.exports = MEGAMENU_DATA;
       if (!root.classList.contains("is-open")) return;
       root.classList.remove("is-open");
       trigger.setAttribute("aria-expanded", "false");
+      setMegaOpenState(false);
       if (window.MACROLED_MENU && window.MACROLED_MENU.unlockPageScroll) {
         window.MACROLED_MENU.unlockPageScroll();
       }

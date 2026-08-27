@@ -60,9 +60,47 @@ html.mm-scroll-lock body {
 #macroled-menu.nav-dark .mm-trigger {
   color: #fff !important;
 }
-#macroled-menu.is-on-dark .mm-site-nav .mm-links > a:hover,
-#macroled-menu.is-on-dark .mm-root.is-open .mm-trigger {
+#macroled-menu.is-on-dark .mm-site-nav .mm-links > a:hover {
   color: #e8f7ff;
+}
+
+/* Megamenu abierto: la barra siempre es blanca, aunque el fondo de la página sea oscuro */
+#macroled-menu:has(.mm-root.is-open) .mm-site-nav,
+#macroled-menu.mm-mega-open .mm-site-nav,
+#macroled-menu.is-on-dark:has(.mm-root.is-open) .mm-site-nav,
+#macroled-menu.is-on-dark.mm-mega-open .mm-site-nav,
+#macroled-menu.nav-dark:has(.mm-root.is-open) .mm-site-nav,
+#macroled-menu.nav-dark.mm-mega-open .mm-site-nav {
+  background: #fff !important;
+  border-bottom: 1px solid var(--line, #e6e6e6) !important;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+#macroled-menu:has(.mm-root.is-open) .mm-site-nav .mm-links > a,
+#macroled-menu:has(.mm-root.is-open) .mm-trigger,
+#macroled-menu.mm-mega-open .mm-site-nav .mm-links > a,
+#macroled-menu.mm-mega-open .mm-trigger,
+#macroled-menu.is-on-dark:has(.mm-root.is-open) .mm-site-nav .mm-links > a,
+#macroled-menu.is-on-dark:has(.mm-root.is-open) .mm-trigger,
+#macroled-menu.is-on-dark.mm-mega-open .mm-site-nav .mm-links > a,
+#macroled-menu.is-on-dark.mm-mega-open .mm-trigger,
+#macroled-menu.nav-dark:has(.mm-root.is-open) .mm-site-nav .mm-links > a,
+#macroled-menu.nav-dark:has(.mm-root.is-open) .mm-trigger,
+#macroled-menu.nav-dark.mm-mega-open .mm-site-nav .mm-links > a,
+#macroled-menu.nav-dark.mm-mega-open .mm-trigger {
+  color: var(--ink, #16294f) !important;
+}
+#macroled-menu:has(.mm-root.is-open) .mm-root.is-open .mm-trigger,
+#macroled-menu.mm-mega-open .mm-root.is-open .mm-trigger,
+#macroled-menu.is-on-dark .mm-root.is-open .mm-trigger,
+#macroled-menu.nav-dark .mm-root.is-open .mm-trigger {
+  color: var(--tint-text, #006ea5) !important;
+}
+#macroled-menu:has(.mm-root.is-open) .mm-logo,
+#macroled-menu:has(.mm-root.is-open) .mm-logo svg,
+#macroled-menu.mm-mega-open .mm-logo,
+#macroled-menu.mm-mega-open .mm-logo svg {
+  color: #00bdff;
 }
 #macroled-menu.is-on-dark #mm-mobile .mm-mobile-bar {
   background: rgba(0, 21, 43, 0.2);
@@ -823,15 +861,15 @@ html.mm-scroll-lock body {
   .mm-site-nav { display: none !important; }
   #mm-mobile { display: block; }
   #mm-mobile .mm-logo {
-    width: 90px;
-    max-width: 90px;
+    width: 124px;
+    max-width: 124px;
     color: #fff;
     line-height: 0;
   }
   #mm-mobile .mm-logo svg,
   #mm-mobile .mm-logo-svg {
     display: block;
-    width: 90px;
+    width: 124px;
     max-width: 100%;
     height: auto;
     color: #fff;
@@ -842,32 +880,33 @@ html.mm-scroll-lock body {
   position: relative; z-index: 100;
   display: flex; align-items: center; justify-content: space-between;
   padding: 14px 20px; background: var(--mm-navy, #00152b); color: #fff;
-  height: 62px; box-sizing: border-box;
+  height: 72px; box-sizing: border-box;
   transition: background .22s ease, border-color .22s ease, color .22s ease, backdrop-filter .22s ease;
 }
-#mm-mobile .mm-logo { width: 90px; max-width: 90px; color: #fff; line-height: 0; }
+#mm-mobile .mm-logo { width: 124px; max-width: 124px; color: #fff; line-height: 0; }
 #mm-mobile .mm-logo svg,
 #mm-mobile .mm-logo-svg {
-  display: block; width: 90px; max-width: 100%; height: auto; color: #fff;
+  display: block; width: 124px; max-width: 100%; height: auto; color: #fff;
 }
-#mm-mobile .mm-header-actions { display: flex; align-items: center; gap: 10px; }
+#mm-mobile .mm-header-actions { display: flex; align-items: center; gap: 12px; }
 #mm-mobile .burger {
-  width: 34px; height: 34px; display: flex; flex-direction: column;
-  justify-content: center; align-items: center; gap: 6px;
+  width: 40px; height: 40px; display: flex; flex-direction: column;
+  justify-content: center; align-items: center; gap: 7px;
   background: none; border: none; cursor: pointer; padding: 0;
 }
 #mm-mobile .burger span {
-  display: block; width: 24px; height: 2px; background: #fff; border-radius: 2px;
+  display: block; width: 26px; height: 2.5px; background: #fff; border-radius: 2px;
   transition: transform .3s cubic-bezier(.4,0,.2,1), opacity .2s cubic-bezier(.4,0,.2,1);
 }
-#mm-mobile .burger.active span:nth-child(1) { transform: translateY(8px) rotate(45deg); }
+#mm-mobile .burger.active span:nth-child(1) { transform: translateY(9.5px) rotate(45deg); }
 #mm-mobile .burger.active span:nth-child(2) { opacity: 0; }
-#mm-mobile .burger.active span:nth-child(3) { transform: translateY(-8px) rotate(-45deg); }
+#mm-mobile .burger.active span:nth-child(3) { transform: translateY(-9.5px) rotate(-45deg); }
 #mm-mobile .search-trigger {
-  width: 34px; height: 34px; display: flex; align-items: center; justify-content: center;
+  width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;
   background: none; border: none; color: #fff; cursor: pointer;
   -webkit-tap-highlight-color: transparent;
 }
+#mm-mobile .search-trigger svg { width: 22px; height: 22px; }
 
 #mm-mobile .search-overlay {
   position: fixed; inset: 0; height: 100dvh; background: #fff; z-index: 600;
@@ -930,15 +969,15 @@ html.mm-scroll-lock body {
 #mm-mobile .search-overlay-body .ts-row-footer { justify-content: center; }
 
 #mm-mobile .menu-overlay {
-  position: fixed; inset: 0; top: 62px;
+  position: fixed; inset: 0; top: 72px;
   background: rgba(16,24,32,.4);
   opacity: 0; pointer-events: none; transition: opacity .3s cubic-bezier(.4,0,.2,1);
   z-index: 90;
 }
 #mm-mobile .menu-overlay.open { opacity: 1; pointer-events: auto; }
 #mm-mobile .menu-panel {
-  position: fixed; top: 62px; left: 0; right: 0;
-  height: calc(100dvh - 62px);
+  position: fixed; top: 72px; left: 0; right: 0;
+  height: calc(100dvh - 72px);
   background: #fff;
   transform: translateY(-8px) scaleY(.98); transform-origin: top;
   opacity: 0; pointer-events: none;
@@ -966,21 +1005,21 @@ html.mm-scroll-lock body {
   color: #0086b5; flex-shrink: 0; background: none; border: none; cursor: pointer; padding: 4px;
   font: inherit;
 }
-#mm-mobile .screen-title { font-size: 17px; font-weight: 700; color: #1c2530; }
+#mm-mobile .screen-title { font-size: 19px; font-weight: 700; color: #1c2530; }
 #mm-mobile .screen-body {
   flex: 1; min-height: 0; overflow-y: auto; -webkit-overflow-scrolling: touch;
   padding-bottom: env(safe-area-inset-bottom, 0px);
 }
 #mm-mobile .view-all-inline {
-  margin-left: auto; font-size: 14px; font-weight: 600; color: #0086b5;
+  margin-left: auto; font-size: 15px; font-weight: 600; color: #0086b5;
   text-decoration: none; flex-shrink: 0; padding: 4px 0 4px 12px; text-align: end;
 }
 #mm-mobile .menu-list { list-style: none; }
 #mm-mobile .menu-list li { border-bottom: 1px solid #ececef; }
 #mm-mobile .menu-list li.mm-mobile-group-label {
   border-bottom: none;
-  padding: 18px 20px 4px;
-  font-size: 12px;
+  padding: 18px 20px 6px;
+  font-size: 13px;
   font-weight: 700;
   letter-spacing: .04em;
   text-transform: uppercase;
@@ -989,8 +1028,8 @@ html.mm-scroll-lock body {
 #mm-mobile .menu-list button,
 #mm-mobile .menu-list a {
   display: flex; align-items: center; justify-content: space-between; gap: 10px;
-  width: 100%; padding: 20px; background: none; border: none; text-align: left;
-  font-size: 16px; font-weight: 600; color: #1c2530; text-decoration: none; cursor: pointer;
+  width: 100%; padding: 22px 20px; background: none; border: none; text-align: left;
+  font-size: 18px; font-weight: 600; color: #1c2530; text-decoration: none; cursor: pointer;
   font-family: inherit; box-sizing: border-box;
 }
 #mm-mobile .menu-list .item-label { display: flex; align-items: center; gap: 8px; min-width: 0; }
@@ -1019,11 +1058,5 @@ html.mm-scroll-lock body {
 .ai-launch { z-index: 2147483645 !important; }
 .ai-backdrop { z-index: 2147483646 !important; }
 .ai-panel { z-index: 2147483647 !important; }
-
-@media print {
-  #macroled-menu {
-    display: none !important;
-  }
-}
 
 
