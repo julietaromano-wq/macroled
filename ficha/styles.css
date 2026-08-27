@@ -74,7 +74,16 @@ img{max-width:100%;display:block;}
 /* El navbar (#macroled-menu) usa z-index:100000 !important — sin esto,
    el lightbox de Fancybox queda tapado por el navbar fijo. */
 .fancybox__container{z-index:100010 !important;}
-:focus-visible{outline:none;box-shadow:var(--focus-ring);}
+/* Scopeado (no global): un ":focus-visible" suelto pisaba también el buscador
+   del navbar compartido (#macroled-menu), que ya tiene su propio anillo de foco
+   en menu.css — se veían los dos superpuestos en la ficha y no en /nuevo-productos. */
+.wrap :focus-visible,
+.hero :focus-visible,
+.detail :focus-visible,
+.compare-bar :focus-visible,
+.ai-panel :focus-visible,
+.ai-launch:focus-visible,
+.share-sheet :focus-visible{outline:none;box-shadow:var(--focus-ring);}
 
 /* Card blanca sobre fondo gris (cambio local). Padding fluido para mobile. */
 main{padding:calc(48px + clamp(12px,2vw,24px)) clamp(12px,2vw,24px) 0;}

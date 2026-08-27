@@ -1848,6 +1848,7 @@
         q: "*",
         query_by: "sku",
         filter_by: `sku:=${JSON.stringify(sku)}`,
+        include_fields: "familia,macrofamilia",
         per_page: "1",
       });
       const res = await fetch(
