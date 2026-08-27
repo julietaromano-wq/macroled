@@ -2045,9 +2045,7 @@
     PRODUCT_CTX.warranty = garVal;
     PRODUCT_CTX.ficha = fichaUrl;
     PRODUCT_CTX.manual = manualUrl || garantiaUrl;
-    /* —— Capa 1 / Capa 2: contexto ampliado para el asistente ——
-       Se suman SKU/EAN/Familia/Macrofamilia al mapa de specs para que la
-       búsqueda genérica (genericSpecMatch) también los pueda encontrar. */
+    /* Contexto del producto activo para el asistente (SKU que se manda a n8n). */
     PRODUCT_CTX.specs = Object.assign({}, specs, {
       SKU: sku,
       EAN13: ean13,
@@ -2213,304 +2211,6 @@
     contactoUrl: CONTACTO_URL,
   });
 
-  /**
-   * Capa 1 — reglas locales. Cada regla intenta resolver la pregunta con
-   * datos que YA están cargados en la página (PRODUCT_CTX.specs), sin
-   * llamar a la IA. Se evalúan en orden; gana la primera que matchea Y
-   * tiene dato disponible para este SKU.
-   *
-   * key      -> nombre exacto del spec en PRODUCT_CTX.specs
-   * tpl(v)   -> cómo redactar la respuesta con ese valor
-   * special  -> casos que no son un spec simple (ficha, sku, precio, etc.)
-   */
-  /* Qué significa cada código IP habitual en iluminación (para enriquecer
-     la respuesta sin inventar datos que no están en la ficha). */
-  const IP_MEANINGS = {
-    ip20: "uso en interiores, sin protección contra líquidos",
-    ip44: "resistente a salpicaduras, apto para exteriores protegidos",
-    ip54: "protegido contra polvo y salpicaduras de agua",
-    ip65: "protegido contra chorros de agua, apto para exteriores",
-    ip66: "protegido contra chorros de agua potentes",
-    ip67: "resistente a inmersión temporal en agua",
-    ip68: "resistente a inmersión prolongada en agua",
-  };
-
-  const REGLAS_LOCALES = [
-    { test: /autonom[ií]a|dura la bater[ií]a|cu[aá]ntas horas/i, key: "Autonomía",
-      tpl: (v) => `La autonomía es de <b>${v}</b>.` },
-
-    { test: /tiempo de carga|cu[aá]nto tarda en cargar/i, key: "Tiempo de carga",
-      tpl: (v) => `Se carga por completo en <b>${v}</b>.` },
-
-    { test: /\bip\d{0,2}\b|resiste el? agua|humedad|exterior|lluvia|intemperie/i, key: "Protección IP",
-      tpl: (v) => {
-        const meaning = IP_MEANINGS[normKey(v).replace(/\s+/g, "")];
-        return meaning
-          ? `Sí, tiene protección <b>${v}</b>: ${meaning}.`
-          : `Sí, tiene protección <b>${v}</b>.`;
-      } },
-
-    { test: /\bik\d{0,2}\b|resiste golpes|impacto/i, key: "Protección IK",
-      tpl: (v) => `Tiene protección contra impactos <b>${v}</b>.` },
-
-    { test: /potenc|watt|consumo/i, key: "Potencia",
-      tpl: (v, specs) => {
-        const volt = (specs["Tensión"] || "").trim();
-        return volt
-          ? `La potencia es de <b>${v}</b>, con alimentación <b>${volt}</b>.`
-          : `La potencia es de <b>${v}</b>.`;
-      } },
-
-    { test: /tensi[oó]n|voltaje|alimentaci[oó]n|220v|12v|24v/i, key: "Tensión",
-      tpl: (v) => `Funciona con <b>${v}</b>.` },
-
-    { test: /garant[ií]a/i, key: "Garantía",
-      tpl: (v) => `La garantía oficial es de <b>${v}</b>.` },
-
-    { test: /lumen|flujo lumin/i, key: "Flujo luminoso",
-      tpl: (v) => `El flujo luminoso es de <b>${v}</b>.` },
-
-    { test: /temperatura.*color|kelvin|c[aá]lid[oa]|neutr[oa]|fr[ií]a|\bcct\b/i, key: "Temperatura del color",
-      tpl: (v) => `La temperatura de color es <b>${v}</b>.` },
-
-    { test: /\bcri\b|fidelidad de color/i, key: "CRI",
-      tpl: (v) => `El CRI es <b>${v}</b>.` },
-
-    { test: /dimeriz|dimmable|regular la intensidad/i, key: "Dimerizable",
-      tpl: (v) => isTruthyFlag(v)
-        ? `Sí, este modelo es <b>dimerizable</b>.`
-        : `No, este modelo no es dimerizable.` },
-
-    { test: /[aá]ngulo|apertura del haz/i, key: "Ángulo de apertura",
-      tpl: (v) => `El ángulo de apertura es de <b>${v}</b>.` },
-
-    { test: /material|de qu[eé] est[aá] hecho|cuerpo/i, key: "Material del cuerpo",
-      tpl: (v) => `El cuerpo es de <b>${v}</b>.` },
-
-    { test: /dimension|medida|tama[ñn]o|mide/i, key: "Dimensiones",
-      tpl: (v) => `Las dimensiones son <b>${v}</b>.` },
-
-    { test: /\bpeso\b|cu[aá]nto pesa/i, key: "Peso",
-      tpl: (v) => `El peso es <b>${v}</b>.` },
-
-    { test: /\bsmart\b|app|control por celular/i, key: "Smart",
-      tpl: (v) => isTruthyFlag(v)
-        ? `Sí, tiene función <b>Smart</b> (control por app).`
-        : `No tiene función Smart.` },
-
-    { test: /control remoto|viene con remoto/i, key: "Control remoto",
-      tpl: () => `Sí, este modelo incluye <b>control remoto</b>.` },
-
-    { test: /panel t[aá]ctil|t[aá]ctil/i, key: "Panel táctil",
-      tpl: () => `Sí, cuenta con <b>panel táctil</b>.` },
-
-    { test: /vida [uú]til|horas de vida|cu[aá]nto dura el led/i, key: "Vida útil",
-      tpl: (v) => `La vida útil estimada es de <b>${v}</b>.` },
-
-    { test: /cantidad de luces|cu[aá]ntas luces/i, key: "Cantidad de luces",
-      tpl: (v) => `Tiene <b>${v}</b>.` },
-
-    /* —— Casos especiales (no son un spec directo) —— */
-    { test: /ficha t[eé]cnica|\bpdf\b|descargar la ficha|datasheet/i, special: "ficha" },
-    { test: /manual|instalaci[oó]n|c[oó]mo se instala|montaje/i, special: "manual" },
-    { test: /\bsku\b|c[oó]digo de producto|referencia/i, special: "sku" },
-    { test: /\bean\b|c[oó]digo de barras/i, special: "ean" },
-    { test: /precio|costo|cu[aá]nto sale|cu[aá]nto cuesta|vale/i, special: "precio" },
-    { test: /\bstock\b|\bdisponibilidad\b|\bdisponibles?\b|\bqueda(n)? (alguno|unidades|stock)\b/i, special: "stock" },
-    { test: /colore?s?\b|variante|viene en otro color/i, special: "variantes" },
-    { test: /compatible|se puede usar con|anda con/i, special: "compatible" },
-    { test: /qu[eé] (tipo de )?protecci[oó]n (tiene|posee|ofrece)|nivel de protecci[oó]n/i, special: "proteccion" },
-  ];
-
-  function specialAnswer(kind, question) {
-    const ctx = window.__mlProductCtx || PRODUCT_CTX;
-    switch (kind) {
-      case "ficha":
-        return ctx.ficha
-          ? `Podés descargar la <a href="${ctx.ficha}" target="_blank" rel="noopener">ficha técnica (PDF)</a> desde esta misma página.`
-          : null;
-      case "manual":
-        return ctx.manual
-          ? `Acá tenés el <a href="${ctx.manual}" target="_blank" rel="noopener">manual / guía de instalación</a>.`
-          : null;
-      case "sku":
-        return ctx.sku ? `El SKU de este producto es <b>${ctx.sku}</b>.` : null;
-      case "ean":
-        return ctx.ean13 ? `El código EAN-13 es <b>${ctx.ean13}</b>.` : null;
-      case "precio":
-      case "stock":
-        return `Para precio y disponibilidad te recomiendo escribirnos desde <a href="${CONTACTO_URL}" target="_blank" rel="noopener">nuestro formulario de contacto</a>, así te asesoran con el dato actualizado.`;
-      case "variantes": {
-        // Antes agarraba TODOS los .variant-chip de la página sin filtrar,
-        // así que si el producto tenía variantes de Color Y de Temperatura
-        // las mezclaba en una sola lista (ej: "Azul, 2200K, 2700K..."). Ahora
-        // apuntamos al grupo de variante correcto según lo que preguntaron.
-        const groups = Array.from(document.querySelectorAll(".variant-group"));
-        if (!groups.length) return null;
-
-        const wantsColor = /color/i.test(question);
-        let target = groups[0];
-        if (wantsColor) {
-          const colorGroup = groups.find((g) => /color/i.test(g.querySelector(".variant-label")?.textContent || ""));
-          if (colorGroup) target = colorGroup;
-        }
-
-        const chips = target.querySelectorAll(".variant-chip");
-        if (!chips.length) return null;
-        const valores = Array.from(chips).map((c) => c.textContent.trim());
-        const labelText = (target.querySelector(".variant-label")?.textContent || "Variante").trim();
-        return `Este modelo tiene estas opciones de ${labelText.toLowerCase()} disponibles: <b>${valores.join(", ")}</b>. Podés cambiarlas arriba, en la ficha.`;
-      }
-      case "compatible":
-        return null; // sin dato local confiable -> que lo resuelva la Capa 2
-      case "proteccion": {
-        // Pregunta genérica ("¿qué protección tiene?"): combina IP e IK si
-        // el producto tiene los dos cargados, no solo uno. Las preguntas
-        // puntuales ("¿es IP44?" / "¿resiste golpes?") siguen matcheando
-        // las reglas de arriba y responden solo lo que preguntaron.
-        const ip = (ctx.specs["Protección IP"] || "").trim();
-        const ik = (ctx.specs["Protección IK"] || "").trim();
-        const partes = [];
-        if (hasSpecValue(ip)) {
-          const meaning = IP_MEANINGS[normKey(ip).replace(/\s+/g, "")];
-          partes.push(`protección <b>${ip}</b>${meaning ? ` (${meaning})` : ""}`);
-        }
-        if (hasSpecValue(ik)) partes.push(`protección contra impactos <b>${ik}</b>`);
-        if (!partes.length) return null;
-        return `Este producto tiene ${partes.join(" y ")}.`;
-      }
-      default:
-        return null;
-    }
-  }
-
-  /* —— "No aplica para este tipo de producto" ——
-     Antes de rendirnos con genericSpecMatch, chequeamos si la pregunta
-     apunta a una CATEGORÍA completa de specs (eléctricas, lumínicas,
-     conectividad) que este producto ni siquiera tiene cargada — típico
-     de accesorios (artefactos para lámparas, portalámparas) o sensores,
-     que no tienen ficha eléctrica/lumínica propia. En ese caso avisamos
-     que no aplica, en vez de sonar como que nos falta el dato.
-     Se apoya en SPEC_GROUPS, que ya define esas categorías más arriba. */
-  const GROUP_INTENT_TESTS = [
-    { test: /el[eé]ctric|voltaje|tensi[oó]n|potenc|watt|amper|driver|corriente|frecuencia\b/i,
-      groupTitle: "Características eléctricas" },
-    { test: /lumin|lumen|\bluz\b|kelvin|\bcri\b|\bled\b|apertura|[aá]ngulo|vida [uú]til/i,
-      groupTitle: "Características lumínicas" },
-    { test: /conectividad|wifi|wi-fi|bluetooth|zigbee|\brf\b|\bapp\b|\bsmart\b|asistente de voz/i,
-      groupTitle: "Características de conectividad" },
-  ];
-
-  function groupHasAnyValue(groupTitle, specs) {
-    const group = SPEC_GROUPS.find((g) => g.title === groupTitle);
-    if (!group) return true; // si no reconocemos el grupo, no bloqueamos la respuesta
-    return group.rows.some((row) => hasSpecValue(lookupSpec(specs, row.key)));
-  }
-
-  function categoryFallback(question, specs) {
-    for (const g of GROUP_INTENT_TESTS) {
-      if (!g.test.test(question)) continue;
-      if (groupHasAnyValue(g.groupTitle, specs)) continue; // sí tiene datos de esa categoría, no es esto
-      return noDataFallbackMsg();
-    }
-    return null;
-  }
-
-  /* —— Búsqueda genérica sobre TODOS los specs cargados en la ficha ——
-     Cuando ninguna regla curada matchea (o matchea pero no hay dato),
-     probamos encontrar el spec correcto por superposición de palabras
-     clave, en vez de rendirnos directo a "no tengo esa info". */
-  const SPEC_STOPWORDS = new Set([
-    "el", "la", "los", "las", "de", "del", "que", "es", "son", "tiene",
-    "tienen", "cual", "cuales", "como", "con", "para", "por", "este",
-    "esta", "estos", "estas", "producto", "modelo", "me", "podes", "podés",
-    "decime", "dato", "datos", "info", "informacion", "información", "un",
-    "una", "unos", "unas", "y", "o", "en", "se", "puede", "pueden", "sabes",
-    "sabés", "vos", "cuánto", "cuanto", "cuánta", "cuanta", "qué", "que",
-    /* Conectores que aparecen en decenas de nombres de spec ("Tipo de X",
-       "Color de X") y por sí solos no distinguen nada — si los dejamos,
-       cualquier pregunta con "tipo" matchea el primer spec que empiece
-       con "Tipo de ...", aunque no tenga relación real con la pregunta. */
-    "tipo", "tipos", "usa", "usan", "usás", "usas", "utiliza", "utilizan",
-    "viene", "vienen", "trae", "incluye", "incluyen",
-  ]);
-
-  function normalizeForSearch(s) {
-    return normKey(s).replace(/[^a-z0-9\s]/g, " ").trim();
-  }
-
-  /* Misma limpieza para la pregunta Y para el nombre del spec, así "tipo"
-     o "de" no cuentan como coincidencia real en ninguno de los dos lados. */
-  function meaningfulTokens(s) {
-    return normalizeForSearch(s)
-      .split(/\s+/)
-      .filter((t) => t.length > 2 && !SPEC_STOPWORDS.has(t));
-  }
-
-  function questionTokens(q) {
-    return meaningfulTokens(q);
-  }
-
-  function genericSpecMatch(question) {
-    const ctx = window.__mlProductCtx || PRODUCT_CTX;
-    const specs = ctx.specs || {};
-    const qTokens = questionTokens(question);
-    if (!qTokens.length) return null;
-
-    let best = null;
-    let bestScore = 0;
-
-    Object.keys(specs).forEach((key) => {
-      const val = (specs[key] || "").trim();
-      if (!hasSpecValue(val)) return;
-      const keyTokens = meaningfulTokens(key);
-      if (!keyTokens.length) return; // la key quedó vacía tras sacar conectores -> no comparable
-      let score = 0;
-      qTokens.forEach((qt) => {
-        if (keyTokens.some((kt) => kt === qt || kt.startsWith(qt) || qt.startsWith(kt))) score++;
-      });
-      if (score > bestScore) {
-        bestScore = score;
-        best = { key, val };
-      }
-    });
-
-    return best ? `<b>${best.key}</b>: ${best.val}.` : null;
-  }
-
-  /**
-   * Intenta responder SOLO con datos locales. Devuelve HTML de respuesta,
-   * o null si no encontramos nada (ni en las reglas curadas ni en la
-   * búsqueda genérica), así el flujo principal sabe que tiene que ir a
-   * la Capa 2.
-   */
-  function localAnswer(question) {
-    const ctx = window.__mlProductCtx || PRODUCT_CTX;
-    const specs = ctx.specs || {};
-
-    for (const regla of REGLAS_LOCALES) {
-      if (!regla.test.test(question)) continue;
-
-      if (regla.special) {
-        const resp = specialAnswer(regla.special, question);
-        if (resp) return resp;
-        continue; // esta regla matcheó pero no hay dato -> seguir probando otras
-      }
-
-      const val = (specs[regla.key] || "").trim();
-      if (hasSpecValue(val)) return regla.tpl(val, specs);
-      // matcheó la intención pero no hay dato cargado para este SKU -> seguir
-    }
-
-    // Antes de rendirnos: ¿la pregunta apunta a una categoría entera
-    // (eléctricas / lumínicas / conectividad) que este producto no tiene?
-    const categoria = categoryFallback(question, specs);
-    if (categoria) return categoria;
-
-    // Ninguna regla curada respondió: buscamos en TODOS los specs de la
-    // ficha antes de rendirnos y pasar a la Capa 2.
-    return genericSpecMatch(question);
-  }
 
   /**
    * Mensaje de fallback de la Capa 2 (se lo pasamos al motor genérico como
@@ -2530,14 +2230,8 @@
   }
 
   /* —— Motor del asistente ——
-     Copiado tal cual de productos/script.js (window.MacroledAssistant.init)
-     para que ambas páginas usen el mismo motor: mismo webhook, mismo
-     timeout, mismo parseo de respuesta y el mismo sessionId por carga de
-     página para que n8n pueda mantener memoria de la conversación (la
-     ficha no lo mandaba antes). Lo único propio de esta página es la
-     config que se le pasa a initAssistant() más abajo (greeting,
-     localAnswer con los specs del producto, suggestions dinámicas y el
-     payload/fallback con el contexto del SKU). */
+     Mismo webhook y parseo que productos. Todas las preguntas van a la IA;
+     el payload incluye el SKU de la ficha que el usuario está viendo. */
   const N8N_WEBHOOK_URL = "https://n8n.coresagroup.com/webhook/macroled-ia";
   const AI_TIMEOUT_MS = 12000;
 
@@ -2556,7 +2250,6 @@
   function initAssistant(options) {
     options = options || {};
     const getPayload = typeof options.getPayload === "function" ? options.getPayload : (q) => ({ pregunta: q });
-    const localAnswerFn = typeof options.localAnswer === "function" ? options.localAnswer : null;
     const getSuggestions = typeof options.suggestions === "function" ? options.suggestions : () => [];
     const fallbackHtml = typeof options.fallbackHtml === "function" ? options.fallbackHtml : defaultFallbackHtml;
     const greeting = options.greeting || "Hola, soy el asistente de <b>productos Macroled</b>.";
@@ -2725,10 +2418,7 @@
     }
 
     /**
-     * Flujo principal: si la página dio un localAnswer (Capa 1, gratis e
-     * instantánea), se prueba primero; si no hay dato o la página no la
-     * definió, va directo a la Capa 2 (agente con IA sobre el catálogo
-     * completo).
+     * Todas las preguntas van al agente. El SKU de la ficha viaja en el payload.
      */
     async function ask(question) {
       const q = question.trim();
@@ -2741,16 +2431,7 @@
       aiTyping.classList.add("is-on");
       aiForm.querySelector(".ai-send").disabled = true;
 
-      let respuesta = localAnswerFn ? localAnswerFn(q) : null;
-
-      if (respuesta) {
-        // Capa 1: gratis e instantánea, pero dejamos un pequeño delay
-        // para que no se sienta robótico / demasiado abrupto.
-        await new Promise((r) => setTimeout(r, 300 + Math.random() * 250));
-      } else {
-        // Capa 2: agente con IA sobre el catálogo completo
-        respuesta = await askAI(q);
-      }
+      const respuesta = await askAI(q);
 
       aiTyping.classList.remove("is-on");
       addMsg("bot", respuesta);
@@ -2822,14 +2503,21 @@
   }
   window.addEventListener("load", hardenCtaUtility);
 
-  /* Copia fiel de productos/script.js: mismo greeting
-     y mismo payload/fallback por defecto del motor (sin datos del SKU).
-     Lo único propio de la ficha es localAnswer (Capa 1 con los specs del
-     producto actual, definido más arriba) — no se ve en el panel, solo
-     responde más rápido cuando puede. */
+  function getFichaPayload(question) {
+    const ctx = window.__mlProductCtx || PRODUCT_CTX || {};
+    const skuFromDom = (document.getElementById("ficha-sku") || {}).textContent || "";
+    return {
+      pregunta: question,
+      contexto: "ficha",
+      sku: String(ctx.sku || skuFromDom).trim(),
+      nombre: String(ctx.name || "").trim(),
+    };
+  }
+
   const assistant = initAssistant({
     greeting: `Hola, soy el asistente de <b>productos Macroled</b>. Preguntame por un producto, SKU o característica y te ayudo a encontrarlo.`,
-    localAnswer: localAnswer,
+    getPayload: getFichaPayload,
+    fallbackHtml: noDataFallbackMsg,
   });
 
   /* —— Share —— */

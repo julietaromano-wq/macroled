@@ -151,8 +151,8 @@
         title: "Casa FOA 2026, Edición Pocito",
         description: "Formamos parte de uno de los eventos de diseño más reconocidos del país, aportando luminarias LED que realzan texturas, colores y ambientes en proyectos de alto nivel estético.",
         href: "/novedades/casa-foa-2026-pocito",
-        image: "https://www.casafoa.com/landing/wp-content/uploads/2026/04/Espacio-21-Casa-FOA-Juan-Cruz-Paredes-2.webp",
-        hoverImage: "https://www.casafoa.com/landing/wp-content/uploads/2026/04/Espacio-17-Casa-FOA-Juan-Cruz-Paredes-4.webp"
+        image: "https://cdn.prod.website-files.com/66298c6904f627b9b69307c7/6a79f74fcfa63a1d3bc495b9_Espacio-13-Casa-FOA-2026-Juan-Cruz-Paredes-1.webp",
+        hoverImage: "https://cdn.prod.website-files.com/66298c6904f627b9b69307c7/6a79f7562c2172c4662fdc88_Espacio-26-Casa-FOA-2026-Juan-Cruz-Paredes-1.webp"
       },
       {
         title: "Expo Construir",
