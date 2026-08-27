@@ -1831,6 +1831,42 @@
     return best;
   }
 
+  /* El campo "Familia" del CMS (ej. "Galponeras Standard") es más fino que
+     el facet "familia" que filtra /nuevo-productos (ej. "Galponeras") — son
+     taxonomías distintas. Linkear con el valor del CMS deja el filtro sin
+     resultados. Se resuelve el valor real contra Typesense por SKU. */
+  const TS_HOST = "https://typesense.coresagroup.com";
+  const TS_API_KEY = "g0oiNYY8THGuU9jnCsvqIH1X9HtvYRCR";
+  const TS_COLLECTION = "Macroled_Prueba";
+  const familiaCache = Object.create(null);
+
+  async function fetchLiveFamilia(sku) {
+    if (!sku) return null;
+    if (familiaCache[sku] !== undefined) return familiaCache[sku];
+    try {
+      const params = new URLSearchParams({
+        q: "*",
+        query_by: "sku",
+        filter_by: `sku:=${JSON.stringify(sku)}`,
+        per_page: "1",
+      });
+      const res = await fetch(
+        `${TS_HOST}/collections/${encodeURIComponent(TS_COLLECTION)}/documents/search?${params}`,
+        { headers: { "X-TYPESENSE-API-KEY": TS_API_KEY } }
+      );
+      if (!res.ok) throw new Error(`Typesense ${res.status}`);
+      const data = await res.json();
+      const doc = (data.hits || [])[0] && data.hits[0].document;
+      const result = doc && doc.familia ? { familia: doc.familia, macrofamilia: doc.macrofamilia || "" } : null;
+      familiaCache[sku] = result;
+      return result;
+    } catch (err) {
+      console.warn("[crumb] no se pudo resolver la familia real desde Typesense", err);
+      familiaCache[sku] = null;
+      return null;
+    }
+  }
+
   function setCrumbFamilyLink(macro, family) {
     const familyLink = document.getElementById("crumb-family");
     if (!familyLink) return;
@@ -1842,6 +1878,18 @@
     } else {
       familyLink.removeAttribute("href");
     }
+  }
+
+  function applyCrumbFamily(sku, macro, family) {
+    // Fallback inmediato con lo que ya tenemos del CMS, mientras se resuelve
+    // el valor real (evita que el breadcrumb quede vacío mientras carga).
+    setText("#crumb-family", family);
+    setCrumbFamilyLink(macro, family);
+    fetchLiveFamilia(sku).then((live) => {
+      if (!live) return;
+      setText("#crumb-family", live.familia);
+      setCrumbFamilyLink(live.macrofamilia || macro, live.familia);
+    });
   }
 
   function applyProduct(el, opts) {
@@ -1881,8 +1929,7 @@
     if (macro || family) {
       setText("#ficha-eyebrow", [macro, family].filter(Boolean).join(" · "));
     }
-    setText("#crumb-family", family);
-    setCrumbFamilyLink(macro, family);
+    applyCrumbFamily(sku, macro, family);
     setText("#aiProductName", name);
     setText("#aiProductMeta", `SKU ${sku}${macro ? " · " + macro : ""}`);
 
