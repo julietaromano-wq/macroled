@@ -7515,6 +7515,7 @@ body.assistant-open .ai-launch {
 .ai-messages {
   flex: 1;
   overflow-y: auto;
+  overflow-x: hidden;
   padding: 18px 20px;
   display: flex;
   flex-direction: column;
@@ -7522,9 +7523,12 @@ body.assistant-open .ai-launch {
 }
 
 .ai-msg {
+  min-width: 0;
   max-width: 92%;
   font-size: 13.5px;
   line-height: 1.5;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .ai-msg.bot {
@@ -7538,6 +7542,10 @@ body.assistant-open .ai-launch {
 .ai-bubble {
   padding: 12px 14px;
   border-radius: 12px;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  overflow-x: hidden;
+  max-width: 100%;
 }
 
 .ai-msg.bot .ai-bubble {
@@ -7556,6 +7564,8 @@ body.assistant-open .ai-launch {
   color: var(--btn-blue);
   font-weight: 600;
   text-decoration: underline;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .ai-typing {

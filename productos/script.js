@@ -393,6 +393,11 @@ let potenciaOptions = []; // { value, watts }
 let potenciaBounds = { min: 0, max: 1800 };
 let potenciaRangeTimer = null;
 
+/* SKUs Smart: el campo `smart` se guarda en el documento (la pastilla lo lee)
+   pero no está en el índice filtrable de Typesense (`smart:=Si` da 0). */
+let smartSkuOptions = [];
+let smartSkuPromise = null;
+
 function parseWatts(str){
   if(str == null || str === "") return null;
   const m = String(str).match(/(\d+(?:[.,]\d+)?)/);
@@ -416,12 +421,6 @@ function potenciaFilterClause(min, max){
   return `${POTENCIA_RAW_FIELD}:=[${escaped}]`;
 }
 
-/* Campo `smart` en Typesense: "Si"/"No" o boolean. La pastilla recorta y
-   acepta true; el filtro tiene que cubrir las dos formas o no encuentra nada. */
-const SMART_ATTR_FIELD = "smart";
-const SMART_YES_VALUES = ["Si", "Sí", "SI", "si", "sí", "true", "True", "TRUE", "1", "Yes", "yes"];
-const SMART_ATTR2_VALUES = ["Si", "Sí", "SI", "si", "sí", "Smart", "smart", "SMART"];
-
 function isSmartYesValue(value){
   if(value === true || value === 1) return true;
   const v = String(value == null ? "" : value).trim().toLowerCase()
@@ -435,13 +434,59 @@ function isProductSmart(doc){
   return isSmartYesValue(doc.attr2);
 }
 
+function isProductNuevo(doc){
+  if(!doc) return false;
+  const raw = doc.nuevo;
+  if(raw === true || raw === 1) return true;
+  const v = String(raw == null ? "" : raw).trim().toLowerCase()
+    .normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+  return v === "si" || v === "true" || v === "1" || v === "yes" || v === "nuevo";
+}
+
 function smartFilterClause(enabled){
   if(!enabled) return null;
-  const smartVals = SMART_YES_VALUES.map(v => `\`${v}\``).join(",");
-  const attr2Vals = SMART_ATTR2_VALUES.map(v => `\`${v}\``).join(",");
-  // Pastilla: lee smart / es_smart / attr2 (true o "Si"). Typesense exige
-  // match exacto; si el campo es boolean, :=Si no encuentra ninguno.
-  return `(${SMART_ATTR_FIELD}:true || ${SMART_ATTR_FIELD}:=[${smartVals}] || attr2:=[${attr2Vals}])`;
+  if(!smartSkuOptions.length) return `sku:=[\`__sin_resultados_smart__\`]`;
+  const escaped = smartSkuOptions.map(v => `\`${String(v).replace(/`/g, "")}\``).join(",");
+  return `sku:=[${escaped}]`;
+}
+
+async function loadSmartSkuOptions(){
+  if(smartSkuPromise) return smartSkuPromise;
+  smartSkuPromise = (async () => {
+    const skus = [];
+    const perPage = 250;
+    let page = 1;
+    let found = Infinity;
+    try{
+      while((page - 1) * perPage < found && page <= 50){
+        const params = new URLSearchParams({
+          q: "*",
+          query_by: "nombre_typesense,sku,descripcion",
+          filter_by: BASE_FILTER,
+          per_page: String(perPage),
+          page: String(page),
+          include_fields: "sku,smart,es_smart,attr2"
+        });
+        const res = await fetch(`${TS_HOST}/collections/${COLLECTION}/documents/search?${params.toString()}`, {
+          headers: { "X-TYPESENSE-API-KEY": TS_API_KEY }
+        });
+        if(!res.ok) break;
+        const data = await res.json();
+        found = Number(data.found) || 0;
+        (data.hits || []).forEach(hit => {
+          const doc = hit.document || {};
+          if(doc.sku && isProductSmart(doc)) skus.push(String(doc.sku));
+        });
+        if(!(data.hits || []).length) break;
+        page++;
+      }
+      smartSkuOptions = skus;
+    }catch(err){
+      console.error("No se pudo armar el índice Smart:", err);
+      smartSkuOptions = [];
+    }
+  })();
+  return smartSkuPromise;
 }
 
 function smartSwitchHtml(checked, ariaLabel){
@@ -576,6 +621,34 @@ async function loadMacrofamiliaOptions(){
 /* =========================================================
    TYPESENSE FETCH
    ========================================================= */
+const TS_FILTER_GET_MAX = 1800;
+
+async function typesenseDocumentsSearch(params, signal){
+  const headers = { "X-TYPESENSE-API-KEY": TS_API_KEY };
+  const filterBy = params.get("filter_by") || "";
+  if(filterBy.length <= TS_FILTER_GET_MAX){
+    const url = `${TS_HOST}/collections/${COLLECTION}/documents/search?${params.toString()}`;
+    return fetch(url, { headers, signal });
+  }
+  const search = {};
+  params.forEach((value, key) => { search[key] = value; });
+  const res = await fetch(`${TS_HOST}/multi_search`, {
+    method: "POST",
+    headers: { ...headers, "Content-Type": "application/json" },
+    signal,
+    body: JSON.stringify({ searches: [{ collection: COLLECTION, ...search }] })
+  });
+  const payload = await res.json().catch(() => ({}));
+  const inner = (payload && payload.results && payload.results[0]) || payload || {};
+  const ok = res.ok && !inner.error;
+  return {
+    ok,
+    status: inner.code || res.status,
+    json: async () => inner,
+    text: async () => inner.error || JSON.stringify(inner)
+  };
+}
+
 async function searchTypesense(){
   // Si hay una búsqueda anterior todavía en vuelo, la cancelamos: su
   // respuesta ya no nos importa y evita que pise el estado más reciente
@@ -584,6 +657,8 @@ async function searchTypesense(){
   if(currentSearchController) currentSearchController.abort();
   currentSearchController = new AbortController();
   const { signal } = currentSearchController;
+
+  if(state.smartOnly) await loadSmartSkuOptions();
 
   const activeMacro = [...state.selected.macrofamilia][0];
   const activeFamilia = state.selected.familia.size > 0;
@@ -642,16 +717,13 @@ async function searchTypesense(){
   if(filterParts.length) params.set("filter_by", filterParts.join(" && "));
   if(state.sortBy) params.set("sort_by", state.sortBy);
 
-  const url = `${TS_HOST}/collections/${COLLECTION}/documents/search?${params.toString()}`;
-
   try{
-    const res = await fetch(url, { headers: { "X-TYPESENSE-API-KEY": TS_API_KEY }, signal });
+    const res = await typesenseDocumentsSearch(params, signal);
     if(!res.ok){
       if(activeMacro && (facetFields.includes(SUBFAMILIA_FIELD) || facetFields.includes(FAMILIA_FIELD))){
         console.warn("Facet 'subfamilia' o 'familia' no disponible en Typesense todavía, reintentando sin ellas.");
         params.set("facet_by", FACET_FIELDS.join(","));
-        const retryUrl = `${TS_HOST}/collections/${COLLECTION}/documents/search?${params.toString()}`;
-        const retryRes = await fetch(retryUrl, { headers: { "X-TYPESENSE-API-KEY": TS_API_KEY }, signal });
+        const retryRes = await typesenseDocumentsSearch(params, signal);
         if(retryRes.ok) return await retryRes.json();
       }
       const errText = await res.text();
@@ -1240,19 +1312,10 @@ function buildSpecs(doc){
 // nombre exacto de la columna apenas esté confirmado.
 const ATTR_VARIANTES_FIELD = "attr_variantes";
 
-// Nombre real del campo de Typesense para "Cant variantes" — reemplazar
-// por el nombre exacto de la columna apenas esté confirmado.
-const CANT_VARIANTES_FIELD = "cant_variantes";
-
-// Tag "N variantes" arriba a la izquierda cuando el producto tiene dato
-// cargado en ese campo (distinto del conteo por `variantes_sku` que ya usa
-// el badge de arriba a la derecha)
-function buildVariantesBadge(doc){
-  const raw = doc[CANT_VARIANTES_FIELD];
-  if(raw === undefined || raw === null || raw === "") return "";
-  const num = parseInt(raw, 10);
-  if(!num || num <= 0) return "";
-  return `<span class="count-badge">${num} variantes</span>`;
+// Tag "Nuevo" arriba a la izquierda cuando el campo nuevo es Sí/true
+function buildNuevoBadge(doc){
+  if(!isProductNuevo(doc)) return "";
+  return `<span class="badge">Nuevo</span>`;
 }
 
 // Tag "SMART" arriba a la derecha cuando el campo smart es Sí/Si
@@ -1566,7 +1629,6 @@ function cardTemplate(doc){
   const imgs = parseImages(doc);
   const firstImg = imgs[0] || "";
   const optimizedImgs = imgs.map(i => optimizeImg(i, "500x500"));
-  const nVariants = Array.isArray(doc.variantes_sku) ? doc.variantes_sku.length : 0;
 
   const specs = buildSpecs(doc);
   const specsHtml = specs.length
@@ -1578,14 +1640,14 @@ function cardTemplate(doc){
   const productHref = doc.link_ficha_web || "";
   const sku = (doc.sku || doc.id || "").toString();
   const escAttr = (s) => (s || "").toString().replace(/"/g, "&quot;");
-  const badgeHtml = nVariants > 1 ? `<span class="badge">${nVariants} variantes</span>` : "";
   const tempHtml = buildLuzMediaDots(doc);
-  const metaInner = `${badgeHtml}${tempHtml}`;
+  const metaInner = tempHtml;
 
   return `
     <div class="card"${productHref ? ` role="link" tabindex="0"` : ""} data-sku="${escAttr(sku)}"${productHref ? ` data-href="${escAttr(productHref)}"` : ""}>
       <div class="media">
         <div class="media-frame">
+          ${buildNuevoBadge(doc)}
           <div class="media-badges-left">
             ${buildSmartBadge(doc)}
           </div>
@@ -2031,7 +2093,7 @@ function renderCategoryHeading(){
   let title = "Productos";
   if(state.query) title = `Resultados para "${state.query}"`;
   else if(subfamilias.length === 1) title = subfamilias[0];
-  else if(subfamilias.length >= 2) title = "Galponeras";
+  else if(subfamilias.length >= 2) title = active || activeFamilia || "Productos";
   else if(activeFamilia) title = activeFamilia;
   else if(active) title = active;
 
@@ -2164,18 +2226,19 @@ if(searchInput){
     loadAndRender();
   });
 }
-document.getElementById("btnGrid").addEventListener("click", () => {
-  state.view = "grid";
-  document.getElementById("grid").classList.remove("list");
-  document.getElementById("btnGrid").classList.add("active");
-  document.getElementById("btnList").classList.remove("active");
-});
-document.getElementById("btnList").addEventListener("click", () => {
-  state.view = "list";
-  document.getElementById("grid").classList.add("list");
-  document.getElementById("btnList").classList.add("active");
-  document.getElementById("btnGrid").classList.remove("active");
-});
+function applyCatalogView(view){
+  const next = view === "list" ? "list" : "grid";
+  state.view = next;
+  const grid = document.getElementById("grid");
+  if(grid) grid.classList.toggle("list", next === "list");
+  const btnGrid = document.getElementById("btnGrid");
+  const btnList = document.getElementById("btnList");
+  if(btnGrid) btnGrid.classList.toggle("active", next === "grid");
+  if(btnList) btnList.classList.toggle("active", next === "list");
+}
+
+document.getElementById("btnGrid").addEventListener("click", () => applyCatalogView("grid"));
+document.getElementById("btnList").addEventListener("click", () => applyCatalogView("list"));
 
 document.getElementById("compareBarHeader").addEventListener("click", () => {
   state.compareCollapsed = !state.compareCollapsed;
@@ -2314,7 +2377,7 @@ function renderMobileFilters(facetCounts){
   const activeMacro = [...state.pending.macrofamilia][0];
 
   const rows = [
-    { field: "sort", label: "Ordenar por", summary: currentSortLabel() },
+    { field: "view", label: "Tipo de vista", summary: state.view === "list" ? "Lista" : "Grilla" },
     { field: "smart", type: "switch", label: "Smart" }
   ];
 
@@ -2428,13 +2491,13 @@ async function updatePendingResultsCount(){
   }
   const potClause = potenciaFilterClause(state.pendingPotenciaMin, state.pendingPotenciaMax);
   if(potClause) filterParts.push(potClause);
+  if(state.pendingSmartOnly) await loadSmartSkuOptions();
   const smartClause = smartFilterClause(state.pendingSmartOnly);
   if(smartClause) filterParts.push(smartClause);
   const params = new URLSearchParams({ q: state.query || "*", query_by: "nombre_typesense,sku,descripcion", per_page: "1", page: "1" });
   if(filterParts.length) params.set("filter_by", filterParts.join(" && "));
-  const url = `${TS_HOST}/collections/${COLLECTION}/documents/search?${params.toString()}`;
   try{
-    const res = await fetch(url, { headers: { "X-TYPESENSE-API-KEY": TS_API_KEY } });
+    const res = await typesenseDocumentsSearch(params);
     if(!res.ok) return;
     const data = await res.json();
     if(filtersApply) filtersApply.textContent = `Ver ${data.found} resultado${data.found === 1 ? "" : "s"}`;
@@ -2447,7 +2510,25 @@ function openDetailScreen(field){
   const titleEl = document.getElementById("fmnDetailTitle");
   const bodyEl = document.getElementById("fmnDetailBody");
 
-  if(field === "sort"){
+  if(field === "view"){
+    titleEl.textContent = "Tipo de vista";
+    bodyEl.classList.remove("fmn-color-swatches");
+    const options = [
+      { value: "grid", label: "Grilla" },
+      { value: "list", label: "Lista" }
+    ];
+    bodyEl.innerHTML = options.map(o => `
+      <div class="fmn-option-row${state.view === o.value ? " active" : ""}" data-value="${o.value}">
+        <span class="fmn-radio"></span><span>${o.label}</span>
+      </div>
+    `).join("");
+    bodyEl.querySelectorAll(".fmn-option-row").forEach(row => {
+      row.addEventListener("click", () => {
+        applyCatalogView(row.dataset.value);
+        closeFiltersDrawer();
+      });
+    });
+  } else if(field === "sort"){
     titleEl.textContent = "Ordenar por";
     const select = document.getElementById("sortSelect");
     const options = [...select.options].filter(o => o.value !== "");
@@ -2702,6 +2783,7 @@ function syncFiltersToURL(){
 
 applyStateFromURL();
 loadMacrofamiliaOptions();
+loadSmartSkuOptions();
 loadPotenciaOptions().then(() => {
   const appliedPot = applyPendingUrlPotencia();
   if(!appliedPot) resetPotenciaRange();
@@ -2762,14 +2844,16 @@ if(typeof requestIdleCallback === "function"){
   const N8N_WEBHOOK_URL = "https://n8n.coresagroup.com/webhook/macroled-ia";
   const AI_TIMEOUT_MS = 12000;
 
-  /* Id de sesión: uno por carga de página, se manda en cada request al webhook
-     para que n8n pueda mantener memoria de la conversación (nodo Memory con
-     Session Key = {{ $json.body.sessionId }}). */
-  window.MacroledSessionId =
-    window.MacroledSessionId ||
-    (window.crypto && crypto.randomUUID
-      ? crypto.randomUUID()
-      : `sid-${Date.now()}-${Math.random().toString(36).slice(2)}`);
+  /* Id de sesión: uno por carga de página, solo en memoria. Al refrescar
+     arranca conversación nueva. Si el webhook responde resetSession,
+     se genera uno nuevo al toque. */
+  function newSessionId() {
+    return window.crypto && window.crypto.randomUUID
+      ? window.crypto.randomUUID()
+      : `sid-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+  }
+
+  window.MacroledSessionId = window.MacroledSessionId || newSessionId();
 
   function defaultFallbackHtml() {
     return "No pude encontrar información sobre esa consulta en este momento.";
@@ -2802,6 +2886,7 @@ if(typeof requestIdleCallback === "function"){
     let aiBusy = false;
     let aiLastTrigger = null;
     const usedSuggestions = new Set();
+    let askedCount = 0;
 
     function openAssistant(trigger) {
       aiLastTrigger = trigger || document.activeElement;
@@ -2841,16 +2926,68 @@ if(typeof requestIdleCallback === "function"){
       }, 280);
     }
 
+    function linkifyHtml(html) {
+      const wrap = document.createElement("div");
+      wrap.innerHTML = html;
+      function walk(node) {
+        if (node.nodeType === 3) {
+          const text = node.nodeValue;
+          const re = /\b((?:https?:\/\/|www\.)[^\s<]+)/gi;
+          if (!re.test(text)) return;
+          re.lastIndex = 0;
+          const frag = document.createDocumentFragment();
+          let last = 0;
+          let match;
+          while ((match = re.exec(text))) {
+            if (match.index > last) {
+              frag.appendChild(document.createTextNode(text.slice(last, match.index)));
+            }
+            let raw = match[1];
+            const punct = raw.match(/[),.;:!?]+$/);
+            let hrefSrc = raw;
+            let extra = "";
+            if (punct) {
+              hrefSrc = raw.slice(0, -punct[0].length);
+              extra = punct[0];
+            }
+            const a = document.createElement("a");
+            a.href = /^https?:\/\//i.test(hrefSrc) ? hrefSrc : "https://" + hrefSrc;
+            a.target = "_blank";
+            a.rel = "noopener noreferrer";
+            a.textContent = hrefSrc;
+            frag.appendChild(a);
+            if (extra) frag.appendChild(document.createTextNode(extra));
+            last = match.index + raw.length;
+          }
+          if (last < text.length) frag.appendChild(document.createTextNode(text.slice(last)));
+          node.parentNode.replaceChild(frag, node);
+        } else if (node.nodeType === 1) {
+          if (node.tagName === "A") {
+            node.setAttribute("target", "_blank");
+            node.setAttribute("rel", "noopener noreferrer");
+            return;
+          }
+          Array.prototype.slice.call(node.childNodes).forEach(walk);
+        }
+      }
+      Array.prototype.slice.call(wrap.childNodes).forEach(walk);
+      return wrap.innerHTML;
+    }
+
     function addMsg(role, html) {
       const el = document.createElement("div");
       el.className = `ai-msg ${role}`;
-      el.innerHTML = `<div class="ai-bubble">${html}</div>`;
+      el.innerHTML = `<div class="ai-bubble">${role === "bot" ? linkifyHtml(html) : html}</div>`;
       aiMessages.appendChild(el);
       aiMessages.scrollTop = aiMessages.scrollHeight;
     }
 
     function renderSuggestions() {
       if (!aiSuggestions) return;
+      if (askedCount >= 2) {
+        aiSuggestions.innerHTML = "";
+        return;
+      }
       aiSuggestions.innerHTML = getSuggestions()
         .filter((s) => !usedSuggestions.has(s))
         .map((s) => `<button type="button" class="ai-chip">${s}</button>`)
@@ -2880,6 +3017,7 @@ if(typeof requestIdleCallback === "function"){
         // un array de 1 item ([{ respuesta: "..." }]) y a veces manda el
         // objeto suelto ({ respuesta: "..." }) — aceptamos las dos formas.
         const item = Array.isArray(data) ? data[0] : data;
+        if (item && item.resetSession) window.MacroledSessionId = newSessionId();
         const texto = item && (item.respuesta || item.output || item.answer);
         if (!texto) throw new Error("Respuesta vacía del agente");
 
@@ -2903,6 +3041,7 @@ if(typeof requestIdleCallback === "function"){
       if (!q || aiBusy) return;
       aiBusy = true;
       if (getSuggestions().includes(q)) usedSuggestions.add(q);
+      askedCount += 1;
       if (aiSuggestions) aiSuggestions.innerHTML = "";
       addMsg("user", q.replace(/</g, "&lt;"));
       aiTyping.classList.add("is-on");
@@ -2986,18 +3125,8 @@ if(typeof requestIdleCallback === "function"){
     return;
   }
 
-  /* Solo dos sugerencias fijas; al elegir una, el widget la saca de la lista. */
-  function buildCatalogSuggestions() {
-    return [
-      "¿Qué luz me conviene para un living?",
-      "Busco algo para iluminar un local comercial",
-    ];
-  }
-
-  /* Le manda al webhook la pregunta + los filtros/búsqueda activos en ese
-     momento, para que el agente tenga contexto de qué está mirando el
-     usuario (aunque el tool de búsqueda del agente ya resuelve bastante
-     esto solo, buscando en todo el catálogo). */
+  /* Sin sugerencias guía: el asistente se usa para buscar un producto concreto.
+     Le manda al webhook la pregunta + los filtros/búsqueda activos. */
   function getCatalogPayload(question) {
     const s = window.state || {};
     const selected = s.selected || {};
@@ -3022,8 +3151,7 @@ if(typeof requestIdleCallback === "function"){
 
   try {
     window.MacroledAssistant.init({
-      greeting: `Hola, soy el asistente de <b>productos Macroled</b>. Estoy para ayudarte a encontrar productos y soluciones según tus necesidades de iluminación.`,
-      suggestions: buildCatalogSuggestions,
+      greeting: `Hola, soy el asistente de <b>productos Macroled</b>. Preguntame por un producto, SKU o característica y te ayudo a encontrarlo.`,
       getPayload: getCatalogPayload,
       fallbackHtml: catalogFallbackHtml,
       // Sin "localAnswer": esta página siempre va directo a la Capa 2.
