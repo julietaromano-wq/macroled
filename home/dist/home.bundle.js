@@ -1892,11 +1892,13 @@
     }
   };
 
-  window.MacroledSessionId =
-    window.MacroledSessionId ||
-    (window.crypto && window.crypto.randomUUID
+  function newSessionId() {
+    return window.crypto && window.crypto.randomUUID
       ? window.crypto.randomUUID()
-      : `sid-${Date.now()}-${Math.random().toString(36).slice(2)}`);
+      : `sid-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+  }
+
+  window.MacroledSessionId = window.MacroledSessionId || newSessionId();
 
   const N8N_WEBHOOK_URL = "https://n8n.coresagroup.com/webhook/macroled-ia";
   const AI_TIMEOUT_MS = 12000;
@@ -1932,6 +1934,7 @@
     let aiBusy = false;
     let aiLastTrigger = null;
     const usedSuggestions = new Set();
+    let askedCount = 0;
 
     function openAssistant(trigger) {
       aiLastTrigger = trigger || document.activeElement;
@@ -1970,16 +1973,68 @@
       }, 280);
     }
 
+    function linkifyHtml(html) {
+      const wrap = document.createElement("div");
+      wrap.innerHTML = html;
+      function walk(node) {
+        if (node.nodeType === 3) {
+          const text = node.nodeValue;
+          const re = /\b((?:https?:\/\/|www\.)[^\s<]+)/gi;
+          if (!re.test(text)) return;
+          re.lastIndex = 0;
+          const frag = document.createDocumentFragment();
+          let last = 0;
+          let match;
+          while ((match = re.exec(text))) {
+            if (match.index > last) {
+              frag.appendChild(document.createTextNode(text.slice(last, match.index)));
+            }
+            let raw = match[1];
+            const punct = raw.match(/[),.;:!?]+$/);
+            let hrefSrc = raw;
+            let extra = "";
+            if (punct) {
+              hrefSrc = raw.slice(0, -punct[0].length);
+              extra = punct[0];
+            }
+            const a = document.createElement("a");
+            a.href = /^https?:\/\//i.test(hrefSrc) ? hrefSrc : "https://" + hrefSrc;
+            a.target = "_blank";
+            a.rel = "noopener noreferrer";
+            a.textContent = hrefSrc;
+            frag.appendChild(a);
+            if (extra) frag.appendChild(document.createTextNode(extra));
+            last = match.index + raw.length;
+          }
+          if (last < text.length) frag.appendChild(document.createTextNode(text.slice(last)));
+          node.parentNode.replaceChild(frag, node);
+        } else if (node.nodeType === 1) {
+          if (node.tagName === "A") {
+            node.setAttribute("target", "_blank");
+            node.setAttribute("rel", "noopener noreferrer");
+            return;
+          }
+          Array.prototype.slice.call(node.childNodes).forEach(walk);
+        }
+      }
+      Array.prototype.slice.call(wrap.childNodes).forEach(walk);
+      return wrap.innerHTML;
+    }
+
     function addMsg(role, html) {
       const el = document.createElement("div");
       el.className = `ai-msg ${role}`;
-      el.innerHTML = `<div class="ai-bubble">${html}</div>`;
+      el.innerHTML = `<div class="ai-bubble">${role === "bot" ? linkifyHtml(html) : html}</div>`;
       aiMessages.appendChild(el);
       aiMessages.scrollTop = aiMessages.scrollHeight;
     }
 
     function renderSuggestions() {
       if (!aiSuggestions) return;
+      if (askedCount >= 2) {
+        aiSuggestions.innerHTML = "";
+        return;
+      }
       aiSuggestions.innerHTML = getSuggestions()
         .filter((s) => !usedSuggestions.has(s))
         .map((s) => `<button type="button" class="ai-chip">${s}</button>`)
@@ -2000,6 +2055,7 @@
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const data = await res.json();
         const item = Array.isArray(data) ? data[0] : data;
+        if (item && item.resetSession) window.MacroledSessionId = newSessionId();
         const texto = item && (item.respuesta || item.output || item.answer);
         if (!texto) throw new Error("Respuesta vacía del agente");
         return String(texto).replace(/\n/g, "<br>");
@@ -2015,6 +2071,7 @@
       if (!q || aiBusy) return;
       aiBusy = true;
       if (getSuggestions().includes(q)) usedSuggestions.add(q);
+      askedCount += 1;
       if (aiSuggestions) aiSuggestions.innerHTML = "";
       addMsg("user", q.replace(/</g, "&lt;"));
       aiTyping.classList.add("is-on");
@@ -2069,13 +2126,6 @@
   "use strict";
   if (!window.MacroledAssistant) return;
 
-  function buildSuggestions() {
-    return [
-      "¿Qué luz me conviene para un living?",
-      "Busco algo para iluminar un local comercial",
-    ];
-  }
-
   function getPayload(question) {
     const s = window.state || {};
     const selected = s.selected || {};
@@ -2093,8 +2143,7 @@
   }
 
   window.MacroledAssistant.init({
-    greeting: `Hola, soy el asistente de <b>productos Macroled</b>. Estoy para ayudarte a encontrar productos y soluciones según tus necesidades de iluminación.`,
-    suggestions: buildSuggestions,
+    greeting: `Hola, soy el asistente de <b>productos Macroled</b>. Preguntame por un producto, SKU o característica y te ayudo a encontrarlo.`,
     getPayload,
     fallbackHtml: () => `No pude encontrar información sobre esa consulta. Probá con otra pregunta o explorá el catálogo.`,
   });

@@ -40,6 +40,14 @@
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="6" x2="20" y2="6"/><circle cx="9" cy="6" r="2.2" fill="#fff"/><line x1="4" y1="12" x2="20" y2="12"/><circle cx="16" cy="12" r="2.2" fill="#fff"/><line x1="4" y1="18" x2="20" y2="18"/><circle cx="11" cy="18" r="2.2" fill="#fff"/></svg>
         Filtros
       </button>
+      <select class="sort" id="sortSelect">
+        <option value="">Ordenar por</option>
+        <option value="nuevo:desc">Novedades primero</option>
+      </select>
+      <div class="view-toggle">
+        <button id="btnGrid" class="active" title="Vista grilla">▦</button>
+        <button id="btnList" title="Vista lista">☰</button>
+      </div>
     </div>
     <div class="count-row">
       <div class="count-row-left">
@@ -47,16 +55,6 @@
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="4" y1="6" x2="20" y2="6"/><circle cx="9" cy="6" r="2.2" fill="#fff"/><line x1="4" y1="12" x2="20" y2="12"/><circle cx="16" cy="12" r="2.2" fill="#fff"/><line x1="4" y1="18" x2="20" y2="18"/><circle cx="11" cy="18" r="2.2" fill="#fff"/></svg>
           Filtros
         </button>
-      </div>
-      <div class="toolbar-right">
-        <select class="sort" id="sortSelect">
-          <option value="">Ordenar por</option>
-          <option value="nuevo:desc">Novedades primero</option>
-        </select>
-        <div class="view-toggle">
-          <button id="btnGrid" class="active" title="Vista grilla">▦</button>
-          <button id="btnList" title="Vista lista">☰</button>
-        </div>
       </div>
     </div>
   </div>
@@ -162,7 +160,7 @@
   <div class="ai-typing" id="aiTyping" aria-hidden="true"><span></span><span></span><span></span></div>
   <div class="ai-suggestions" id="aiSuggestions"></div>
   <form class="ai-form" id="aiForm">
-    <input type="text" id="aiInput" placeholder="Escribí tu pregunta…" autocomplete="off" aria-label="Pregunta">
+    <input type="text" id="aiInput" placeholder="Buscá un producto, SKU o característica…" autocomplete="off" aria-label="Pregunta">
     <button type="submit" class="ai-send" aria-label="Enviar">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
     </button>
