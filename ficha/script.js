@@ -1993,6 +1993,13 @@
     setText("#crumb-name", name);
     setText("#ficha-sku", sku);
     setText("#ficha-ean", ean13);
+    const eanEl = document.getElementById("ficha-ean");
+    const eanWrap = eanEl && eanEl.closest("span");
+    if (eanWrap) {
+      eanWrap.hidden = !ean13;
+      const dot = eanWrap.previousElementSibling;
+      if (dot && dot.classList.contains("dot")) dot.hidden = !ean13;
+    }
     setText("#ficha-lead", description);
     if (macro || family) {
       setText("#ficha-eyebrow", [macro, family].filter(Boolean).join(" · "));
