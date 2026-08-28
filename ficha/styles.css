@@ -246,15 +246,17 @@ main{padding:calc(48px + clamp(12px,2vw,24px)) clamp(12px,2vw,24px) 0;}
   pointer-events:none;
 }
 .stage-badge[hidden]{display:none !important;}
-.zoom-btn{
+.stage-actions{
   position:absolute;top:16px;right:16px;z-index:3;
+  display:flex;align-items:center;gap:8px;
+}
+.zoom-btn{
   display:inline-flex;align-items:center;gap:7px;
   border:1px solid var(--line-strong);background:var(--white);
   border-radius:var(--radius-sm);padding:9px 12px;
   font-size:12px;font-weight:600;color:var(--ink);cursor:pointer;
 }
-.zoom-btn__enlarge{display:inline-flex;align-items:center;gap:7px;}
-.zoom-btn__share{display:none;align-items:center;justify-content:center;}
+.zoom-btn--share-mobile{display:none;}
 .zoom-btn:hover{
   border-color:var(--line-hover);background:var(--bg-card);color:var(--ink);
 }
@@ -2070,16 +2072,16 @@ body.assistant-open .ai-launch{
   .stage{cursor:pointer;border-radius:10px;touch-action:pan-y;}
   .stage-img{padding:20px 16px;}
   .zoom-lens,.zoom-pane{display:none !important;}
-  /* Ampliar → Compartir en la misma esquina */
+  /* Ampliar + Compartir como iconos, misma esquina */
+  .stage-actions{top:12px;right:12px;gap:8px;}
   .zoom-btn{
-    top:12px;right:12px;
     padding:10px;
     min-width:40px;min-height:40px;
     justify-content:center;
     border-radius:10px;
   }
-  .zoom-btn__enlarge{display:none;}
-  .zoom-btn__share{display:inline-flex;}
+  .zoom-btn__label{display:none;}
+  .zoom-btn--share-mobile{display:inline-flex;}
 
   /* Bottom sheet compartir */
   .share-sheet{
