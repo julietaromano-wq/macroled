@@ -84,16 +84,19 @@
     }).join("");
     return `<span class="temp-dots${keys.length>=2?" is-collapsed":""}" tabindex="0" aria-label="Temperatura de luz"><span class="temp-dots-icon" aria-hidden="true">${ICON_BULB}</span>${rows}</span>`;
   }
-  function buildVariantBadge(doc){
-    const configured=parseInt(doc.cant_variantes,10);
-    const fieldCount=variantSpec(doc)?.value.split(";").map(value=>value.trim()).filter(Boolean).length||0;
-    const skuCount=Array.isArray(doc.variantes_sku)?doc.variantes_sku.length:0;
-    const count=configured>0?configured:Math.max(fieldCount,skuCount);
-    return count>1?`<span class="badge">${count} variantes</span>`:"";
+  function isProductNuevo(doc){
+    const raw=doc.nuevo;
+    if(raw===true||raw===1) return true;
+    const value=String(raw??"").trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"");
+    return value==="si"||value==="true"||value==="1"||value==="yes"||value==="nuevo";
   }
+  function buildNuevoBadge(doc){
+    return isProductNuevo(doc)?'<span class="badge ml-highlight-badge" aria-label="Producto nuevo">NUEVO</span>':"";
+  }
+  const ICON_WIFI='<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/></svg>';
   function buildSmartBadge(doc){
     const directSmart=doc.smart===true||doc.es_smart===true||[doc.smart,doc.es_smart].some(value=>/^(si|sí|true|1|smart)$/i.test(String(value||"").trim()));
-    return directSmart||rawSpecs(doc).some(isSmartSpec)?'<span class="ml-product-smart-badge" aria-label="Producto Smart">SMART</span>':"";
+    return directSmart||rawSpecs(doc).some(isSmartSpec)?`<span class="smart-badge" aria-label="Producto Smart">${ICON_WIFI}SMART</span>`:"";
   }
   const filterValue=value=>String(value??"").replace(/`/g,"\\`");
   const shuffled=items=>{const copy=[...items];for(let index=copy.length-1;index>0;index--){const swap=Math.floor(Math.random()*(index+1));[copy[index],copy[swap]]=[copy[swap],copy[index]]}return copy};
@@ -120,21 +123,24 @@
   }
   function cardTemplate(doc){
     const imgs=parseImages(doc),specs=buildSpecs(doc),link=safeUrl(doc.link_ficha_web),tag=link?"a":"div";
-    const attrs=specs.length
-      ?specs.map(spec=>`<div class="ml-product-attr"><span class="ml-product-attr__label">${escapeHTML(spec.label)}</span><span class="ml-product-attr__value">${escapeHTML(spec.value)}</span></div>`).join("")
-      :'<span class="ml-product-card__note">Sin atributos cargados</span>';
+    const name=doc.nombre_typesense||"Producto sin nombre";
+    const specsHtml=specs.length
+      ?specs.map(spec=>`<div class="spec"><span class="spec-label">${escapeHTML(spec.label)}</span><span class="val">${escapeHTML(spec.value)}</span></div>`).join("")
+      :"";
     const image=imgs.length
-      ?`<img src="${escapeHTML(imgs[0])}" alt="${escapeHTML(doc.nombre_typesense||"Producto Macroled")}" loading="lazy" width="400" height="400">`
+      ?`<img src="${escapeHTML(imgs[0])}" alt="${escapeHTML(name)}" loading="lazy" width="400" height="400">`
       :'<span class="ml-product-card__note">Sin imagen</span>';
+    const smart=buildSmartBadge(doc);
+    const temp=buildTempBadge(doc);
     const linkAttrs=link?` href="${escapeHTML(link)}" data-href="${escapeHTML(link)}"`:"";
-    return `<${tag} class="ml-product-card${link?"":" ml-product-card--disabled"}"${linkAttrs} data-id="${escapeHTML(doc.id||doc.sku||"")}"><div class="ml-product-card__media">${buildSmartBadge(doc)}${buildVariantBadge(doc)}${buildTempBadge(doc)}${image}</div><div class="ml-product-card__title">${escapeHTML(doc.nombre_typesense||"Producto sin nombre")}</div><div class="ml-product-card__attrs">${attrs}</div></${tag}>`;
+    return `<${tag} class="ml-product-card${link?"":" ml-product-card--disabled"}"${linkAttrs} data-id="${escapeHTML(doc.id||doc.sku||"")}"><div class="media"><div class="media-frame">${buildNuevoBadge(doc)}${smart?`<div class="media-badges-left">${smart}</div>`:""}${image}</div>${temp?`<div class="card-overlays">${temp}</div>`:""}</div><div class="card-content"><div class="ml-card-body"><div class="card-title" title="${escapeHTML(name)}">${escapeHTML(name)}</div>${specsHtml?`<div class="specs">${specsHtml}</div>`:""}</div></div></${tag}>`;
   }
   function loadingSkeletons(count=5){
     const total=Math.max(1,Number(count)||5);
     return `<span class="ml-product-loading-label">Cargando productos…</span>${Array.from({length:total},(_,index)=>`<div class="ml-product-skeleton" aria-hidden="true" style="--skeleton-order:${index}"><div class="ml-product-skeleton__media"></div><div class="ml-product-skeleton__line ml-product-skeleton__line--title"></div><div class="ml-product-skeleton__attrs"><span></span><span></span></div></div>`).join("")}`;
   }
   function wireCarousels(grid){
-    grid.querySelectorAll(".ml-product-card__media").forEach(media=>{const img=media.querySelector("img[data-images]");if(!img)return;let images=[];try{images=JSON.parse(img.dataset.images)}catch(_){return}const move=direction=>{let index=Number(img.dataset.index||0);index=(index+direction+images.length)%images.length;img.dataset.index=String(index);img.src=images[index]};media.querySelector(".ml-product-card__nav--prev")?.addEventListener("click",event=>{event.preventDefault();event.stopPropagation();move(-1)});media.querySelector(".ml-product-card__nav--next")?.addEventListener("click",event=>{event.preventDefault();event.stopPropagation();move(1)})});
+    grid.querySelectorAll(".ml-product-card .media").forEach(media=>{const img=media.querySelector("img[data-images]");if(!img)return;let images=[];try{images=JSON.parse(img.dataset.images)}catch(_){return}const move=direction=>{let index=Number(img.dataset.index||0);index=(index+direction+images.length)%images.length;img.dataset.index=String(index);img.src=images[index]};media.querySelector(".ml-product-card__nav--prev")?.addEventListener("click",event=>{event.preventDefault();event.stopPropagation();move(-1)});media.querySelector(".ml-product-card__nav--next")?.addEventListener("click",event=>{event.preventDefault();event.stopPropagation();move(1)})});
   }
   async function renderGrid(grid){
     const field=grid.dataset.productsField,value=grid.dataset.productsValue,configuredCount=Number(grid.dataset.productsCount||4);

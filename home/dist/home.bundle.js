@@ -27,7 +27,7 @@
    */
   const MANUAL_CATEGORIES = {
     interior: [
-      { ...category("Lineales PRO", "lineales-pro"), href: "https://macroled.webflow.io/nuevo-productos?macrofamilia=Lineales+PRO", image: "https://d1zltvqju4u8ql.cloudfront.net/fit-in/180x180/MACROLED/WEB/PORTADA-LINEALES-PRO.webp", badge: "Nuevo" },
+      { ...category("Lineales PRO", "lineales-pro"), href: "https://macroled.webflow.io/nuevo-productos?macrofamilia=Lineales+PRO", image: "https://d1zltvqju4u8ql.cloudfront.net/fit-in/350x350/MACROLED/WEB/PORTADA-LINEALES-PRO.webp", badge: "Nuevo" },
       { ...category("Skyline", "luminarias-skyline"), href: "https://macroled.webflow.io/nuevo-productos?macrofamilia=Rieles+Magn%C3%A9ticos&familia=Luminarias", image: "https://s3.coresagroup.com/MACROLED/250/skyline.png", badge: "Nuevo" },
       { ...category("Artefactos para lámparas", "artefactos-para-lamparas"), href: "https://macroled.webflow.io/nuevo-productos?macrofamilia=Artefactos+para+L%C3%A1mparas", image: "https://s3.coresagroup.com/MACROLED/250/policarbonato-embutir-ar111.png" },
       { ...category("Paneles", "paneles"), href: "https://macroled.webflow.io/nuevo-productos?macrofamilia=Paneles", image: "https://d1zltvqju4u8ql.cloudfront.net/fit-in/250x250/MACROLED/WEB/GRAN-FORMATO-BACKLIGHT.webp" },
@@ -76,12 +76,12 @@
         categories: MANUAL_CATEGORIES.interior,
         featuredLines: [
           {
-            ...line("Línea Monaco", "Módulos y tomas diseñados con un enfoque en estética, funcionalidad y seguridad. Una propuesta versátil con armadas, conexiones y componentes pensados para adaptarse a instalaciones eléctricas contemporáneas.", "#e9ecef", "#101820", "image-left"),
+            ...line("Línea Mónaco", "Módulos y tomas diseñados con un enfoque en estética, funcionalidad y seguridad. Una propuesta versátil con armadas, conexiones y componentes pensados para adaptarse a instalaciones eléctricas contemporáneas.", "#e9ecef", "#101820", "image-left"),
             id: "monaco",
             image: "https://cdn.prod.website-files.com/65f1fdd7248b6709fdebe904/69a977bb0fe12ec5b81b7e9b_monaco-cover%20copia.webp",
             imageFit: "contain",
             href: "https://macroled.webflow.io/nuevo-productos?macrofamilia=Interruptores+y+Tomas&familia=Monaco",
-            titleEmphasis: "Monaco",
+            titleEmphasis: "Mónaco",
             content: { mode: "static", categoryGroup: "monaco" }
           },
           {
@@ -175,26 +175,33 @@
     ],
     faq: [
       {
-        question: "¿Puedo recibir asesoramiento para mi proyecto lumínico?",
-        answer: "Sí. Nuestro equipo puede asesorarte de acuerdo con las necesidades de tu espacio o proyecto, considerando aspectos como sus dimensiones, el uso, los niveles de iluminación requeridos y la atmósfera que buscás crear. Podés usar el asistente de productos Macroled, integrado con inteligencia artificial, para encontrar soluciones en la web o contactarnos desde la sección Contacto para recibir una recomendación personalizada.",
-        emphasis: ["asistente de productos Macroled", "sección Contacto"]
-      },
-      {
-        question: "¿Dónde encuentro la información técnica?",
-        answer: "En la página de cada producto encontrás su ficha técnica, especificaciones e información comercial. Además, en la sección Descargas podés acceder a toda la documentación técnica disponible.",
-        emphasis: ["página de cada producto", "sección Descargas"]
-      },
-      {
-        question: "¿Macroled trabaja con proyectos profesionales?",
-        answer: "Sí. Nuestro equipo puede acompañarte en la elección de soluciones de iluminación para proyectos profesionales."
+        question: "¿Dónde encuentro la información técnica de los productos?",
+        answer: "En la ficha de cada producto vas a encontrar todas sus especificaciones técnicas, junto con los archivos disponibles para descargar. También podés consultar la sección Descargas, donde reunimos catálogos y material técnico de nuestros productos. Y si necesitás resolver una consulta puntual, podés usar nuestro Asistente de Productos para encontrar la información que buscás.",
+        emphasis: ["ficha de cada producto", "sección Descargas", "Asistente de Productos"]
       },
       {
         question: "¿Cómo puedo comparar distintas alternativas?",
-        answer: "Podés revisar la información de cada producto, seleccionar los que te interesan y utilizar la función Comparar para evaluar sus características y prestaciones. Si necesitás orientación adicional, también podés consultar a nuestro equipo para encontrar la alternativa más adecuada para tu necesidad."
+        answer: "Desde nuestra sección de productos podés seleccionar hasta 3 productos y compararlos especificación por especificación. También podés elegir mostrar solo las diferencias para identificar rápidamente qué cambia entre modelos similares.",
+        emphasis: ["sección de productos"]
+      },
+      {
+        question: "¿Macroled tiene luminarias para proyectos profesionales?",
+        answer: "Sí, contamos con una amplia gama de soluciones destinadas a proyectos lumínicos profesionales. Completá el formulario de contacto y nuestro equipo técnico te va a acompañar en la selección de los productos más adecuados para tu proyecto.",
+        emphasis: ["formulario de contacto"]
       },
       {
         question: "¿Macroled vende a profesionales y también a consumidores finales?",
-        answer: "Sí. Somos fabricantes y comercializamos nuestros productos tanto a revendedores y proveedores como a consumidores finales. Contactanos para recibir información comercial y conocer la opción de compra más adecuada para tu necesidad."
+        answer: "Comercializamos nuestros productos a través de una amplia red de distribuidores en todo el país y también contamos con tienda oficial en Mercado Libre, donde podés realizar tus compras como consumidor final.",
+        emphasis: ["red de distribuidores", "Mercado Libre"]
+      },
+      {
+        question: "¿Los productos tienen garantía?",
+        answer: "Sí, nuestros productos cuentan con garantía ante fallas de fabricación. Para conocer las condiciones y el período de cobertura, consultá la documentación correspondiente o contactanos."
+      },
+      {
+        question: "¿Cómo puedo recibir asesoramiento para un proyecto?",
+        answer: "Si estás trabajando en un proyecto y necesitás definir productos, cantidades o alternativas, podés completar el formulario de contacto. Nuestro equipo técnico puede orientarte según las necesidades de cada proyecto.",
+        emphasis: ["formulario de contacto"]
       }
     ]
   };
@@ -287,16 +294,19 @@
     }).join("");
     return `<span class="temp-dots${keys.length>=2?" is-collapsed":""}" tabindex="0" aria-label="Temperatura de luz"><span class="temp-dots-icon" aria-hidden="true">${ICON_BULB}</span>${rows}</span>`;
   }
-  function buildVariantBadge(doc){
-    const configured=parseInt(doc.cant_variantes,10);
-    const fieldCount=variantSpec(doc)?.value.split(";").map(value=>value.trim()).filter(Boolean).length||0;
-    const skuCount=Array.isArray(doc.variantes_sku)?doc.variantes_sku.length:0;
-    const count=configured>0?configured:Math.max(fieldCount,skuCount);
-    return count>1?`<span class="badge">${count} variantes</span>`:"";
+  function isProductNuevo(doc){
+    const raw=doc.nuevo;
+    if(raw===true||raw===1) return true;
+    const value=String(raw??"").trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"");
+    return value==="si"||value==="true"||value==="1"||value==="yes"||value==="nuevo";
   }
+  function buildNuevoBadge(doc){
+    return isProductNuevo(doc)?'<span class="badge ml-highlight-badge" aria-label="Producto nuevo">NUEVO</span>':"";
+  }
+  const ICON_WIFI='<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/></svg>';
   function buildSmartBadge(doc){
     const directSmart=doc.smart===true||doc.es_smart===true||[doc.smart,doc.es_smart].some(value=>/^(si|sí|true|1|smart)$/i.test(String(value||"").trim()));
-    return directSmart||rawSpecs(doc).some(isSmartSpec)?'<span class="ml-product-smart-badge" aria-label="Producto Smart">SMART</span>':"";
+    return directSmart||rawSpecs(doc).some(isSmartSpec)?`<span class="smart-badge" aria-label="Producto Smart">${ICON_WIFI}SMART</span>`:"";
   }
   const filterValue=value=>String(value??"").replace(/`/g,"\\`");
   const shuffled=items=>{const copy=[...items];for(let index=copy.length-1;index>0;index--){const swap=Math.floor(Math.random()*(index+1));[copy[index],copy[swap]]=[copy[swap],copy[index]]}return copy};
@@ -323,21 +333,24 @@
   }
   function cardTemplate(doc){
     const imgs=parseImages(doc),specs=buildSpecs(doc),link=safeUrl(doc.link_ficha_web),tag=link?"a":"div";
-    const attrs=specs.length
-      ?specs.map(spec=>`<div class="ml-product-attr"><span class="ml-product-attr__label">${escapeHTML(spec.label)}</span><span class="ml-product-attr__value">${escapeHTML(spec.value)}</span></div>`).join("")
-      :'<span class="ml-product-card__note">Sin atributos cargados</span>';
+    const name=doc.nombre_typesense||"Producto sin nombre";
+    const specsHtml=specs.length
+      ?specs.map(spec=>`<div class="spec"><span class="spec-label">${escapeHTML(spec.label)}</span><span class="val">${escapeHTML(spec.value)}</span></div>`).join("")
+      :"";
     const image=imgs.length
-      ?`<img src="${escapeHTML(imgs[0])}" alt="${escapeHTML(doc.nombre_typesense||"Producto Macroled")}" loading="lazy" width="400" height="400">`
+      ?`<img src="${escapeHTML(imgs[0])}" alt="${escapeHTML(name)}" loading="lazy" width="400" height="400">`
       :'<span class="ml-product-card__note">Sin imagen</span>';
+    const smart=buildSmartBadge(doc);
+    const temp=buildTempBadge(doc);
     const linkAttrs=link?` href="${escapeHTML(link)}" data-href="${escapeHTML(link)}"`:"";
-    return `<${tag} class="ml-product-card${link?"":" ml-product-card--disabled"}"${linkAttrs} data-id="${escapeHTML(doc.id||doc.sku||"")}"><div class="ml-product-card__media">${buildSmartBadge(doc)}${buildVariantBadge(doc)}${buildTempBadge(doc)}${image}</div><div class="ml-product-card__title">${escapeHTML(doc.nombre_typesense||"Producto sin nombre")}</div><div class="ml-product-card__attrs">${attrs}</div></${tag}>`;
+    return `<${tag} class="ml-product-card${link?"":" ml-product-card--disabled"}"${linkAttrs} data-id="${escapeHTML(doc.id||doc.sku||"")}"><div class="media"><div class="media-frame">${buildNuevoBadge(doc)}${smart?`<div class="media-badges-left">${smart}</div>`:""}${image}</div>${temp?`<div class="card-overlays">${temp}</div>`:""}</div><div class="card-content"><div class="ml-card-body"><div class="card-title" title="${escapeHTML(name)}">${escapeHTML(name)}</div>${specsHtml?`<div class="specs">${specsHtml}</div>`:""}</div></div></${tag}>`;
   }
   function loadingSkeletons(count=5){
     const total=Math.max(1,Number(count)||5);
     return `<span class="ml-product-loading-label">Cargando productos…</span>${Array.from({length:total},(_,index)=>`<div class="ml-product-skeleton" aria-hidden="true" style="--skeleton-order:${index}"><div class="ml-product-skeleton__media"></div><div class="ml-product-skeleton__line ml-product-skeleton__line--title"></div><div class="ml-product-skeleton__attrs"><span></span><span></span></div></div>`).join("")}`;
   }
   function wireCarousels(grid){
-    grid.querySelectorAll(".ml-product-card__media").forEach(media=>{const img=media.querySelector("img[data-images]");if(!img)return;let images=[];try{images=JSON.parse(img.dataset.images)}catch(_){return}const move=direction=>{let index=Number(img.dataset.index||0);index=(index+direction+images.length)%images.length;img.dataset.index=String(index);img.src=images[index]};media.querySelector(".ml-product-card__nav--prev")?.addEventListener("click",event=>{event.preventDefault();event.stopPropagation();move(-1)});media.querySelector(".ml-product-card__nav--next")?.addEventListener("click",event=>{event.preventDefault();event.stopPropagation();move(1)})});
+    grid.querySelectorAll(".ml-product-card .media").forEach(media=>{const img=media.querySelector("img[data-images]");if(!img)return;let images=[];try{images=JSON.parse(img.dataset.images)}catch(_){return}const move=direction=>{let index=Number(img.dataset.index||0);index=(index+direction+images.length)%images.length;img.dataset.index=String(index);img.src=images[index]};media.querySelector(".ml-product-card__nav--prev")?.addEventListener("click",event=>{event.preventDefault();event.stopPropagation();move(-1)});media.querySelector(".ml-product-card__nav--next")?.addEventListener("click",event=>{event.preventDefault();event.stopPropagation();move(1)})});
   }
   async function renderGrid(grid){
     const field=grid.dataset.productsField,value=grid.dataset.productsValue,configuredCount=Number(grid.dataset.productsCount||4);

@@ -14,7 +14,7 @@
         <div class="ml-hero__content">
           <div class="ml-hero__copy">
             <h1 id="ml-hero-title">La iluminación<br class="ml-hero__title-break">alcanza otro nivel</h1>
-            <p class="ml-hero__subtitle">Tecnología lumínica con la precisión técnica<br class="ml-hero__subtitle-break">que exige cada proyecto.</p>
+            <p class="ml-hero__subtitle">Tecnología lumínica con la <span class="ml-hero__phrase">precisión técnica</span><br class="ml-hero__subtitle-break">que exige cada proyecto.</p>
             <a class="ml-button ml-button--primary" href="https://macroled.webflow.io/nuevo-productos">Explorá nuestros productos</a>
           </div>
         </div>
@@ -117,7 +117,10 @@
         </div>
         <div class="ml-foa__overlay" aria-hidden="true"></div>
         <div class="ml-foa__content">
-          <h2 id="ml-foa-title">Sponsor oficial de <strong>Casa FOA</strong></h2>
+          <div class="ml-foa__copy">
+            <h2 id="ml-foa-title">Somos sponsor oficial de <strong>Casa FOA</strong></h2>
+            <p class="ml-foa__subtitle">Desde 2024 iluminamos los espacios de la exposición de arquitectura y diseño más importante del país.</p>
+          </div>
           <a class="ml-button ml-button--primary ml-button--primary-light ml-foa__button" href="https://www.macroled.com.ar/casafoa">Descubrí Casa FOA</a>
         </div>
       </section>
@@ -236,18 +239,12 @@
       </svg>
     </div>
     <h2 id="nlTitle">Sumate a nuestro newsletter</h2>
-    <p class="nl-popup__sub">Completá tus datos para recibir novedades, lanzamientos y contenido exclusivo.</p>
+    <p class="nl-popup__sub">Completá tus datos para recibir novedades,<br>lanzamientos y contenido exclusivo.</p>
     <form id="nlForm" class="nl-form">
       <div class="nl-field">
         <div class="nl-pill">
           <label class="nl-border-label" for="nl-nombre">Nombre</label>
           <input id="nl-nombre" type="text" name="nombre" placeholder="Tu nombre" required autocomplete="name">
-        </div>
-      </div>
-      <div class="nl-field">
-        <div class="nl-pill">
-          <label class="nl-border-label" for="nl-cuit">CUIT</label>
-          <input id="nl-cuit" type="text" name="cuit" placeholder="20-12345678-9" required inputmode="numeric" autocomplete="off">
         </div>
       </div>
       <div class="nl-field">
@@ -263,9 +260,8 @@
             <select id="nl-interes" name="area_interes" required>
               <option value="" disabled selected>Seleccioná una opción</option>
               <option value="residencial">Residencial</option>
-              <option value="comercial">Comercial</option>
-              <option value="industrial">Industrial</option>
               <option value="proyectos">Obras y proyectos</option>
+              <option value="arquitectura">Arquitectura</option>
             </select>
           </div>
         </div>

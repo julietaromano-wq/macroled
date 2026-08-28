@@ -24,7 +24,7 @@
    */
   const MANUAL_CATEGORIES = {
     interior: [
-      { ...category("Lineales PRO", "lineales-pro"), href: "https://macroled.webflow.io/nuevo-productos?macrofamilia=Lineales+PRO", image: "https://d1zltvqju4u8ql.cloudfront.net/fit-in/180x180/MACROLED/WEB/PORTADA-LINEALES-PRO.webp", badge: "Nuevo" },
+      { ...category("Lineales PRO", "lineales-pro"), href: "https://macroled.webflow.io/nuevo-productos?macrofamilia=Lineales+PRO", image: "https://d1zltvqju4u8ql.cloudfront.net/fit-in/350x350/MACROLED/WEB/PORTADA-LINEALES-PRO.webp", badge: "Nuevo" },
       { ...category("Skyline", "luminarias-skyline"), href: "https://macroled.webflow.io/nuevo-productos?macrofamilia=Rieles+Magn%C3%A9ticos&familia=Luminarias", image: "https://s3.coresagroup.com/MACROLED/250/skyline.png", badge: "Nuevo" },
       { ...category("Artefactos para lámparas", "artefactos-para-lamparas"), href: "https://macroled.webflow.io/nuevo-productos?macrofamilia=Artefactos+para+L%C3%A1mparas", image: "https://s3.coresagroup.com/MACROLED/250/policarbonato-embutir-ar111.png" },
       { ...category("Paneles", "paneles"), href: "https://macroled.webflow.io/nuevo-productos?macrofamilia=Paneles", image: "https://d1zltvqju4u8ql.cloudfront.net/fit-in/250x250/MACROLED/WEB/GRAN-FORMATO-BACKLIGHT.webp" },
@@ -73,12 +73,12 @@
         categories: MANUAL_CATEGORIES.interior,
         featuredLines: [
           {
-            ...line("Línea Monaco", "Módulos y tomas diseñados con un enfoque en estética, funcionalidad y seguridad. Una propuesta versátil con armadas, conexiones y componentes pensados para adaptarse a instalaciones eléctricas contemporáneas.", "#e9ecef", "#101820", "image-left"),
+            ...line("Línea Mónaco", "Módulos y tomas diseñados con un enfoque en estética, funcionalidad y seguridad. Una propuesta versátil con armadas, conexiones y componentes pensados para adaptarse a instalaciones eléctricas contemporáneas.", "#e9ecef", "#101820", "image-left"),
             id: "monaco",
             image: "https://cdn.prod.website-files.com/65f1fdd7248b6709fdebe904/69a977bb0fe12ec5b81b7e9b_monaco-cover%20copia.webp",
             imageFit: "contain",
             href: "https://macroled.webflow.io/nuevo-productos?macrofamilia=Interruptores+y+Tomas&familia=Monaco",
-            titleEmphasis: "Monaco",
+            titleEmphasis: "Mónaco",
             content: { mode: "static", categoryGroup: "monaco" }
           },
           {
@@ -172,26 +172,33 @@
     ],
     faq: [
       {
-        question: "¿Puedo recibir asesoramiento para mi proyecto lumínico?",
-        answer: "Sí. Nuestro equipo puede asesorarte de acuerdo con las necesidades de tu espacio o proyecto, considerando aspectos como sus dimensiones, el uso, los niveles de iluminación requeridos y la atmósfera que buscás crear. Podés usar el asistente de productos Macroled, integrado con inteligencia artificial, para encontrar soluciones en la web o contactarnos desde la sección Contacto para recibir una recomendación personalizada.",
-        emphasis: ["asistente de productos Macroled", "sección Contacto"]
-      },
-      {
-        question: "¿Dónde encuentro la información técnica?",
-        answer: "En la página de cada producto encontrás su ficha técnica, especificaciones e información comercial. Además, en la sección Descargas podés acceder a toda la documentación técnica disponible.",
-        emphasis: ["página de cada producto", "sección Descargas"]
-      },
-      {
-        question: "¿Macroled trabaja con proyectos profesionales?",
-        answer: "Sí. Nuestro equipo puede acompañarte en la elección de soluciones de iluminación para proyectos profesionales."
+        question: "¿Dónde encuentro la información técnica de los productos?",
+        answer: "En la ficha de cada producto vas a encontrar todas sus especificaciones técnicas, junto con los archivos disponibles para descargar. También podés consultar la sección Descargas, donde reunimos catálogos y material técnico de nuestros productos. Y si necesitás resolver una consulta puntual, podés usar nuestro Asistente de Productos para encontrar la información que buscás.",
+        emphasis: ["ficha de cada producto", "sección Descargas", "Asistente de Productos"]
       },
       {
         question: "¿Cómo puedo comparar distintas alternativas?",
-        answer: "Podés revisar la información de cada producto, seleccionar los que te interesan y utilizar la función Comparar para evaluar sus características y prestaciones. Si necesitás orientación adicional, también podés consultar a nuestro equipo para encontrar la alternativa más adecuada para tu necesidad."
+        answer: "Desde nuestra sección de productos podés seleccionar hasta 3 productos y compararlos especificación por especificación. También podés elegir mostrar solo las diferencias para identificar rápidamente qué cambia entre modelos similares.",
+        emphasis: ["sección de productos"]
+      },
+      {
+        question: "¿Macroled tiene luminarias para proyectos profesionales?",
+        answer: "Sí, contamos con una amplia gama de soluciones destinadas a proyectos lumínicos profesionales. Completá el formulario de contacto y nuestro equipo técnico te va a acompañar en la selección de los productos más adecuados para tu proyecto.",
+        emphasis: ["formulario de contacto"]
       },
       {
         question: "¿Macroled vende a profesionales y también a consumidores finales?",
-        answer: "Sí. Somos fabricantes y comercializamos nuestros productos tanto a revendedores y proveedores como a consumidores finales. Contactanos para recibir información comercial y conocer la opción de compra más adecuada para tu necesidad."
+        answer: "Comercializamos nuestros productos a través de una amplia red de distribuidores en todo el país y también contamos con tienda oficial en Mercado Libre, donde podés realizar tus compras como consumidor final.",
+        emphasis: ["red de distribuidores", "Mercado Libre"]
+      },
+      {
+        question: "¿Los productos tienen garantía?",
+        answer: "Sí, nuestros productos cuentan con garantía ante fallas de fabricación. Para conocer las condiciones y el período de cobertura, consultá la documentación correspondiente o contactanos."
+      },
+      {
+        question: "¿Cómo puedo recibir asesoramiento para un proyecto?",
+        answer: "Si estás trabajando en un proyecto y necesitás definir productos, cantidades o alternativas, podés completar el formulario de contacto. Nuestro equipo técnico puede orientarte según las necesidades de cada proyecto.",
+        emphasis: ["formulario de contacto"]
       }
     ]
   };

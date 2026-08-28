@@ -1646,7 +1646,7 @@ function cardTemplate(doc){
   return `
     <div class="card"${productHref ? ` role="link" tabindex="0"` : ""} data-sku="${escAttr(sku)}"${productHref ? ` data-href="${escAttr(productHref)}"` : ""}>
       <div class="media">
-        <div class="media-frame">
+        <div class="media-frame${firstImg ? " is-loading" : ""}">
           ${buildNuevoBadge(doc)}
           <div class="media-badges-left">
             ${buildSmartBadge(doc)}
@@ -1703,6 +1703,20 @@ function wireCardLinks(){
   });
 }
 
+function bindImageLoading(img){
+  const frame = img.closest(".media-frame");
+  if(!frame || img.dataset.loadBound) return;
+  img.dataset.loadBound = "1";
+  const stop = () => frame.classList.remove("is-loading");
+  const start = () => {
+    if(img.complete) stop();
+    else frame.classList.add("is-loading");
+  };
+  start();
+  img.addEventListener("load", stop);
+  img.addEventListener("error", stop);
+}
+
 function bindImgFallback(img){
   if(!img || img.dataset.fbBound) return;
   img.dataset.fbBound = "1";
@@ -1718,6 +1732,7 @@ function wireCarousels(){
   document.querySelectorAll(".card .media").forEach(media => {
     const img = media.querySelector("img");
     if(!img) return;
+    bindImageLoading(img);
     bindImgFallback(img);
     const imgs = JSON.parse(img.dataset.imgs || "[]");
     if(imgs.length < 2) return;
@@ -1749,20 +1764,24 @@ function wireCarousels(){
       idx = (newIdx + imgs.length) % imgs.length;
       const targetIdx = idx;
       const target = srcAt(targetIdx);
+      const frame = img.closest(".media-frame");
       img.dataset.idx = String(targetIdx);
       if(!target) return;
 
       if(loadedSet.has(targetIdx)){
+        frame?.classList.remove("is-loading");
         img.style.opacity = "1";
         img.src = target;
       } else {
-        img.style.opacity = "0.4";
+        frame?.classList.add("is-loading");
+        img.style.opacity = "0";
         const pre = new Image();
         pre.onload = () => {
           loadedSet.add(targetIdx);
           if(idx === targetIdx){
             img.src = target;
             img.style.opacity = "1";
+            frame?.classList.remove("is-loading");
           }
         };
         pre.onerror = () => {
@@ -1772,7 +1791,11 @@ function wireCarousels(){
             if(idx === targetIdx){
               img.src = orig;
               img.style.opacity = "1";
+              frame?.classList.remove("is-loading");
             }
+          } else {
+            frame?.classList.remove("is-loading");
+            img.style.opacity = "1";
           }
         };
         pre.src = target;
