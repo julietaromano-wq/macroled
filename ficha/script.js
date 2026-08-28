@@ -2828,11 +2828,24 @@
     setTimeout(tick, 200);
   }
 
+  /**
+   * Hasta acá el nombre/SKU/EAN/specs visibles eran el placeholder estático
+   * del HTML. initVariants() ya corrió (sync) y aplicó el producto real si
+   * lo encontró, así que revelar ahora no deja ver el placeholder viejo.
+   * Si el embed CMS nunca aparece, esto también se ejecuta (bootFicha corre
+   * igual tras el timeout de waitForCmsAndBoot) para no dejar la ficha oculta.
+   */
+  function revealFicha() {
+    const wrap = document.querySelector(".wrap.is-hydrating");
+    if (wrap) wrap.classList.remove("is-hydrating");
+  }
+
   function bootFicha() {
     hardenCtaUtility();
     initVariants();
     watchForLateVariants();
     initReveals();
+    revealFicha();
   }
 
   function waitForCmsAndBoot() {
@@ -2856,4 +2869,8 @@
   }
 
   waitForCmsAndBoot();
+  /* Red de seguridad: si por lo que sea bootFicha tarda de más, no dejamos
+     la ficha oculta más de 1.2s (peor caso normal: el embed CMS ya está en
+     el DOM y esto ni se nota, revealFicha ya corrió antes). */
+  setTimeout(revealFicha, 1200);
 })();

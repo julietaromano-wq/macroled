@@ -95,6 +95,19 @@ main{padding:calc(48px + clamp(12px,2vw,24px)) clamp(12px,2vw,24px) 0;}
   border-radius:10px;
 }
 
+/* Evita el flash de datos placeholder (nombre/SKU/specs) mientras el JS
+   todavía no aplicó el producto real leído del embed CMS. El fallback en
+   script.js (revealFicha) garantiza que esto se remueva igual si el CMS
+   nunca aparece, para no dejar la ficha oculta. */
+.wrap.is-hydrating .info,
+.wrap.is-hydrating .crumb .here{
+  opacity:0;
+}
+.info,
+.crumb .here{
+  transition:opacity .2s ease;
+}
+
 /* —— Site header —— */
 .topbar{border-bottom:1px solid var(--line-soft);background:var(--white);}
 .topbar-inner{
