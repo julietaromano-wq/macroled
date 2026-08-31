@@ -47,48 +47,40 @@ html.mm-scroll-lock body {
   overscroll-behavior: none !important;
 }
 
-/* Oscuro solo con el megamenú cerrado. Si está abierto, gana el bloque blanco de abajo. */
-#macroled-menu.is-on-dark:not(.mm-mega-open):not(:has(.mm-root.is-open)) .mm-site-nav,
-#macroled-menu.nav-dark:not(.mm-mega-open):not(:has(.mm-root.is-open)) .mm-site-nav {
+#macroled-menu.is-on-dark:not(.mm-mega-open) .mm-site-nav,
+#macroled-menu.nav-dark:not(.mm-mega-open) .mm-site-nav {
   background: rgba(0, 21, 43, 0.16) !important;
   border-bottom: 1px solid rgba(255, 255, 255, 0.16) !important;
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
 }
-#macroled-menu.is-on-dark:not(.mm-mega-open):not(:has(.mm-root.is-open)) .mm-site-nav .mm-links > a,
-#macroled-menu.is-on-dark:not(.mm-mega-open):not(:has(.mm-root.is-open)) .mm-trigger,
-#macroled-menu.nav-dark:not(.mm-mega-open):not(:has(.mm-root.is-open)) .mm-site-nav .mm-links > a,
-#macroled-menu.nav-dark:not(.mm-mega-open):not(:has(.mm-root.is-open)) .mm-trigger {
+#macroled-menu.is-on-dark:not(.mm-mega-open) .mm-site-nav .mm-links > a,
+#macroled-menu.is-on-dark:not(.mm-mega-open) .mm-trigger,
+#macroled-menu.nav-dark:not(.mm-mega-open) .mm-site-nav .mm-links > a,
+#macroled-menu.nav-dark:not(.mm-mega-open) .mm-trigger {
   color: #fff !important;
 }
-#macroled-menu.is-on-dark:not(.mm-mega-open):not(:has(.mm-root.is-open)) .mm-site-nav .mm-links > a:hover {
+#macroled-menu.is-on-dark:not(.mm-mega-open) .mm-site-nav .mm-links > a:hover {
   color: #e8f7ff;
 }
 
-/* Megamenú abierto: la barra de arriba siempre es blanca */
-#macroled-menu.mm-mega-open .mm-site-nav,
-#macroled-menu:has(.mm-root.is-open) .mm-site-nav {
+/* Solo al abrir el megamenú: la barra pasa a blanca. Al cerrar, vuelve el tema del fondo. */
+#macroled-menu.mm-mega-open .mm-site-nav {
   background: #fff !important;
   border-bottom: 1px solid var(--line, #e6e6e6) !important;
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
 }
 #macroled-menu.mm-mega-open .mm-site-nav .mm-links > a,
-#macroled-menu.mm-mega-open .mm-trigger,
-#macroled-menu:has(.mm-root.is-open) .mm-site-nav .mm-links > a,
-#macroled-menu:has(.mm-root.is-open) .mm-trigger {
+#macroled-menu.mm-mega-open .mm-trigger {
   color: var(--ink, #16294f) !important;
 }
 #macroled-menu.mm-mega-open .mm-site-nav .mm-links > a:hover,
-#macroled-menu:has(.mm-root.is-open) .mm-site-nav .mm-links > a:hover,
-#macroled-menu.mm-mega-open .mm-root.is-open .mm-trigger,
-#macroled-menu:has(.mm-root.is-open) .mm-root.is-open .mm-trigger {
+#macroled-menu.mm-mega-open .mm-root.is-open .mm-trigger {
   color: var(--tint-text, #006ea5) !important;
 }
 #macroled-menu.mm-mega-open .mm-logo,
-#macroled-menu.mm-mega-open .mm-logo svg,
-#macroled-menu:has(.mm-root.is-open) .mm-logo,
-#macroled-menu:has(.mm-root.is-open) .mm-logo svg {
+#macroled-menu.mm-mega-open .mm-logo svg {
   color: #00bdff;
 }
 #macroled-menu.is-on-dark #mm-mobile .mm-mobile-bar {

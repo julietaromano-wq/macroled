@@ -633,9 +633,6 @@ if (typeof module !== "undefined") module.exports = MEGAMENU_DATA;
     function setMegaOpenState(isOpen) {
       var menu = document.getElementById("macroled-menu");
       if (menu) menu.classList.toggle("mm-mega-open", !!isOpen);
-      if (window.MACROLED_MENU && typeof window.MACROLED_MENU.refreshNavTheme === "function") {
-        window.MACROLED_MENU.refreshNavTheme();
-      }
     }
 
     function open() {
@@ -1334,97 +1331,37 @@ if (typeof module !== "undefined") module.exports = MEGAMENU_DATA;
   if (window.__macroledNavThemeInit) return;
   window.__macroledNavThemeInit = true;
 
-  var themeBeforeMega = null;
-
-  function parseRgb(str) {
-    if (!str || str === "transparent") return null;
-    var m = String(str).match(/rgba?\(\s*(\d+)[,\s]+(\d+)[,\s]+(\d+)(?:\s*[,/]\s*([\d.]+))?/);
-    if (!m) return null;
-    var a = m[4] == null ? 1 : parseFloat(m[4]);
-    if (a < 0.12) return null;
-    return { r: +m[1], g: +m[2], b: +m[3], a: a };
-  }
-
-  function luminance(c) {
-    function lin(v) {
-      v /= 255;
-      return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4);
-    }
-    return 0.2126 * lin(c.r) + 0.7152 * lin(c.g) + 0.0722 * lin(c.b);
-  }
-
-  function themeFromAttr(el) {
-    if (!el || !el.closest) return null;
-    var node = el.closest("[data-nav-theme]");
-    if (!node) return null;
-    var t = String(node.getAttribute("data-nav-theme") || "").toLowerCase();
-    if (t === "dark" || t === "light") return t;
-    return null;
-  }
-
-  function sampleTheme(menu) {
-    var y = Math.max(10, Math.round((menu.getBoundingClientRect().height || 72) * 0.55));
-    var x = Math.round(window.innerWidth / 2);
-    var stack = [];
-    try { stack = document.elementsFromPoint(x, y) || []; } catch (err) {}
-
-    var i, el, tagged, cs, color, tag, rect;
-    for (i = 0; i < stack.length; i++) {
-      el = stack[i];
-      if (!el || menu.contains(el)) continue;
-      tagged = themeFromAttr(el);
-      if (tagged) return tagged;
-    }
-
-    for (i = 0; i < stack.length; i++) {
-      el = stack[i];
-      if (!el || menu.contains(el)) continue;
-      tag = el.tagName;
-      if (tag === "VIDEO" || tag === "CANVAS") return "dark";
-      if (tag === "IMG") {
-        rect = el.getBoundingClientRect();
-        if (rect.width > 80 && rect.height > 40) return "dark";
+  function sectionTheme() {
+    var probe = 36;
+    var nodes = document.querySelectorAll("[data-nav-theme]");
+    var i, el, rect, theme, picked = null, pickedTop = -Infinity;
+    for (i = 0; i < nodes.length; i++) {
+      el = nodes[i];
+      rect = el.getBoundingClientRect();
+      if (rect.bottom <= probe || rect.top > probe) continue;
+      theme = String(el.getAttribute("data-nav-theme") || "").toLowerCase();
+      if (theme !== "dark" && theme !== "light") continue;
+      if (rect.top >= pickedTop) {
+        picked = theme;
+        pickedTop = rect.top;
       }
-      cs = window.getComputedStyle(el);
-      if (cs.backgroundImage && cs.backgroundImage !== "none") {
-        color = parseRgb(cs.backgroundColor);
-        if (color && color.a > 0.82 && luminance(color) > 0.62) return "light";
-        return "dark";
-      }
-      color = parseRgb(cs.backgroundColor);
-      if (color) return luminance(color) < 0.48 ? "dark" : "light";
     }
-
-    tagged = themeFromAttr(document.body) || themeFromAttr(document.documentElement);
-    if (tagged) return tagged;
-    return "light";
+    return picked || "light";
   }
 
   function apply(menu, theme) {
     var next = theme === "dark" ? "dark" : "light";
+    if (menu.getAttribute("data-mm-theme") === next) return;
     menu.setAttribute("data-mm-theme", next);
     menu.classList.toggle("is-on-dark", next === "dark");
     menu.classList.toggle("nav-dark", next === "dark");
     menu.classList.toggle("is-on-light", next === "light");
   }
 
-  function isMegaOpen(menu) {
-    return menu.classList.contains("mm-mega-open") || !!menu.querySelector(".mm-root.is-open");
-  }
-
   function update() {
     var menu = document.getElementById("macroled-menu");
-    if (!menu) return;
-    if (isMegaOpen(menu)) {
-      if (themeBeforeMega == null) {
-        themeBeforeMega = menu.getAttribute("data-mm-theme") || sampleTheme(menu) || "light";
-      }
-      apply(menu, "light");
-      return;
-    }
-    var restore = themeBeforeMega;
-    themeBeforeMega = null;
-    apply(menu, restore || sampleTheme(menu));
+    if (!menu || menu.classList.contains("mm-mega-open")) return;
+    apply(menu, sectionTheme());
   }
 
   window.MACROLED_MENU = window.MACROLED_MENU || {};
@@ -1442,18 +1379,12 @@ if (typeof module !== "undefined") module.exports = MEGAMENU_DATA;
 
   function init() {
     update();
-    window.addEventListener("scroll", onScroll, { passive: true, capture: true });
+    window.addEventListener("scroll", onScroll, { passive: true });
     window.addEventListener("resize", onScroll, { passive: true });
   }
 
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init);
   else init();
-  window.Webflow = window.Webflow || [];
-  window.Webflow.push(function () {
-    requestAnimationFrame(update);
-    setTimeout(update, 80);
-    setTimeout(update, 400);
-  });
 })();
 
 (function () {
