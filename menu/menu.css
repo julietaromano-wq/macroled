@@ -83,35 +83,11 @@ html.mm-scroll-lock body {
 #macroled-menu.mm-mega-open .mm-logo svg {
   color: #00bdff;
 }
-#macroled-menu.is-on-dark #mm-mobile .mm-mobile-bar {
-  background: rgba(0, 21, 43, 0.2);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.16);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  color: #fff;
-}
-#macroled-menu.is-on-dark #mm-mobile .mm-logo,
-#macroled-menu.is-on-dark #mm-mobile .mm-logo svg {
-  color: #fff;
-}
-#macroled-menu.is-on-dark #mm-mobile .burger span { background: #fff; }
-#macroled-menu.is-on-dark #mm-mobile .search-trigger { color: #fff; }
 
 #macroled-menu.is-on-light .mm-site-nav {
   background: #fff;
   border-bottom-color: var(--line, #e6e6e6);
 }
-#macroled-menu.is-on-light #mm-mobile .mm-mobile-bar {
-  background: #fff;
-  color: #16294f;
-  border-bottom: 1px solid #e6e6e6;
-}
-#macroled-menu.is-on-light #mm-mobile .mm-logo,
-#macroled-menu.is-on-light #mm-mobile .mm-logo svg {
-  color: #00bdff;
-}
-#macroled-menu.is-on-light #mm-mobile .burger span { background: #16294f; }
-#macroled-menu.is-on-light #mm-mobile .search-trigger { color: #16294f; }
 
 /* Si el navbar nativo de Webflow queda visible, descomentá:
 .w-nav { display: none !important; }
@@ -309,7 +285,7 @@ html.mm-scroll-lock body {
   #mm-ts-search-results .ts-arrow { flex-shrink: 0; color: #8a8580; display: flex; }
   #mm-ts-search-results .ts-nuevo {
     display: inline-block;
-    background: #efd16a;
+    background: #ddca97;
     color: #3a3a3a;
     font-size: 10px;
     font-weight: 600;
@@ -498,7 +474,7 @@ html.mm-scroll-lock body {
   text-transform: uppercase;
   letter-spacing: 0.04em;
   line-height: 1;
-  background: #efd16a;
+  background: #ddca97;
   color: var(--mm-text);
   padding: 4px 6px 3px;
   border-radius: 4px;
@@ -952,7 +928,7 @@ html.mm-scroll-lock body {
 #mm-mobile .search-overlay-body .ts-sku { font-size: 12px; color: #8a94a0; margin-top: 2px; }
 #mm-mobile .search-overlay-body .ts-arrow { flex-shrink: 0; color: #8a94a0; display: flex; }
 #mm-mobile .search-overlay-body .ts-nuevo {
-  display: inline-block; background: #efd16a; color: #3a3a3a;
+  display: inline-block; background: #ddca97; color: #3a3a3a;
   font-size: 10px; font-weight: 600; padding: 1px 6px; border-radius: 8px; margin-left: 6px;
 }
 #mm-mobile .search-overlay-body .ts-row-more,

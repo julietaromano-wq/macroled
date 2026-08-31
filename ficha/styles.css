@@ -1367,7 +1367,7 @@ body.assistant-open .ai-launch{
 }
 .ml-product-card:hover .media img{transform:scale(1.08);}
 
-/* Rol/variantes arriba a la izquierda, Smart arriba a la derecha — mismo
+/* Nuevo arriba a la izquierda, Smart arriba a la derecha — mismo
    layout que nuevo-home-final cuando coinciden los dos (no se apilan). */
 .ml-product-card .media-badges-left{
   position:absolute;z-index:2;
@@ -1394,14 +1394,14 @@ body.assistant-open .ai-launch{
   color:#fff;box-shadow:0 3px 10px rgba(0,144,199,.35);
   font-size:.68rem;font-weight:500;line-height:1;letter-spacing:.03em;white-space:nowrap;
 }
-.ml-product-variant-badge{
+.ml-product-nuevo-badge{
   display:inline-flex;align-items:center;
-  max-width:11rem;
-  padding:5px 10px;overflow:hidden;
-  border:1px solid #d3e4ec;border-radius:8px;
-  background:#f9fdff;color:#00688c;
-  font-size:.7rem;font-weight:600;line-height:1.15;
-  text-overflow:ellipsis;white-space:nowrap;
+  padding:.45rem .7rem;
+  border:0;border-radius:999px;
+  background:#ddca97;color:#16294f;
+  box-shadow:0 3px 10px rgba(201,179,118,.35);
+  font-size:.68rem;font-weight:600;line-height:1;
+  letter-spacing:.03em;text-transform:uppercase;white-space:nowrap;
 }
 
 /* Temperatura de color: pill abajo a la derecha, una fila por tono. */

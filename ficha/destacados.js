@@ -62,14 +62,7 @@
   function safeUrl(value) {
     try {
       const url = new URL(String(value), window.location.href);
-      if (!["http:", "https:"].includes(url.protocol)) return "";
-      // El CMS a veces guarda links apuntando al staging de Webflow;
-      // el sitio real es macroled.com.ar.
-      if (/(^|\.)macroled\.webflow\.io$/i.test(url.hostname)) {
-        url.protocol = "https:";
-        url.hostname = "macroled.com.ar";
-      }
-      return url.href;
+      return ["http:", "https:"].includes(url.protocol) ? url.href : "";
     } catch (_) {
       return "";
     }
@@ -232,6 +225,29 @@
     }" tabindex="0" aria-label="Temperatura de luz"><span class="temp-dots-icon" aria-hidden="true">${ICON_BULB}</span>${rows}</span>`;
   }
 
+  function isProductNuevo(doc) {
+    const raw = doc.nuevo;
+    if (raw === true || raw === 1) return true;
+    const value = String(raw ?? "")
+      .trim()
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "");
+    return (
+      value === "si" ||
+      value === "true" ||
+      value === "1" ||
+      value === "yes" ||
+      value === "nuevo"
+    );
+  }
+
+  function buildNuevoBadge(doc) {
+    return isProductNuevo(doc)
+      ? `<span class="ml-product-nuevo-badge" aria-label="Producto nuevo">Nuevo</span>`
+      : "";
+  }
+
   function buildSmartBadge(doc) {
     const directSmart =
       doc.smart === true ||
@@ -266,12 +282,15 @@
           doc.nombre_typesense || "Producto Macroled"
         )}" loading="lazy" width="400" height="400">`
       : '<span class="ml-product-card__note">Sin imagen</span>';
+    const badgesLeft = buildNuevoBadge(doc);
     const badgesRight = buildSmartBadge(doc);
     return `<${tag} class="ml-product-card${
       link ? "" : " ml-product-card--disabled"
     }"${link ? ` href="${escapeHTML(link)}"` : ""} data-id="${escapeHTML(
       doc.id || doc.sku || ""
     )}"><div class="media">${
+      badgesLeft ? `<div class="media-badges-left">${badgesLeft}</div>` : ""
+    }${
       badgesRight ? `<div class="media-badges-right">${badgesRight}</div>` : ""
     }<div class="card-overlays">${buildTempBadge(
       doc
@@ -318,14 +337,7 @@
       }px)`;
     };
 
-    let updateRaf = null;
-    track.onscroll = () => {
-      if (updateRaf) return;
-      updateRaf = requestAnimationFrame(() => {
-        updateRaf = null;
-        update();
-      });
-    };
+    track.onscroll = update;
     const moveToCard = (direction) => {
       if (!cards.length) return;
       const firstLeft = cards[0].getBoundingClientRect().left;
