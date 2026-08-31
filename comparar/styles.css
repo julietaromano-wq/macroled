@@ -90,6 +90,16 @@
                          se ve invadiendo la celda de al lado en vez de cortarse */
   }
   .mini-cell:first-child{border-left:none;}
+  /* switch "solo diferencias" fusionado en el mini-header (mobile): vive
+     en la primera celda (la que en desktop espeja la columna de labels y
+     queda vacía), así aparece/desaparece pegado al resto del mini-header
+     en vez de un elemento sticky aparte — ver updateMiniHeader() */
+  .mini-cell.mini-diff{padding:14px 10px;}
+  .mini-diff-toggle{display:flex;align-items:center;gap:6px;cursor:pointer;user-select:none;}
+  .mini-diff-toggle .switch{width:30px;height:18px;}
+  .mini-diff-toggle .switch .knob{width:14px;height:14px;}
+  .mini-diff-toggle .switch.on .knob{transform:translateX(12px);}
+  .mini-diff-label{font-size:var(--fs-xs);font-weight:600;color:var(--ink);white-space:nowrap;}
   .mini-cell .thumb{width:42px;height:42px;flex:none;display:flex;align-items:center;justify-content:center;}
   .mini-cell .thumb img{width:100%;height:100%;object-fit:contain;}
   .mini-cell .info, .mini-cell .mini-info{
@@ -864,12 +874,12 @@
     .share-btn{font-size:14px;min-height:44px;}
     /* en mobile el switch de "solo diferencias" no vive apretado en la
        columna de labels de 132px: se oculta acá y se usa #diffBar en su
-       lugar. sticky (no solo "arriba de la tabla" en el flujo normal):
-       si no, al scrollear se pierde de vista igual que cualquier otro
-       contenido — con sticky queda pegado al top mientras se scrollea la
-       tabla de specs. z-index menor al de #miniHeader (100010): cuando
-       el mini-header aparece más abajo en el scroll, lo tapa. */
-    .diff-bar{display:block;position:sticky;top:0;z-index:100005;}
+       lugar, siempre visible arriba de la tabla mientras la fila de
+       productos está a la vista. Una vez que esa fila scrollea fuera de
+       vista y aparece el mini-header (#miniHeader, sticky), el switch se
+       muda ahí (ver .mini-diff en updateMiniHeader) — así los dos
+       controles se turnan sin superponerse ni perderse de vista. */
+    .diff-bar{display:block;}
     .diff-bar-toggle{font-size:15px;padding:12px 20px;}
 
     /* Carrusel horizontal: label sticky + productos anchos */
@@ -911,8 +921,13 @@
        envuelto en 132px (4 líneas) estira toda la fila de encabezado y
        deja un espacio vacío parejo debajo de las cards de producto — por
        eso además se le saca la altura real con height:0 y se limpia el
-       padding/gap, así no aporta nada a la altura de la fila. */
-    .header-label{visibility:hidden;height:0;min-height:0;padding:0;gap:0;overflow:hidden;}
+       padding/gap, así no aporta nada a la altura de la fila.
+       padding con !important: ".cell.label{padding:...}" (acá y en el
+       breakpoint de 560px) es un selector compuesto más específico y le
+       gana al padding:0 de acá — con box-sizing:border-box, height:0 no
+       puede ser menor que ese padding, así que la caja terminaba
+       midiendo ~21px reales en vez de colapsar del todo. */
+    .header-label{visibility:hidden;height:0;min-height:0;padding:0 !important;gap:0;overflow:hidden;border:none !important;}
     /* sin filas de specs (0 productos) esa columna de 132px no la usa
        nadie más: ahí sí se puede sacar del todo el track en vez de
        dejarlo reservado e invisible */

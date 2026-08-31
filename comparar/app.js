@@ -1175,7 +1175,14 @@ let headerObserver = null;
 
 function updateMiniHeader(){
   const miniGrid = document.getElementById("miniGrid");
-  let html = `<div class="mini-cell"></div>`; // columna vacía, espeja la de labels
+  // en mobile, la primera celda (que en desktop espeja la columna de
+  // labels y queda vacía) lleva el switch de "solo diferencias" — así
+  // aparece/desaparece pegado al resto del mini-header, en vez de un
+  // elemento sticky aparte que se desincroniza del scroll
+  const isMobile = window.matchMedia("(max-width: 900px)").matches;
+  let html = isMobile
+    ? `<div class="mini-cell mini-diff"><label class="mini-diff-toggle" id="miniDiffToggle" title="Mostrar solo las diferencias"><span class="switch${showOnlyDiffs ? " on" : ""}"><span class="knob"></span></span><span class="mini-diff-label">Dif.</span></label></div>`
+    : `<div class="mini-cell"></div>`;
   for(let i = 0; i < COMPARE_MAX; i++){
     const p = comparedProducts[i];
     html += p
@@ -1184,6 +1191,15 @@ function updateMiniHeader(){
   }
   miniGrid.innerHTML = html;
 }
+
+// #miniHeader nunca se recrea (a diferencia de #miniGrid, que se
+// reescribe entero en cada updateMiniHeader()), así que el switch de
+// diferencias se engancha acá con delegación una sola vez.
+document.getElementById("miniHeader")?.addEventListener("click", (e) => {
+  if(!e.target.closest("#miniDiffToggle")) return;
+  showOnlyDiffs = !showOnlyDiffs;
+  render();
+});
 
 function observeHeaderSentinel(){
   const sentinel = document.getElementById("headerSentinel");
