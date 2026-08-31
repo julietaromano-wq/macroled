@@ -58,6 +58,17 @@
       <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
       Imprimir comparación
     </button>
+    <button class="share-btn" id="shareBtn" type="button" hidden>
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.6" y1="13.5" x2="15.4" y2="17.5"/><line x1="15.4" y1="6.5" x2="8.6" y2="10.5"/></svg>
+      Compartir
+    </button>
+  </div>
+
+  <div class="diff-bar" id="diffBar">
+    <label class="diff-bar-toggle" id="diffFloatToggle">
+      <span>Mostrar solo diferencias</span>
+      <span class="switch" id="diffFloatSwitch"><span class="knob"></span></span>
+    </label>
   </div>
 
   <div class="swipe-hint" id="swipeHint" role="status" aria-live="polite">
@@ -69,6 +80,7 @@
     <span>Deslizá hacia la derecha para ver los demás productos</span>
   </div>
 
+  <div class="compare-shell-wrap" id="compareShellWrap">
   <div class="compare-shell" id="compareShell">
     <div class="compare-grid" id="compareGrid" aria-busy="true"></div>
     <script>
@@ -85,14 +97,22 @@
           + '<div class="cell value coldata compare-skel-cell" aria-hidden="true"><span class="skel skel-value"></span></div>'
           + '<div class="cell value coldata compare-skel-cell" aria-hidden="true"><span class="skel skel-value"></span></div>';
         var section = '<div class="cell section compare-skel-cell" aria-hidden="true"><span class="skel skel-section"></span></div>';
-        var html = '<div class="cell label header-label compare-skel-cell" aria-hidden="true"><span class="skel skel-toggle"></span></div>'
+        var html = '<div class="cell label compare-skel-cell" aria-hidden="true"></div>'
           + head + head + head
           + section + row + row + row
           + section + row + row + row;
         document.getElementById("compareGrid").innerHTML = html;
       })();
     </script>
+  </div>
+    <div class="scroll-fade" id="scrollFade"></div>
+    <div class="scroll-dots" id="scrollDots"></div>
   </div></div>
+
+<div class="share-toast" id="shareToast">
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+  <span id="shareToastText">Enlace copiado</span>
+</div>
 
 <div class="modal-overlay" id="modalOverlay">
   <div class="modal-card">

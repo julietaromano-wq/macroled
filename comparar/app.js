@@ -514,6 +514,7 @@ function mapDocToCompared(doc, extras){
     principalSku: extras.principalSku || doc.sku,
     sku: doc.sku,
     family: doc.familia || doc.macrofamilia || "",
+    macrofamilia: doc.macrofamilia || "",
     name: doc.nombre_typesense || extras.nombre || "Producto sin nombre",
     img,
     ficha: doc.link_ficha_web || "#",
@@ -637,6 +638,16 @@ async function searchTypesenseModal(query){
     per_page: "20",
     page: "1"
   });
+
+  // si ya hay productos agregados, los de su misma macrofamilia se
+  // priorizan en el resultado (sin dejar de mostrar el resto: no es un
+  // filtro, solo reordena)
+  const boostFamilies = [...new Set(comparedProducts.map(p => p.macrofamilia).filter(Boolean))];
+  if(boostFamilies.length){
+    const escaped = boostFamilies.map(f => `\`${f}\``).join(",");
+    params.set("sort_by", `_eval(macrofamilia:=[${escaped}]):desc,_text_match:desc`);
+  }
+
   const url = `${TS_HOST}/collections/${COLLECTION}/documents/search?${params.toString()}`;
   try{
     const res = await fetch(url, { headers: { "X-TYPESENSE-API-KEY": TS_API_KEY } });
@@ -760,6 +771,11 @@ function render(){
   const grid = document.getElementById("compareGrid");
   const rows = buildRows();
 
+  // sin filas de specs no hay nada usando la columna de labels de 132px:
+  // en mobile se puede colapsar del todo (ver .compare-grid.no-rows en
+  // styles.css) en vez de dejarla reservada e invisible.
+  grid.classList.toggle("no-rows", rows.length === 0);
+
   document.getElementById("countLabel").textContent =
     `${comparedProducts.length} producto${comparedProducts.length === 1 ? "" : "s"}`;
 
@@ -769,7 +785,10 @@ function render(){
   document.getElementById("swipeHint").classList.remove("hidden");
 
   // Fila de encabezado: primera celda tiene el toggle de diferencias adentro,
-  // seguida siempre de 3 columnas (producto o slot "Agregar")
+  // seguida siempre de 3 columnas (producto o slot "Agregar"). En mobile
+  // esta celda se oculta por CSS (queda tapada por el ancho angosto de la
+  // columna) y en su lugar se usa #diffBar, siempre visible arriba de la
+  // tabla — ver el media query de .header-label / .diff-bar en styles.css.
   let html = `
     <div class="cell label header-label" style="border-bottom:1px solid #edeff2;">
       <label class="diff-toggle">
@@ -856,20 +875,26 @@ function render(){
   grid.querySelectorAll("[data-open-modal]").forEach(el => el.addEventListener("click", openModal));
   wireTooltips(grid);
 
-  // el toggle se recrea en cada render (vive dentro de la celda de encabezado),
-  // así que hay que re-conectar su listener y re-sincronizar su estado visual
+  // el toggle de desktop (dentro del grid) se recrea en cada render, así
+  // que hay que re-conectar su listener y re-sincronizar su estado visual.
+  // El de mobile (#diffBar) vive fuera del grid y ya está conectado una
+  // sola vez más abajo — acá solo se sincroniza su estado visual.
   document.getElementById("diffCheckbox").addEventListener("change", (e) => {
     showOnlyDiffs = e.target.checked;
     document.getElementById("diffSwitch").classList.toggle("on", showOnlyDiffs);
+    document.getElementById("diffFloatSwitch").classList.toggle("on", showOnlyDiffs);
     render();
   });
   if(showOnlyDiffs){
     document.getElementById("diffCheckbox").checked = true;
     document.getElementById("diffSwitch").classList.add("on");
   }
+  document.getElementById("diffFloatSwitch").classList.toggle("on", showOnlyDiffs);
 
   updateMiniHeader();
   observeHeaderSentinel();
+  updateScrollAffordance();
+  pinStickyColumns();
 }
 
 /* =========================================================
@@ -1110,6 +1135,47 @@ document.getElementById("compareShell").addEventListener("scroll", function onFi
 }, { passive: true });
 
 /* =========================================================
+   AFFORDANCE PERSISTENTE DE SCROLL — a diferencia del banner de texto
+   (que se oculta para siempre en el primer scroll), el gradiente + los
+   puntos quedan mientras haya más columnas por ver, y se actualizan en
+   cada scroll horizontal.
+   ========================================================= */
+function updateScrollAffordance(){
+  const shell = document.getElementById("compareShell");
+  const fade = document.getElementById("scrollFade");
+  const dots = document.getElementById("scrollDots");
+  const max = shell.scrollWidth - shell.clientWidth;
+  const hasOverflow = max > 4;
+
+  fade.classList.toggle("show", hasOverflow && shell.scrollLeft < max - 4);
+  dots.classList.toggle("show", hasOverflow);
+  if(!hasOverflow) return;
+
+  const count = Math.min(COMPARE_MAX, Math.max(1, comparedProducts.length + (comparedProducts.length < COMPARE_MAX ? 1 : 0)));
+  if(dots.children.length !== count){
+    dots.innerHTML = Array.from({ length: count }).map(() => "<span></span>").join("");
+  }
+  const progress = shell.scrollLeft / max;
+  const active = Math.min(count - 1, Math.round(progress * (count - 1)));
+  Array.from(dots.children).forEach((dot, i) => dot.classList.toggle("on", i === active));
+}
+
+/* =========================================================
+   COLUMNA DE LABELS + TÍTULO DE SECCIÓN "FIJOS" EN EL SCROLL HORIZONTAL
+   — no se usa position:sticky (con muchas celdas sticky apiladas se ve
+   una costura/sombra entre ellas al scrollear, incluso en Chromium). En
+   cambio, se mueven a mano con transform en cada scroll: como todas
+   reciben el mismo valor en el mismo frame, se desplazan en perfecto
+   conjunto y no queda ninguna costura visible.
+   ========================================================= */
+function pinStickyColumns(){
+  const x = document.getElementById("compareShell").scrollLeft;
+  const t = `translateX(${x}px)`;
+  document.querySelectorAll("#compareGrid .cell.label").forEach(el => { el.style.transform = t; });
+  document.querySelectorAll("#compareGrid .cell.section .section-title").forEach(el => { el.style.transform = t; });
+}
+
+/* =========================================================
    MINI-HEADER STICKY — aparece pegado arriba cuando la fila real de
    productos (con foto, nombre y botones) ya scrolleó fuera de vista, para
    no perder de vista qué columna es cada producto. Funciona en mobile y
@@ -1144,11 +1210,89 @@ function observeHeaderSentinel(){
   headerObserver.observe(sentinel);
 }
 
-// el mini-header no scrollea solo: espeja el scroll horizontal de la tabla
-// real vía una variable CSS, así ambos quedan siempre alineados
-document.getElementById("compareShell").addEventListener("scroll", function(){
-  document.documentElement.style.setProperty("--mini-scroll-x", `${-this.scrollLeft}px`);
+/* =========================================================
+   SWITCH "SOLO DIFERENCIAS" EN MOBILE — #diffBar es un control fijo,
+   siempre visible arriba de la tabla (no depende del scroll). Solo
+   existe uno de los dos controles a la vez: en desktop se ve el de
+   adentro del grid (.header-label) y #diffBar está oculto; en mobile es
+   al revés (ver el media query en styles.css). Los dos actúan sobre el
+   mismo estado (showOnlyDiffs) y se mantienen sincronizados entre sí en
+   render().
+   ========================================================= */
+document.getElementById("diffFloatToggle").addEventListener("click", () => {
+  showOnlyDiffs = !showOnlyDiffs;
+  document.getElementById("diffSwitch").classList.toggle("on", showOnlyDiffs);
+  document.getElementById("diffCheckbox").checked = showOnlyDiffs;
+  document.getElementById("diffFloatSwitch").classList.toggle("on", showOnlyDiffs);
+  render();
+});
+
+/* =========================================================
+   UN SOLO LISTENER DE SCROLL HORIZONTAL — antes había varios listeners
+   de "scroll" separados en #compareShell (mini-scroll-x, pinStickyColumns,
+   updateScrollAffordance), cada uno haciendo sus propias consultas/cambios
+   al DOM en cada evento. Durante un scroll con inercia eso puede disparar
+   muchas veces por segundo y competir con el scroll-snap nativo por
+   tiempo de main thread, haciendo que el snap no llegue a asentarse bien
+   (cards a mitad de camino en vez de mostrarse completas). Ahora todo
+   corre junto, una sola vez por frame.
+   ========================================================= */
+function resyncHorizontalScrollUI(){
+  const shell = document.getElementById("compareShell");
+  document.documentElement.style.setProperty("--mini-scroll-x", `${-shell.scrollLeft}px`);
+  pinStickyColumns();
+  updateScrollAffordance();
+}
+
+let hScrollTicking = false;
+let scrollSettleTimer = null;
+document.getElementById("compareShell").addEventListener("scroll", () => {
+  if(!hScrollTicking){
+    hScrollTicking = true;
+    requestAnimationFrame(() => { hScrollTicking = false; resyncHorizontalScrollUI(); });
+  }
+  clearTimeout(scrollSettleTimer);
+  scrollSettleTimer = setTimeout(resyncHorizontalScrollUI, 120);
 }, { passive: true });
+document.getElementById("compareShell").addEventListener("scrollend", resyncHorizontalScrollUI, { passive: true });
+
+/* =========================================================
+   COMPARTIR (mobile) — en un celular "imprimir" tiene poco uso real;
+   si el navegador soporta Web Share usamos eso, y si no, copiamos el
+   link al portapapeles con feedback visual.
+   ========================================================= */
+(function setupShare(){
+  const isMobile = window.matchMedia("(max-width: 900px)").matches;
+  if(!isMobile) return;
+
+  const printBtn = document.getElementById("printBtn");
+  const shareBtn = document.getElementById("shareBtn");
+  printBtn.style.display = "none";
+  shareBtn.hidden = false;
+  shareBtn.style.display = "inline-flex";
+
+  function showShareToast(text){
+    const toast = document.getElementById("shareToast");
+    document.getElementById("shareToastText").textContent = text;
+    toast.classList.add("show");
+    clearTimeout(showShareToast._t);
+    showShareToast._t = setTimeout(() => toast.classList.remove("show"), 1800);
+  }
+
+  shareBtn.addEventListener("click", async () => {
+    const shareData = { title: document.title, url: location.href };
+    if(navigator.share){
+      try{ await navigator.share(shareData); }catch(_){ /* usuario canceló */ }
+      return;
+    }
+    try{
+      await navigator.clipboard.writeText(location.href);
+      showShareToast("Enlace copiado");
+    }catch(_){
+      showShareToast("No se pudo copiar el enlace");
+    }
+  });
+})();
 
 /* =========================================================
    CARGA INICIAL — resuelve los SKUs guardados en localStorage
