@@ -1162,11 +1162,20 @@ document.getElementById("compareShell").addEventListener("scroll", function onFi
 
 /* =========================================================
    AFFORDANCE PERSISTENTE DE SCROLL — a diferencia del banner de texto
-   (que se oculta para siempre en el primer scroll), el gradiente + los
-   puntos quedan mientras haya más columnas por ver, y se actualizan en
-   cada scroll horizontal.
-   ========================================================= */
+   (que se oculta para siempre en el primer scroll), el gradiente queda
+   mientras haya más columnas por ver.
+   shell.scrollWidth/clientWidth son lecturas de layout: si se piden justo
+   después de escribir estilos (como los transform de pinStickyColumns),
+   el navegador tiene que resolver el layout pendiente antes de poder
+   contestar — eso es "layout thrashing", y forzarlo en cada frame de
+   scroll es una causa real de scroll trabado. Por eso esta función NO se
+   llama desde el callback de rAF (ver resyncHorizontalScrollUI): solo se
+   ejecuta al asentarse el scroll (settle timer / scrollend), donde una
+   lectura de layout ocasional no se nota. En mobile el gradiente ni se ve
+   (.scroll-fade{display:none}, ver styles.css), así que ahí ni vale la
+   pena leer nada. */
 function updateScrollAffordance(){
+  if(mobileMQ.matches) return;
   const shell = document.getElementById("compareShell");
   const fade = document.getElementById("scrollFade");
   if(!shell || !fade) return;
@@ -1317,6 +1326,13 @@ function resyncHorizontalScrollUI(){
   const shell = document.getElementById("compareShell");
   document.documentElement.style.setProperty("--mini-scroll-x", `${-shell.scrollLeft}px`);
   pinStickyColumns();
+}
+
+// se asienta el scroll (settle timer / scrollend): acá sí conviene correr
+// updateScrollAffordance(), que lee scrollWidth/clientWidth — ver el
+// comentario en su definición sobre por qué NO se llama en cada frame.
+function resyncHorizontalScrollUISettled(){
+  resyncHorizontalScrollUI();
   updateScrollAffordance();
 }
 
@@ -1328,50 +1344,9 @@ document.getElementById("compareShell").addEventListener("scroll", () => {
     requestAnimationFrame(() => { hScrollTicking = false; resyncHorizontalScrollUI(); });
   }
   clearTimeout(scrollSettleTimer);
-  scrollSettleTimer = setTimeout(resyncHorizontalScrollUI, 120);
+  scrollSettleTimer = setTimeout(resyncHorizontalScrollUISettled, 120);
 }, { passive: true });
-document.getElementById("compareShell").addEventListener("scrollend", resyncHorizontalScrollUI, { passive: true });
-
-/* =========================================================
-   COMPARTIR (mobile) — en un celular "imprimir" tiene poco uso real;
-   si el navegador soporta Web Share usamos eso, y si no, copiamos el
-   link al portapapeles con feedback visual.
-   ========================================================= */
-(function setupShare(){
-  const isMobile = mobileMQ.matches;
-  if(!isMobile) return;
-
-  const printBtn = document.getElementById("printBtn");
-  const shareBtn = document.getElementById("shareBtn");
-  if(!shareBtn) return; // HTML viejo sin el botón de compartir: se queda con "Imprimir"
-  if(printBtn) printBtn.style.display = "none";
-  shareBtn.hidden = false;
-  shareBtn.style.display = "inline-flex";
-
-  function showShareToast(text){
-    const toast = document.getElementById("shareToast");
-    const toastText = document.getElementById("shareToastText");
-    if(!toast || !toastText) return;
-    toastText.textContent = text;
-    toast.classList.add("show");
-    clearTimeout(showShareToast._t);
-    showShareToast._t = setTimeout(() => toast.classList.remove("show"), 1800);
-  }
-
-  shareBtn.addEventListener("click", async () => {
-    const shareData = { title: document.title, url: location.href };
-    if(navigator.share){
-      try{ await navigator.share(shareData); }catch(_){ /* usuario canceló */ }
-      return;
-    }
-    try{
-      await navigator.clipboard.writeText(location.href);
-      showShareToast("Enlace copiado");
-    }catch(_){
-      showShareToast("No se pudo copiar el enlace");
-    }
-  });
-})();
+document.getElementById("compareShell").addEventListener("scrollend", resyncHorizontalScrollUISettled, { passive: true });
 
 /* =========================================================
    CARGA INICIAL — resuelve los SKUs guardados en localStorage
