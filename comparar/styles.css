@@ -100,18 +100,19 @@
     min-width:0;flex:1 1 0%;overflow:hidden;
     display:flex !important;
     flex-direction:column !important;
-    align-items:flex-start !important;
+    align-items:center !important;
     gap:2px;
   }
-  /* antes probamos ellipsis (nowrap + text-overflow) para nombres largos,
-     pero no se activaba de forma confiable dentro de este flex; con wrap
-     el nombre simplemente pasa a 2 líneas y la fila crece, sin depender
-     de que el navegador calcule bien el shrink del flex item */
-  .mini-cell .name{font-size:var(--fs-base);font-weight:700;color:var(--navy);line-height:1.3;overflow:hidden;white-space:normal;overflow-wrap:break-word;}
-  .mini-cell .sku{font-size:var(--fs-xs);font-weight:500;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-top:2px;}
+  /* nombre, SKU y variante van centrados (igual que la card de producto
+     real, .cell.product-head .pname/.psku) y con wrap en vez de
+     ellipsis — con nowrap+ellipsis un SKU/variante largo se veía cortado
+     de golpe; con wrap simplemente pasa a una segunda línea y la fila
+     crece, mismo criterio que ya se usaba para .name */
+  .mini-cell .name{font-size:var(--fs-base);font-weight:700;color:var(--navy);line-height:1.3;overflow:hidden;white-space:normal;overflow-wrap:break-word;text-align:center;}
+  .mini-cell .sku{font-size:var(--fs-xs);font-weight:500;color:var(--muted);overflow:hidden;white-space:normal;overflow-wrap:break-word;text-align:center;margin-top:2px;}
   /* un escalón por debajo del SKU: mismo tamaño pero más liviana (peso
      normal + opacity) para que no compita con nombre/SKU por jerarquía */
-  .mini-cell .variant{font-size:var(--fs-xs);font-weight:400;color:var(--muted);opacity:.75;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .mini-cell .variant{font-size:var(--fs-xs);font-weight:400;color:var(--muted);opacity:.75;overflow:hidden;white-space:normal;overflow-wrap:break-word;text-align:center;}
 
   /* switch "solo diferencias" para MOBILE — reemplaza al de adentro del
      grid (.header-label), que en mobile se saca del todo del flow (no hay
