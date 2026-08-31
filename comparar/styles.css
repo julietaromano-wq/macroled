@@ -35,6 +35,10 @@
     --fs-md:clamp(.9375rem,.9rem + .28vw,1rem);
     --fs-lg:clamp(1rem,.95rem + .35vw,1.125rem);
     --fs-title:clamp(1.75rem,1.2rem + 2.2vw,2rem);
+    /* padding horizontal de .page — también lo usan .mini-compare-inner y
+       .mini-diff-row para que su contenido quede alineado con el resto de
+       la página; se redefine por breakpoint junto con .page (ver @media) */
+    --page-pad-x:clamp(14px,3.5vw,40px);
   }
   *{box-sizing:border-box;}
   body,button,input,select,textarea{font-family:var(--font);}
@@ -50,7 +54,7 @@
   /* ---- Page shell ---- */
   .page{
     max-width:1320px;margin:0 auto;
-    padding:clamp(16px,2.5vw,24px) clamp(14px,3.5vw,40px) clamp(48px,8vw,64px);
+    padding:clamp(16px,2.5vw,24px) var(--page-pad-x) clamp(48px,8vw,64px);
     padding-bottom:max(clamp(48px,8vw,64px), calc(24px + env(safe-area-inset-bottom,0px)));
   }
   .back-link{
@@ -82,7 +86,7 @@
     transform:translateY(-100%);transition:transform .2s ease;
   }
   .mini-compare-bar.show{transform:translateY(0);}
-  .mini-compare-inner{max-width:1320px;margin:0 auto;padding:0 clamp(16px,3.5vw,40px);overflow:hidden;}
+  .mini-compare-inner{max-width:1320px;margin:0 auto;padding:0 var(--page-pad-x);overflow:hidden;}
   .mini-grid{transform:translateX(var(--mini-scroll-x, 0px));}
   .mini-cell{
     padding:14px 20px;display:flex;align-items:center;gap:14px;min-width:0;border-left:1px solid var(--line);
@@ -90,16 +94,6 @@
                          se ve invadiendo la celda de al lado en vez de cortarse */
   }
   .mini-cell:first-child{border-left:none;}
-  /* switch "solo diferencias" fusionado en el mini-header (mobile): vive
-     en la primera celda (la que en desktop espeja la columna de labels y
-     queda vacía), así aparece/desaparece pegado al resto del mini-header
-     en vez de un elemento sticky aparte — ver updateMiniHeader() */
-  .mini-cell.mini-diff{padding:14px 10px;}
-  .mini-diff-toggle{display:flex;align-items:center;gap:6px;cursor:pointer;user-select:none;}
-  .mini-diff-toggle .switch{width:30px;height:18px;}
-  .mini-diff-toggle .switch .knob{width:14px;height:14px;}
-  .mini-diff-toggle .switch.on .knob{transform:translateX(12px);}
-  .mini-diff-label{font-size:var(--fs-xs);font-weight:600;color:var(--ink);white-space:nowrap;}
   .mini-cell .thumb{width:42px;height:42px;flex:none;display:flex;align-items:center;justify-content:center;}
   .mini-cell .thumb img{width:100%;height:100%;object-fit:contain;}
   .mini-cell .info, .mini-cell .mini-info{
@@ -115,15 +109,26 @@
      de que el navegador calcule bien el shrink del flex item */
   .mini-cell .name{font-size:var(--fs-base);font-weight:700;color:var(--navy);line-height:1.3;overflow:hidden;white-space:normal;overflow-wrap:break-word;}
   .mini-cell .sku{font-size:var(--fs-xs);font-weight:500;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-top:2px;}
+  /* un escalón por debajo del SKU: mismo tamaño pero más liviana (peso
+     normal + opacity) para que no compita con nombre/SKU por jerarquía */
+  .mini-cell .variant{font-size:var(--fs-xs);font-weight:400;color:var(--muted);opacity:.75;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 
   /* switch "solo diferencias" para MOBILE — reemplaza al de adentro del
-     grid (.header-label), que en pantallas angostas queda apretado en la
-     columna de labels de 112px. Vive en el flujo normal de la página,
-     siempre visible arriba de la tabla (no depende del scroll). Oculto
-     acá por defecto (desktop); se muestra vía @media más abajo, donde
-     también se oculta .header-label — solo uno de los dos existe a la
-     vez, nunca ambos. */
+     grid (.header-label), que en mobile se saca del todo del flow (no hay
+     columna de labels ahí, ver el media query de 480px). Vive en el flujo
+     normal de la página, siempre visible arriba de la tabla (no depende
+     del scroll). Oculto acá por defecto (desktop); se muestra vía @media
+     más abajo, donde también se oculta .header-label — solo uno de los
+     dos existe a la vez, nunca ambos. */
   .diff-bar{ display:none; }
+  /* fila propia del switch "solo diferencias" DEBAJO del mini-header
+     (mobile) — vive dentro de #miniHeader (no se recrea, a diferencia de
+     #miniGrid) como un bloque separado y con su propio borde superior,
+     en vez de compartir celda con las fotos de producto. Al ser hijo de
+     #miniHeader, aparece/desaparece pegado a él (misma transform de
+     .mini-compare-bar.show), sin necesidad de sincronizar visibilidad a mano. */
+  .mini-diff-row{ display:none; max-width:1320px;margin:0 auto;padding:10px var(--page-pad-x) 12px;border-top:1px solid var(--line); }
+  .mini-diff-row .diff-bar-toggle{ margin:0; }
   .diff-bar-toggle{
     display:flex;align-items:center;justify-content:space-between;gap:12px;
     padding:12px 16px;margin:0 0 14px;
@@ -168,8 +173,7 @@
   .share-toast svg{color:#5eead4;flex:none;}
 
   @media print{ .mini-compare-bar{display:none !important;} }
-  @media screen and (max-width:900px){ .mini-compare-inner{padding:0 20px;} }
-  @media screen and (max-width:560px){ .mini-compare-inner{padding:0 14px;} .mini-cell{padding:11px 12px;gap:10px;} .mini-cell .thumb{width:36px;height:36px;} .mini-cell .name{font-size:13px;} .mini-cell .sku{font-size:11px;} }
+  @media screen and (max-width:480px){ .mini-cell{padding:11px 12px;gap:10px;} .mini-cell .thumb{width:36px;height:36px;} .mini-cell .name{font-size:13px;} .mini-cell .sku{font-size:11px;} }
 
   .toolbar{display:flex;align-items:center;justify-content:flex-end;flex-wrap:wrap;gap:14px;margin-bottom:18px;}
   .diff-toggle{display:flex;align-items:center;gap:10px;font-size:var(--fs-sm);color:var(--ink);font-weight:600;cursor:pointer;user-select:none;}
@@ -224,6 +228,13 @@
        cada scroll, ver pinStickyColumns) puede recortarse o parpadear un
        par de px durante el gesto de scroll táctil real. */
     backface-visibility:hidden;-webkit-backface-visibility:hidden;
+  }
+  /* target del pin en mobile cuando .cell.label es .label-full (ver
+     pinStickyColumns en app.js) — en desktop no se transforma nunca
+     (la celda entera ya se pinea como cualquier .cell.label). */
+  .label-full-text{
+    position:relative;display:inline-flex;min-width:0;
+    will-change:transform;backface-visibility:hidden;-webkit-backface-visibility:hidden;
   }
   .header-label{align-items:flex-start;flex-direction:column;justify-content:end;gap:10px;padding:20px 16px;background:#fff;}
   .header-label .diff-toggle{display:flex;align-items:center;gap:9px;font-size:var(--fs-sm);color:var(--ink);font-weight:600;cursor:pointer;user-select:none;line-height:1.3;}
@@ -861,30 +872,45 @@
     .compare-grid{min-width:720px;}
   }
 
-  @media screen and (max-width:900px){
+  /* Todo el tratamiento "mobile" (carrusel de comparación, mini-header,
+     bottom-sheet del modal, tipografía compacta) vive acá abajo de
+     480px — por encima de eso la página se ve igual que en desktop. Antes
+     este bloque arrancaba en 900px con un segundo escalón a los 560px;
+     se fusionaron en uno solo porque a los 480px el rango que queda ya es
+     chico de por sí (no amerita dos escalones separados). */
+  @media screen and (max-width:480px){
+    :root{ --page-pad-x:12px; }
     .page{
-      padding:16px 16px max(56px, calc(20px + env(safe-area-inset-bottom,0px)));
+      padding:14px var(--page-pad-x) max(64px, calc(16px + env(safe-area-inset-bottom,0px)));
     }
     .page-head{margin-bottom:24px;align-items:center;}
-    .page-head h1{font-size:30px;}
+    .page-head h1{font-size:28px;letter-spacing:-.2px;}
     .page-head .count{font-size:14px;}
-    .back-link{font-size:14px;}
+    .back-link{margin-bottom:10px;font-size:14px;}
     .diff-toggle{font-size:14px;}
     .print-btn,
-    .share-btn{font-size:14px;min-height:44px;}
-    /* en mobile el switch de "solo diferencias" no vive apretado en la
-       columna de labels de 132px: se oculta acá y se usa #diffBar en su
-       lugar, siempre visible arriba de la tabla mientras la fila de
-       productos está a la vista. Una vez que esa fila scrollea fuera de
-       vista y aparece el mini-header (#miniHeader, sticky), el switch se
-       muda ahí (ver .mini-diff en updateMiniHeader) — así los dos
-       controles se turnan sin superponerse ni perderse de vista. */
+    .share-btn{
+      justify-content:center;
+      min-height:46px;
+      font-size:14px;
+    }
+    /* en mobile el switch de "solo diferencias" de adentro del grid
+       (.header-label) se saca del flow: se usa #diffBar en su lugar,
+       siempre visible arriba de la tabla mientras la fila de productos
+       está a la vista. Una vez que esa fila scrollea fuera de vista y
+       aparece el mini-header (#miniHeader, sticky), el switch se muestra
+       en #miniDiffRow — una fila propia debajo del mini-header, separada
+       de él por un borde — así los dos controles se turnan sin
+       superponerse ni perderse de vista. */
     .diff-bar{display:block;}
-    .diff-bar-toggle{font-size:15px;padding:12px 20px;}
+    .diff-bar-toggle{font-size:14px;padding:12px 14px;}
+    .mini-diff-row{display:block;padding:8px var(--page-pad-x) 10px;}
 
-    /* Carrusel horizontal: label sticky + productos anchos */
+    /* Carrusel horizontal: sin columna de label reservada (se sacó del
+       flow — ver .header-label / .label-full más abajo), 3 columnas de
+       producto que se reparten todo el ancho */
     .compare-grid, .mini-grid{
-      grid-template-columns: 132px repeat(3, minmax(220px, 72vw));
+      grid-template-columns: repeat(3, minmax(200px, 76vw));
     }
     .compare-grid{min-width:0;}
     .compare-shell{
@@ -892,106 +918,67 @@
          camino entre cards si no traía suficiente impulso; "mandatory"
          fuerza a que siempre encastre en una card completa */
       scroll-snap-type:x mandatory;
-      scroll-padding-left:132px;
-      border-radius:10px;
+      border-radius:8px;
       margin:0 -2px;
     }
     .cell.product-head, .cell.add-slot{scroll-snap-align:start;}
-    .cell{padding:12px 12px;font-size:14px;}
+    .cell{padding:10px 10px;font-size:14px;}
     .cell.label{
       /* antes tenía box-shadow acá: una sombra por celda sticky (una por
          fila) se desalinea/parpadea durante el scroll horizontal en
          WebKit. El borde de .coldata ya separa visualmente las columnas. */
-      font-size:14px;
-      padding:12px 10px;
+      font-size:13px;
+      padding:10px 8px;
+    }
+    /* fila de spec: el label ocupa el ancho completo (mismo trato que
+       .cell.section, con un fondo mucho más tenue — es un sub-nivel, no
+       un título de grupo) y queda pineado como los títulos de sección;
+       los 3 valores del producto pasan a la fila de abajo (sin columna de
+       label que saltear, ahora caen directo en las 3 columnas del
+       carrusel), sin cambiar su comportamiento de siempre. */
+    .cell.label.label-full{
+      grid-column:1/-1;
+      padding:10px 10px 5px;
+      font-size:13.5px;font-weight:500;color:var(--navy);
+      background:#f9fafb;
     }
     .cell.value{font-size:14px;padding:12px;}
     .cell.section{
-      font-size:15px;
-      padding:12px;
+      font-size:14px;
+      padding:10px 8px;
       min-height:44px;
     }
     .cell.section .section-title{gap:8px;}
-    .cell.section .section-title svg{width:16px;height:16px;}
-    /* visibility:hidden (no display:none): tiene que seguir ocupando su
-       track de 132px en el grid — si se saca del flow con display:none,
-       el auto-placement corre una columna a la izquierda y el primer
-       "Agregar" cae apretado en esa columna angosta en vez de quedar en
-       la suya de 220px+. Pero sin colapsar alto/padding, su texto
-       envuelto en 132px (4 líneas) estira toda la fila de encabezado y
-       deja un espacio vacío parejo debajo de las cards de producto — por
-       eso además se le saca la altura real con height:0 y se limpia el
-       padding/gap, así no aporta nada a la altura de la fila.
-       padding con !important: ".cell.label{padding:...}" (acá y en el
-       breakpoint de 560px) es un selector compuesto más específico y le
-       gana al padding:0 de acá — con box-sizing:border-box, height:0 no
-       puede ser menor que ese padding, así que la caja terminaba
-       midiendo ~21px reales en vez de colapsar del todo. */
-    .header-label{visibility:hidden;height:0;min-height:0;padding:0 !important;gap:0;overflow:hidden;border:none !important;}
-    /* sin filas de specs (0 productos) esa columna de 132px no la usa
-       nadie más: ahí sí se puede sacar del todo el track en vez de
-       dejarlo reservado e invisible */
-    .compare-grid.no-rows{grid-template-columns:repeat(3, minmax(220px, 72vw));}
-    .compare-grid.no-rows .header-label{display:none;}
-    .compare-shell:has(.compare-grid.no-rows){scroll-padding-left:0;}
+    .cell.section .section-title svg{width:15px;height:15px;}
+    /* el switch de "solo diferencias" que vive acá en desktop (adentro de
+       .header-label) ya se muestra aparte en mobile (#diffBar /
+       #miniDiffRow) — sin columna de label que ocupar, se saca del todo
+       del flow en vez de solo ocultarse. */
+    .header-label{display:none;}
     .cell.product-head{
-      padding:16px 12px 14px;
+      padding:14px 10px 12px;
       gap:0;
     }
-    .cell.product-head .thumb{width:96px;height:96px;}
-    .cell.product-head .thumb-ph{width:42px;height:42px;}
-    .cell.product-head .pname{font-size:15px;padding-top:10px;}
-    .cell.product-head .psku{font-size:12px;}
-    .cell.product-head .phead-btns{margin-top:auto;padding-top:10px;gap:6px;}
-    .phead-btns .btn{min-height:40px;padding:9px 12px;font-size:14px;}
-    .add-slot .box{min-height:160px;}
-    .add-slot .box span.lbl{font-size:14px;}
-    .swipe-hint.show{display:flex;}
-  }
-
-  @media screen and (max-width:560px){
-    .page{
-      padding:14px 12px max(64px, calc(16px + env(safe-area-inset-bottom,0px)));
-    }
-    .back-link{margin-bottom:10px;font-size:14px;}
-    .page-head h1{font-size:28px;letter-spacing:-.2px;}
-    .page-head .count{font-size:14px;}
-
-    .compare-grid, .mini-grid{
-      grid-template-columns: 112px repeat(3, minmax(200px, 76vw));
-    }
-    .compare-grid.no-rows{grid-template-columns:repeat(3, minmax(200px, 76vw));}
-    .compare-shell{
-      scroll-padding-left:112px;
-      border-radius:8px;
-    }
-    .compare-shell:has(.compare-grid.no-rows){scroll-padding-left:0;}
-    .cell{padding:10px 10px;}
-    .cell.label{padding:10px 8px;font-size:13px;}
-    .cell.value{font-size:14px;}
-    .cell.section{padding:10px 8px;font-size:14px;}
-    .cell.section .section-title svg{width:15px;height:15px;}
-    .cell.product-head{padding:14px 10px 12px;}
     .cell.product-head .thumb{width:84px;height:84px;}
+    .cell.product-head .thumb-ph{width:42px;height:42px;}
     .cell.product-head .pname{font-size:14px;padding-top:8px;}
     .cell.product-head .psku{font-size:12px;}
+    .cell.product-head .phead-btns{margin-top:auto;padding-top:10px;gap:6px;}
     .cell.product-head .remove{
       width:34px;height:34px;top:6px;right:6px;
     }
-    .phead-btns .btn{min-height:38px;font-size:13px;padding:8px 10px;}
-    .print-btn,
-    .share-btn{
-      justify-content:center;
-      min-height:46px;
-      font-size:14px;
-    }
-    .diff-bar-toggle{font-size:14px;padding:12px 14px;}
-    .page-head{align-items:center;}
-    .page-head .print-btn,
-    .page-head .share-btn{margin-left:auto;}
+    .phead-btns .btn{min-height:38px;padding:8px 10px;font-size:13px;}
     .add-slot .box{min-height:140px;}
     .add-slot .box .plus{width:32px;height:32px;font-size:18px;}
     .add-slot .box span.lbl{font-size:13px;}
+    .swipe-hint.show{display:flex;}
+    /* el hint de texto + el scroll-snap ya avisan que hay más para ver:
+       el degradé del borde sobra en mobile y tapaba un poco el borde
+       redondeado del shell */
+    .scroll-fade{display:none;}
+
+    .page-head .print-btn,
+    .page-head .share-btn{margin-left:auto;}
 
     .modal-overlay{align-items:flex-end;padding:0;}
     .modal-card{
@@ -1012,9 +999,8 @@
 
   @media screen and (max-width:380px){
     .compare-grid, .mini-grid{
-      grid-template-columns: 100px repeat(3, minmax(190px, 78vw));
+      grid-template-columns: repeat(3, minmax(190px, 78vw));
     }
-    .compare-shell{scroll-padding-left:100px;}
     .cell.product-head .thumb{width:72px;height:72px;}
     .phead-btns .btn{font-size:12px;}
   }
@@ -1362,9 +1348,6 @@ button.ai-launch svg .ai-icon-spark,
 }
 .ai-backdrop{z-index:2147483646 !important;}
 .ai-panel{z-index:2147483647 !important;}
-@media screen and (max-width:900px){
-  .page-head h1{font-size:30px !important;}
-}
-@media screen and (max-width:560px){
+@media screen and (max-width:480px){
   .page-head h1{font-size:28px !important;}
 }
