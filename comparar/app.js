@@ -514,6 +514,7 @@ function mapDocToCompared(doc, extras){
     principalSku: extras.principalSku || doc.sku,
     sku: doc.sku,
     family: doc.familia || doc.macrofamilia || "",
+    macrofamilia: doc.macrofamilia || "",
     name: doc.nombre_typesense || extras.nombre || "Producto sin nombre",
     img,
     ficha: doc.link_ficha_web || "#",
@@ -521,6 +522,19 @@ function mapDocToCompared(doc, extras){
     variants,
     axes
   };
+}
+
+// variante amigable del producto para el mini-header (ej. "Blanco cálido
+// 3000K") — a diferencia de currentVariantSummary(), no cae en un
+// fallback "SKU: ..." cuando no hay variante real: en el mini-header el
+// SKU ya se muestra en su propia línea, así que acá directamente no se
+// agrega nada si no hay variante que valga la pena mostrar.
+function miniVariantLabel(p){
+  if(!p || !p.variants || p.variants.length < 2) return "";
+  const current = p.variants.find(v => v.sku === p.sku);
+  const doc = current ? current.doc : null;
+  if(!doc) return "";
+  return variantFriendlyLabel(doc, p.axes, p.variants.map(v => v.doc)) || "";
 }
 
 function currentVariantSummary(p){
@@ -637,6 +651,16 @@ async function searchTypesenseModal(query){
     per_page: "20",
     page: "1"
   });
+
+  // si ya hay productos agregados, los de su misma macrofamilia se
+  // priorizan en el resultado (sin dejar de mostrar el resto: no es un
+  // filtro, solo reordena)
+  const boostFamilies = [...new Set(comparedProducts.map(p => p.macrofamilia).filter(Boolean))];
+  if(boostFamilies.length){
+    const escaped = boostFamilies.map(f => `\`${f}\``).join(",");
+    params.set("sort_by", `_eval(macrofamilia:=[${escaped}]):desc,_text_match:desc`);
+  }
+
   const url = `${TS_HOST}/collections/${COLLECTION}/documents/search?${params.toString()}`;
   try{
     const res = await fetch(url, { headers: { "X-TYPESENSE-API-KEY": TS_API_KEY } });
@@ -650,6 +674,11 @@ async function searchTypesenseModal(query){
 }
 
 const COMPARE_MAX = 3;
+// se crea una sola vez: leer mobileMQ.matches es barato, pero
+// window.matchMedia(...) arma un MediaQueryList nuevo cada vez que se
+// llama — evitarlo importa acá porque se consulta en cada frame de
+// scroll horizontal (ver pinStickyColumns).
+const mobileMQ = window.matchMedia("(max-width: 480px)");
 const ICON_CHECK = `<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`;
 const ICON_LINK = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>`;
 const ICON_BULB = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18h6M10 22h4"/><path d="M12 2a7 7 0 0 0-4 12.9V17h8v-2.1A7 7 0 0 0 12 2z"/></svg>`;
@@ -769,7 +798,10 @@ function render(){
   document.getElementById("swipeHint").classList.remove("hidden");
 
   // Fila de encabezado: primera celda tiene el toggle de diferencias adentro,
-  // seguida siempre de 3 columnas (producto o slot "Agregar")
+  // seguida siempre de 3 columnas (producto o slot "Agregar"). En mobile
+  // esta celda se oculta por CSS (queda tapada por el ancho angosto de la
+  // columna) y en su lugar se usa #diffBar, siempre visible arriba de la
+  // tabla — ver el media query de .header-label / .diff-bar en styles.css.
   let html = `
     <div class="cell label header-label" style="border-bottom:1px solid #edeff2;">
       <label class="diff-toggle">
@@ -817,7 +849,16 @@ function render(){
     const labelCell = row.tip
       ? `<button type="button" class="spec-tip" data-tip-title="${escAttr(row.label)}" data-tip="${escAttr(row.tip)}" aria-label="${escAttr(row.label)}: más información"><span class="spec-tip__label">${row.label}</span>${SPEC_TIP_MARK}</button>`
       : row.label;
-    html += `<div class="cell label">${labelCell}</div>`;
+    // en mobile, .label-full ocupa la fila completa (mismo trato que
+    // .cell.section) y el valor de cada producto pasa a una fila propia
+    // debajo, ahora en un grid de 3 columnas (sin columna de label
+    // reservada) — ver el media query de .label-full en styles.css.
+    // .label-full-text es el target del pin en mobile (el texto se
+    // desliza para quedar pegado a la izquierda mientras la celda entera,
+    // ya del ancho total, no necesita moverse — mismo patrón que
+    // .section-title). En desktop .label-full no cambia de ancho, así que
+    // ahí se sigue pineando la celda entera (ver pinStickyColumns).
+    html += `<div class="cell label label-full"><span class="label-full-text">${labelCell}</span></div>`;
     for(let i = 0; i < COMPARE_MAX; i++){
       const p = comparedProducts[i];
       if(p){
@@ -856,20 +897,30 @@ function render(){
   grid.querySelectorAll("[data-open-modal]").forEach(el => el.addEventListener("click", openModal));
   wireTooltips(grid);
 
-  // el toggle se recrea en cada render (vive dentro de la celda de encabezado),
-  // así que hay que re-conectar su listener y re-sincronizar su estado visual
+  // el toggle de desktop (dentro del grid) se recrea en cada render, así
+  // que hay que re-conectar su listener y re-sincronizar su estado visual.
+  // Los de mobile (#diffBar y el de debajo del mini-header) viven fuera
+  // del grid y ya están conectados una sola vez más abajo — acá solo se
+  // sincroniza su estado visual.
   document.getElementById("diffCheckbox").addEventListener("change", (e) => {
     showOnlyDiffs = e.target.checked;
     document.getElementById("diffSwitch").classList.toggle("on", showOnlyDiffs);
+    document.getElementById("diffFloatSwitch")?.classList.toggle("on", showOnlyDiffs);
+    document.getElementById("miniDiffSwitch")?.classList.toggle("on", showOnlyDiffs);
     render();
   });
   if(showOnlyDiffs){
     document.getElementById("diffCheckbox").checked = true;
     document.getElementById("diffSwitch").classList.add("on");
   }
+  document.getElementById("diffFloatSwitch")?.classList.toggle("on", showOnlyDiffs);
+  document.getElementById("miniDiffSwitch")?.classList.toggle("on", showOnlyDiffs);
 
   updateMiniHeader();
   observeHeaderSentinel();
+  updateScrollAffordance();
+  collectPinTargets();
+  pinStickyColumns();
 }
 
 /* =========================================================
@@ -1110,6 +1161,78 @@ document.getElementById("compareShell").addEventListener("scroll", function onFi
 }, { passive: true });
 
 /* =========================================================
+   AFFORDANCE PERSISTENTE DE SCROLL — a diferencia del banner de texto
+   (que se oculta para siempre en el primer scroll), el gradiente queda
+   mientras haya más columnas por ver.
+   shell.scrollWidth/clientWidth son lecturas de layout: si se piden justo
+   después de escribir estilos (como los transform de pinStickyColumns),
+   el navegador tiene que resolver el layout pendiente antes de poder
+   contestar — eso es "layout thrashing", y forzarlo en cada frame de
+   scroll es una causa real de scroll trabado. Por eso esta función NO se
+   llama desde el callback de rAF (ver resyncHorizontalScrollUI): solo se
+   ejecuta al asentarse el scroll (settle timer / scrollend), donde una
+   lectura de layout ocasional no se nota. En mobile el gradiente ni se ve
+   (.scroll-fade{display:none}, ver styles.css), así que ahí ni vale la
+   pena leer nada. */
+function updateScrollAffordance(){
+  if(mobileMQ.matches) return;
+  const shell = document.getElementById("compareShell");
+  const fade = document.getElementById("scrollFade");
+  if(!shell || !fade) return;
+  const max = shell.scrollWidth - shell.clientWidth;
+  const hasOverflow = max > 4;
+
+  fade.classList.toggle("show", hasOverflow && shell.scrollLeft < max - 4);
+}
+
+/* =========================================================
+   COLUMNA DE LABELS + TÍTULO DE SECCIÓN "FIJOS" EN EL SCROLL HORIZONTAL
+   — no se usa position:sticky (con muchas celdas sticky apiladas se ve
+   una costura/sombra entre ellas al scrollear, incluso en Chromium). En
+   cambio, se mueven a mano con transform en cada scroll: como todas
+   reciben el mismo valor en el mismo frame, se desplazan en perfecto
+   conjunto y no queda ninguna costura visible.
+
+   pinStickyColumns() corre en cada frame de scroll (ver
+   resyncHorizontalScrollUI), así que NO puede volver a recorrer el DOM
+   con querySelectorAll/querySelector cada vez — con una comparación de
+   20-30 specs eso es re-escanear todo #compareGrid decenas de veces por
+   segundo mientras se scrollea, y se sentía como lag/scroll trabado. En
+   vez de eso, collectPinTargets() junta las referencias UNA sola vez por
+   render() (cuando el grid recién se recreó) y pinStickyColumns() solo
+   itera ese array ya armado. */
+let pinTargets = null;
+
+function collectPinTargets(){
+  pinTargets = {
+    plainLabels: document.querySelectorAll("#compareGrid .cell.label:not(.label-full)"),
+    fullLabels: Array.from(document.querySelectorAll("#compareGrid .cell.label.label-full")).map(el => ({
+      el, inner: el.querySelector(".label-full-text")
+    })),
+    sectionTitles: document.querySelectorAll("#compareGrid .cell.section .section-title"),
+  };
+}
+
+function pinStickyColumns(){
+  if(!pinTargets) return;
+  const x = document.getElementById("compareShell").scrollLeft;
+  const t = `translateX(${x}px)`;
+  const isMobile = mobileMQ.matches;
+  pinTargets.plainLabels.forEach(el => { el.style.transform = t; });
+  // .label-full: en mobile ocupa toda la fila (mismo ancho que el contenido
+  // scrolleable), así que la celda no se mueve — solo el texto de adentro se
+  // desliza para quedar pegado a la izquierda (idéntico a .section-title).
+  // En desktop la celda vuelve a ser una columna angosta más, así que se
+  // pinea entera como cualquier .cell.label (si no, su fondo blanco no
+  // taparía los valores que scrollean por detrás).
+  pinTargets.fullLabels.forEach(({ el, inner }) => {
+    el.style.transform = isMobile ? "" : t;
+    if(inner) inner.style.transform = isMobile ? t : "";
+  });
+  pinTargets.sectionTitles.forEach(el => { el.style.transform = t; });
+}
+
+/* =========================================================
    MINI-HEADER STICKY — aparece pegado arriba cuando la fila real de
    productos (con foto, nombre y botones) ya scrolleó fuera de vista, para
    no perder de vista qué columna es cada producto. Funciona en mobile y
@@ -1119,15 +1242,33 @@ let headerObserver = null;
 
 function updateMiniHeader(){
   const miniGrid = document.getElementById("miniGrid");
-  let html = `<div class="mini-cell"></div>`; // columna vacía, espeja la de labels
+  // en desktop/tablet el grid real sigue teniendo 4 columnas (label + 3
+  // productos), así que el mini-header espeja esa primera columna vacía
+  // para que sus celdas queden alineadas con las de producto de abajo. En
+  // mobile esa columna ya no existe (ver el media query de 480px en
+  // styles.css: .compare-grid pasa a 3 columnas), así que acá tampoco.
+  const isMobile = mobileMQ.matches;
+  let html = isMobile ? "" : `<div class="mini-cell"></div>`;
   for(let i = 0; i < COMPARE_MAX; i++){
     const p = comparedProducts[i];
-    html += p
-      ? `<div class="mini-cell"><div class="thumb">${p.img ? `<img src="${escAttr(p.img)}" alt="">` : ""}</div><div class="mini-info"><div class="name">${p.name}</div><div class="sku">${escAttr(currentVariantSummary(p))}</div></div></div>`
-      : `<div class="mini-cell"></div>`;
+    if(p){
+      const variantLabel = miniVariantLabel(p);
+      const variantHtml = variantLabel ? `<div class="variant">${escAttr(variantLabel)}</div>` : "";
+      html += `<div class="mini-cell"><div class="thumb">${p.img ? `<img src="${escAttr(p.img)}" alt="">` : ""}</div><div class="mini-info"><div class="name">${p.name}</div><div class="sku">${escAttr(p.sku)}</div>${variantHtml}</div></div>`;
+    }else{
+      html += `<div class="mini-cell"></div>`;
+    }
   }
   miniGrid.innerHTML = html;
 }
+
+// #miniDiffToggle vive dentro de #miniHeader, que nunca se recrea (a
+// diferencia de #miniGrid, que se reescribe entero en cada
+// updateMiniHeader()), así que se engancha acá una sola vez.
+document.getElementById("miniDiffToggle")?.addEventListener("click", () => {
+  showOnlyDiffs = !showOnlyDiffs;
+  render();
+});
 
 function observeHeaderSentinel(){
   const sentinel = document.getElementById("headerSentinel");
@@ -1144,11 +1285,68 @@ function observeHeaderSentinel(){
   headerObserver.observe(sentinel);
 }
 
-// el mini-header no scrollea solo: espeja el scroll horizontal de la tabla
-// real vía una variable CSS, así ambos quedan siempre alineados
-document.getElementById("compareShell").addEventListener("scroll", function(){
-  document.documentElement.style.setProperty("--mini-scroll-x", `${-this.scrollLeft}px`);
+/* =========================================================
+   SWITCH "SOLO DIFERENCIAS" EN MOBILE — hay dos controles fuera del
+   grid: #diffBar (fijo, siempre visible arriba de la tabla mientras la
+   fila de productos está a la vista) y #miniDiffToggle (fila propia
+   debajo del mini-header, visible una vez que esa fila scrollea fuera de
+   vista y el mini-header se pone sticky — ver #miniDiffRow en
+   styles.css). En desktop ninguno de los dos se ve: se usa el de adentro
+   del grid (.header-label). Los tres actúan sobre el mismo estado
+   (showOnlyDiffs) y se mantienen sincronizados entre sí en render().
+   ========================================================= */
+// se protege con un check de null: si esta página quedó cacheada con un
+// HTML viejo (sin el bloque #diffBar) mientras se sirve un app.js más
+// nuevo, esto no debe tirar abajo el resto del script — sin esto, una
+// excepción acá corta TODO el render que sigue más abajo en el archivo.
+const diffFloatToggleEl = document.getElementById("diffFloatToggle");
+if(diffFloatToggleEl){
+  diffFloatToggleEl.addEventListener("click", () => {
+    showOnlyDiffs = !showOnlyDiffs;
+    document.getElementById("diffSwitch")?.classList.toggle("on", showOnlyDiffs);
+    const diffCheckboxEl = document.getElementById("diffCheckbox");
+    if(diffCheckboxEl) diffCheckboxEl.checked = showOnlyDiffs;
+    document.getElementById("diffFloatSwitch")?.classList.toggle("on", showOnlyDiffs);
+    document.getElementById("miniDiffSwitch")?.classList.toggle("on", showOnlyDiffs);
+    render();
+  });
+}
+
+/* =========================================================
+   UN SOLO LISTENER DE SCROLL HORIZONTAL — antes había varios listeners
+   de "scroll" separados en #compareShell (mini-scroll-x, pinStickyColumns,
+   updateScrollAffordance), cada uno haciendo sus propias consultas/cambios
+   al DOM en cada evento. Durante un scroll con inercia eso puede disparar
+   muchas veces por segundo y competir con el scroll-snap nativo por
+   tiempo de main thread, haciendo que el snap no llegue a asentarse bien
+   (cards a mitad de camino en vez de mostrarse completas). Ahora todo
+   corre junto, una sola vez por frame.
+   ========================================================= */
+function resyncHorizontalScrollUI(){
+  const shell = document.getElementById("compareShell");
+  document.documentElement.style.setProperty("--mini-scroll-x", `${-shell.scrollLeft}px`);
+  pinStickyColumns();
+}
+
+// se asienta el scroll (settle timer / scrollend): acá sí conviene correr
+// updateScrollAffordance(), que lee scrollWidth/clientWidth — ver el
+// comentario en su definición sobre por qué NO se llama en cada frame.
+function resyncHorizontalScrollUISettled(){
+  resyncHorizontalScrollUI();
+  updateScrollAffordance();
+}
+
+let hScrollTicking = false;
+let scrollSettleTimer = null;
+document.getElementById("compareShell").addEventListener("scroll", () => {
+  if(!hScrollTicking){
+    hScrollTicking = true;
+    requestAnimationFrame(() => { hScrollTicking = false; resyncHorizontalScrollUI(); });
+  }
+  clearTimeout(scrollSettleTimer);
+  scrollSettleTimer = setTimeout(resyncHorizontalScrollUISettled, 120);
 }, { passive: true });
+document.getElementById("compareShell").addEventListener("scrollend", resyncHorizontalScrollUISettled, { passive: true });
 
 /* =========================================================
    CARGA INICIAL — resuelve los SKUs guardados en localStorage

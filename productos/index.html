@@ -32,6 +32,10 @@
 
   <div class="results-toolbar">
     <div class="results-search">
+      <button type="button" class="filters-expand-btn" id="filtersExpandBtn" title="Mostrar filtros">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="4" y1="6" x2="20" y2="6"/><circle cx="9" cy="6" r="2.2" fill="#fff"/><line x1="4" y1="12" x2="20" y2="12"/><circle cx="16" cy="12" r="2.2" fill="#fff"/><line x1="4" y1="18" x2="20" y2="18"/><circle cx="11" cy="18" r="2.2" fill="#fff"/></svg>
+        Filtros
+      </button>
       <div class="search-bar">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
         <input type="text" id="searchInput" name="ml-catalog-q" placeholder="Buscar por nombre, SKU o descripción..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" aria-label="Buscar productos">
@@ -40,21 +44,24 @@
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="6" x2="20" y2="6"/><circle cx="9" cy="6" r="2.2" fill="#fff"/><line x1="4" y1="12" x2="20" y2="12"/><circle cx="16" cy="12" r="2.2" fill="#fff"/><line x1="4" y1="18" x2="20" y2="18"/><circle cx="11" cy="18" r="2.2" fill="#fff"/></svg>
         Filtros
       </button>
-      <select class="sort" id="sortSelect">
-        <option value="">Ordenar por</option>
-        <option value="nuevo:desc">Novedades primero</option>
+      <div class="sort-dropdown" id="sortDropdown">
+        <button class="sort-trigger" id="sortTrigger" type="button" aria-haspopup="listbox" aria-expanded="false">
+          <span class="sort-current" id="sortCurrent">Ordenar por</span>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="sort-menu" id="sortMenu" role="listbox" aria-label="Ordenar productos" hidden>
+          <button type="button" class="sort-option" role="option" aria-selected="false" data-sort="nuevo:desc">Novedades</button>
+          <button type="button" class="sort-option" role="option" aria-selected="false" data-sort="alpha:asc">A–Z</button>
+        </div>
+      </div>
+      <select class="sort sort-native" id="sortSelect" tabindex="-1" aria-hidden="true">
+        <option value="" selected>Ordenar por</option>
+        <option value="nuevo:desc">Novedades</option>
+        <option value="alpha:asc">A–Z</option>
       </select>
       <div class="view-toggle">
         <button id="btnGrid" class="active" title="Vista grilla">▦</button>
         <button id="btnList" title="Vista lista">☰</button>
-      </div>
-    </div>
-    <div class="count-row">
-      <div class="count-row-left">
-        <button type="button" class="filters-expand-btn" id="filtersExpandBtn" title="Mostrar filtros">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="4" y1="6" x2="20" y2="6"/><circle cx="9" cy="6" r="2.2" fill="#fff"/><line x1="4" y1="12" x2="20" y2="12"/><circle cx="16" cy="12" r="2.2" fill="#fff"/><line x1="4" y1="18" x2="20" y2="18"/><circle cx="11" cy="18" r="2.2" fill="#fff"/></svg>
-          Filtros
-        </button>
       </div>
     </div>
   </div>

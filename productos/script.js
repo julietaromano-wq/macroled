@@ -397,6 +397,8 @@ let potenciaRangeTimer = null;
    pero no está en el índice filtrable de Typesense (`smart:=Si` da 0). */
 let smartSkuOptions = [];
 let smartSkuPromise = null;
+let smartProductContexts = [];
+let smartIndexLoaded = false;
 
 function parseWatts(str){
   if(str == null || str === "") return null;
@@ -434,6 +436,37 @@ function isProductSmart(doc){
   return isSmartYesValue(doc.attr2);
 }
 
+function smartContextValues(value){
+  if(Array.isArray(value)) return value.map(v => String(v).trim()).filter(Boolean);
+  return value == null || value === "" ? [] : [String(value).trim()];
+}
+
+/* En el catálogo general el switch siempre está disponible. Al navegar la
+   jerarquía, sólo se muestra si el contexto contiene algún producto Smart. */
+function hasSmartProductsInContext(selected, searching, smartEnabled){
+  if(smartEnabled || searching || !smartIndexLoaded) return true;
+  const active = ["macrofamilia", "familia", "subfamilia", "categoria"]
+    .map(field => [field, [...(selected[field] || [])]])
+    .filter(([, values]) => values.length);
+  if(!active.length) return true;
+  return smartProductContexts.some(context => active.every(([field, values]) =>
+    values.some(value => context[field].includes(String(value).trim()))
+  ));
+}
+
+function filterSmartHierarchyCounts(counts, field, selected, smartEnabled){
+  if(!smartEnabled || !smartIndexLoaded) return counts;
+  return (counts || []).filter(count => {
+    const contextSelection = { ...selected, [field]: new Set([count.value]) };
+    const active = ["macrofamilia", "familia", "subfamilia", "categoria"]
+      .map(contextField => [contextField, [...(contextSelection[contextField] || [])]])
+      .filter(([, values]) => values.length);
+    return smartProductContexts.some(context => active.every(([contextField, values]) =>
+      values.some(value => context[contextField].includes(String(value).trim()))
+    ));
+  });
+}
+
 function isProductNuevo(doc){
   if(!doc) return false;
   const raw = doc.nuevo;
@@ -454,6 +487,7 @@ async function loadSmartSkuOptions(){
   if(smartSkuPromise) return smartSkuPromise;
   smartSkuPromise = (async () => {
     const skus = [];
+    const contexts = [];
     const perPage = 250;
     let page = 1;
     let found = Infinity;
@@ -465,7 +499,7 @@ async function loadSmartSkuOptions(){
           filter_by: BASE_FILTER,
           per_page: String(perPage),
           page: String(page),
-          include_fields: "sku,smart,es_smart,attr2"
+          include_fields: "sku,smart,es_smart,attr2,macrofamilia,familia,subfamilia,categoria"
         });
         const res = await fetch(`${TS_HOST}/collections/${COLLECTION}/documents/search?${params.toString()}`, {
           headers: { "X-TYPESENSE-API-KEY": TS_API_KEY }
@@ -475,15 +509,27 @@ async function loadSmartSkuOptions(){
         found = Number(data.found) || 0;
         (data.hits || []).forEach(hit => {
           const doc = hit.document || {};
-          if(doc.sku && isProductSmart(doc)) skus.push(String(doc.sku));
+          if(doc.sku && isProductSmart(doc)){
+            skus.push(String(doc.sku));
+            contexts.push({
+              macrofamilia: smartContextValues(doc.macrofamilia),
+              familia: smartContextValues(doc.familia),
+              subfamilia: smartContextValues(doc.subfamilia),
+              categoria: smartContextValues(doc.categoria)
+            });
+          }
         });
         if(!(data.hits || []).length) break;
         page++;
       }
       smartSkuOptions = skus;
+      smartProductContexts = contexts;
     }catch(err){
       console.error("No se pudo armar el índice Smart:", err);
       smartSkuOptions = [];
+      smartProductContexts = [];
+    }finally{
+      smartIndexLoaded = true;
     }
   })();
   return smartSkuPromise;
@@ -649,6 +695,33 @@ async function typesenseDocumentsSearch(params, signal){
   };
 }
 
+async function buildAlphabeticalResults(firstPage, params, signal){
+  const allHits = [...(firstPage.hits || [])];
+  const batchSize = Number(params.get("per_page")) || 250;
+  const totalPages = Math.ceil((Number(firstPage.found) || 0) / batchSize);
+
+  for(let page = 2; page <= totalPages; page++){
+    const pageParams = new URLSearchParams(params);
+    pageParams.set("page", String(page));
+    const res = await typesenseDocumentsSearch(pageParams, signal);
+    if(!res.ok) throw new Error(`Typesense ${res.status}: ${await res.text()}`);
+    const data = await res.json();
+    allHits.push(...(data.hits || []));
+  }
+
+  const productName = hit => {
+    const doc = hit.document || {};
+    return String(doc.nombre_typesense || doc.nombre || doc.descripcion || doc.sku || "").trim();
+  };
+  allHits.sort((a, b) => productName(a).localeCompare(productName(b), "es", {
+    sensitivity: "base", numeric: true
+  }));
+
+  const visiblePerPage = getPerPage();
+  const from = (state.page - 1) * visiblePerPage;
+  return { ...firstPage, hits: allHits.slice(from, from + visiblePerPage), page: state.page };
+}
+
 async function searchTypesense(){
   // Si hay una búsqueda anterior todavía en vuelo, la cancelamos: su
   // respuesta ya no nos importa y evita que pise el estado más reciente
@@ -715,7 +788,13 @@ async function searchTypesense(){
     page: String(state.page)
   });
   if(filterParts.length) params.set("filter_by", filterParts.join(" && "));
-  if(state.sortBy) params.set("sort_by", state.sortBy);
+  const alphabetical = state.sortBy === "alpha:asc";
+  if(alphabetical){
+    params.set("per_page", "250");
+    params.set("page", "1");
+  }else if(state.sortBy){
+    params.set("sort_by", state.sortBy);
+  }
 
   try{
     const res = await typesenseDocumentsSearch(params, signal);
@@ -724,12 +803,16 @@ async function searchTypesense(){
         console.warn("Facet 'subfamilia' o 'familia' no disponible en Typesense todavía, reintentando sin ellas.");
         params.set("facet_by", FACET_FIELDS.join(","));
         const retryRes = await typesenseDocumentsSearch(params, signal);
-        if(retryRes.ok) return await retryRes.json();
+        if(retryRes.ok){
+          const retryData = await retryRes.json();
+          return alphabetical ? await buildAlphabeticalResults(retryData, params, signal) : retryData;
+        }
       }
       const errText = await res.text();
       throw new Error(`Typesense ${res.status}: ${errText}`);
     }
-    return await res.json();
+    const data = await res.json();
+    return alphabetical ? await buildAlphabeticalResults(data, params, signal) : data;
   }catch(err){
     // AbortError es esperado (cancelamos nosotros mismos la request vieja),
     // no es un error real ni hay que mostrar el mensaje de "no se pudo conectar"
@@ -884,10 +967,16 @@ function renderFacets(facetCounts){
   const activeMacro = searching ? "" : [...state.selected.macrofamilia][0];
   const hasFamilia = !searching && state.selected.familia.size > 0;
   const familiaKey = [...state.selected.familia].sort().join(",");
+  const showSmartSwitch = hasSmartProductsInContext(state.selected, searching, state.smartOnly);
 
   if(activeMacro && !hasFamilia){
     /* Familia — solo mientras no haya una elegida */
-    const familiaCounts = resolveFamiliaCounts(facetCounts, activeMacro, state.selected.familia);
+    const familiaCounts = filterSmartHierarchyCounts(
+      resolveFamiliaCounts(facetCounts, activeMacro, state.selected.familia),
+      FAMILIA_FIELD,
+      state.selected,
+      state.smartOnly
+    );
 
     if(familiaCounts.length){
       const famGroup = document.createElement("div");
@@ -914,7 +1003,12 @@ function renderFacets(facetCounts){
 
   if(activeMacro && hasFamilia){
     /* Subfamilia — aparece al elegir Familia (selección múltiple) */
-    let subfamCounts = resolveSubfamiliaCounts(facetCounts, activeMacro, familiaKey, state.selected.subfamilia);
+    let subfamCounts = filterSmartHierarchyCounts(
+      resolveSubfamiliaCounts(facetCounts, activeMacro, familiaKey, state.selected.subfamilia),
+      SUBFAMILIA_FIELD,
+      state.selected,
+      state.smartOnly
+    );
 
     if(subfamCounts.length){
       const subfamGroup = document.createElement("div");
@@ -982,7 +1076,7 @@ function renderFacets(facetCounts){
 
   let smartSwitchInserted = false;
   const ensureSmartSwitch = () => {
-    if(smartSwitchInserted) return;
+    if(smartSwitchInserted || !showSmartSwitch) return;
     appendSmartSwitchFacet(panel);
     smartSwitchInserted = true;
   };
@@ -1007,6 +1101,9 @@ function renderFacets(facetCounts){
         value: c.value,
         count: byVal[c.value] != null ? byVal[c.value] : 0
       }));
+    }
+    if(field === "macrofamilia"){
+      counts = filterSmartHierarchyCounts(counts, field, state.selected, state.smartOnly);
     }
 
     const group = document.createElement("div");
@@ -1062,7 +1159,7 @@ function renderFacets(facetCounts){
   if(!panel.querySelector("[data-field=\"potencia\"]")){
     appendPotenciaRangeFacet(panel, false);
   }
-  if(!smartSwitchInserted) appendSmartSwitchFacet(panel);
+  if(!smartSwitchInserted && showSmartSwitch) appendSmartSwitchFacet(panel);
 
   panel.querySelectorAll(".facet-title").forEach(title => {
     title.addEventListener("click", () => {
@@ -1315,7 +1412,7 @@ const ATTR_VARIANTES_FIELD = "attr_variantes";
 // Tag "Nuevo" arriba a la izquierda cuando el campo nuevo es Sí/true
 function buildNuevoBadge(doc){
   if(!isProductNuevo(doc)) return "";
-  return `<span class="badge">Nuevo</span>`;
+  return `<span class="badge" aria-label="Producto nuevo">NUEVO</span>`;
 }
 
 // Tag "SMART" arriba a la derecha cuando el campo smart es Sí/Si
@@ -1844,18 +1941,90 @@ function buildCompareUrl(){
    localStorage vía compare.js, compartida con comparar.html
    ========================================================= */
 let compareBarPrevCount = 0;
+let compareBoundaryFrame = 0;
+
+function isExpandedMobileCompare(bar){
+  return window.matchMedia("(max-width: 640px)").matches && !bar.classList.contains("collapsed");
+}
+
+function updateCompareBoundary(){
+  compareBoundaryFrame = 0;
+  const root = document.getElementById("macroled-productos");
+  const bar = document.getElementById("compareBar");
+  const pagination = document.getElementById("pagination");
+  const gridShell = document.getElementById("gridShell");
+  if(!root || !bar || !pagination || getComputedStyle(bar).display === "none"){
+    if(root) root.style.removeProperty("--compare-boundary-lift");
+    return;
+  }
+
+  // En mobile, abierto funciona como un modal superpuesto. No se ancla a la
+  // paginación ni empuja el contenido; para verla, el usuario lo contrae.
+  if(isExpandedMobileCompare(bar)){
+    root.style.setProperty("--compare-boundary-lift", "0px");
+    return;
+  }
+
+  // Durante una actualización de filtros la paginación puede quedar vacía.
+  // En ese estado mantenemos la barra fija para evitar saltos hacia arriba.
+  if(gridShell?.classList.contains("is-filtering") || !pagination.childElementCount){
+    root.style.setProperty("--compare-boundary-lift", "0px");
+    return;
+  }
+
+  // La posición de reposo se calcula desde la paginación (no desde el final
+  // del contenedor, que ya incluye padding propio). Al alcanzarla, la barra
+  // queda exactamente a 2rem y luego se desplaza junto con el catálogo.
+  const barGap = parseFloat(getComputedStyle(bar).getPropertyValue("--compare-bar-gap")) || 0;
+  const fixedTop = window.innerHeight - barGap - bar.offsetHeight;
+  const restingTop = pagination.getBoundingClientRect().bottom + 32;
+  const lift = Math.max(0, fixedTop - restingTop);
+  root.style.setProperty("--compare-boundary-lift", lift + "px");
+}
+
+function scheduleCompareBoundaryUpdate(){
+  if(compareBoundaryFrame) return;
+  compareBoundaryFrame = requestAnimationFrame(updateCompareBoundary);
+}
+
 function updateComparePadding(){
+  const root = document.getElementById("macroled-productos");
   const bar = document.getElementById("compareBar");
   if(getComputedStyle(bar).display === "none"){
-    document.body.style.paddingBottom = "";
-    document.body.style.removeProperty("--compare-bar-offset");
+    root.style.removeProperty("--compare-bar-offset");
+    root.style.removeProperty("--compare-boundary-lift");
     document.body.classList.remove("has-compare-bar");
     return;
   }
-  const offset = bar.offsetHeight + 28;
-  document.body.style.paddingBottom = offset + "px";
-  document.body.style.setProperty("--compare-bar-offset", offset + "px");
+  if(isExpandedMobileCompare(bar)){
+    root.style.setProperty("--compare-bar-offset", "0px");
+    root.style.setProperty("--compare-boundary-lift", "0px");
+    document.body.classList.add("has-compare-bar");
+    return;
+  }
+  const pagination = document.getElementById("pagination");
+  const rootStyle = getComputedStyle(root);
+  const currentPadding = parseFloat(rootStyle.paddingBottom) || 0;
+  const trailingSpace = Math.max(0,
+    root.getBoundingClientRect().bottom - currentPadding - pagination.getBoundingClientRect().bottom
+  );
+  const barGap = parseFloat(getComputedStyle(bar).getPropertyValue("--compare-bar-gap")) || 0;
+  const paginationGap = 32; // 2rem entre la paginación y el comparador
+  const offset = Math.max(0, bar.offsetHeight + barGap + paginationGap - trailingSpace);
+  root.style.setProperty("--compare-bar-offset", offset + "px");
   document.body.classList.add("has-compare-bar");
+  scheduleCompareBoundaryUpdate();
+}
+
+window.addEventListener("scroll", scheduleCompareBoundaryUpdate, { passive:true });
+window.addEventListener("resize", () => {
+  updateComparePadding();
+  scheduleCompareBoundaryUpdate();
+});
+if("ResizeObserver" in window){
+  const compareBoundaryObserver = new ResizeObserver(scheduleCompareBoundaryUpdate);
+  compareBoundaryObserver.observe(document.getElementById("macroled-productos"));
+  compareBoundaryObserver.observe(document.getElementById("compareBar"));
 }
 function renderCompareBar(){
   const bar = document.getElementById("compareBar");
@@ -1900,10 +2069,16 @@ function renderCompareBar(){
   const ctaDisabled = list.length < 2;
   body.innerHTML = `
     <div class="compare-items">${chips}${emptySlots}</div>
-    <a href="${buildCompareUrl()}" class="compare-cta${ctaDisabled ? " disabled" : ""}"
-       title="${ctaDisabled ? "Agregá al menos 2 productos para comparar" : ""}">
-      ${ICON_COMPARE} Comparar productos
-    </a>
+    <div class="compare-actions">
+      <a href="${buildCompareUrl()}" class="compare-cta${ctaDisabled ? " disabled" : ""}"
+         title="${ctaDisabled ? "Agregá al menos 2 productos para comparar" : ""}">
+        ${ICON_COMPARE} Comparar
+      </a>
+      <button type="button" class="compare-clear" id="compareClear" aria-label="Borrar todos los productos seleccionados">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>
+        Borrar
+      </button>
+    </div>
   `;
 
   body.querySelectorAll("[data-remove]").forEach(btn => {
@@ -1912,6 +2087,12 @@ function renderCompareBar(){
       renderCompareBar();
       syncCompareCheckboxes();
     });
+  });
+
+  document.getElementById("compareClear").addEventListener("click", () => {
+    window.MacroledCompare.clearCompare();
+    renderCompareBar();
+    syncCompareCheckboxes();
   });
 
   updateComparePadding();
@@ -2068,9 +2249,12 @@ function renderBreadcrumb(){
     resetPotenciaRange();
     state.smartOnly = false;
     state.pendingSmartOnly = false;
-    state.sortBy = "";
     const sortSelect = document.getElementById("sortSelect");
-    if(sortSelect) sortSelect.value = "";
+    if(sortSelect){
+      sortSelect.value = "";
+      syncSortDropdown();
+    }
+    state.sortBy = "";
     state.page = 1;
     loadAndRender();
   }
@@ -2147,6 +2331,7 @@ async function loadAndRender(){
   if(isRefilter && gridShell){
     gridShell.classList.add("is-filtering");
     gridShell.setAttribute("aria-busy", "true");
+    scheduleCompareBoundaryUpdate();
   } else {
     showingLabel.textContent = "Cargando productos…";
   }
@@ -2183,6 +2368,7 @@ async function loadAndRender(){
     if(gridShell){
       gridShell.classList.remove("is-filtering");
       gridShell.setAttribute("aria-busy", "false");
+      scheduleCompareBoundaryUpdate();
     }
   }
 }
@@ -2190,11 +2376,57 @@ async function loadAndRender(){
 /* =========================================================
    TOOLBAR EVENTS
    ========================================================= */
-document.getElementById("sortSelect").addEventListener("change", (e) => {
+const sortSelect = document.getElementById("sortSelect");
+const sortDropdown = document.getElementById("sortDropdown");
+const sortTrigger = document.getElementById("sortTrigger");
+const sortMenu = document.getElementById("sortMenu");
+const sortCurrent = document.getElementById("sortCurrent");
+
+function syncSortDropdown(){
+  sortCurrent.textContent = "Ordenar por";
+  sortMenu.querySelectorAll(".sort-option").forEach(option => {
+    const active = option.dataset.sort === sortSelect.value;
+    option.classList.toggle("active", active);
+    option.setAttribute("aria-selected", String(active));
+  });
+}
+
+function closeSortDropdown(){
+  sortDropdown.classList.remove("open");
+  sortTrigger.setAttribute("aria-expanded", "false");
+  sortMenu.hidden = true;
+}
+
+sortTrigger.addEventListener("click", () => {
+  const willOpen = !sortDropdown.classList.contains("open");
+  sortDropdown.classList.toggle("open", willOpen);
+  sortTrigger.setAttribute("aria-expanded", String(willOpen));
+  sortMenu.hidden = !willOpen;
+});
+
+sortMenu.querySelectorAll(".sort-option").forEach(option => {
+  option.addEventListener("click", () => {
+    sortSelect.value = option.dataset.sort;
+    syncSortDropdown();
+    closeSortDropdown();
+    sortSelect.dispatchEvent(new Event("change", { bubbles:true }));
+  });
+});
+
+document.addEventListener("click", (event) => {
+  if(!sortDropdown.contains(event.target)) closeSortDropdown();
+});
+document.addEventListener("keydown", (event) => {
+  if(event.key === "Escape") closeSortDropdown();
+});
+
+sortSelect.addEventListener("change", (e) => {
+  syncSortDropdown();
   state.sortBy = e.target.value;
   state.page = 1;
   loadAndRender();
 });
+syncSortDropdown();
 
 function applySearchQuery(raw){
   const next = String(raw || "").trim();
@@ -2338,6 +2570,7 @@ filtersApply.addEventListener("click", async () => {
   state.potenciaMax = state.pendingPotenciaMax;
   state.smartOnly = state.pendingSmartOnly;
   document.getElementById("sortSelect").value = state.sortBy;
+  syncSortDropdown();
   state.page = 1;
   await loadAndRender();
   closeFiltersDrawer();
@@ -2399,13 +2632,15 @@ function renderMobileFilters(facetCounts){
   const listEl = document.getElementById("fmnList");
   const activeMacro = [...state.pending.macrofamilia][0];
 
+  const searching = Boolean(state.query);
   const rows = [
-    { field: "view", label: "Tipo de vista", summary: state.view === "list" ? "Lista" : "Grilla" },
-    { field: "smart", type: "switch", label: "Smart" }
+    { field: "view", label: "Tipo de vista", summary: state.view === "list" ? "Lista" : "Grilla" }
   ];
+  if(hasSmartProductsInContext(state.pending, searching, state.pendingSmartOnly)){
+    rows.push({ field: "smart", type: "switch", label: "Smart" });
+  }
 
   FMN_ORDER.forEach(field => {
-    const searching = Boolean(state.query);
     const hasFamilia = state.pending.familia.size > 0;
     if(searching && (field === "familia" || field === "subfamilia" || field === "categoria")) return;
     if(field === "familia" && (!activeMacro || hasFamilia)) return;
@@ -2580,11 +2815,12 @@ function openDetailScreen(field){
     const live = (lastFacetCounts.find(f => f.field_name === "macrofamilia") || {}).counts || [];
     const liveByVal = {};
     live.forEach(c => { liveByVal[c.value] = c.count; });
-    const counts = sortFacetCounts(
+    let counts = sortFacetCounts(
       Boolean(state.query) && cached.length
         ? cached.map(c => ({ value: c.value, count: liveByVal[c.value] != null ? liveByVal[c.value] : 0 }))
         : cached
     );
+    counts = filterSmartHierarchyCounts(counts, "macrofamilia", state.pending, state.pendingSmartOnly);
     const hasSelection = state.pending.macrofamilia.size > 0;
     bodyEl.innerHTML = counts.map(c => {
       const checked = state.pending.macrofamilia.has(c.value);
@@ -2614,7 +2850,12 @@ function openDetailScreen(field){
   } else if(field === "familia"){
     titleEl.textContent = FMN_LABELS.familia;
     const activeMacro = [...state.pending.macrofamilia][0];
-    const counts = resolveFamiliaCounts(lastFacetCounts, activeMacro, state.pending.familia);
+    const counts = filterSmartHierarchyCounts(
+      resolveFamiliaCounts(lastFacetCounts, activeMacro, state.pending.familia),
+      FAMILIA_FIELD,
+      state.pending,
+      state.pendingSmartOnly
+    );
     bodyEl.innerHTML = counts.map(c => {
       const checked = state.pending.familia.has(c.value);
       return `
@@ -2640,7 +2881,12 @@ function openDetailScreen(field){
     titleEl.textContent = "Subfamilia";
     const activeMacro = [...state.pending.macrofamilia][0];
     const familiaKey = [...state.pending.familia].sort().join(",");
-    const counts = resolveSubfamiliaCounts(lastFacetCounts, activeMacro, familiaKey, state.pending.subfamilia);
+    const counts = filterSmartHierarchyCounts(
+      resolveSubfamiliaCounts(lastFacetCounts, activeMacro, familiaKey, state.pending.subfamilia),
+      SUBFAMILIA_FIELD,
+      state.pending,
+      state.pendingSmartOnly
+    );
     bodyEl.innerHTML = counts.map(c => fmnCheckboxRowHtml("subfamilia", c)).join("");
     fmnWireCheckboxRows(bodyEl, "subfamilia");
   } else if(field === "potencia"){
@@ -2666,7 +2912,10 @@ function openDetailScreen(field){
     titleEl.textContent = FMN_LABELS[field];
     bodyEl.classList.remove("fmn-color-swatches");
     const data = lastFacetCounts.find(f => f.field_name === field);
-    const counts = sortFacetCounts(data ? data.counts : []);
+    let counts = sortFacetCounts(data ? data.counts : []);
+    if(field === "categoria"){
+      counts = filterSmartHierarchyCounts(counts, field, state.pending, state.pendingSmartOnly);
+    }
     bodyEl.innerHTML = counts.map(c => fmnCheckboxRowHtml(field, c)).join("");
     fmnWireCheckboxRows(bodyEl, field);
   }
@@ -2735,10 +2984,14 @@ function applyStateFromURL(){
   const page = parseInt(params.get("page") || "1", 10);
   state.page = Number.isFinite(page) && page > 0 ? page : 1;
 
-  const sort = params.get("sort") || "";
+  const sortParam = params.get("sort") || "";
+  const sort = ["nuevo:desc", "alpha:asc"].includes(sortParam) ? sortParam : "";
   state.sortBy = sort;
   const sortSelect = document.getElementById("sortSelect");
-  if(sortSelect) sortSelect.value = sort;
+  if(sortSelect){
+    sortSelect.value = sort;
+    syncSortDropdown();
+  }
 
   const potMin = params.get("pot_min");
   const potMax = params.get("pot_max");
@@ -2806,7 +3059,14 @@ function syncFiltersToURL(){
 
 applyStateFromURL();
 loadMacrofamiliaOptions();
-loadSmartSkuOptions();
+loadSmartSkuOptions().then(() => {
+  /* La primera grilla puede terminar antes que el índice auxiliar Smart.
+     Actualizamos sólo los paneles para aplicar la visibilidad correcta. */
+  if(document.getElementById("filtersPanel")?.children.length){
+    renderFacets(lastFacetCounts);
+    renderMobileFilters(lastFacetCounts);
+  }
+});
 loadPotenciaOptions().then(() => {
   const appliedPot = applyPendingUrlPotencia();
   if(!appliedPot) resetPotenciaRange();

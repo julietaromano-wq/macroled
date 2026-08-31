@@ -20,6 +20,7 @@
   const zoomLens = document.getElementById("zoomLens");
   const zoomPane = document.getElementById("zoomPane");
   const openLightboxBtn = document.getElementById("openLightboxBtn");
+  const mobileShareBtn = document.getElementById("mobileShareBtn");
   const canHoverZoom = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
   const THUMB_PLAY = `<span class="thumb-play" aria-hidden="true"><svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></span>`;
 
@@ -191,11 +192,7 @@
 
     stageEl.classList.toggle("is-video", video);
     if (openLightboxBtn) {
-      const mobileShare = window.matchMedia("(max-width: 640px)").matches;
-      openLightboxBtn.setAttribute(
-        "aria-label",
-        mobileShare ? "Compartir" : video ? "Ampliar video" : "Ampliar imagen"
-      );
+      openLightboxBtn.setAttribute("aria-label", video ? "Ampliar video" : "Ampliar imagen");
     }
 
     if (g.type === "html5video" && stageVideo) {
@@ -428,30 +425,21 @@
     if (e.target.closest("video") && stageVideo && !stageVideo.hidden) return;
     onOpenGallery(e);
   });
-  const mqShareInStage = window.matchMedia("(max-width: 640px)");
-  function syncStageCornerLabel() {
-    if (!openLightboxBtn || !GALLERY.length) return;
-    const g = GALLERY[activeIndex];
-    const video = g && isVideoType(g.type);
-    openLightboxBtn.setAttribute(
-      "aria-label",
-      mqShareInStage.matches ? "Compartir" : video ? "Ampliar video" : "Ampliar imagen"
-    );
-  }
-  mqShareInStage.addEventListener?.("change", syncStageCornerLabel);
-
   if (openLightboxBtn) {
     openLightboxBtn.addEventListener("click", (e) => {
       e.preventDefault();
       e.stopPropagation();
-      if (mqShareInStage.matches) {
-        /* En mobile el botón abre compartir; el tap en la imagen sigue ampliando */
-        if (typeof window.__mlToggleShareFromStage === "function") {
-          window.__mlToggleShareFromStage(openLightboxBtn);
-        }
-        return;
-      }
       onOpenGallery(e);
+    });
+  }
+
+  if (mobileShareBtn) {
+    mobileShareBtn.addEventListener("click", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      if (typeof window.__mlToggleShareFromStage === "function") {
+        window.__mlToggleShareFromStage(mobileShareBtn);
+      }
     });
   }
 
@@ -1993,6 +1981,13 @@
     setText("#crumb-name", name);
     setText("#ficha-sku", sku);
     setText("#ficha-ean", ean13);
+    const eanEl = document.getElementById("ficha-ean");
+    const eanWrap = eanEl && eanEl.closest("span");
+    if (eanWrap) {
+      eanWrap.hidden = !ean13;
+      const dot = eanWrap.previousElementSibling;
+      if (dot && dot.classList.contains("dot")) dot.hidden = !ean13;
+    }
     setText("#ficha-lead", description);
     if (macro || family) {
       setText("#ficha-eyebrow", [macro, family].filter(Boolean).join(" · "));
@@ -2640,7 +2635,7 @@
     });
     shareOpen = true;
     if (shareBtn) shareBtn.setAttribute("aria-expanded", "true");
-    if (openLightboxBtn) openLightboxBtn.setAttribute("aria-expanded", "true");
+    if (mobileShareBtn) mobileShareBtn.setAttribute("aria-expanded", "true");
   }
 
   function closeShareSheet() {
@@ -2654,7 +2649,7 @@
     setTimeout(finish, 360);
     shareOpen = false;
     if (shareBtn) shareBtn.setAttribute("aria-expanded", "false");
-    if (openLightboxBtn) openLightboxBtn.setAttribute("aria-expanded", "false");
+    if (mobileShareBtn) mobileShareBtn.setAttribute("aria-expanded", "false");
   }
 
   function openShareMenu() {
@@ -2677,7 +2672,7 @@
     if (shareMenu) shareMenu.hidden = true;
     shareOpen = false;
     if (shareBtn) shareBtn.setAttribute("aria-expanded", "false");
-    if (openLightboxBtn) openLightboxBtn.setAttribute("aria-expanded", "false");
+    if (mobileShareBtn) mobileShareBtn.setAttribute("aria-expanded", "false");
   }
 
   function toggleShareFromStage() {
@@ -2828,11 +2823,24 @@
     setTimeout(tick, 200);
   }
 
+  /**
+   * Hasta acá el nombre/SKU/EAN/specs visibles eran el placeholder estático
+   * del HTML. initVariants() ya corrió (sync) y aplicó el producto real si
+   * lo encontró, así que revelar ahora no deja ver el placeholder viejo.
+   * Si el embed CMS nunca aparece, esto también se ejecuta (bootFicha corre
+   * igual tras el timeout de waitForCmsAndBoot) para no dejar la ficha oculta.
+   */
+  function revealFicha() {
+    const wrap = document.querySelector(".wrap.is-hydrating");
+    if (wrap) wrap.classList.remove("is-hydrating");
+  }
+
   function bootFicha() {
     hardenCtaUtility();
     initVariants();
     watchForLateVariants();
     initReveals();
+    revealFicha();
   }
 
   function waitForCmsAndBoot() {
@@ -2856,4 +2864,8 @@
   }
 
   waitForCmsAndBoot();
+  /* Red de seguridad: si por lo que sea bootFicha tarda de más, no dejamos
+     la ficha oculta más de 1.2s (peor caso normal: el embed CMS ya está en
+     el DOM y esto ni se nota, revealFicha ya corrió antes). */
+  setTimeout(revealFicha, 1200);
 })();
