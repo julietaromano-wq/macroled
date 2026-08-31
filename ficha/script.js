@@ -899,10 +899,14 @@
 
   const SMART_APP_LINES = new Set(["ROMA", "TOKIO"]);
 
-  function isRomaTokioSmartProduct(el, specs) {
+  function isSmartProduct(el, specs) {
     const smartRaw =
       specs["Smart"] || specs["Tecnología"] || el.getAttribute("data-smart");
-    if (!isTruthyFlag(smartRaw)) return false;
+    return isTruthyFlag(smartRaw);
+  }
+
+  function isRomaTokioSmartProduct(el, specs) {
+    if (!isSmartProduct(el, specs)) return false;
 
     const linea = normalizeLinea(
       el.getAttribute("data-linea") || el.getAttribute("data-line") || ""
@@ -922,11 +926,10 @@
   }
 
   function syncSmartBanner(el, specs) {
-    const isSmart = isRomaTokioSmartProduct(el, specs);
     const banner = document.getElementById("smartBanner");
-    if (banner) banner.hidden = !isSmart;
+    if (banner) banner.hidden = !isSmartProduct(el, specs);
     const warning = document.getElementById("smartWarning");
-    if (warning) warning.hidden = !isSmart;
+    if (warning) warning.hidden = !isRomaTokioSmartProduct(el, specs);
   }
 
   /* Orden de jerarquía. Solo se muestran hasta TRUST_MAX visibles. */
