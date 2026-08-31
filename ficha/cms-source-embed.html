@@ -1,6 +1,11 @@
 <!--
   Reutiliza el embed CMS que ya tienen en Webflow (data-specs JSON).
   Solo se listan campos base + specs. Vacío en CMS = "" en JSON = no se muestra.
+
+  data-smart: solo bindear a {{wf:SMART|Dynamo}} en collections que tengan
+  el campo "SMART" (confirmado en Final_Lámparas Copy, Final_Rieles Magnéticos
+  y Final_Reflectores). Paneles y Artefactos todavía NO tienen ese campo:
+  dejar data-smart="" en esas collections hasta que se agregue el campo.
 -->
 <div class="cms-product-item"
      data-hero
@@ -30,7 +35,7 @@
      data-relacionados-despiece="{{wf:PRODUCTOS RELACIONADOS (DESPIECE)|Dynamo}}"
      data-compatibles="{{wf:PRODUCTOS COMPATIBLES|Dynamo}}"
      data-product-url="/{{wf:Slug|Dynamo}}"
-     data-smart=""
+     data-smart="{{wf:SMART|Dynamo}}"
      data-specs='{
        "Ángulo de apertura": "{{wf:ANGULO DE APERTURA|Dynamo}}",
        "Autonomía": "{{wf:AUTONOMÍA|Dynamo}}",
