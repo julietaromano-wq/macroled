@@ -370,6 +370,18 @@ if (typeof module !== "undefined") module.exports = MEGAMENU_DATA;
 
   var ALL_PRODUCTS_URL = "/productos";
   var HOME_URL = localizeHref("/nuevo-home-final") || "/";
+  var CATALOG_QS_KEY = "macroled_catalog_qs";
+
+  function saveCatalogQuery(href) {
+    try {
+      var url = new URL(href, window.location.origin);
+      var path = url.pathname.replace(/\/+$/, "") || "/";
+      if (path !== "/productos") return;
+      var qs = (url.search || "").replace(/^\?/, "");
+      if (qs) sessionStorage.setItem(CATALOG_QS_KEY, qs);
+      else sessionStorage.removeItem(CATALOG_QS_KEY);
+    } catch (err) {}
+  }
   var GROUP_AS_FAMILIA = {
     "interruptores-tomas": true,
     "luminarias-proyecto": true
@@ -439,6 +451,7 @@ if (typeof module !== "undefined") module.exports = MEGAMENU_DATA;
   window.MACROLED_MENU = window.MACROLED_MENU || {};
   window.MACROLED_MENU.catalogUrl = catalogUrl;
   window.MACROLED_MENU.localizeHref = localizeHref;
+  window.MACROLED_MENU.saveCatalogQuery = saveCatalogQuery;
   window.MACROLED_MENU.ALL_PRODUCTS_URL = ALL_PRODUCTS_URL;
   window.MACROLED_MENU.HOME_URL = HOME_URL;
 })();
@@ -1373,25 +1386,63 @@ if (typeof module !== "undefined") module.exports = MEGAMENU_DATA;
   if (window.__macroledNavThemeInit) return;
   window.__macroledNavThemeInit = true;
 
+  function navHeight() {
+    var menu = document.getElementById("macroled-menu");
+    if (!menu) return 72;
+    var desktop = menu.querySelector(".mm-site-nav");
+    var mobile = menu.querySelector(".mm-mobile-bar");
+    var bar = window.matchMedia && window.matchMedia("(max-width: 1100px)").matches ? mobile : desktop;
+    bar = bar || desktop || mobile;
+    return (bar && bar.getBoundingClientRect().height) || 72;
+  }
+
+  function readTheme(el) {
+    if (!el) return null;
+    var theme = String(el.getAttribute("data-nav-theme") || "").toLowerCase();
+    return theme === "dark" || theme === "light" ? theme : null;
+  }
+
   function sectionTheme() {
-    var probe = 36;
     var nodes = document.querySelectorAll("[data-nav-theme]");
-    var i, el, rect, theme, picked = null, pickedTop = -Infinity;
+    if (!nodes.length) return null;
+
+    var navH = navHeight();
+    var probes = [Math.max(8, Math.round(navH * 0.45)), navH + 2, navH + 18];
+    var p, i, el, rect, theme, picked, pickedTop;
+
+    for (p = 0; p < probes.length; p++) {
+      picked = null;
+      pickedTop = -Infinity;
+      for (i = 0; i < nodes.length; i++) {
+        el = nodes[i];
+        rect = el.getBoundingClientRect();
+        if (rect.bottom <= probes[p] || rect.top > probes[p]) continue;
+        theme = readTheme(el);
+        if (!theme) continue;
+        if (rect.top >= pickedTop) {
+          picked = theme;
+          pickedTop = rect.top;
+        }
+      }
+      if (picked) return picked;
+    }
+
     for (i = 0; i < nodes.length; i++) {
       el = nodes[i];
       rect = el.getBoundingClientRect();
-      if (rect.bottom <= probe || rect.top > probe) continue;
-      theme = String(el.getAttribute("data-nav-theme") || "").toLowerCase();
-      if (theme !== "dark" && theme !== "light") continue;
-      if (rect.top >= pickedTop) {
-        picked = theme;
-        pickedTop = rect.top;
-      }
+      if (rect.bottom <= 0 || rect.top >= navH + 24) continue;
+      theme = readTheme(el);
+      if (theme) return theme;
     }
-    return picked || "light";
+
+    if ((window.scrollY || window.pageYOffset || 0) < 12) {
+      return readTheme(nodes[0]);
+    }
+    return null;
   }
 
   function apply(menu, theme) {
+    if (!theme) return;
     var next = theme === "dark" ? "dark" : "light";
     if (menu.getAttribute("data-mm-theme") === next) return;
     menu.setAttribute("data-mm-theme", next);
@@ -1423,6 +1474,23 @@ if (typeof module !== "undefined") module.exports = MEGAMENU_DATA;
     update();
     window.addEventListener("scroll", onScroll, { passive: true });
     window.addEventListener("resize", onScroll, { passive: true });
+    [50, 150, 400, 1000].forEach(function (ms) { setTimeout(update, ms); });
+    window.Webflow = window.Webflow || [];
+    window.Webflow.push(function () {
+      requestAnimationFrame(update);
+      setTimeout(update, 80);
+      setTimeout(update, 400);
+    });
+    if (typeof MutationObserver !== "undefined" && document.body) {
+      var obs = new MutationObserver(function () { update(); });
+      obs.observe(document.body, {
+        childList: true,
+        subtree: true,
+        attributes: true,
+        attributeFilter: ["data-nav-theme"]
+      });
+      setTimeout(function () { obs.disconnect(); }, 4000);
+    }
   }
 
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init);
@@ -1446,6 +1514,25 @@ if (typeof module !== "undefined") module.exports = MEGAMENU_DATA;
       if (next && next !== href) a.setAttribute("href", next);
     });
   }
+
+  document.addEventListener("click", function (e) {
+    var menu = document.getElementById("macroled-menu");
+    if (!menu) return;
+    var a = e.target && e.target.closest ? e.target.closest("a[href]") : null;
+    if (!a || !menu.contains(a)) return;
+    var href = localizeHref(a.getAttribute("href") || "");
+    if (!href || href === "#") return;
+    var url;
+    try { url = new URL(href, window.location.origin); } catch (err) { return; }
+    var path = url.pathname.replace(/\/+$/, "") || "/";
+    if (path !== "/productos") return;
+    if (window.MACROLED_MENU && typeof window.MACROLED_MENU.saveCatalogQuery === "function") {
+      window.MACROLED_MENU.saveCatalogQuery(url.pathname + url.search);
+    }
+    if (!url.search) return;
+    e.preventDefault();
+    window.location.assign(url.pathname + url.search + url.hash);
+  }, true);
 
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", rewriteMenuLinks);
   else rewriteMenuLinks();

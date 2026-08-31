@@ -2953,7 +2953,22 @@ function expandUrlParamValues(params, key){
 }
 
 function applyStateFromURL(){
-  const params = new URLSearchParams(location.search);
+  let search = location.search;
+  const urlParams = new URLSearchParams(location.search);
+  const hasUrlFilter = URL_FILTER_KEYS.some(([param]) => urlParams.has(param)) || urlParams.has("q");
+  if(!hasUrlFilter){
+    try {
+      const saved = sessionStorage.getItem("macroled_catalog_qs");
+      if(saved){
+        search = saved.charAt(0) === "?" ? saved : `?${saved}`;
+        sessionStorage.removeItem("macroled_catalog_qs");
+        history.replaceState({}, "", `${location.pathname}${search}`);
+      }
+    } catch (_) {}
+  } else {
+    try { sessionStorage.removeItem("macroled_catalog_qs"); } catch (_) {}
+  }
+  const params = new URLSearchParams(search.charAt(0) === "?" ? search.slice(1) : search);
   clearSelectedFilters();
   // No usar resetPotenciaRange() acá: los bounds todavía pueden ser el
   // placeholder 0–1800 y eso deja el slider “activo” al cargar el index.
