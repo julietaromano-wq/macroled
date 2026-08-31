@@ -47,59 +47,48 @@ html.mm-scroll-lock body {
   overscroll-behavior: none !important;
 }
 
-#macroled-menu.is-on-dark .mm-site-nav,
-#macroled-menu.nav-dark .mm-site-nav {
+/* Oscuro solo con el megamenú cerrado. Si está abierto, gana el bloque blanco de abajo. */
+#macroled-menu.is-on-dark:not(.mm-mega-open):not(:has(.mm-root.is-open)) .mm-site-nav,
+#macroled-menu.nav-dark:not(.mm-mega-open):not(:has(.mm-root.is-open)) .mm-site-nav {
   background: rgba(0, 21, 43, 0.16) !important;
   border-bottom: 1px solid rgba(255, 255, 255, 0.16) !important;
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
 }
-#macroled-menu.is-on-dark .mm-site-nav .mm-links > a,
-#macroled-menu.is-on-dark .mm-trigger,
-#macroled-menu.nav-dark .mm-site-nav .mm-links > a,
-#macroled-menu.nav-dark .mm-trigger {
+#macroled-menu.is-on-dark:not(.mm-mega-open):not(:has(.mm-root.is-open)) .mm-site-nav .mm-links > a,
+#macroled-menu.is-on-dark:not(.mm-mega-open):not(:has(.mm-root.is-open)) .mm-trigger,
+#macroled-menu.nav-dark:not(.mm-mega-open):not(:has(.mm-root.is-open)) .mm-site-nav .mm-links > a,
+#macroled-menu.nav-dark:not(.mm-mega-open):not(:has(.mm-root.is-open)) .mm-trigger {
   color: #fff !important;
 }
-#macroled-menu.is-on-dark .mm-site-nav .mm-links > a:hover {
+#macroled-menu.is-on-dark:not(.mm-mega-open):not(:has(.mm-root.is-open)) .mm-site-nav .mm-links > a:hover {
   color: #e8f7ff;
 }
 
-/* Megamenu abierto: la barra siempre es blanca, aunque el fondo de la página sea oscuro */
-#macroled-menu:has(.mm-root.is-open) .mm-site-nav,
+/* Megamenú abierto: la barra de arriba siempre es blanca */
 #macroled-menu.mm-mega-open .mm-site-nav,
-#macroled-menu.is-on-dark:has(.mm-root.is-open) .mm-site-nav,
-#macroled-menu.is-on-dark.mm-mega-open .mm-site-nav,
-#macroled-menu.nav-dark:has(.mm-root.is-open) .mm-site-nav,
-#macroled-menu.nav-dark.mm-mega-open .mm-site-nav {
+#macroled-menu:has(.mm-root.is-open) .mm-site-nav {
   background: #fff !important;
   border-bottom: 1px solid var(--line, #e6e6e6) !important;
-  backdrop-filter: none;
-  -webkit-backdrop-filter: none;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
 }
-#macroled-menu:has(.mm-root.is-open) .mm-site-nav .mm-links > a,
-#macroled-menu:has(.mm-root.is-open) .mm-trigger,
 #macroled-menu.mm-mega-open .mm-site-nav .mm-links > a,
 #macroled-menu.mm-mega-open .mm-trigger,
-#macroled-menu.is-on-dark:has(.mm-root.is-open) .mm-site-nav .mm-links > a,
-#macroled-menu.is-on-dark:has(.mm-root.is-open) .mm-trigger,
-#macroled-menu.is-on-dark.mm-mega-open .mm-site-nav .mm-links > a,
-#macroled-menu.is-on-dark.mm-mega-open .mm-trigger,
-#macroled-menu.nav-dark:has(.mm-root.is-open) .mm-site-nav .mm-links > a,
-#macroled-menu.nav-dark:has(.mm-root.is-open) .mm-trigger,
-#macroled-menu.nav-dark.mm-mega-open .mm-site-nav .mm-links > a,
-#macroled-menu.nav-dark.mm-mega-open .mm-trigger {
+#macroled-menu:has(.mm-root.is-open) .mm-site-nav .mm-links > a,
+#macroled-menu:has(.mm-root.is-open) .mm-trigger {
   color: var(--ink, #16294f) !important;
 }
-#macroled-menu:has(.mm-root.is-open) .mm-root.is-open .mm-trigger,
+#macroled-menu.mm-mega-open .mm-site-nav .mm-links > a:hover,
+#macroled-menu:has(.mm-root.is-open) .mm-site-nav .mm-links > a:hover,
 #macroled-menu.mm-mega-open .mm-root.is-open .mm-trigger,
-#macroled-menu.is-on-dark .mm-root.is-open .mm-trigger,
-#macroled-menu.nav-dark .mm-root.is-open .mm-trigger {
+#macroled-menu:has(.mm-root.is-open) .mm-root.is-open .mm-trigger {
   color: var(--tint-text, #006ea5) !important;
 }
-#macroled-menu:has(.mm-root.is-open) .mm-logo,
-#macroled-menu:has(.mm-root.is-open) .mm-logo svg,
 #macroled-menu.mm-mega-open .mm-logo,
-#macroled-menu.mm-mega-open .mm-logo svg {
+#macroled-menu.mm-mega-open .mm-logo svg,
+#macroled-menu:has(.mm-root.is-open) .mm-logo,
+#macroled-menu:has(.mm-root.is-open) .mm-logo svg {
   color: #00bdff;
 }
 #macroled-menu.is-on-dark #mm-mobile .mm-mobile-bar {
@@ -159,10 +148,20 @@ html.mm-scroll-lock body {
     overflow: visible;
     gap: 32px;
   }
-  .mm-logo { color: #00bdff; flex-shrink:0; width: 180px; }
-  .mm-logo svg { display: block; width: 100%; height: auto; }
+  .mm-logo {
+    color: #00bdff;
+    flex-shrink: 0;
+    width: 180px;
+    display: block;
+    position: relative;
+    z-index: 30;
+    cursor: pointer;
+    pointer-events: auto;
+  }
+  .mm-logo svg { display: block; width: 100%; height: auto; pointer-events: none; }
   .mm-site-nav .mm-links {
     flex: 1;
+    min-width: 0;
     display:flex; align-items:center; justify-content:center; gap:28px;
   }
   .mm-site-nav .mm-links > a {
@@ -865,6 +864,11 @@ html.mm-scroll-lock body {
     max-width: 124px;
     color: #fff;
     line-height: 0;
+    display: block;
+    position: relative;
+    z-index: 30;
+    cursor: pointer;
+    pointer-events: auto;
   }
   #mm-mobile .mm-logo svg,
   #mm-mobile .mm-logo-svg {
