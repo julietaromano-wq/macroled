@@ -125,22 +125,14 @@
   .diff-bar-toggle .switch.on{background:var(--brand);}
   .diff-bar-toggle .switch.on .knob{transform:translateX(16px);}
 
-  /* affordance persistente de scroll horizontal: gradiente + puntos, no
-     dependen de que el usuario haya leído el hint de texto a tiempo */
+  /* affordance persistente de scroll horizontal: no depende de que el
+     usuario haya leído el hint de texto a tiempo */
   .scroll-fade{
     position:absolute;top:0;right:0;bottom:0;width:36px;pointer-events:none;
     background:linear-gradient(90deg, rgba(255,255,255,0), rgba(20,24,33,.10));
     opacity:0;transition:opacity .2s;
   }
   .scroll-fade.show{opacity:1;}
-  .scroll-dots{
-    position:absolute;left:50%;bottom:10px;transform:translateX(-50%);
-    display:flex;gap:5px;background:rgba(0,21,43,.55);padding:5px 8px;border-radius:20px;
-    opacity:0;pointer-events:none;transition:opacity .2s;
-  }
-  .scroll-dots.show{opacity:1;}
-  .scroll-dots span{width:5px;height:5px;border-radius:50%;background:rgba(255,255,255,.4);transition:background .15s,transform .15s;flex:none;}
-  .scroll-dots span.on{background:#fff;transform:scale(1.3);}
 
   .share-btn{
     display:none;align-items:center;justify-content:center;gap:8px;
@@ -167,7 +159,7 @@
 
   @media print{ .mini-compare-bar{display:none !important;} }
   @media screen and (max-width:900px){ .mini-compare-inner{padding:0 20px;} }
-  @media screen and (max-width:560px){ .mini-compare-inner{padding:0 14px;} .mini-cell{padding:11px 12px;gap:10px;} .mini-cell .thumb{width:36px;height:36px;} .mini-cell .name{font-size:13px;} .mini-cell .sku{display:none;} }
+  @media screen and (max-width:560px){ .mini-compare-inner{padding:0 14px;} .mini-cell{padding:11px 12px;gap:10px;} .mini-cell .thumb{width:36px;height:36px;} .mini-cell .name{font-size:13px;} .mini-cell .sku{font-size:11px;} }
 
   .toolbar{display:flex;align-items:center;justify-content:flex-end;flex-wrap:wrap;gap:14px;margin-bottom:18px;}
   .diff-toggle{display:flex;align-items:center;gap:10px;font-size:var(--fs-sm);color:var(--ink);font-weight:600;cursor:pointer;user-select:none;}
@@ -216,6 +208,12 @@
     background:#fff;
     font-size:var(--fs-sm);font-weight:500;color:var(--muted);
     position:relative;z-index:3;will-change:transform;
+    /* backface-visibility:hidden fuerza a WebKit a promover esta celda a
+       su propia capa de composición estable — sin esto, en iOS Safari
+       el borde/contenido de esta columna (movida a mano con transform en
+       cada scroll, ver pinStickyColumns) puede recortarse o parpadear un
+       par de px durante el gesto de scroll táctil real. */
+    backface-visibility:hidden;-webkit-backface-visibility:hidden;
   }
   .header-label{align-items:flex-start;flex-direction:column;justify-content:end;gap:10px;padding:20px 16px;background:#fff;}
   .header-label .diff-toggle{display:flex;align-items:center;gap:9px;font-size:var(--fs-sm);color:var(--ink);font-weight:600;cursor:pointer;user-select:none;line-height:1.3;}
@@ -238,6 +236,7 @@
   .cell.section .section-title{
     position:relative;will-change:transform;
     display:inline-flex;flex-direction:row;flex-wrap:nowrap;align-items:center;gap:10px;min-width:0;
+    backface-visibility:hidden;-webkit-backface-visibility:hidden;
   }
   .cell.section .section-title svg{
     width:18px;height:18px;flex:none;color:var(--btn-blue);
@@ -865,8 +864,12 @@
     .share-btn{font-size:14px;min-height:44px;}
     /* en mobile el switch de "solo diferencias" no vive apretado en la
        columna de labels de 132px: se oculta acá y se usa #diffBar en su
-       lugar, siempre visible arriba de la tabla */
-    .diff-bar{display:block;}
+       lugar. sticky (no solo "arriba de la tabla" en el flujo normal):
+       si no, al scrollear se pierde de vista igual que cualquier otro
+       contenido — con sticky queda pegado al top mientras se scrollea la
+       tabla de specs. z-index menor al de #miniHeader (100010): cuando
+       el mini-header aparece más abajo en el scroll, lo tapa. */
+    .diff-bar{display:block;position:sticky;top:0;z-index:100005;}
     .diff-bar-toggle{font-size:15px;padding:12px 20px;}
 
     /* Carrusel horizontal: label sticky + productos anchos */
@@ -904,8 +907,12 @@
        track de 132px en el grid — si se saca del flow con display:none,
        el auto-placement corre una columna a la izquierda y el primer
        "Agregar" cae apretado en esa columna angosta en vez de quedar en
-       la suya de 220px+ */
-    .header-label{visibility:hidden;}
+       la suya de 220px+. Pero sin colapsar alto/padding, su texto
+       envuelto en 132px (4 líneas) estira toda la fila de encabezado y
+       deja un espacio vacío parejo debajo de las cards de producto — por
+       eso además se le saca la altura real con height:0 y se limpia el
+       padding/gap, así no aporta nada a la altura de la fila. */
+    .header-label{visibility:hidden;height:0;min-height:0;padding:0;gap:0;overflow:hidden;}
     /* sin filas de specs (0 productos) esa columna de 132px no la usa
        nadie más: ahí sí se puede sacar del todo el track en vez de
        dejarlo reservado e invisible */

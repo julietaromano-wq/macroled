@@ -1143,22 +1143,11 @@ document.getElementById("compareShell").addEventListener("scroll", function onFi
 function updateScrollAffordance(){
   const shell = document.getElementById("compareShell");
   const fade = document.getElementById("scrollFade");
-  const dots = document.getElementById("scrollDots");
-  if(!shell || !fade || !dots) return;
+  if(!shell || !fade) return;
   const max = shell.scrollWidth - shell.clientWidth;
   const hasOverflow = max > 4;
 
   fade.classList.toggle("show", hasOverflow && shell.scrollLeft < max - 4);
-  dots.classList.toggle("show", hasOverflow);
-  if(!hasOverflow) return;
-
-  const count = Math.min(COMPARE_MAX, Math.max(1, comparedProducts.length + (comparedProducts.length < COMPARE_MAX ? 1 : 0)));
-  if(dots.children.length !== count){
-    dots.innerHTML = Array.from({ length: count }).map(() => "<span></span>").join("");
-  }
-  const progress = shell.scrollLeft / max;
-  const active = Math.min(count - 1, Math.round(progress * (count - 1)));
-  Array.from(dots.children).forEach((dot, i) => dot.classList.toggle("on", i === active));
 }
 
 /* =========================================================
@@ -1190,7 +1179,7 @@ function updateMiniHeader(){
   for(let i = 0; i < COMPARE_MAX; i++){
     const p = comparedProducts[i];
     html += p
-      ? `<div class="mini-cell"><div class="thumb">${p.img ? `<img src="${escAttr(p.img)}" alt="">` : ""}</div><div class="mini-info"><div class="name">${p.name}</div><div class="sku">${escAttr(currentVariantSummary(p))}</div></div></div>`
+      ? `<div class="mini-cell"><div class="thumb">${p.img ? `<img src="${escAttr(p.img)}" alt="">` : ""}</div><div class="mini-info"><div class="name">${p.name}</div><div class="sku">${escAttr(p.sku)}</div></div></div>`
       : `<div class="mini-cell"></div>`;
   }
   miniGrid.innerHTML = html;
