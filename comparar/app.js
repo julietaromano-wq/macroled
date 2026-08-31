@@ -882,14 +882,14 @@ function render(){
   document.getElementById("diffCheckbox").addEventListener("change", (e) => {
     showOnlyDiffs = e.target.checked;
     document.getElementById("diffSwitch").classList.toggle("on", showOnlyDiffs);
-    document.getElementById("diffFloatSwitch").classList.toggle("on", showOnlyDiffs);
+    document.getElementById("diffFloatSwitch")?.classList.toggle("on", showOnlyDiffs);
     render();
   });
   if(showOnlyDiffs){
     document.getElementById("diffCheckbox").checked = true;
     document.getElementById("diffSwitch").classList.add("on");
   }
-  document.getElementById("diffFloatSwitch").classList.toggle("on", showOnlyDiffs);
+  document.getElementById("diffFloatSwitch")?.classList.toggle("on", showOnlyDiffs);
 
   updateMiniHeader();
   observeHeaderSentinel();
@@ -1144,6 +1144,7 @@ function updateScrollAffordance(){
   const shell = document.getElementById("compareShell");
   const fade = document.getElementById("scrollFade");
   const dots = document.getElementById("scrollDots");
+  if(!shell || !fade || !dots) return;
   const max = shell.scrollWidth - shell.clientWidth;
   const hasOverflow = max > 4;
 
@@ -1219,13 +1220,21 @@ function observeHeaderSentinel(){
    mismo estado (showOnlyDiffs) y se mantienen sincronizados entre sí en
    render().
    ========================================================= */
-document.getElementById("diffFloatToggle").addEventListener("click", () => {
-  showOnlyDiffs = !showOnlyDiffs;
-  document.getElementById("diffSwitch").classList.toggle("on", showOnlyDiffs);
-  document.getElementById("diffCheckbox").checked = showOnlyDiffs;
-  document.getElementById("diffFloatSwitch").classList.toggle("on", showOnlyDiffs);
-  render();
-});
+// se protege con un check de null: si esta página quedó cacheada con un
+// HTML viejo (sin el bloque #diffBar) mientras se sirve un app.js más
+// nuevo, esto no debe tirar abajo el resto del script — sin esto, una
+// excepción acá corta TODO el render que sigue más abajo en el archivo.
+const diffFloatToggleEl = document.getElementById("diffFloatToggle");
+if(diffFloatToggleEl){
+  diffFloatToggleEl.addEventListener("click", () => {
+    showOnlyDiffs = !showOnlyDiffs;
+    document.getElementById("diffSwitch")?.classList.toggle("on", showOnlyDiffs);
+    const diffCheckboxEl = document.getElementById("diffCheckbox");
+    if(diffCheckboxEl) diffCheckboxEl.checked = showOnlyDiffs;
+    document.getElementById("diffFloatSwitch")?.classList.toggle("on", showOnlyDiffs);
+    render();
+  });
+}
 
 /* =========================================================
    UN SOLO LISTENER DE SCROLL HORIZONTAL — antes había varios listeners
@@ -1267,13 +1276,16 @@ document.getElementById("compareShell").addEventListener("scrollend", resyncHori
 
   const printBtn = document.getElementById("printBtn");
   const shareBtn = document.getElementById("shareBtn");
-  printBtn.style.display = "none";
+  if(!shareBtn) return; // HTML viejo sin el botón de compartir: se queda con "Imprimir"
+  if(printBtn) printBtn.style.display = "none";
   shareBtn.hidden = false;
   shareBtn.style.display = "inline-flex";
 
   function showShareToast(text){
     const toast = document.getElementById("shareToast");
-    document.getElementById("shareToastText").textContent = text;
+    const toastText = document.getElementById("shareToastText");
+    if(!toast || !toastText) return;
+    toastText.textContent = text;
     toast.classList.add("show");
     clearTimeout(showShareToast._t);
     showShareToast._t = setTimeout(() => toast.classList.remove("show"), 1800);
