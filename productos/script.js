@@ -792,8 +792,13 @@ async function searchTypesense(){
   if(alphabetical){
     params.set("per_page", "250");
     params.set("page", "1");
-  }else if(state.sortBy){
-    params.set("sort_by", state.sortBy);
+    params.set("sort_by", "order:asc");
+  }else if(state.sortBy === "nuevo:desc"){
+    params.set("sort_by", "nuevo:desc");
+  }else{
+    // Destacados: forzar el orden del catálogo. Sin sort_by, Typesense no
+    // garantiza order (con q=* todos empatan en relevancia y el orden varía).
+    params.set("sort_by", "order:asc");
   }
 
   try{
@@ -1421,12 +1426,98 @@ function buildSmartBadge(doc){
   return `<span class="smart-badge">${ICON_WIFI}SMART</span>`;
 }
 
-// Paleta suave de temperatura (cálido / neutro / frío) — misma para specs y filtros
-const TEMP_TONES = {
-  calido: { color: "#fff79b", label: "Cálido" },
-  neutro: { color: "#d9d9d9", label: "Neutro" },
-  frio:   { color: "#bce4fa", label: "Frío" }
+// Paleta de temperatura / color de luz — pastilla en cards y filtros
+const TEMP_VARIANT_TONES = {
+  calido:          { color: "#fff79b", label: "Cálido", order: 100 },
+  neutro:          { color: "#d9d9d9", label: "Neutro", order: 200 },
+  frio:            { color: "#bce4fa", label: "Frío", order: 300 },
+  rgb:             { color: "linear-gradient(135deg,#e74c3c 0%,#f1c40f 33%,#2ecc71 66%,#3498db 100%)", label: "RGB", order: 400 },
+  rgbw:            { color: "linear-gradient(135deg,#e74c3c 0%,#f1c40f 25%,#2ecc71 50%,#3498db 75%,#f5f5f5 100%)", label: "RGB+W", order: 410 },
+  rgb_calido:      { color: "linear-gradient(135deg,#e74c3c 0%,#f1c40f 25%,#fff79b 100%)", label: "RGB + Cálido", order: 420 },
+  frio_ambar:      { color: "linear-gradient(135deg,#bce4fa 50%,#ffbf00 50%)", label: "Frío + Ámbar", order: 430 },
+  azul:            { color: "#1565c0", label: "Azul", order: 500 },
+  amarillo:        { color: "#fdd835", label: "Amarillo", order: 510 },
+  rojo:            { color: "#c62828", label: "Rojo", order: 520 },
+  verde:           { color: "#2e7d32", label: "Verde", order: 530 },
+  ambar:           { color: "#ffbf00", label: "Ámbar", order: 540 },
+  cct:             { color: "#90a4ae", label: "CCT", order: 600 },
+  blanco_dinamico: { color: "linear-gradient(135deg,#fff79b 0%,#d9d9d9 50%,#bce4fa 100%)", label: "Blanco Dinámico", order: 610 }
 };
+const TEMP_TONES = {
+  calido: TEMP_VARIANT_TONES.calido,
+  neutro: TEMP_VARIANT_TONES.neutro,
+  frio:   TEMP_VARIANT_TONES.frio
+};
+const TEMP_VARIANT_SKIP = new Set(["noooo", "nooo", "no"]);
+
+function normTempText(value){
+  return String(value || "")
+    .trim()
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "");
+}
+
+function matchTempVariantKey(raw){
+  const norm = normTempText(raw);
+  if(!norm || TEMP_VARIANT_SKIP.has(norm)) return null;
+
+  const kelvin = parseInt(raw, 10);
+  if(!Number.isNaN(kelvin)){
+    if(kelvin <= 3000) return "calido";
+    if(kelvin <= 4500) return "neutro";
+    return "frio";
+  }
+
+  if(/blanco\s*dinamico/.test(norm)) return "blanco_dinamico";
+  if(/rgb\s*\+\s*w|rgbw/.test(norm)) return "rgbw";
+  if(/rgb\s*\+\s*calido/.test(norm)) return "rgb_calido";
+  if(/frio\s*\+\s*ambar/.test(norm)) return "frio_ambar";
+  if(/^rgb$/.test(norm)) return "rgb";
+  if(/^cct$/.test(norm)) return "cct";
+  if(/c[aá]lido/.test(norm)) return "calido";
+  if(/neutro/.test(norm)) return "neutro";
+  if(/fr[ií]o/.test(norm)) return "frio";
+  if(/^azul$/.test(norm)) return "azul";
+  if(/^amarillo$/.test(norm)) return "amarillo";
+  if(/^rojo$/.test(norm)) return "rojo";
+  if(/^verde$/.test(norm)) return "verde";
+  if(/^ambar$/.test(norm)) return "ambar";
+
+  return null;
+}
+
+function splitTempVariantParts(source){
+  return String(source || "")
+    .split(/[;|]/)
+    .flatMap(part => part.split(/\s*,\s*/))
+    .map(s => s.trim())
+    .filter(Boolean);
+}
+
+function tempVariantSortOrder(key, raw){
+  const tone = TEMP_VARIANT_TONES[key];
+  if(tone) return tone.order;
+  const k = parseInt(raw, 10);
+  return Number.isNaN(k) ? 9999 : k;
+}
+
+function buildTempVariantEntries(doc, fallbackValue){
+  const source = getLuzToneSource(doc, fallbackValue);
+  if(!source) return [];
+
+  const seen = new Set();
+  const entries = [];
+  splitTempVariantParts(source).forEach(part => {
+    const key = matchTempVariantKey(part);
+    if(!key || seen.has(key)) return;
+    seen.add(key);
+    const tone = TEMP_VARIANT_TONES[key];
+    if(tone) entries.push({ key, color: tone.color, label: tone.label, order: tempVariantSortOrder(key, part) });
+  });
+
+  return entries.sort((a, b) => a.order - b.order);
+}
 
 /* =========================================================
    COLOR FACET — círculos + unificación de variantes
@@ -1626,29 +1717,39 @@ function appendColorSwatches(container, counts, selectedSet, onToggle){
 }
 
 function tempCategoryKey(value){
-  const raw = String(value || "").trim().toLowerCase();
-  if(/c[aá]lido/.test(raw)) return "calido";
-  if(/neutro/.test(raw)) return "neutro";
-  if(/fr[ií]o/.test(raw)) return "frio";
-  const k = parseInt(value, 10);
-  if(Number.isNaN(k)) return null;
-  if(k <= 3000) return "calido";
-  if(k <= 4500) return "neutro";
-  return "frio";
+  return matchTempVariantKey(value);
 }
 
 function tempCategoryColor(value){
-  const key = tempCategoryKey(value);
-  return key ? TEMP_TONES[key].color : null;
+  const entries = buildTempVariantEntries({}, value);
+  if(entries.length === 1) return entries[0].color;
+  if(entries.length > 1) return tempDotColor(value);
+  const key = matchTempVariantKey(value);
+  return key ? TEMP_VARIANT_TONES[key].color : null;
 }
 
 function tempCategoryLabel(value){
-  const key = tempCategoryKey(value);
-  return key ? TEMP_TONES[key].label : "";
+  const entries = buildTempVariantEntries({}, value);
+  if(entries.length) return entries.map(entry => entry.label).join(", ");
+  const raw = String(value || "").trim();
+  return TEMP_VARIANT_SKIP.has(normTempText(raw)) ? "" : raw;
 }
 
 function tempDotColor(value){
-  return tempCategoryColor(value) || CCT_DOT[value] || "#ccc";
+  const entries = buildTempVariantEntries({}, value);
+  if(entries.length === 1) return entries[0].color;
+  if(entries.length > 1){
+    const solids = entries.map(entry => entry.color).filter(color => !color.includes("gradient"));
+    if(solids.length >= 2){
+      const step = 100 / solids.length;
+      const stops = solids.map((color, index) => `${color} ${index * step}% ${(index + 1) * step}%`).join(", ");
+      return `linear-gradient(135deg, ${stops})`;
+    }
+    if(entries.length) return entries[0].color;
+  }
+  const key = matchTempVariantKey(value);
+  if(key) return TEMP_VARIANT_TONES[key].color;
+  return CCT_DOT[value] || "#ccc";
 }
 
 function getLuzToneSource(doc, fallbackValue){
@@ -1657,55 +1758,35 @@ function getLuzToneSource(doc, fallbackValue){
 }
 
 function buildLuzCategoryKeys(doc, fallbackValue){
-  const source = getLuzToneSource(doc, fallbackValue);
-  if(!source) return [];
-
-  const tones = String(source).split(";").map(t => t.trim()).filter(Boolean);
-  const bestKelvinByKey = new Map();
-  tones.forEach(t => {
-    const key = tempCategoryKey(t);
-    if(!key) return;
-    const k = parseInt(t, 10);
-    const sortK = Number.isNaN(k) ? (key === "calido" ? 2700 : key === "neutro" ? 4000 : 6500) : k;
-    if(!bestKelvinByKey.has(key) || sortK < bestKelvinByKey.get(key)){
-      bestKelvinByKey.set(key, sortK);
-    }
-  });
-
-  return [...bestKelvinByKey.entries()]
-    .sort((a, b) => a[1] - b[1])
-    .map(([key]) => key);
+  return buildTempVariantEntries(doc, fallbackValue).map(entry => entry.key);
 }
 
 function buildLuzCategoryLabel(doc, fallbackValue){
-  const keys = buildLuzCategoryKeys(doc, fallbackValue);
-  if(!keys.length) return "";
-  return keys.map(key => TEMP_TONES[key].label).join(" · ");
+  const entries = buildTempVariantEntries(doc, fallbackValue);
+  if(!entries.length) return "";
+  return entries.map(entry => entry.label).join(" · ");
 }
 
 function buildLuzDots(doc, fallbackValue){
-  const keys = buildLuzCategoryKeys(doc, fallbackValue);
-  if(!keys.length) return "";
-  return keys.map(key => {
-    const { color, label } = TEMP_TONES[key];
-    return `<span class="dot luz-dot" style="background:${color}" title="${label}" aria-label="${label}"></span>`;
-  }).join("");
+  const entries = buildTempVariantEntries(doc, fallbackValue);
+  if(!entries.length) return "";
+  return entries.map(entry =>
+    `<span class="dot luz-dot" style="background:${entry.color}" title="${entry.label}" aria-label="${entry.label}"></span>`
+  ).join("");
 }
 
 // Pill en la foto (abajo derecha): solo círculos; al hover se deslizan los nombres
 function buildLuzMediaDots(doc){
-  const isVariantLuz = String(doc.nombre_attr_variantes || "").trim().toLowerCase() === "luz";
-  const fallback = isVariantLuz
-    ? (doc.attr_variantes || doc.attr3 || "")
-    : (doc.attr3 || "");
-  const keys = buildLuzCategoryKeys(doc, fallback);
-  if(!keys.length) return "";
+  const temperatureVariants = Array.isArray(doc.variante_temperatura_filtro)
+    ? doc.variante_temperatura_filtro.join(";")
+    : doc.variante_temperatura_filtro;
+  const entries = buildTempVariantEntries({}, temperatureVariants);
+  if(!entries.length) return "";
 
-  const collapsed = keys.length >= 2 ? " is-collapsed" : "";
-  const rows = keys.map(key => {
-    const { color, label } = TEMP_TONES[key];
-    return `<span class="temp-dots-row"><span class="temp-dots-label">${label}</span><span class="dot luz-dot" style="background:${color}" title="${label}" aria-label="${label}"></span></span>`;
-  }).join("");
+  const collapsed = entries.length >= 2 ? " is-collapsed" : "";
+  const rows = entries.map(entry =>
+    `<span class="temp-dots-row"><span class="temp-dots-label">${entry.label}</span><span class="dot luz-dot" style="background:${entry.color}" title="${entry.label}" aria-label="${entry.label}"></span></span>`
+  ).join("");
 
   return `<span class="temp-dots${collapsed}" tabindex="0" aria-label="Temperatura de luz"><span class="temp-dots-icon" aria-hidden="true">${ICON_BULB}</span>${rows}</span>`;
 }
