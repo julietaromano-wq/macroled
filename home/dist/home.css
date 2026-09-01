@@ -725,7 +725,7 @@ body {
   background: linear-gradient(135deg, #00bdff, #0090c7);
   color: #fff;
   box-shadow: 0 3px 10px rgba(0, 144, 199, 0.35);
-  font-size: 0.68rem;
+  font-size: 0.60rem;
   font-weight: 500;
   line-height: 1;
   letter-spacing: 0.03em;
@@ -747,8 +747,8 @@ body {
 .ml-home .ml-product-card .badge {
   position: absolute;
   z-index: 3;
-  top: 0.4rem;
-  left: 0.35rem;
+  top: 0.6rem;
+  left: 0.6rem;
   display: inline-flex;
   align-items: center;
   max-width: 58%;
@@ -760,7 +760,7 @@ body {
   background: #ddca97;
   color: var(--ml-dark-blue-700);
   box-shadow: 0 3px 10px rgba(201, 179, 118, 0.35);
-  font-size: 0.68rem;
+  font-size: 0.60rem;
   font-weight: 600;
   line-height: 1;
   letter-spacing: 0.03em;
@@ -914,7 +914,7 @@ body {
   .ml-home .ml-product-card .card-title { font-size: 1rem; }
   .ml-home .ml-product-card .spec-label { font-size: 14px; }
   .ml-home .ml-product-card .spec .val { font-size: 15px; }
-  .ml-home .ml-product-card .badge { top: 0.35rem; left: 0.3rem; }
+  .ml-home .ml-product-card .badge { top: 0.6rem; left: 0.6rem; }
 }
 @media (max-width: 560px) {
   .ml-home .ml-product-card { padding: 0.6rem 0.6rem 0.35rem; border-radius: 0.75rem; }
@@ -922,7 +922,7 @@ body {
   .ml-home .ml-product-card .card-title { margin-bottom: 6px; font-size: 16px; }
   .ml-home .ml-product-card .spec-label { font-size: 14px; }
   .ml-home .ml-product-card .spec .val { font-size: 15px; }
-  .ml-home .ml-product-card .badge { max-width: 52%; padding: 0.4rem 0.6rem; font-size: 0.68rem; }
+  .ml-home .ml-product-card .badge { max-width: 52%; padding: 0.4rem 0.6rem; font-size: 0.60rem; }
   .ml-home .ml-product-card .temp-dots { right: 5px; bottom: 5px; max-width: 46%; padding: 4px 6px; }
   .ml-home .ml-product-card .temp-dots .luz-dot { width: 8px; height: 8px; }
   .ml-home .ml-product-card .temp-dots-label { font-size: 14px; }
@@ -5900,7 +5900,7 @@ a.ml-news-card:focus-visible .ml-news-card__arrow {
   background: #ddca97;
   color: var(--ml-dark-blue-700);
   box-shadow: 0 3px 10px rgba(201, 179, 118, 0.35);
-  font-size: 0.68rem;
+  font-size: 0.60rem;
   font-weight: 600;
   line-height: 1;
   letter-spacing: 0.03em;
@@ -6019,7 +6019,7 @@ a.ml-news-card:focus-visible .ml-news-card__arrow {
   }
 
   .ml-home .ml-highlight-badge {
-    font-size: 0.75rem;
+    font-size: 0.60rem;
   }
 
   .ml-home .ml-product-attr__label,
