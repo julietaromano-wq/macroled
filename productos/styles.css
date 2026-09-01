@@ -16,6 +16,7 @@
     --dark-blue-600:#012a4a;
     --navy:#00152B;
     --colortext:#5D5C5C;
+    --filter-row-text:var(--ml-grey-700,#414750);
     --btn-blue:#0077a8;
     --btn-blue-dark:#005f87;
     --tint:rgb(227,242,253);
@@ -81,7 +82,7 @@
   .category-heading[hidden],
   .category-heading:empty{display:none !important;margin:0;}
   .filters-desktop-heading{
-    display:flex;align-items:center;justify-content:space-between;gap:12px;
+    display:none;align-items:center;justify-content:space-between;gap:12px;
     margin:0 0 8px;letter-spacing:0;
     padding:10px 8px;
     border-bottom:1px solid var(--line);
@@ -133,7 +134,7 @@
   .filters-collapse-btn:hover{border:none;background:transparent;color:var(--dark-blue--700);}
   .filters-collapse-btn svg{display:block;}
   .filters-expand-btn{
-    display:none;align-items:center;gap:8px;
+    display:inline-flex;align-items:center;gap:8px;
     border:1px solid var(--line);background:#fff;
     border-radius:10px;padding:9px 16px;font-size:13px;font-weight:600;color:var(--ink);
     cursor:pointer;transition:border-color .12s,background .12s;flex:none;align-self:stretch;
@@ -222,7 +223,7 @@
   .facet-body{margin-top:16px;display:flex;flex-direction:column;gap:4px;}
   .facet-group.collapsed .facet-body{display:none;}
   .facet-row{display:flex;align-items:center;gap:10px;font-size:14px;cursor:pointer;user-select:none;
-  color:var(--colortext);border-radius:6px;margin:0;padding:6px 8px;transition:background .12s,color .12s,font-weight .12s;
+  color:var(--filter-row-text);border-radius:6px;margin:0;padding:6px 8px;transition:background .12s,color .12s,font-weight .12s;
   width:100%;min-width:0;max-width:none;}
   .facet-row > span:not(.cb-wrap):not(.count):not(.dot){
     min-width:0;overflow-wrap:anywhere;word-break:break-word;
@@ -239,8 +240,9 @@
   .cb-wrap input:checked + .box{background:var(--dark-blue--700);border-color:var(--dark-blue--700);}
   .cb-wrap input:checked + .box svg{opacity:1;}
   .cb-wrap input:focus-visible + .box{outline:2px solid var(--brand);outline-offset:2px;}
-  .facet-row .count{color:var(--colortext);
-    margin-left:auto;color:var(--ink-soft);font-size:12px;}
+  .facet-row .count{
+    margin-left:auto;color:var(--filter-row-text);font-size:12px;
+  }
   .dot{width:9px;height:9px;border-radius:50%;display:inline-block;flex:none;}
   .dot.luz-dot{
     width:10px;height:10px;
@@ -260,11 +262,11 @@
   .facet-row.is-empty{opacity:.55;}
   .soon-note{font-size:12px;color:var(--ink-soft);font-style:italic;line-height:1.4;}
   .facet-row.familia-row{
-    font-weight:500;
-    padding:6px 8px 6px 25px;
+    font-weight:400;
+    padding:7px 8px 7px 25px;
   }
   .facet-row.familia-row.active{
-    background:rgb(227,242,253);color:rgb(0,110,165);font-weight:700;
+    background:rgb(227,242,253);color:rgb(0,110,165);font-weight:400;
   }
 
   .facet-switch-group{padding:12px 0;}
@@ -420,8 +422,8 @@
 
   .macro-row{
     display:flex;align-items:center;justify-content:space-between;gap:10px;
-    padding:6px 8px 6px 25px;
-    font-size:14px;color:var(--colortext);cursor:pointer;
+    padding:7px 8px 7px 25px;
+    font-size:14px;font-weight:400;color:var(--filter-row-text);cursor:pointer;
     width:100%;margin:0;border-radius:6px;
     transition:color .12s,background .12s,font-weight .12s;
   }
@@ -431,8 +433,8 @@
     font-weight:600;
   }
   .facet-row.familia-row:hover{font-weight:600;}
-  .macro-row.active{color:var(--brand-dark);font-weight:700;}
-  .macro-row .count{color:var(--ink-soft);font-size:12px;font-weight:400;}
+  .macro-row.active{color:var(--brand-dark);font-weight:400;}
+  .macro-row .count{color:var(--filter-row-text);font-size:12px;font-weight:400;}
 
   /* Rango de Potencia (slider dual + inputs en W) */
   .potencia-range{display:flex;flex-direction:column;gap:14px;padding:4px 2px 2px;}
@@ -493,7 +495,7 @@
     padding:12px 16px;background:#fff;margin-bottom:0;
     transition:border-color .15s,box-shadow .15s;
   }
-  .search-bar:focus-within{border-color:var(--brand);box-shadow:var(--focus-ring);}
+  .search-bar:focus-within{border-color:#0090c7;box-shadow:none;}
   .search-bar:focus-within svg{color:var(--brand-dark);}
   .search-bar svg{flex:none;color:var(--ink-soft);}
   .search-bar input{
@@ -533,10 +535,10 @@
     transition:border-color .12s;
   }
   select.sort:hover{border-color:#c3cad6;}
-  .sort-dropdown{position:relative;z-index:1;flex:none;align-self:stretch;min-width:190px;}
+  .sort-dropdown{position:relative;z-index:1;flex:none;align-self:stretch;width:max-content;min-width:0;}
   .sort-dropdown.open{z-index:40;}
   .sort-trigger{
-    width:100%;height:100%;min-height:42px;border:1px solid var(--line);border-radius:10px;
+    width:max-content;height:100%;min-height:42px;border:1px solid var(--line);border-radius:10px;
     padding:8px 14px;background:#fff;color:var(--ink);cursor:pointer;
     display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-rows:auto auto;
     align-items:center;column-gap:14px;row-gap:1px;font:inherit;font-size:13px;text-align:left;
@@ -549,11 +551,16 @@
   .sort-trigger svg{grid-column:2;grid-row:1/3;transition:transform .18s;}
   .sort-dropdown.open .sort-trigger svg{transform:rotate(180deg);}
   .sort-menu{
-    position:absolute;top:calc(100% + 6px);left:0;right:0;z-index:10030;
+    position:absolute;top:calc(100% + 6px);right:0;left:auto;z-index:10030;width:180px;
+    box-sizing:border-box;
     padding:6px;background:#fff;border:1px solid var(--line);border-radius:10px;
     box-shadow:0 12px 28px rgba(10,14,25,.15);
   }
   .sort-menu[hidden]{display:none;}
+  .sort-menu-title{
+    display:block;padding:5px 12px 4px;color:var(--ink-soft);
+    font-size:11px;font-weight:500;line-height:1.2;
+  }
   .sort-option{
     width:100%;border:0;background:transparent;color:var(--ink);border-radius:7px;
     padding:7px 12px;text-align:left;font:inherit;font-size:13px;font-weight:400;cursor:pointer;
@@ -580,18 +587,26 @@
   }
   .view-toggle{display:flex;border:1px solid var(--line);border-radius:10px;overflow:hidden;}
   .view-toggle button{
-    border:none;background:#fff;padding:8px 10px;cursor:pointer;font-size:15px;color:var(--ink-soft);
+    border:none;background:var(--bg-page);padding:8px 10px;cursor:pointer;font-size:15px;color:var(--ink-soft);
     transition:background .12s,color .12s;
   }
   .view-toggle button:hover:not(.active){background:var(--bg-card);}
-  .view-toggle button.active{background:var(--brand);color:#fff;}
+  .view-toggle button.active{background:#fff;color:var(--dark-blue--700);}
 
   .filters-toggle{
     display:none;align-items:center;gap:8px;border:1px solid var(--line);background:#fff;
     border-radius:var(--radius-sm);padding:9px 16px;font-size:13px;font-weight:600;color:var(--ink);
-    cursor:pointer;transition:border-color .12s,background .12s;
+    cursor:pointer;transition:border-color .12s,background .12s;position:relative;
   }
   .filters-toggle:hover{border-color:#c3cad6;background:var(--bg-card);}
+  .filters-count{
+    position:absolute;top:-7px;right:-7px;z-index:1;
+    width:20px;height:20px;border-radius:50%;background:var(--brand);color:#fff;
+    display:inline-grid;place-items:center;place-content:center;
+    font-size:11px;font-weight:700;line-height:1;text-align:center;
+    box-shadow:0 0 0 2px #fff;
+  }
+  .filters-count[hidden]{display:none;}
   .filters-backdrop{
     display:none;position:fixed;inset:0;background:rgba(10,14,25,.45);z-index:10040;
   }
@@ -634,8 +649,11 @@
     pointer-events:none;user-select:none;
   }
   .grid-loading{
-    position:absolute;inset:0;z-index:5;
-    display:none;align-items:center;justify-content:center;
+    position:absolute;z-index:1000;
+    left:var(--grid-loading-x, 50%);
+    top:var(--grid-loading-y, 50%);
+    display:none;
+    transform:translate(-50%,-50%);
     pointer-events:none;
   }
   .grid-shell.is-filtering .grid-loading{display:flex;}
@@ -1001,7 +1019,7 @@
   .compare-bar{
     position:fixed;left:20px;bottom:20px;transform:none;
     width:calc(100% - 40px - 168px);z-index:10020;
-    transition:width .3s var(--ease),left .3s var(--ease),bottom .3s var(--ease);
+    transition:width .3s var(--ease),left .3s var(--ease);
     touch-action:manipulation;
     -webkit-text-size-adjust:100%;
     text-size-adjust:100%;
@@ -1045,7 +1063,7 @@
   }
   .compare-chip{
     position:relative;
-    display:flex;align-items:center;gap:10px;background:#f5f6f7;/* border:1px solid #eceef1; */
+    display:flex;align-items:center;gap:10px;background:#f5f6f7;border:1px solid #eceef1;
     border-radius:10px;padding:9px 30px 9px 8px;
     width:auto;min-width:0;max-width:none;flex:none;
     box-sizing:border-box;overflow:hidden;
@@ -1072,11 +1090,11 @@
   .compare-chip-thumb img{width:100%;height:100%;object-fit:contain;}
   .compare-chip-info{display:flex;flex-direction:column;align-items:flex-start;text-align:left;gap:2px;min-width:0;flex:1;overflow:hidden;}
   .compare-chip-name{
-    font-size:14px;font-weight:600;color:var(--ink);line-height:1.25;
+    font-size:14px;font-weight:700;color:var(--ink);line-height:1.25;
     display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;
     max-width:100%;
   }
-  .compare-chip-sku{font-size:11px;color:#9fa3a9;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;}
+  .compare-chip-sku{font-size:11px;color:#6a7687;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;}
   .compare-slot-empty{
     width:auto;min-width:0;min-height:64px;height:100%;border-radius:10px;border:1.5px dashed #d8dce1;
     display:flex;align-items:center;justify-content:center;color:#c3c9d1;flex:none;font-size:16px;
@@ -1124,13 +1142,10 @@
     .compare-chip-thumb{
       width:40px;height:40px;padding:3px;border-radius:7px;
     }
-    .compare-chip-name{font-size:14px;font-weight:600;}
+    .compare-chip-name{font-size:14px;font-weight:700;}
     .compare-chip-sku{font-size:11px;}
     .compare-chip-remove{top:5px;right:5px;width:16px;height:16px;font-size:12px;}
     .compare-slot-empty{min-height:56px;font-size:15px;border-radius:9px;}
-    .compare-cta{
-      padding:8px 32px;font-size:13px;font-weight:600;gap:5px;
-    }
   }
   @media (max-width:900px){
     .compare-cta,.compare-clear{padding-left:12px;padding-right:12px;}
@@ -1359,19 +1374,48 @@
       font-size:18px;line-height:1;color:var(--ink-soft);cursor:pointer;
     }
 
-    .filters-mobile-nav{display:block;flex:1;overflow:hidden;position:relative;min-height:0;}
-    .fmn-screen{position:absolute;inset:0;overflow-y:auto;display:none;-webkit-overflow-scrolling:touch;}
+    .filters-mobile-nav{
+      display:block;flex:1;overflow:hidden;position:relative;min-height:0;
+      margin-right:-20px;margin-left:-20px;
+    }
+    .fmn-screen{
+      position:absolute;inset:0;overflow-y:auto;display:none;
+      padding-right:32px;padding-left:20px;box-sizing:border-box;scrollbar-gutter:stable;
+      -webkit-overflow-scrolling:touch;
+    }
     .fmn-screen.active{display:block;}
 
     .fmn-row{
       display:flex;align-items:center;justify-content:space-between;gap:12px;
-      padding:15px 4px;border-bottom:1px solid var(--line);cursor:pointer;
+      padding:15px 4px;border-bottom:0;cursor:pointer;
       font-size:15px;font-weight:600;color:var(--ink);
     }
+    .fmn-row-label{
+      display:flex;align-items:center;gap:10px;min-width:0;
+    }
+    .fmn-row-label svg{
+      width:16px;height:16px;flex:none;color:rgb(0,110,165);
+    }
+    .fmn-active-count{
+      margin-left:6px;color:var(--ink-soft);font-size:13px;font-weight:600;
+    }
+    .fmn-section-end{
+      border-bottom:0;
+    }
+    .fmn-filters-start,
+    .fmn-secondary-start{
+      position:relative;margin-top:18px;border-top:0;
+    }
+    .fmn-filters-start::before,
+    .fmn-secondary-start::before{
+      content:"";position:absolute;top:-10px;left:-20px;right:-32px;
+      height:1px;background:var(--line);pointer-events:none;
+    }
     .fmn-row.fmn-switch-row{cursor:pointer;}
+    .fmn-row.fmn-switch-row{border-bottom:0;}
     .fmn-switch-row .ft-label{font-size:15px;font-weight:600;color:var(--ink);}
     .fmn-switch-row .ft-label svg{color:rgb(0,110,165);}
-    .fmn-row-meta{display:flex;align-items:center;gap:8px;font-weight:400;color:var(--ink-soft);font-size:13px;min-width:0;}
+    .fmn-row-meta{display:flex;align-items:center;gap:8px;font-weight:400;color:var(--ink-soft);font-size:14px;min-width:0;}
     .fmn-row-meta span:first-child{max-width:min(160px,42vw);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
     .fmn-chev{
       display:inline-flex;align-items:center;justify-content:center;
@@ -1427,14 +1471,26 @@
     }
     .fmn-checkbox svg{width:11px;height:11px;}
     .fmn-option-row.active .fmn-checkbox{background:var(--dark-blue--700);border-color:var(--dark-blue--700);}
+    .fmn-view-option-icon{
+      display:inline-flex;align-items:center;justify-content:center;
+      margin-left:auto;color:var(--ink-soft);font-size:18px;font-weight:400;line-height:1;
+    }
 
     .filters-mobile-footer{
-      display:block;position:sticky;bottom:0;background:#fff;
+      display:flex;flex-direction:column;gap:8px;position:sticky;bottom:0;background:#fff;
       padding:14px 0 max(16px,env(safe-area-inset-bottom));border-top:1px solid var(--line);
     }
     .filters-apply{
       width:100%;background:#0077a8;color:#fff;border:none;border-radius:var(--radius-sm);
       padding:14px;font-size:14px;font-weight:700;cursor:pointer;
+    }
+    #macroled-productos .filters-mobile-footer .filters-clear{
+      width:100%;height:auto;margin:0;padding:8px 14px;border:0;background:transparent;
+      color:var(--ink-soft);font-size:14px;font-weight:600;text-align:center;
+      transition:color .15s,background .15s;
+    }
+    #macroled-productos .filters-mobile-footer .filters-clear:hover{
+      border:0;background:transparent;color:var(--ink);
     }
 
     .potencia-inputs{gap:8px;}
@@ -1453,6 +1509,7 @@
     .results-search .filters-toggle{padding:0 12px;font-size:12.5px;min-height:46px;}
     .count-row .showing{font-size:14px;}
     .filters-apply{font-size:15px;padding:15px;}
+    #macroled-productos .filters-mobile-footer .filters-clear{font-size:15px;}
 
     /* Compare bar mobile — igual que ficha */
     .compare-bar{
@@ -1469,7 +1526,7 @@
       font-size:14px;
       font-weight:600;
     }
-    .compare-chip-name{font-size:14px;font-weight:600;}
+    .compare-chip-name{font-size:14px;font-weight:700;}
     .compare-chip-sku{font-size:12px;}
     .compare-chip-remove{font-size:16px;}
     .compare-checkbox{font-size:16px;}
@@ -1551,7 +1608,7 @@
     .showing{font-size:14px;}
     .chip{font-size:13px;}
     .fmn-row{font-size:15px;}
-    .fmn-row-meta{font-size:13px;}
+    .fmn-row-meta{font-size:14px;}
   }
 
   @media (max-width:900px) and (hover:hover) and (pointer:fine){
@@ -1598,7 +1655,7 @@ body.assistant-open .ai-launch{
   font-family:var(--font);
   font-size:15px !important;font-weight:600 !important;cursor:pointer;
   box-shadow:0 12px 32px rgba(0,21,43,.28);
-  transition:transform var(--btn-dur) var(--ease),background var(--btn-dur) var(--ease),box-shadow var(--btn-dur) var(--ease),visibility .2s,bottom .3s var(--ease);
+  transition:transform var(--btn-dur) var(--ease),background var(--btn-dur) var(--ease),box-shadow var(--btn-dur) var(--ease),visibility .2s;
   -webkit-font-smoothing:antialiased;
 }
 .ai-launch:hover{
@@ -2684,6 +2741,7 @@ body.filters-open button.ai-launch{
     width:auto !important;
     min-width:0 !important;
     max-width:none !important;
+    border-radius:10px !important;
   }
   #macroled-productos .results-search .search-bar input{
     width:100% !important;
@@ -2694,6 +2752,7 @@ body.filters-open button.ai-launch{
   #macroled-productos .results-search .filters-toggle{
     display:inline-flex !important;
     flex:none !important;
+    border-radius:10px !important;
   }
   #macroled-productos .results-search .view-toggle,
   #macroled-productos .results-search select.sort{
@@ -2877,7 +2936,7 @@ body.filters-open button.ai-launch{
 }
 
 /* El comparador pertenece al catálogo, no al body de Webflow.
-   El padding reserva lugar después de la paginación y el lift calculado por
+   El padding reserva lugar después de los resultados y el lift calculado por
    JS lo ancla al final del componente antes de que comience el footer. */
 #macroled-productos{
   position:relative !important;
@@ -2888,9 +2947,444 @@ body.filters-open button.ai-launch{
   --compare-bar-gap:20px;
   bottom:calc(var(--compare-bar-gap) + var(--compare-boundary-lift, 0px)) !important;
 }
+#macroled-productos .search-bar:focus-within{
+  border-color:#0090c7 !important;
+  box-shadow:none !important;
+}
+#macroled-productos .ai-launch{
+  bottom:calc(max(20px,env(safe-area-inset-bottom,0px)) + var(--compare-boundary-lift, 0px)) !important;
+}
 @media (max-width:640px){
   #macroled-productos .compare-bar{
     --compare-bar-gap:12px;
+  }
+  #macroled-productos .ai-launch{
+    bottom:calc(max(12px,env(safe-area-inset-bottom,0px)) + var(--compare-boundary-lift, 0px)) !important;
+  }
+}
+
+/* Comparador: nombre del producto en tablet y desktop. */
+@media (min-width:641px){
+  #macroled-productos .compare-chip-name{
+    font-size:13px !important;
+  }
+}
+
+/* Controles principales visibles durante el scroll. */
+#macroled-productos .catalog-controls-row{
+  position:sticky !important;
+  top:0;
+  z-index:10020;
+  background:var(--bg-page);
+  transition:padding-top .18s ease;
+}
+#macroled-productos .catalog-controls-row.is-stuck{
+  padding-top:10px;
+}
+
+@media (min-width:901px){
+  #macroled-productos .layout.filters-collapsed
+    .catalog-controls-row > .filters-expand-btn,
+  #macroled-productos .layout.filters-collapsed
+    .catalog-controls-row > .filters-expand-btn:hover{
+    padding-right:16px;
+    border-right:1px solid #e3e7ec;
+  }
+}
+
+@media (min-width:901px){
+  #macroled-productos .grid.list{
+    grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+  }
+  #macroled-productos .layout.filters-collapsed .grid.list{
+    grid-template-columns:repeat(3,minmax(0,1fr)) !important;
+  }
+}
+
+/* Prueba de layout: controles secundarios debajo del buscador. */
+@media (min-width:901px){
+  #macroled-productos .layout{
+    row-gap:20px !important;
+  }
+  #macroled-productos .catalog-controls-row{
+    grid-column:1 / -1 !important;
+    grid-row:2 !important;
+    display:grid;
+    grid-template-columns:300px minmax(0,1fr);
+    column-gap:48px;
+    align-items:start;
+    min-width:0;
+    margin:0;
+    padding:0 0 10px;
+    min-height:44px;
+    border-bottom:1px solid #e3e7ec;
+  }
+  #macroled-productos .filters-rail{grid-row:3 !important;}
+  #macroled-productos .results-body{grid-row:3 !important;}
+  #macroled-productos .catalog-controls-main{
+    display:flex;
+    align-items:stretch;
+    min-width:0;
+  }
+  #macroled-productos .catalog-controls-row > .filters-expand-btn{
+    align-self:center;
+  }
+  #macroled-productos .catalog-controls-row .toolbar-top{
+    flex:1 1 auto;
+    min-width:0;
+    margin:0;
+    align-self:center;
+  }
+  #macroled-productos .catalog-controls-row .toolbar-top:not(:empty){
+    display:grid !important;
+    grid-template-columns:auto minmax(0,1fr) auto;
+    grid-template-rows:auto;
+    align-items:start;
+    column-gap:16px;
+    row-gap:8px;
+  }
+  #macroled-productos .catalog-controls-row .toolbar-top .label{
+    grid-column:1;
+    grid-row:1;
+    align-self:start;
+    padding-top:6px;
+    white-space:nowrap;
+  }
+  #macroled-productos .catalog-controls-row .chips-row{
+    grid-column:2;
+    grid-row:1;
+    display:flex;
+    flex-wrap:wrap;
+    align-items:center;
+    gap:8px;
+    min-width:0;
+  }
+  #macroled-productos .catalog-controls-row .clear-btn{
+    grid-column:3;
+    grid-row:1;
+    align-self:start;
+    margin-left:0;
+    height:32px;
+    padding:0;
+    border:0;
+    border-radius:0;
+    background:transparent;
+    color:var(--dark-blue-600);
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    line-height:1;
+    white-space:nowrap;
+  }
+  #macroled-productos .catalog-controls-row .clear-btn:hover{
+    border:0;
+    background:transparent;
+    color:var(--dark-blue-600);
+  }
+  #macroled-productos .catalog-controls-row .filters-expand-btn,
+  #macroled-productos .catalog-controls-row .sort-trigger{
+    min-height:0;
+    height:100%;
+    padding:0;
+    border:0;
+    border-radius:0;
+    background:transparent;
+    box-shadow:none;
+    color:var(--dark-blue-600);
+    align-self:start;
+    display:inline-flex;
+    align-items:center;
+    justify-content:flex-start;
+    gap:8px;
+    line-height:1;
+  }
+  #macroled-productos .catalog-controls-row .filters-expand-btn:hover,
+  #macroled-productos .catalog-controls-row .sort-trigger:hover{
+    border:0;
+    background:transparent;
+    color:var(--dark-blue--700);
+  }
+  #macroled-productos .catalog-controls-row .sort-trigger{
+    column-gap:8px;
+  }
+  #macroled-productos .catalog-controls-row .sort-current{
+    color:var(--dark-blue-600);
+  }
+  #macroled-productos .catalog-controls-row .sort-dropdown{
+    margin-left:auto;
+    align-self:start;
+    height:auto;
+  }
+  #macroled-productos .catalog-controls-row:has(.toolbar-top:not(:empty)) .sort-dropdown{
+    border-left:1px solid #e3e7ec;
+    padding-left:16px;
+    align-self:stretch;
+    display:flex;
+    align-items:flex-start;
+  }
+  #macroled-productos .layout.filters-collapsed .catalog-controls-row{
+    grid-column:1 !important;
+    grid-row:3 !important;
+    grid-template-columns:auto minmax(0,1fr);
+    column-gap:16px;
+  }
+  #macroled-productos .layout.filters-collapsed{
+    grid-template-rows:auto auto auto auto !important;
+  }
+  #macroled-productos .layout.filters-collapsed .results-body{grid-row:4 !important;}
+  #macroled-productos .layout.filters-collapsed
+    .catalog-controls-row:has(.toolbar-top:not(:empty))
+    .sort-dropdown{
+    border-left:1px solid #e3e7ec;
+    padding-left:16px;
+    align-self:stretch;
+    display:flex;
+    align-items:flex-start;
+  }
+}
+@media (min-width:901px) and (max-width:1200px){
+  #macroled-productos .catalog-controls-row{
+    grid-template-columns:260px minmax(0,1fr);
+    column-gap:32px;
+  }
+}
+
+/* Prueba de layout: búsqueda en la fila de controles y chips en el lateral. */
+@media (min-width:901px){
+  #macroled-productos .catalog-controls-main .results-search{
+    flex:1 1 auto;
+    width:auto;
+    min-width:0;
+  }
+  #macroled-productos .catalog-controls-main .sort-dropdown{
+    flex:none;
+    margin-left:16px;
+    padding-left:16px;
+    border-left:1px solid #e3e7ec;
+    align-self:stretch;
+    display:flex;
+    align-items:center;
+  }
+  #macroled-productos .catalog-controls-main .sort-trigger{
+    width:max-content;
+  }
+  #macroled-productos .catalog-controls-main .sort-prefix{
+    color:var(--dark-blue-600);
+    font-size:13px;
+    font-weight:500;
+  }
+  #macroled-productos .catalog-controls-main .sort-current,
+  #macroled-productos .catalog-controls-main .sort-trigger svg{
+    color:var(--dark-blue-600);
+    transition:color .15s ease;
+  }
+  #macroled-productos .catalog-controls-main .sort-trigger:hover .sort-current,
+  #macroled-productos .catalog-controls-main .sort-trigger:hover svg{
+    color:var(--btn-blue);
+  }
+  #macroled-productos .catalog-controls-row > .filters-expand-btn:hover{
+    color:var(--btn-blue);
+  }
+  #macroled-productos .filters-rail .toolbar-top:not(:empty){
+    display:flex !important;
+    flex-direction:column;
+    align-items:stretch;
+    gap:8px;
+    width:100%;
+    margin:0 0 16px;
+    padding:0 0 8px;
+    border-bottom:1px solid #e3e7ec;
+  }
+  #macroled-productos .filters-rail .toolbar-top .label{
+    width:100%;
+    padding:0;
+  }
+  #macroled-productos .filters-rail .chips-row{
+    display:flex;
+    flex-wrap:wrap;
+    align-items:center;
+    gap:8px;
+    width:100%;
+  }
+  #macroled-productos .filters-rail .clear-btn{
+    align-self:flex-start;
+    height:32px;
+    margin:0;
+    padding:0;
+    border:0;
+    background:transparent;
+    color:var(--ml-dark-blue-400,#334b63);
+  }
+}
+@media (max-width:900px){
+  #macroled-productos .catalog-controls-row{
+    display:block !important;
+    width:100% !important;
+    padding:0 !important;
+    border:0 !important;
+  }
+  #macroled-productos .catalog-controls-main{
+    display:block !important;
+    width:100% !important;
+  }
+  #macroled-productos .catalog-controls-main .sort-dropdown{
+    display:none !important;
+  }
+}
+/* Cierre/apertura fluido de la columna de filtros en desktop. */
+@media (min-width:901px){
+  #macroled-productos .layout{
+    transition:
+      grid-template-columns .58s cubic-bezier(.22,1,.36,1),
+      column-gap .58s cubic-bezier(.22,1,.36,1) !important;
+  }
+  #macroled-productos .category-heading{
+    width:300px !important;
+    min-width:300px !important;
+    max-width:300px !important;
+    position:relative !important;
+    z-index:31 !important;
+    overflow:visible !important;
+    background:var(--bg,#f5f6f8) !important;
+    transition:none !important;
+  }
+  #macroled-productos .filters-rail{
+    transition:
+      max-width .58s cubic-bezier(.22,1,.36,1),
+      width .58s cubic-bezier(.22,1,.36,1),
+      opacity .42s ease !important;
+  }
+  #macroled-productos .layout.filters-collapsed{
+    grid-template-columns:0 minmax(0,1fr) !important;
+    grid-template-rows:auto auto auto auto !important;
+    column-gap:0 !important;
+  }
+  #macroled-productos .layout.filters-collapsed .filters-rail{
+    display:block !important;
+    grid-column:1 !important;
+    grid-row:4 !important;
+    width:0 !important;
+    max-width:0 !important;
+    opacity:0 !important;
+    overflow:hidden !important;
+    pointer-events:none !important;
+  }
+  #macroled-productos .layout.filters-collapsed .category-heading{
+    grid-column:1 !important;
+    grid-row:1 !important;
+    width:300px !important;
+    max-width:300px !important;
+    position:relative !important;
+    z-index:31 !important;
+    overflow:visible !important;
+    background:var(--bg,#f5f6f8) !important;
+    transition:none !important;
+  }
+  #macroled-productos .layout.filters-collapsed .results-toolbar{
+    grid-column:2 !important;
+    grid-row:2 !important;
+  }
+  #macroled-productos .layout.filters-collapsed .catalog-controls-row{
+    grid-column:1 / -1 !important;
+    grid-row:3 !important;
+  }
+  #macroled-productos .layout.filters-collapsed .results-body{
+    grid-column:2 !important;
+    grid-row:4 !important;
+  }
+  #macroled-productos .layout.filters-collapsed .grid,
+  #macroled-productos .layout.filters-collapsed .grid.list{
+    grid-template-columns:repeat(4,minmax(0,1fr)) !important;
+  }
+}
+@media (min-width:901px) and (max-width:1200px){
+  #macroled-productos .category-heading,
+  #macroled-productos .layout.filters-collapsed .category-heading{
+    width:260px !important;
+    min-width:260px !important;
+    max-width:260px !important;
+  }
+}
+
+/* El encabezado no cambia al mostrar/ocultar filtros: solo se anima el área inferior. */
+@media (min-width:901px){
+  #macroled-productos .results-body{
+    grid-column:1 / -1 !important;
+    grid-row:3 !important;
+    margin-left:348px !important;
+    transition:margin-left .58s cubic-bezier(.22,1,.36,1) !important;
+  }
+  #macroled-productos .layout.filters-collapsed{
+    grid-template-columns:300px minmax(0,1fr) !important;
+    grid-template-rows:auto auto auto !important;
+    column-gap:16px !important;
+  }
+  #macroled-productos .layout.filters-collapsed .category-heading{
+    grid-column:1 !important;
+    grid-row:1 !important;
+  }
+  #macroled-productos .layout.filters-collapsed .results-toolbar{
+    grid-column:2 !important;
+    grid-row:1 !important;
+  }
+  #macroled-productos .layout.filters-collapsed .catalog-controls-row{
+    grid-column:1 / -1 !important;
+    grid-row:2 !important;
+    grid-template-columns:auto minmax(0,1fr);
+    column-gap:16px;
+  }
+  #macroled-productos .layout.filters-collapsed .filters-rail{
+    grid-column:1 !important;
+    grid-row:3 !important;
+  }
+  #macroled-productos .layout.filters-collapsed .results-body{
+    grid-column:1 / -1 !important;
+    grid-row:3 !important;
+    margin-left:0 !important;
+  }
+}
+@media (min-width:901px) and (max-width:1200px){
+  #macroled-productos .results-body{
+    margin-left:292px !important;
+  }
+  #macroled-productos .layout.filters-collapsed{
+    grid-template-columns:260px minmax(0,1fr) !important;
+    column-gap:16px !important;
+  }
+  #macroled-productos .layout.filters-collapsed .catalog-controls-row{
+    grid-template-columns:auto minmax(0,1fr);
+    column-gap:16px;
+  }
+  #macroled-productos .layout.filters-collapsed .results-body{
+    margin-left:0 !important;
+  }
+}
+
+@media (min-width:641px){
+  #macroled-productos .grid.list{
+    grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+  }
+  #macroled-productos .layout.filters-collapsed .grid.list{
+    grid-template-columns:repeat(3,minmax(0,1fr)) !important;
+  }
+}
+
+/* Borrar filtros: mismo tratamiento de texto que "Borrar" del comparador. */
+#macroled-productos .filters-rail .clear-btn,
+#macroled-productos .catalog-controls-row .clear-btn{
+  color:var(--ink-soft);
+  transition:color .15s,background .15s;
+}
+#macroled-productos .filters-rail .clear-btn:hover,
+#macroled-productos .catalog-controls-row .clear-btn:hover{
+  color:var(--ink);
+  background:transparent;
+}
+
+/* Comparador desktop: selector específico para prevalecer sobre Webflow. */
+@media (min-width:901px){
+  #macroled-productos .compare-cta{
+    padding:8px 32px;
   }
 }
 

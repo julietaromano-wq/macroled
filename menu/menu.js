@@ -1438,7 +1438,16 @@ if (typeof module !== "undefined") module.exports = MEGAMENU_DATA;
     if ((window.scrollY || window.pageYOffset || 0) < 12) {
       return readTheme(nodes[0]);
     }
-    return null;
+    return "light";
+  }
+
+  function isMobileNav() {
+    return window.matchMedia && window.matchMedia("(max-width: 1100px)").matches;
+  }
+
+  function clearTheme(menu) {
+    menu.removeAttribute("data-mm-theme");
+    menu.classList.remove("is-on-dark", "nav-dark", "is-on-light");
   }
 
   function apply(menu, theme) {
@@ -1454,6 +1463,10 @@ if (typeof module !== "undefined") module.exports = MEGAMENU_DATA;
   function update() {
     var menu = document.getElementById("macroled-menu");
     if (!menu || menu.classList.contains("mm-mega-open")) return;
+    if (isMobileNav()) {
+      clearTheme(menu);
+      return;
+    }
     apply(menu, sectionTheme());
   }
 
