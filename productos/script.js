@@ -50,7 +50,7 @@ const POTENCIA_RAW_FIELD = "potencia";
 const EXTRA_FACET_FIELDS = [CATEGORIA_FIELD];
 
 const FACET_LABELS = {
-  macrofamilia: "Productos",
+  macrofamilia: "Macrofamilia",
   variante_temperatura_filtro: "Temperatura color",
   color: "Color",
   potencia: "Potencia",
@@ -289,12 +289,16 @@ const ICON_DIMMER_VB = 'viewBox="0 0 17.91 14.17" fill="currentColor"';
 const ICON_DIMMER_INNER = `<path d="M17.08,14.17H.82c-.31,0-.58-.16-.73-.43-.14-.26-.13-.56.04-.81L8.26.38c.15-.24.42-.38.7-.38.28,0,.54.14.69.38l8.13,12.55c.16.24.17.55.03.81-.14.27-.42.43-.73.43M8.95.58s-.15.01-.21.11L.62,13.25c-.07.1-.03.19-.01.22.04.08.12.13.22.13h16.26c.1,0,.18-.05.22-.13.02-.04.05-.13,0-.22L9.17.69c-.07-.1-.17-.11-.21-.11"/><path d="M8.96,12.69c-2.23,0-4.05-1.76-4.05-3.93s1.82-3.93,4.05-3.93,4.05,1.76,4.05,3.93-1.82,3.93-4.05,3.93M8.96,5.39c-1.92,0-3.48,1.51-3.48,3.36s1.56,3.36,3.48,3.36,3.48-1.51,3.48-3.36-1.56-3.36-3.48-3.36"/><path d="M10.96,8.75c.03-.51-.17-1.04-.55-1.42-.37-.39-.9-.63-1.46-.65-.55-.02-1.13.17-1.56.55-.43.37-.71.94-.73,1.53-.03-.59.21-1.2.63-1.63.42-.44,1.03-.71,1.66-.73.63-.03,1.27.19,1.76.63.49.42.8,1.07.82,1.74h-.58Z"/>`;
 const FACET_ICONS = {
   macrofamilia: `<svg ${ICON_SIZE}><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>`,
+  familia: `<svg ${ICON_SIZE}><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/></svg>`,
+  subfamilia: `<svg ${ICON_SIZE}><rect x="3" y="8.5" width="7" height="7" rx="1.5"/><rect x="14" y="8.5" width="7" height="7" rx="1.5"/></svg>`,
   variante_temperatura_filtro: `<svg ${ICON_SIZE}><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>`,
   color: `<svg ${ICON_SIZE}><path d="M12 2a10 10 0 1 0 0 20 3 3 0 0 0 0-6h-1a2 2 0 0 1 0-4h3a2 2 0 0 0 2-2 10 10 0 0 0-4-8z"/><circle cx="7.5" cy="10.5" r="1" fill="currentColor" stroke="none"/><circle cx="12" cy="7" r="1" fill="currentColor" stroke="none"/><circle cx="16.5" cy="10.5" r="1" fill="currentColor" stroke="none"/></svg>`,
   potencia: `<svg ${ICON_SIZE}><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>`,
   dimerizable: `<svg width="16" height="16" ${ICON_DIMMER_VB} aria-hidden="true">${ICON_DIMMER_INNER}</svg>`,
   smart: `<svg ${ICON_SIZE}><path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/></svg>`,
-  categoria: `<svg ${ICON_SIZE}><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>`
+  categoria: `<svg ${ICON_SIZE}><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>`,
+  view: `<svg ${ICON_SIZE}><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M10 4v16M10 10h11"/></svg>`,
+  sort: `<svg ${ICON_SIZE}><path d="M8 6h12M8 12h9M8 18h6"/><path d="M4 4v16M2 18l2 2 2-2"/></svg>`
 };
 const ICON_CHECK = `<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`;
 const ICON_COMPARE = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 3 21 3 21 7"/><line x1="21" y1="3" x2="10" y2="14"/><path d="M21 14v5a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h5"/></svg>`;
@@ -535,10 +539,10 @@ async function loadSmartSkuOptions(){
   return smartSkuPromise;
 }
 
-function smartSwitchHtml(checked, ariaLabel){
+function smartSwitchHtml(checked, ariaLabel, activeCount = 0){
   const on = !!checked;
   return `
-    <span class="ft-label">${FACET_ICONS.smart}<span>Smart</span></span>
+    <span class="ft-label">${FACET_ICONS.smart}<span>Smart${activeCount ? `<span class="fmn-active-count">(${activeCount})</span>` : ""}</span></span>
     <span class="switch-ui">
       <input type="checkbox" class="smart-switch-input" role="switch" aria-label="${ariaLabel || "Filtrar productos Smart"}" aria-checked="${on ? "true" : "false"}"${on ? " checked" : ""}>
       <span class="switch-track" aria-hidden="true"><span class="switch-thumb"></span></span>
@@ -743,6 +747,7 @@ async function searchTypesense(){
       : FACET_FIELDS);
 
   const filterParts = [BASE_FILTER];
+  const ownFacetClauses = new Map();
   const prevColorFacet = (typeof lastFacetCounts !== "undefined" ? lastFacetCounts : []).find(f => f.field_name === "color");
   if(prevColorFacet) mergeColorFacetCounts(prevColorFacet.counts);
   coerceColorSelection(state.selected.color);
@@ -753,32 +758,42 @@ async function searchTypesense(){
       : [...state.selected[field]];
     if(vals.length){
       const escaped = vals.map(v => `\`${v}\``).join(",");
-      filterParts.push(`${field}:=[${escaped}]`);
+      const clause = `${field}:=[${escaped}]`;
+      filterParts.push(clause);
+      ownFacetClauses.set(field, clause);
     }
   }
   if(!searchingAll){
     if(activeMacro && state.selected.familia.size){
       const escaped = [...state.selected.familia].map(v => `\`${v}\``).join(",");
-      filterParts.push(`${FAMILIA_FIELD}:=[${escaped}]`);
+      const clause = `${FAMILIA_FIELD}:=[${escaped}]`;
+      filterParts.push(clause);
     }
     if(activeMacro && activeFamilia && state.selected.subfamilia.size){
       const escaped = [...state.selected.subfamilia].map(v => `\`${v}\``).join(",");
-      filterParts.push(`${SUBFAMILIA_FIELD}:=[${escaped}]`);
+      const clause = `${SUBFAMILIA_FIELD}:=[${escaped}]`;
+      filterParts.push(clause);
     }
     if(activeFamilia && state.selected.subfamilia.size){
       for(const field of EXTRA_FACET_FIELDS){
         const vals = [...state.selected[field]];
         if(vals.length){
           const escaped = vals.map(v => `\`${v}\``).join(",");
-          filterParts.push(`${field}:=[${escaped}]`);
+          const clause = `${field}:=[${escaped}]`;
+          filterParts.push(clause);
+          ownFacetClauses.set(field, clause);
         }
       }
     }
   }
   const potClause = potenciaFilterClause(state.potenciaMin, state.potenciaMax);
-  if(potClause) filterParts.push(potClause);
+  if(potClause){
+    filterParts.push(potClause);
+  }
   const smartClause = smartFilterClause(state.smartOnly);
-  if(smartClause) filterParts.push(smartClause);
+  if(smartClause){
+    filterParts.push(smartClause);
+  }
   const params = new URLSearchParams({
     q: state.query || "*",
     query_by: "nombre_typesense,sku,descripcion",
@@ -792,13 +807,11 @@ async function searchTypesense(){
   if(alphabetical){
     params.set("per_page", "250");
     params.set("page", "1");
+    // La recopilación previa al orden alfabético necesita un orden estable
+    // para no repetir u omitir documentos al avanzar entre páginas.
     params.set("sort_by", "order:asc");
   }else if(state.sortBy === "nuevo:desc"){
     params.set("sort_by", "nuevo:desc");
-  }else{
-    // Destacados: forzar el orden del catálogo. Sin sort_by, Typesense no
-    // garantiza order (con q=* todos empatan en relevancia y el orden varía).
-    params.set("sort_by", "order:asc");
   }
 
   try{
@@ -817,6 +830,36 @@ async function searchTypesense(){
       throw new Error(`Typesense ${res.status}: ${errText}`);
     }
     const data = await res.json();
+    // Facets disyuntivos: cada grupo con checkbox calcula sus opciones sin
+    // aplicarse a sí mismo, pero conserva todos los demás filtros activos.
+    // Así las alternativas compatibles mantienen su conteo real y se pueden
+    // combinar, en lugar de desaparecer o quedar artificialmente en cero.
+    const checkboxFacetFields = [
+      ...FACET_FIELDS.filter(field => field !== "macrofamilia"),
+      ...EXTRA_FACET_FIELDS
+    ];
+    const activeCheckboxFacets = checkboxFacetFields.filter(field => ownFacetClauses.has(field));
+    const disjunctiveFacets = await Promise.all(activeCheckboxFacets.map(async field => {
+      const ownClause = ownFacetClauses.get(field);
+      const facetParams = new URLSearchParams({
+        q: state.query || "*",
+        query_by: "nombre_typesense,sku,descripcion",
+        facet_by: field,
+        max_facet_values: "100",
+        per_page: "1",
+        page: "1",
+        filter_by: filterParts.filter(clause => clause !== ownClause).join(" && ")
+      });
+      const response = await typesenseDocumentsSearch(facetParams, signal);
+      if(!response.ok) return null;
+      const facetData = await response.json();
+      return (facetData.facet_counts || []).find(facet => facet.field_name === field) || null;
+    }));
+    const refreshedFields = new Set(disjunctiveFacets.filter(Boolean).map(facet => facet.field_name));
+    if(refreshedFields.size){
+      data.facet_counts = (data.facet_counts || []).filter(facet => !refreshedFields.has(facet.field_name));
+      data.facet_counts.push(...disjunctiveFacets.filter(Boolean));
+    }
     return alphabetical ? await buildAlphabeticalResults(data, params, signal) : data;
   }catch(err){
     // AbortError es esperado (cancelamos nosotros mismos la request vieja),
@@ -1099,6 +1142,7 @@ function renderFacets(facetCounts){
 
     const facetData = (facetCounts || []).find(f => f.field_name === field);
     let counts = sortFacetCounts(facetData ? facetData.counts : []);
+    if(field === "variante_temperatura_filtro") counts = filterTemperatureCounts(counts);
     if(field === "macrofamilia" && searching && macrofamiliaOptions.length){
       const byVal = {};
       counts.forEach(c => { byVal[c.value] = c.count; });
@@ -1109,6 +1153,7 @@ function renderFacets(facetCounts){
     }
     if(field === "macrofamilia"){
       counts = filterSmartHierarchyCounts(counts, field, state.selected, state.smartOnly);
+      if(searching) counts = counts.filter(c => Number(c.count) > 0);
     }
 
     const group = document.createElement("div");
@@ -1139,8 +1184,9 @@ function renderFacets(facetCounts){
         return;
       }
       const row = document.createElement("label");
-      row.className = "facet-row";
       const checked = state.selected[field].has(c.value) ? "checked" : "";
+      const mutedOption = state.selected[field]?.size && !checked;
+      row.className = "facet-row" + (mutedOption ? " is-muted" : "");
       const dot = field === "variante_temperatura_filtro"
         ? `<span class="dot temp-dot" style="background:${tempDotColor(c.value)}" title="${tempCategoryLabel(c.value) || c.value}"></span>` : "";
       row.innerHTML = `
@@ -1265,7 +1311,33 @@ function resolveSubfamiliaCounts(facetCounts, macro, familia, selectedSet){
 /* =========================================================
    RENDER: APPLIED FILTER CHIPS
    ========================================================= */
+function appliedFiltersCount(){
+  const navigationFields = new Set(["macrofamilia", "familia", "subfamilia"]);
+  const selectedCount = Object.entries(state.selected)
+    .reduce((total, [field, values]) => (
+      navigationFields.has(field) ? total : total + values.size
+    ), 0);
+  return selectedCount
+    + (isPotenciaRangeActive(state.potenciaMin, state.potenciaMax) ? 1 : 0)
+    + (state.smartOnly ? 1 : 0);
+}
+
+function renderFiltersCount(){
+  const badge = document.getElementById("filtersCount");
+  const toggle = document.getElementById("filtersToggle");
+  if(!badge || !toggle) return;
+  const count = appliedFiltersCount();
+  badge.textContent = String(count);
+  badge.hidden = count === 0;
+  const label = count
+    ? `Filtros, ${count} filtro${count === 1 ? "" : "s"} aplicado${count === 1 ? "" : "s"}`
+    : "Filtros";
+  toggle.title = label;
+  toggle.setAttribute("aria-label", label);
+}
+
 function renderChips(){
+  renderFiltersCount();
   const bar = document.getElementById("chipsBar");
   const CHIP_FIELDS = FACET_FIELDS.filter(f => f !== "macrofamilia");
   const chips = [];
@@ -1283,15 +1355,14 @@ function renderChips(){
   }
   if(!chips.length){ bar.style.display = "none"; bar.innerHTML = ""; return; }
   bar.style.display = "flex";
-  bar.innerHTML = `<span class="label">Filtros aplicados</span>` +
-    `<div class="chips-row">` +
+  bar.innerHTML = `<span class="label">Filtros aplicados</span><div class="chips-row">` +
     chips.map(c => {
       const label = c.field === "color" ? colorLabel(c.value) : c.value;
       const safeVal = String(c.value).replace(/"/g, "&quot;");
       return `<span class="chip" data-field="${c.field}" data-value="${safeVal}">${label}<button type="button" aria-label="Quitar filtro">×</button></span>`;
     }).join("") +
-    `<button type="button" class="clear-btn">Borrar filtros</button>` +
-    `</div>`;
+    `</div>` +
+    `<button type="button" class="clear-btn">Borrar filtros</button>`;
 }
 
 function clearAppliedFilters(){
@@ -1426,97 +1497,60 @@ function buildSmartBadge(doc){
   return `<span class="smart-badge">${ICON_WIFI}SMART</span>`;
 }
 
-// Paleta de temperatura / color de luz — pastilla en cards y filtros
-const TEMP_VARIANT_TONES = {
-  calido:          { color: "#fff79b", label: "Cálido", order: 100 },
-  neutro:          { color: "#d9d9d9", label: "Neutro", order: 200 },
-  frio:            { color: "#bce4fa", label: "Frío", order: 300 },
-  rgb:             { color: "linear-gradient(135deg,#e74c3c 0%,#f1c40f 33%,#2ecc71 66%,#3498db 100%)", label: "RGB", order: 400 },
-  rgbw:            { color: "linear-gradient(135deg,#e74c3c 0%,#f1c40f 25%,#2ecc71 50%,#3498db 75%,#f5f5f5 100%)", label: "RGB+W", order: 410 },
-  rgb_calido:      { color: "linear-gradient(135deg,#e74c3c 0%,#f1c40f 25%,#fff79b 100%)", label: "RGB + Cálido", order: 420 },
-  frio_ambar:      { color: "linear-gradient(135deg,#bce4fa 50%,#ffbf00 50%)", label: "Frío + Ámbar", order: 430 },
-  azul:            { color: "#1565c0", label: "Azul", order: 500 },
-  amarillo:        { color: "#fdd835", label: "Amarillo", order: 510 },
-  rojo:            { color: "#c62828", label: "Rojo", order: 520 },
-  verde:           { color: "#2e7d32", label: "Verde", order: 530 },
-  ambar:           { color: "#ffbf00", label: "Ámbar", order: 540 },
-  cct:             { color: "#90a4ae", label: "CCT", order: 600 },
-  blanco_dinamico: { color: "linear-gradient(135deg,#fff79b 0%,#d9d9d9 50%,#bce4fa 100%)", label: "Blanco Dinámico", order: 610 }
-};
+// Lista blanca de colores de luz. Cualquier otro valor del facet se excluye.
 const TEMP_TONES = {
-  calido: TEMP_VARIANT_TONES.calido,
-  neutro: TEMP_VARIANT_TONES.neutro,
-  frio:   TEMP_VARIANT_TONES.frio
+  calido:     { color: "#fff79b", label: "Cálido", order: 100 },
+  neutro:     { color: "#d9d9d9", label: "Neutro", order: 200 },
+  frio:       { color: "#bce4fa", label: "Frío", order: 300 },
+  rgb:        { color: "linear-gradient(135deg,#e74c3c 0%,#f1c40f 33%,#2ecc71 66%,#3498db 100%)", label: "RGB", order: 400 },
+  rgbw:       { color: "linear-gradient(135deg,#e74c3c 0%,#f1c40f 25%,#2ecc71 50%,#3498db 75%,#f5f5f5 100%)", label: "RGB+W", order: 410 },
+  frio_ambar: { color: "linear-gradient(135deg,#bce4fa 50%,#ffbf00 50%)", label: "Frío + Ámbar", order: 420 },
+  azul:       { color: "#1565c0", label: "Azul", order: 500 },
+  amarillo:   { color: "#fdd835", label: "Amarillo", order: 510 },
+  rojo:       { color: "#c62828", label: "Rojo", order: 520 },
+  verde:      { color: "#2e7d32", label: "Verde", order: 530 },
+  ambar:      { color: "#ffbf00", label: "Ámbar", order: 540 }
 };
-const TEMP_VARIANT_SKIP = new Set(["noooo", "nooo", "no"]);
 
-function normTempText(value){
+function normalizeTempText(value){
   return String(value || "")
     .trim()
     .toLowerCase()
     .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "");
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/\s+/g, " ");
 }
 
-function matchTempVariantKey(raw){
-  const norm = normTempText(raw);
-  if(!norm || TEMP_VARIANT_SKIP.has(norm)) return null;
+function tempCategoryKey(value){
+  const raw = String(value || "").trim();
+  const norm = normalizeTempText(raw);
+  if(!norm) return null;
 
-  const kelvin = parseInt(raw, 10);
-  if(!Number.isNaN(kelvin)){
+  const kelvin = /^\d{3,5}\s*k?$/i.test(raw) ? Number.parseInt(raw, 10) : NaN;
+  if(Number.isFinite(kelvin)){
     if(kelvin <= 3000) return "calido";
     if(kelvin <= 4500) return "neutro";
     return "frio";
   }
 
-  if(/blanco\s*dinamico/.test(norm)) return "blanco_dinamico";
-  if(/rgb\s*\+\s*w|rgbw/.test(norm)) return "rgbw";
-  if(/rgb\s*\+\s*calido/.test(norm)) return "rgb_calido";
-  if(/frio\s*\+\s*ambar/.test(norm)) return "frio_ambar";
+  if(/^rgb\s*\+\s*w$|^rgbw$/.test(norm)) return "rgbw";
   if(/^rgb$/.test(norm)) return "rgb";
-  if(/^cct$/.test(norm)) return "cct";
-  if(/c[aá]lido/.test(norm)) return "calido";
-  if(/neutro/.test(norm)) return "neutro";
-  if(/fr[ií]o/.test(norm)) return "frio";
+  if(/^frio\s*\+\s*ambar$/.test(norm)) return "frio_ambar";
+  if(/^calido$/.test(norm)) return "calido";
+  if(/^neutro$/.test(norm)) return "neutro";
+  if(/^frio$/.test(norm)) return "frio";
   if(/^azul$/.test(norm)) return "azul";
   if(/^amarillo$/.test(norm)) return "amarillo";
   if(/^rojo$/.test(norm)) return "rojo";
   if(/^verde$/.test(norm)) return "verde";
   if(/^ambar$/.test(norm)) return "ambar";
-
   return null;
 }
 
-function splitTempVariantParts(source){
-  return String(source || "")
-    .split(/[;|]/)
-    .flatMap(part => part.split(/\s*,\s*/))
-    .map(s => s.trim())
-    .filter(Boolean);
-}
-
-function tempVariantSortOrder(key, raw){
-  const tone = TEMP_VARIANT_TONES[key];
-  if(tone) return tone.order;
-  const k = parseInt(raw, 10);
-  return Number.isNaN(k) ? 9999 : k;
-}
-
-function buildTempVariantEntries(doc, fallbackValue){
-  const source = getLuzToneSource(doc, fallbackValue);
-  if(!source) return [];
-
-  const seen = new Set();
-  const entries = [];
-  splitTempVariantParts(source).forEach(part => {
-    const key = matchTempVariantKey(part);
-    if(!key || seen.has(key)) return;
-    seen.add(key);
-    const tone = TEMP_VARIANT_TONES[key];
-    if(tone) entries.push({ key, color: tone.color, label: tone.label, order: tempVariantSortOrder(key, part) });
-  });
-
-  return entries.sort((a, b) => a.order - b.order);
+function filterTemperatureCounts(counts){
+  return (counts || [])
+    .filter(item => Boolean(tempCategoryKey(item.value)))
+    .sort((a, b) => TEMP_TONES[tempCategoryKey(a.value)].order - TEMP_TONES[tempCategoryKey(b.value)].order);
 }
 
 /* =========================================================
@@ -1693,8 +1727,12 @@ function appendColorSwatches(container, counts, selectedSet, onToggle){
   list.forEach(c => {
     const label = colorLabel(c.value);
     const row = document.createElement("label");
-    row.className = "facet-row" + (!c.count && !selectedSet.has(c.value) ? " is-empty" : "");
-    const checked = selectedSet.has(c.value) ? "checked" : "";
+    const isSelected = selectedSet.has(c.value);
+    const isMuted = selectedSet.size > 0 && !isSelected;
+    row.className = "facet-row"
+      + (isMuted ? " is-muted" : "")
+      + (!c.count && !isSelected ? " is-empty" : "");
+    const checked = isSelected ? "checked" : "";
     const light = isLightColorKey(c.value) ? " light" : "";
     row.innerHTML = `
       <span class="cb-wrap">
@@ -1716,40 +1754,18 @@ function appendColorSwatches(container, counts, selectedSet, onToggle){
   });
 }
 
-function tempCategoryKey(value){
-  return matchTempVariantKey(value);
-}
-
 function tempCategoryColor(value){
-  const entries = buildTempVariantEntries({}, value);
-  if(entries.length === 1) return entries[0].color;
-  if(entries.length > 1) return tempDotColor(value);
-  const key = matchTempVariantKey(value);
-  return key ? TEMP_VARIANT_TONES[key].color : null;
+  const key = tempCategoryKey(value);
+  return key ? TEMP_TONES[key].color : null;
 }
 
 function tempCategoryLabel(value){
-  const entries = buildTempVariantEntries({}, value);
-  if(entries.length) return entries.map(entry => entry.label).join(", ");
-  const raw = String(value || "").trim();
-  return TEMP_VARIANT_SKIP.has(normTempText(raw)) ? "" : raw;
+  const key = tempCategoryKey(value);
+  return key ? TEMP_TONES[key].label : "";
 }
 
 function tempDotColor(value){
-  const entries = buildTempVariantEntries({}, value);
-  if(entries.length === 1) return entries[0].color;
-  if(entries.length > 1){
-    const solids = entries.map(entry => entry.color).filter(color => !color.includes("gradient"));
-    if(solids.length >= 2){
-      const step = 100 / solids.length;
-      const stops = solids.map((color, index) => `${color} ${index * step}% ${(index + 1) * step}%`).join(", ");
-      return `linear-gradient(135deg, ${stops})`;
-    }
-    if(entries.length) return entries[0].color;
-  }
-  const key = matchTempVariantKey(value);
-  if(key) return TEMP_VARIANT_TONES[key].color;
-  return CCT_DOT[value] || "#ccc";
+  return tempCategoryColor(value) || CCT_DOT[value] || "#ccc";
 }
 
 function getLuzToneSource(doc, fallbackValue){
@@ -1758,21 +1774,39 @@ function getLuzToneSource(doc, fallbackValue){
 }
 
 function buildLuzCategoryKeys(doc, fallbackValue){
-  return buildTempVariantEntries(doc, fallbackValue).map(entry => entry.key);
+  const source = getLuzToneSource(doc, fallbackValue);
+  if(!source) return [];
+
+  const tones = String(source).split(";").map(t => t.trim()).filter(Boolean);
+  const bestKelvinByKey = new Map();
+  tones.forEach(t => {
+    const key = tempCategoryKey(t);
+    if(!key) return;
+    const k = parseInt(t, 10);
+    const sortK = Number.isNaN(k) ? (key === "calido" ? 2700 : key === "neutro" ? 4000 : 6500) : k;
+    if(!bestKelvinByKey.has(key) || sortK < bestKelvinByKey.get(key)){
+      bestKelvinByKey.set(key, sortK);
+    }
+  });
+
+  return [...bestKelvinByKey.entries()]
+    .sort((a, b) => a[1] - b[1])
+    .map(([key]) => key);
 }
 
 function buildLuzCategoryLabel(doc, fallbackValue){
-  const entries = buildTempVariantEntries(doc, fallbackValue);
-  if(!entries.length) return "";
-  return entries.map(entry => entry.label).join(" · ");
+  const keys = buildLuzCategoryKeys(doc, fallbackValue);
+  if(!keys.length) return "";
+  return keys.map(key => TEMP_TONES[key].label).join(" · ");
 }
 
 function buildLuzDots(doc, fallbackValue){
-  const entries = buildTempVariantEntries(doc, fallbackValue);
-  if(!entries.length) return "";
-  return entries.map(entry =>
-    `<span class="dot luz-dot" style="background:${entry.color}" title="${entry.label}" aria-label="${entry.label}"></span>`
-  ).join("");
+  const keys = buildLuzCategoryKeys(doc, fallbackValue);
+  if(!keys.length) return "";
+  return keys.map(key => {
+    const { color, label } = TEMP_TONES[key];
+    return `<span class="dot luz-dot" style="background:${color}" title="${label}" aria-label="${label}"></span>`;
+  }).join("");
 }
 
 // Pill en la foto (abajo derecha): solo círculos; al hover se deslizan los nombres
@@ -1780,13 +1814,14 @@ function buildLuzMediaDots(doc){
   const temperatureVariants = Array.isArray(doc.variante_temperatura_filtro)
     ? doc.variante_temperatura_filtro.join(";")
     : doc.variante_temperatura_filtro;
-  const entries = buildTempVariantEntries({}, temperatureVariants);
-  if(!entries.length) return "";
+  const keys = buildLuzCategoryKeys({}, temperatureVariants);
+  if(!keys.length) return "";
 
-  const collapsed = entries.length >= 2 ? " is-collapsed" : "";
-  const rows = entries.map(entry =>
-    `<span class="temp-dots-row"><span class="temp-dots-label">${entry.label}</span><span class="dot luz-dot" style="background:${entry.color}" title="${entry.label}" aria-label="${entry.label}"></span></span>`
-  ).join("");
+  const collapsed = keys.length >= 2 ? " is-collapsed" : "";
+  const rows = keys.map(key => {
+    const { color, label } = TEMP_TONES[key];
+    return `<span class="temp-dots-row"><span class="temp-dots-label">${label}</span><span class="dot luz-dot" style="background:${color}" title="${label}" aria-label="${label}"></span></span>`;
+  }).join("");
 
   return `<span class="temp-dots${collapsed}" tabindex="0" aria-label="Temperatura de luz"><span class="temp-dots-icon" aria-hidden="true">${ICON_BULB}</span>${rows}</span>`;
 }
@@ -2032,35 +2067,13 @@ function updateCompareBoundary(){
   compareBoundaryFrame = 0;
   const root = document.getElementById("macroled-productos");
   const bar = document.getElementById("compareBar");
-  const pagination = document.getElementById("pagination");
-  const gridShell = document.getElementById("gridShell");
-  if(!root || !bar || !pagination || getComputedStyle(bar).display === "none"){
+  if(!root || !bar || getComputedStyle(bar).display === "none"){
     if(root) root.style.removeProperty("--compare-boundary-lift");
     return;
   }
-
-  // En mobile, abierto funciona como un modal superpuesto. No se ancla a la
-  // paginación ni empuja el contenido; para verla, el usuario lo contrae.
-  if(isExpandedMobileCompare(bar)){
-    root.style.setProperty("--compare-boundary-lift", "0px");
-    return;
-  }
-
-  // Durante una actualización de filtros la paginación puede quedar vacía.
-  // En ese estado mantenemos la barra fija para evitar saltos hacia arriba.
-  if(gridShell?.classList.contains("is-filtering") || !pagination.childElementCount){
-    root.style.setProperty("--compare-boundary-lift", "0px");
-    return;
-  }
-
-  // La posición de reposo se calcula desde la paginación (no desde el final
-  // del contenedor, que ya incluye padding propio). Al alcanzarla, la barra
-  // queda exactamente a 2rem y luego se desplaza junto con el catálogo.
-  const barGap = parseFloat(getComputedStyle(bar).getPropertyValue("--compare-bar-gap")) || 0;
-  const fixedTop = window.innerHeight - barGap - bar.offsetHeight;
-  const restingTop = pagination.getBoundingClientRect().bottom + 32;
-  const lift = Math.max(0, fixedTop - restingTop);
-  root.style.setProperty("--compare-boundary-lift", lift + "px");
+  // Comparativa y asistente permanecen anclados al viewport incluso al llegar
+  // al footer; el padding del catálogo reserva el espacio necesario.
+  root.style.setProperty("--compare-boundary-lift", "0px");
 }
 
 function scheduleCompareBoundaryUpdate(){
@@ -2404,6 +2417,33 @@ function finishInitialPreload(){
   if(window.MacroledPreload) window.MacroledPreload.done();
 }
 
+let gridLoadingPositionFrame = 0;
+function updateGridLoadingPosition(){
+  gridLoadingPositionFrame = 0;
+  const gridShell = document.getElementById("gridShell");
+  if(!gridShell?.classList.contains("is-filtering")) return;
+
+  const rect = gridShell.getBoundingClientRect();
+  const visibleTop = Math.max(0, rect.top);
+  const visibleBottom = Math.min(window.innerHeight, rect.bottom);
+  const centerY = visibleBottom > visibleTop
+    ? (visibleTop + visibleBottom) / 2
+    : Math.min(window.innerHeight, Math.max(0, rect.top + rect.height / 2));
+
+  // El indicador vive dentro de gridShell: convertir el centro visible del
+  // viewport a coordenadas locales evita que un ancestro altere position:fixed.
+  gridShell.style.setProperty("--grid-loading-x", `${rect.width / 2}px`);
+  gridShell.style.setProperty("--grid-loading-y", `${centerY - rect.top}px`);
+}
+
+function scheduleGridLoadingPosition(){
+  if(gridLoadingPositionFrame) return;
+  gridLoadingPositionFrame = requestAnimationFrame(updateGridLoadingPosition);
+}
+
+window.addEventListener("scroll", scheduleGridLoadingPosition, { passive: true });
+window.addEventListener("resize", scheduleGridLoadingPosition);
+
 async function loadAndRender(){
   const gridShell = document.getElementById("gridShell");
   const showingLabel = document.getElementById("showingLabel");
@@ -2412,6 +2452,7 @@ async function loadAndRender(){
   if(isRefilter && gridShell){
     gridShell.classList.add("is-filtering");
     gridShell.setAttribute("aria-busy", "true");
+    updateGridLoadingPosition();
     scheduleCompareBoundaryUpdate();
   } else {
     showingLabel.textContent = "Cargando productos…";
@@ -2464,7 +2505,8 @@ const sortMenu = document.getElementById("sortMenu");
 const sortCurrent = document.getElementById("sortCurrent");
 
 function syncSortDropdown(){
-  sortCurrent.textContent = "Ordenar por";
+  const selectedOption = [...sortSelect.options].find(option => option.value === sortSelect.value);
+  sortCurrent.textContent = sortSelect.value ? selectedOption?.textContent || "Ordenar por" : "Ordenar por";
   sortMenu.querySelectorAll(".sort-option").forEach(option => {
     const active = option.dataset.sort === sortSelect.value;
     option.classList.toggle("active", active);
@@ -2591,23 +2633,8 @@ const filtersBackdrop = document.getElementById("filtersBackdrop");
 const filtersToggle = document.getElementById("filtersToggle");
 const filtersClose = document.getElementById("filtersClose");
 const filtersApply = document.getElementById("filtersApply");
-const filtersCollapseBtn = document.getElementById("filtersCollapseBtn");
-const filtersExpandBtn = document.getElementById("filtersExpandBtn");
+const filtersClear = document.getElementById("filtersClear");
 const layoutEl = document.querySelector(".layout");
-const FILTERS_COLLAPSED_KEY = "macroled-filters-collapsed";
-
-function setFiltersCollapsed(collapsed){
-  if(!layoutEl) return;
-  layoutEl.classList.toggle("filters-collapsed", !!collapsed);
-  try{ localStorage.setItem(FILTERS_COLLAPSED_KEY, collapsed ? "1" : "0"); }catch(_){}
-}
-
-function initFiltersCollapsed(){
-  let collapsed = false;
-  try{ collapsed = localStorage.getItem(FILTERS_COLLAPSED_KEY) === "1"; }catch(_){}
-  setFiltersCollapsed(collapsed);
-}
-
 function openFiltersDrawer(){
   syncPendingFromCommitted();
   filtersAside.classList.add("open");
@@ -2629,20 +2656,24 @@ function closeFiltersDrawer(){
 filtersToggle.addEventListener("click", openFiltersDrawer);
 filtersClose.addEventListener("click", closeFiltersDrawer);
 filtersBackdrop.addEventListener("click", closeFiltersDrawer);
-const filtersDesktopHeading = document.querySelector(".filters-desktop-heading");
-if(filtersCollapseBtn){
-  filtersCollapseBtn.addEventListener("click", (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setFiltersCollapsed(true);
-  });
-} else if(filtersDesktopHeading){
-  filtersDesktopHeading.addEventListener("click", () => setFiltersCollapsed(true));
+layoutEl?.classList.remove("filters-collapsed");
+
+const catalogControlsRow = document.querySelector(".catalog-controls-row");
+let catalogControlsFrame = 0;
+function syncCatalogControlsStickyState(){
+  catalogControlsFrame = 0;
+  if(!catalogControlsRow) return;
+  const isStuck = window.scrollY > 0 && catalogControlsRow.getBoundingClientRect().top <= 1;
+  catalogControlsRow.classList.toggle("is-stuck", isStuck);
 }
-if(filtersExpandBtn){
-  filtersExpandBtn.addEventListener("click", () => setFiltersCollapsed(false));
+function scheduleCatalogControlsStickyState(){
+  if(catalogControlsFrame) return;
+  catalogControlsFrame = requestAnimationFrame(syncCatalogControlsStickyState);
 }
-initFiltersCollapsed();
+window.addEventListener("scroll", scheduleCatalogControlsStickyState, { passive:true });
+window.addEventListener("resize", scheduleCatalogControlsStickyState);
+syncCatalogControlsStickyState();
+
 filtersApply.addEventListener("click", async () => {
   // Recién acá se aplican de verdad los filtros elegidos en el drawer
   Object.keys(state.pending).forEach(f => { state.selected[f] = new Set(state.pending[f]); });
@@ -2656,6 +2687,18 @@ filtersApply.addEventListener("click", async () => {
   await loadAndRender();
   closeFiltersDrawer();
 });
+if(filtersClear){
+  filtersClear.addEventListener("click", async () => {
+    Object.values(state.selected).forEach(values => values.clear());
+    Object.values(state.pending).forEach(values => values.clear());
+    resetPotenciaRange();
+    state.smartOnly = false;
+    state.pendingSmartOnly = false;
+    state.page = 1;
+    closeFiltersDrawer();
+    await loadAndRender();
+  });
+}
 document.getElementById("fmnBack").addEventListener("click", goToListScreen);
 
 /* ---- Navegación de dos niveles del drawer mobile: lista de filtros
@@ -2666,7 +2709,7 @@ document.getElementById("fmnBack").addEventListener("click", goToListScreen);
 let lastFacetCounts = [];
 const FMN_ORDER = ["macrofamilia", "familia", "subfamilia", "categoria", "variante_temperatura_filtro", "color", "potencia", "dimerizable"];
 const FMN_LABELS = {
-  macrofamilia: "Productos",
+  macrofamilia: "Macrofamilia",
   familia: "Familia",
   subfamilia: "Subfamilia",
   categoria: "Categoría",
@@ -2700,7 +2743,7 @@ function fmnSummary(field){
 function currentSortLabel(){
   const select = document.getElementById("sortSelect");
   const opt = [...select.options].find(o => o.value === state.pendingSortBy);
-  return opt && opt.value ? opt.textContent : "";
+  return opt ? opt.textContent : "Destacados";
 }
 
 function goToListScreen(){
@@ -2712,19 +2755,17 @@ function renderMobileFilters(facetCounts){
   lastFacetCounts = facetCounts || lastFacetCounts;
   const listEl = document.getElementById("fmnList");
   const activeMacro = [...state.pending.macrofamilia][0];
+  const hierarchyFields = new Set(["macrofamilia", "familia", "subfamilia"]);
 
   const searching = Boolean(state.query);
-  const rows = [
-    { field: "view", label: "Tipo de vista", summary: state.view === "list" ? "Lista" : "Grilla" }
-  ];
-  if(hasSmartProductsInContext(state.pending, searching, state.pendingSmartOnly)){
-    rows.push({ field: "smart", type: "switch", label: "Smart" });
-  }
+  const rows = [];
 
   FMN_ORDER.forEach(field => {
     const hasFamilia = state.pending.familia.size > 0;
     if(searching && (field === "familia" || field === "subfamilia" || field === "categoria")) return;
-    if(field === "familia" && (!activeMacro || hasFamilia)) return;
+    // La jerarquía elegida siempre queda visible para poder cambiarla:
+    // Macrofamilia -> Familia -> Subfamilia.
+    if(field === "familia" && !activeMacro) return;
     if(field === "subfamilia" && !hasFamilia) return;
     if(field === "categoria" && (!hasFamilia || !state.pending.subfamilia.size)) return;
     if((field === "familia" || field === "subfamilia" || field === "categoria") && !activeMacro) return;
@@ -2739,18 +2780,44 @@ function renderMobileFilters(facetCounts){
       }
     }
     const data = lastFacetCounts.find(f => f.field_name === field);
-    const counts = sortFacetCounts(data ? data.counts : []);
+    let counts = sortFacetCounts(data ? data.counts : []);
+    if(field === "variante_temperatura_filtro") counts = filterTemperatureCounts(counts);
     if(field !== "macrofamilia" && !counts.length) return;
     rows.push({ field, label: FMN_LABELS[field], summary: fmnSummary(field), counts });
   });
 
+  if(hasSmartProductsInContext(state.pending, searching, state.pendingSmartOnly)){
+    rows.push({ field: "smart", type: "switch", label: "Smart" });
+  }
+  rows.forEach(row => {
+    if(hierarchyFields.has(row.field)){
+      row.activeCount = 0;
+    } else if(row.field === "potencia"){
+      row.activeCount = isPotenciaRangeActive(state.pendingPotenciaMin, state.pendingPotenciaMax) ? 1 : 0;
+    } else if(row.field === "smart"){
+      row.activeCount = 0;
+    } else {
+      row.activeCount = state.pending[row.field]?.size || 0;
+    }
+  });
+  const firstFilterRow = rows.find(row => !hierarchyFields.has(row.field));
+  if(firstFilterRow) firstFilterRow.filtersStart = true;
+  const hierarchyRows = rows.filter(row => hierarchyFields.has(row.field));
+  const filterRows = rows.filter(row => !hierarchyFields.has(row.field));
+  if(hierarchyRows.length) hierarchyRows[hierarchyRows.length - 1].sectionEnd = true;
+  if(filterRows.length) filterRows[filterRows.length - 1].sectionEnd = true;
+  rows.push(
+    { field: "view", type: "secondary", label: "Tipo de vista", summary: state.view === "list" ? "Lista" : "Grilla" },
+    { field: "sort", type: "secondary", label: "Ordenar", summary: currentSortLabel(), sectionEnd: true }
+  );
+
   listEl.innerHTML = rows.map(r => {
     if(r.type === "switch"){
-      return `<label class="fmn-row fmn-switch-row">${smartSwitchHtml(state.pendingSmartOnly)}</label>`;
+      return `<label class="fmn-row fmn-switch-row${r.filtersStart ? " fmn-filters-start" : ""}${r.sectionEnd ? " fmn-section-end" : ""}">${smartSwitchHtml(state.pendingSmartOnly, undefined, r.activeCount)}</label>`;
     }
     return `
-    <div class="fmn-row" data-field="${r.field}">
-      <span>${r.label}</span>
+    <div class="fmn-row${r.type === "secondary" ? " fmn-secondary-row" : ""}${r.filtersStart ? " fmn-filters-start" : ""}${r.field === "view" ? " fmn-secondary-start" : ""}${r.sectionEnd ? " fmn-section-end" : ""}" data-field="${r.field}">
+      <span class="fmn-row-label">${r.type === "secondary" ? "" : (FACET_ICONS[r.field] || "")}<span>${r.label}${r.type !== "secondary" && r.activeCount ? `<span class="fmn-active-count">(${r.activeCount})</span>` : ""}</span></span>
       <span class="fmn-row-meta">${r.summary ? `<span>${r.summary}</span>` : ""}<span class="fmn-chev" aria-hidden="true">${ICON_FACET_CHEV}</span></span>
     </div>
   `;
@@ -2764,13 +2831,14 @@ function renderMobileFilters(facetCounts){
 
 function fmnCheckboxRowHtml(field, c){
   const checked = state.pending[field].has(c.value);
+  const mutedOption = state.pending[field]?.size && !checked;
   const tempDot = field === "variante_temperatura_filtro"
     ? `<span class="dot temp-dot" style="background:${tempDotColor(c.value)}" title="${tempCategoryLabel(c.value) || c.value}"></span>` : "";
   const colorDot = field === "color"
     ? `<span class="dot color-dot${isLightColorKey(c.value) ? " light" : ""}" style="background:${colorSwatchBg(c.value)}" title="${colorLabel(c.value)}"></span>` : "";
   const label = field === "color" ? colorLabel(c.value) : c.value;
   return `
-    <div class="fmn-option-row${checked ? " active" : ""}${field === "color" && !c.count && !checked ? " is-empty" : ""}" data-value="${c.value}">
+    <div class="fmn-option-row${checked ? " active" : ""}${mutedOption ? " is-muted" : ""}${field === "color" && !c.count && !checked ? " is-empty" : ""}" data-value="${c.value}">
       <span class="fmn-checkbox">${checked ? ICON_CHECK : ""}</span>
       ${tempDot}${colorDot}<span>${label}</span>
       ${c.count !== null && c.count !== undefined ? `<span class="fmn-count">${c.count}</span>` : ""}
@@ -2853,12 +2921,13 @@ function openDetailScreen(field){
     titleEl.textContent = "Tipo de vista";
     bodyEl.classList.remove("fmn-color-swatches");
     const options = [
-      { value: "grid", label: "Grilla" },
-      { value: "list", label: "Lista" }
+      { value: "grid", label: "Grilla", icon: "▦" },
+      { value: "list", label: "Lista", icon: "☰" }
     ];
     bodyEl.innerHTML = options.map(o => `
       <div class="fmn-option-row${state.view === o.value ? " active" : ""}" data-value="${o.value}">
         <span class="fmn-radio"></span><span>${o.label}</span>
+        <span class="fmn-view-option-icon" aria-hidden="true">${o.icon}</span>
       </div>
     `).join("");
     bodyEl.querySelectorAll(".fmn-option-row").forEach(row => {
@@ -2870,7 +2939,7 @@ function openDetailScreen(field){
   } else if(field === "sort"){
     titleEl.textContent = "Ordenar por";
     const select = document.getElementById("sortSelect");
-    const options = [...select.options].filter(o => o.value !== "");
+    const options = [...select.options];
     bodyEl.innerHTML = options.map(o => `
       <div class="fmn-option-row${state.pendingSortBy === o.value ? " active" : ""}" data-value="${o.value}">
         <span class="fmn-radio"></span><span>${o.textContent}</span>
@@ -2879,14 +2948,14 @@ function openDetailScreen(field){
     bodyEl.querySelectorAll(".fmn-option-row").forEach(row => {
       row.addEventListener("click", () => {
         const val = row.dataset.value;
-        state.pendingSortBy = state.pendingSortBy === val ? "" : val;
-        renderMobileFilters(lastFacetCounts);
-        openDetailScreen("sort");
+        state.pendingSortBy = val;
+        select.value = val;
+        select.dispatchEvent(new Event("change", { bubbles:true }));
+        closeFiltersDrawer();
       });
     });
   } else if(field === "macrofamilia"){
-    // Selección única: al elegir una, las demás quedan deshabilitadas
-    // (no se navega afuera de la pantalla, el usuario vuelve cuando quiera)
+    // Selección única y navegación inmediata, igual que vista/orden.
     titleEl.textContent = FMN_LABELS.macrofamilia;
     // Lista completa cacheada (no la filtrada) para que sigan apareciendo
     // todas las macrofamilias aunque ya haya una seleccionada
@@ -2902,30 +2971,38 @@ function openDetailScreen(field){
         : cached
     );
     counts = filterSmartHierarchyCounts(counts, "macrofamilia", state.pending, state.pendingSmartOnly);
-    const hasSelection = state.pending.macrofamilia.size > 0;
+    if(state.query) counts = counts.filter(c => Number(c.count) > 0);
     bodyEl.innerHTML = counts.map(c => {
       const checked = state.pending.macrofamilia.has(c.value);
-      const disabled = hasSelection && !checked;
       return `
-        <div class="fmn-option-row${checked ? " active" : ""}${disabled ? " disabled" : ""}" data-value="${c.value}">
-          <span class="fmn-checkbox">${checked ? ICON_CHECK : ""}</span>
+        <div class="fmn-option-row${checked ? " active" : ""}" data-value="${c.value}">
+          <span class="fmn-radio"></span>
           <span>${c.value}</span><span class="fmn-count">${c.count}</span>
         </div>
       `;
     }).join("");
     bodyEl.querySelectorAll(".fmn-option-row").forEach(row => {
-      row.addEventListener("click", () => {
+      row.addEventListener("click", async () => {
         const val = row.dataset.value;
-        const already = state.pending.macrofamilia.has(val);
-        if(hasSelection && !already) return; // deshabilitada, no hace nada
+        // Elegir una macrofamilia entra en su navegación jerárquica y deja
+        // atrás una búsqueda de texto previa, igual que un cambio de página.
+        state.query = "";
+        syncSearchInputFromState();
+        state.selected.macrofamilia.clear();
+        state.selected.macrofamilia.add(val);
+        state.selected.familia.clear();
+        state.selected.subfamilia.clear();
+        state.selected.categoria.clear();
+
         state.pending.macrofamilia.clear();
+        state.pending.macrofamilia.add(val);
         state.pending.subfamilia.clear();
         state.pending.familia.clear();
         state.pending.categoria.clear();
-        if(!already) state.pending.macrofamilia.add(val);
-        renderMobileFilters(lastFacetCounts);
-        openDetailScreen("macrofamilia");
-        updatePendingResultsCount();
+
+        state.page = 1;
+        closeFiltersDrawer();
+        await loadAndRender();
       });
     });
   } else if(field === "familia"){
@@ -2941,21 +3018,28 @@ function openDetailScreen(field){
       const checked = state.pending.familia.has(c.value);
       return `
         <div class="fmn-option-row${checked ? " active" : ""}" data-value="${c.value}">
+          <span class="fmn-radio"></span>
           <span>${c.value}</span>
           ${c.count !== null && c.count !== undefined ? `<span class="fmn-count">${c.count}</span>` : ""}
         </div>
       `;
     }).join("");
     bodyEl.querySelectorAll(".fmn-option-row").forEach(row => {
-      row.addEventListener("click", () => {
+      row.addEventListener("click", async () => {
         const val = row.dataset.value;
+        state.selected.familia.clear();
+        state.selected.familia.add(val);
+        state.selected.subfamilia.clear();
+        state.selected.categoria.clear();
+
         state.pending.familia.clear();
+        state.pending.familia.add(val);
         state.pending.subfamilia.clear();
         state.pending.categoria.clear();
-        state.pending.familia.add(val);
-        renderMobileFilters(lastFacetCounts);
-        goToListScreen();
-        updatePendingResultsCount();
+
+        state.page = 1;
+        closeFiltersDrawer();
+        await loadAndRender();
       });
     });
   } else if(field === "subfamilia"){
@@ -2994,6 +3078,7 @@ function openDetailScreen(field){
     bodyEl.classList.remove("fmn-color-swatches");
     const data = lastFacetCounts.find(f => f.field_name === field);
     let counts = sortFacetCounts(data ? data.counts : []);
+    if(field === "variante_temperatura_filtro") counts = filterTemperatureCounts(counts);
     if(field === "categoria"){
       counts = filterSmartHierarchyCounts(counts, field, state.pending, state.pendingSmartOnly);
     }

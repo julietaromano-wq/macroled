@@ -30,50 +30,45 @@
     <div class="showing" id="showingLabel">Cargando productos…</div>
   </div>
 
-  <div class="results-toolbar">
-    <div class="results-search">
-      <button type="button" class="filters-expand-btn" id="filtersExpandBtn" title="Mostrar filtros">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="4" y1="6" x2="20" y2="6"/><circle cx="9" cy="6" r="2.2" fill="#fff"/><line x1="4" y1="12" x2="20" y2="12"/><circle cx="16" cy="12" r="2.2" fill="#fff"/><line x1="4" y1="18" x2="20" y2="18"/><circle cx="11" cy="18" r="2.2" fill="#fff"/></svg>
-        Filtros
-      </button>
+  <div class="catalog-controls-row">
+    <div class="catalog-controls-main">
+      <div class="results-search">
       <div class="search-bar">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
         <input type="text" id="searchInput" name="ml-catalog-q" placeholder="Buscar por nombre, SKU o descripción..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" aria-label="Buscar productos">
       </div>
       <button class="filters-toggle" id="filtersToggle" type="button" title="Filtros">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="6" x2="20" y2="6"/><circle cx="9" cy="6" r="2.2" fill="#fff"/><line x1="4" y1="12" x2="20" y2="12"/><circle cx="16" cy="12" r="2.2" fill="#fff"/><line x1="4" y1="18" x2="20" y2="18"/><circle cx="11" cy="18" r="2.2" fill="#fff"/></svg>
+        <span class="filters-count" id="filtersCount" aria-hidden="true" hidden>0</span>
         Filtros
       </button>
+      <div class="view-toggle">
+        <button id="btnGrid" class="active" title="Vista grilla">▦</button>
+        <button id="btnList" title="Vista lista">☰</button>
+      </div>
+      </div>
       <div class="sort-dropdown" id="sortDropdown">
         <button class="sort-trigger" id="sortTrigger" type="button" aria-haspopup="listbox" aria-expanded="false">
-          <span class="sort-current" id="sortCurrent">Ordenar por</span>
+          <span class="sort-current" id="sortCurrent">Destacados</span>
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
         </button>
         <div class="sort-menu" id="sortMenu" role="listbox" aria-label="Ordenar productos" hidden>
+          <span class="sort-menu-title">Ordenar por:</span>
+          <button type="button" class="sort-option" role="option" aria-selected="true" data-sort="">Destacados</button>
           <button type="button" class="sort-option" role="option" aria-selected="false" data-sort="nuevo:desc">Novedades</button>
           <button type="button" class="sort-option" role="option" aria-selected="false" data-sort="alpha:asc">A–Z</button>
         </div>
       </div>
       <select class="sort sort-native" id="sortSelect" tabindex="-1" aria-hidden="true">
-        <option value="" selected>Ordenar por</option>
+        <option value="" selected>Destacados</option>
         <option value="nuevo:desc">Novedades</option>
         <option value="alpha:asc">A–Z</option>
       </select>
-      <div class="view-toggle">
-        <button id="btnGrid" class="active" title="Vista grilla">▦</button>
-        <button id="btnList" title="Vista lista">☰</button>
-      </div>
     </div>
   </div>
 
   <div class="filters-rail">
     <div class="filters-desktop-only">
-      <div class="filters-desktop-heading">
-        <span class="filters-desktop-title">Filtros</span>
-        <button type="button" class="filters-collapse-btn" id="filtersCollapseBtn" title="Ocultar filtros" aria-label="Ocultar filtros">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="4" y1="6" x2="20" y2="6"/><circle cx="9" cy="6" r="2.2" fill="#fff"/><line x1="4" y1="12" x2="20" y2="12"/><circle cx="16" cy="12" r="2.2" fill="#fff"/><line x1="4" y1="18" x2="20" y2="18"/><circle cx="11" cy="18" r="2.2" fill="#fff"/></svg>
-        </button>
-      </div>
       <div id="filtersPanel"></div>
     </div>
   </div>
@@ -121,6 +116,7 @@
   </div>
   <div class="filters-mobile-footer">
     <button class="filters-apply" id="filtersApply">Ver resultados</button>
+    <button class="filters-clear clear-btn" id="filtersClear" type="button">Borrar filtros</button>
   </div>
 </aside>
 
