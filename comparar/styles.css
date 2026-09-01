@@ -53,7 +53,7 @@
 
   /* ---- Page shell ---- */
   .page{
-    max-width:1320px;margin:0 auto;
+    max-width:1500px;margin:0 auto;
     padding:clamp(16px,2.5vw,24px) var(--page-pad-x) clamp(48px,8vw,64px);
     padding-bottom:max(clamp(48px,8vw,64px), calc(24px + env(safe-area-inset-bottom,0px)));
   }
@@ -86,7 +86,7 @@
     transform:translateY(-100%);transition:transform .2s ease;
   }
   .mini-compare-bar.show{transform:translateY(0);}
-  .mini-compare-inner{max-width:1320px;margin:0 auto;padding:0 var(--page-pad-x);overflow:hidden;}
+  .mini-compare-inner{max-width:1500px;margin:0 auto;padding:0 var(--page-pad-x);overflow:hidden;}
   .mini-grid{transform:translateX(var(--mini-scroll-x, 0px));}
   .mini-cell{
     padding:14px 20px;display:flex;align-items:center;gap:14px;min-width:0;border-left:1px solid var(--line);
@@ -128,7 +128,7 @@
      en vez de compartir celda con las fotos de producto. Al ser hijo de
      #miniHeader, aparece/desaparece pegado a él (misma transform de
      .mini-compare-bar.show), sin necesidad de sincronizar visibilidad a mano. */
-  .mini-diff-row{ display:none; max-width:1320px;margin:0 auto;padding:10px var(--page-pad-x) 12px;border-top:1px solid var(--line); }
+  .mini-diff-row{ display:none; max-width:1500px;margin:0 auto;padding:10px var(--page-pad-x) 12px;border-top:1px solid var(--line); }
   .mini-diff-row .diff-bar-toggle{ margin:0; }
   .diff-bar-toggle{
     display:flex;align-items:center;justify-content:space-between;gap:12px;
@@ -222,12 +222,30 @@
   .cell.label{
     background:#fff;
     font-size:var(--fs-sm);font-weight:500;color:var(--muted);
-    position:relative;z-index:3;will-change:transform;
-    /* backface-visibility:hidden fuerza a WebKit a promover esta celda a
-       su propia capa de composición estable — sin esto, en iOS Safari
-       el borde/contenido de esta columna (movida a mano con transform en
-       cada scroll, ver pinStickyColumns) puede recortarse o parpadear un
-       par de px durante el gesto de scroll táctil real. */
+    position:relative;
+  }
+  /* z-index solo cuando la tabla realmente scrollea horizontalmente
+     (#compareShell.has-hscroll, ver updateScrollAffordance en app.js). Sin
+     overflow (desktop ancho) no hay nada que "pinear". */
+  #compareShell.has-hscroll .cell.label{ z-index:3; }
+  /* will-change/backface-visibility, en cambio, solo mientras el carrusel
+     se está moviendo de verdad (#compareShell.is-hscrolling, prendida en el
+     listener de scroll y apagada al asentarse — ver app.js). Dejarlas
+     prendidas todo el tiempo que hay overflow (que en mobile es siempre)
+     promovía cada fila de spec a su propia capa de composición en
+     simultáneo — con ~30 filas eso son ~45 capas de golpe, que es lo que
+     se sentía como scroll lento (horizontal Y vertical, cualquier capa de
+     más pesa en cada frame de la página). Además, promover esta celda a su
+     propia capa de composición sin necesidad hacía que Chromium dejara de
+     pintar el borde-left de la celda vecina (.cell.coldata, línea
+     separadora entre columnas) hasta el próximo repaint forzado.
+     backface-visibility:hidden fuerza a WebKit a promover esta celda a su
+     propia capa estable — sin esto, en iOS Safari el borde/contenido de
+     esta columna (movida a mano con transform en cada scroll, ver
+     pinStickyColumns) puede recortarse o parpadear un par de px durante el
+     gesto de scroll táctil real. */
+  #compareShell.is-hscrolling .cell.label{
+    will-change:transform;
     backface-visibility:hidden;-webkit-backface-visibility:hidden;
   }
   /* target del pin en mobile cuando .cell.label es .label-full (ver
@@ -235,6 +253,8 @@
      (la celda entera ya se pinea como cualquier .cell.label). */
   .label-full-text{
     position:relative;display:inline-flex;min-width:0;
+  }
+  #compareShell.is-hscrolling .label-full-text{
     will-change:transform;backface-visibility:hidden;-webkit-backface-visibility:hidden;
   }
   .header-label{align-items:flex-start;flex-direction:column;justify-content:end;gap:10px;padding:20px 16px;background:#fff;}
@@ -256,9 +276,11 @@
      visual, sin la costura, porque todas se mueven exactamente igual en
      el mismo frame. */
   .cell.section .section-title{
-    position:relative;will-change:transform;
+    position:relative;
     display:inline-flex;flex-direction:row;flex-wrap:nowrap;align-items:center;gap:10px;min-width:0;
-    backface-visibility:hidden;-webkit-backface-visibility:hidden;
+  }
+  #compareShell.is-hscrolling .cell.section .section-title{
+    will-change:transform;backface-visibility:hidden;-webkit-backface-visibility:hidden;
   }
   .cell.section .section-title svg{
     width:18px;height:18px;flex:none;color:var(--btn-blue);

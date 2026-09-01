@@ -1175,13 +1175,22 @@ document.getElementById("compareShell").addEventListener("scroll", function onFi
    (.scroll-fade{display:none}, ver styles.css), así que ahí ni vale la
    pena leer nada. */
 function updateScrollAffordance(){
-  if(mobileMQ.matches) return;
   const shell = document.getElementById("compareShell");
-  const fade = document.getElementById("scrollFade");
-  if(!shell || !fade) return;
+  if(!shell) return;
   const max = shell.scrollWidth - shell.clientWidth;
   const hasOverflow = max > 4;
+  // Activa el "modo pin" (transform + will-change en labels/section-titles,
+  // ver pinStickyColumns) solo cuando la tabla realmente scrollea. Sin esto,
+  // en desktop ancho (sin overflow) esas celdas quedaban promovidas a su
+  // propia capa de composición sin ningún motivo, y eso hacía que Chromium
+  // dejara de pintar el borde-left vecino (.cell.coldata, la línea
+  // separadora entre columnas) hasta el próximo repaint forzado (p.ej. al
+  // abrir DevTools).
+  shell.classList.toggle("has-hscroll", hasOverflow);
 
+  if(mobileMQ.matches) return;
+  const fade = document.getElementById("scrollFade");
+  if(!fade) return;
   fade.classList.toggle("show", hasOverflow && shell.scrollLeft < max - 4);
 }
 
@@ -1215,8 +1224,12 @@ function collectPinTargets(){
 
 function pinStickyColumns(){
   if(!pinTargets) return;
-  const x = document.getElementById("compareShell").scrollLeft;
-  const t = `translateX(${x}px)`;
+  const shell = document.getElementById("compareShell");
+  const hasOverflow = shell.classList.contains("has-hscroll");
+  // Sin overflow no hay nada que "pinear": dejar el transform vacío evita
+  // promover estas celdas a su propia capa de composición sin necesidad
+  // (ver el comentario en updateScrollAffordance).
+  const t = hasOverflow ? `translateX(${shell.scrollLeft}px)` : "";
   const isMobile = mobileMQ.matches;
   pinTargets.plainLabels.forEach(el => { el.style.transform = t; });
   // .label-full: en mobile ocupa toda la fila (mismo ancho que el contenido
@@ -1334,11 +1347,21 @@ function resyncHorizontalScrollUI(){
 function resyncHorizontalScrollUISettled(){
   resyncHorizontalScrollUI();
   updateScrollAffordance();
+  document.getElementById("compareShell").classList.remove("is-hscrolling");
 }
 
 let hScrollTicking = false;
 let scrollSettleTimer = null;
-document.getElementById("compareShell").addEventListener("scroll", () => {
+document.getElementById("compareShell").addEventListener("scroll", function(){
+  // "is-hscrolling" solo vive mientras el dedo/rueda está efectivamente
+  // moviendo el carrusel — ver el comentario junto a .cell.label en
+  // styles.css sobre por qué will-change/backface-visibility no pueden
+  // quedar prendidos todo el tiempo (con ~30 filas de specs eso son ~45
+  // capas de composición promovidas en simultáneo, aunque el usuario ni
+  // esté tocando el carrusel — eso es lo que se sentía como scroll lento,
+  // vertical inclusive, ya que esas capas de más pesan en cada frame de
+  // cualquier scroll de la página, no solo el horizontal).
+  this.classList.add("is-hscrolling");
   if(!hScrollTicking){
     hScrollTicking = true;
     requestAnimationFrame(() => { hScrollTicking = false; resyncHorizontalScrollUI(); });
