@@ -1933,7 +1933,7 @@
     if (macro) params.set("macrofamilia", macro);
     if (family) params.set("familia", family);
     if ([...params].length) {
-      familyLink.setAttribute("href", "/nuevo-productos?" + params.toString());
+      familyLink.setAttribute("href", "/productos?" + params.toString());
     } else {
       familyLink.removeAttribute("href");
     }
