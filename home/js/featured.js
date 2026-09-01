@@ -2,7 +2,7 @@
   "use strict";
 
   const FEATURED_FIELD = "destacados_en";
-  const FEATURED_GROUPS = ["01", "02", "03", "04", "05"];
+  const FEATURED_GROUPS = ["1", "2", "3", "4", "5"];
   const FEATURED_COUNT = 250;
   let currentSpace = null;
   let isFetching = false;
@@ -26,7 +26,9 @@
     const raw = document?.[FEATURED_FIELD];
     const values = Array.isArray(raw) ? raw : [raw];
     return values
-      .map(value => String(value ?? "").trim().padStart(2, "0"))
+      .map(value => Number.parseInt(String(value ?? "").trim(), 10))
+      .filter(Number.isFinite)
+      .map(String)
       .find(value => FEATURED_GROUPS.includes(value)) || "";
   }
 
