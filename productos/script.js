@@ -289,15 +289,15 @@ const ICON_DIMMER_VB = 'viewBox="0 0 17.91 14.17" fill="currentColor"';
 const ICON_DIMMER_INNER = `<path d="M17.08,14.17H.82c-.31,0-.58-.16-.73-.43-.14-.26-.13-.56.04-.81L8.26.38c.15-.24.42-.38.7-.38.28,0,.54.14.69.38l8.13,12.55c.16.24.17.55.03.81-.14.27-.42.43-.73.43M8.95.58s-.15.01-.21.11L.62,13.25c-.07.1-.03.19-.01.22.04.08.12.13.22.13h16.26c.1,0,.18-.05.22-.13.02-.04.05-.13,0-.22L9.17.69c-.07-.1-.17-.11-.21-.11"/><path d="M8.96,12.69c-2.23,0-4.05-1.76-4.05-3.93s1.82-3.93,4.05-3.93,4.05,1.76,4.05,3.93-1.82,3.93-4.05,3.93M8.96,5.39c-1.92,0-3.48,1.51-3.48,3.36s1.56,3.36,3.48,3.36,3.48-1.51,3.48-3.36-1.56-3.36-3.48-3.36"/><path d="M10.96,8.75c.03-.51-.17-1.04-.55-1.42-.37-.39-.9-.63-1.46-.65-.55-.02-1.13.17-1.56.55-.43.37-.71.94-.73,1.53-.03-.59.21-1.2.63-1.63.42-.44,1.03-.71,1.66-.73.63-.03,1.27.19,1.76.63.49.42.8,1.07.82,1.74h-.58Z"/>`;
 const FACET_ICONS = {
   macrofamilia: `<svg ${ICON_SIZE}><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>`,
-  familia: `<svg ${ICON_SIZE}><path d="M4 5h6l2 2h8v12H4z"/><path d="M4 9h16"/></svg>`,
-  subfamilia: `<svg ${ICON_SIZE}><path d="m12 3 9 5-9 5-9-5 9-5Z"/><path d="m3 13 9 5 9-5"/><path d="m3 18 9 5 9-5"/></svg>`,
+  familia: `<svg ${ICON_SIZE}><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/></svg>`,
+  subfamilia: `<svg ${ICON_SIZE}><rect x="3" y="8.5" width="7" height="7" rx="1.5"/><rect x="14" y="8.5" width="7" height="7" rx="1.5"/></svg>`,
   variante_temperatura_filtro: `<svg ${ICON_SIZE}><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>`,
   color: `<svg ${ICON_SIZE}><path d="M12 2a10 10 0 1 0 0 20 3 3 0 0 0 0-6h-1a2 2 0 0 1 0-4h3a2 2 0 0 0 2-2 10 10 0 0 0-4-8z"/><circle cx="7.5" cy="10.5" r="1" fill="currentColor" stroke="none"/><circle cx="12" cy="7" r="1" fill="currentColor" stroke="none"/><circle cx="16.5" cy="10.5" r="1" fill="currentColor" stroke="none"/></svg>`,
   potencia: `<svg ${ICON_SIZE}><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>`,
   dimerizable: `<svg width="16" height="16" ${ICON_DIMMER_VB} aria-hidden="true">${ICON_DIMMER_INNER}</svg>`,
   smart: `<svg ${ICON_SIZE}><path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/></svg>`,
   categoria: `<svg ${ICON_SIZE}><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>`,
-  view: `<svg ${ICON_SIZE}><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>`,
+  view: `<svg ${ICON_SIZE}><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M10 4v16M10 10h11"/></svg>`,
   sort: `<svg ${ICON_SIZE}><path d="M8 6h12M8 12h9M8 18h6"/><path d="M4 4v16M2 18l2 2 2-2"/></svg>`
 };
 const ICON_CHECK = `<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`;
@@ -539,10 +539,10 @@ async function loadSmartSkuOptions(){
   return smartSkuPromise;
 }
 
-function smartSwitchHtml(checked, ariaLabel){
+function smartSwitchHtml(checked, ariaLabel, activeCount = 0){
   const on = !!checked;
   return `
-    <span class="ft-label">${FACET_ICONS.smart}<span>Smart</span></span>
+    <span class="ft-label">${FACET_ICONS.smart}<span>Smart${activeCount ? `<span class="fmn-active-count">(${activeCount})</span>` : ""}</span></span>
     <span class="switch-ui">
       <input type="checkbox" class="smart-switch-input" role="switch" aria-label="${ariaLabel || "Filtrar productos Smart"}" aria-checked="${on ? "true" : "false"}"${on ? " checked" : ""}>
       <span class="switch-track" aria-hidden="true"><span class="switch-thumb"></span></span>
@@ -1111,6 +1111,7 @@ function renderFacets(facetCounts){
     }
     if(field === "macrofamilia"){
       counts = filterSmartHierarchyCounts(counts, field, state.selected, state.smartOnly);
+      if(searching) counts = counts.filter(c => Number(c.count) > 0);
     }
 
     const group = document.createElement("div");
@@ -1275,6 +1276,26 @@ function appliedFiltersCount(){
     + (state.smartOnly ? 1 : 0);
 }
 
+function attributeFiltersCount(selected = state.selected, potenciaMin = state.potenciaMin, potenciaMax = state.potenciaMax, smartOnly = state.smartOnly){
+  const hierarchyFields = new Set(["macrofamilia", "familia", "subfamilia"]);
+  const selectedCount = Object.entries(selected).reduce((total, [field, values]) =>
+    hierarchyFields.has(field) ? total : total + values.size, 0
+  );
+  return selectedCount
+    + (isPotenciaRangeActive(potenciaMin, potenciaMax) ? 1 : 0)
+    + (smartOnly ? 1 : 0);
+}
+
+function renderFiltersExpandLabel(){
+  if(!layoutEl || !filtersExpandBtn) return;
+  const collapsed = layoutEl.classList.contains("filters-collapsed");
+  const count = attributeFiltersCount();
+  const label = collapsed ? `Mostrar filtros${count ? ` (${count})` : ""}` : "Ocultar filtros";
+  if(filtersExpandLabel) filtersExpandLabel.textContent = label;
+  filtersExpandBtn.title = label;
+  filtersExpandBtn.setAttribute("aria-label", label);
+}
+
 function renderFiltersCount(){
   const badge = document.getElementById("filtersCount");
   const toggle = document.getElementById("filtersToggle");
@@ -1291,6 +1312,7 @@ function renderFiltersCount(){
 
 function renderChips(){
   renderFiltersCount();
+  renderFiltersExpandLabel();
   const bar = document.getElementById("chipsBar");
   const CHIP_FIELDS = FACET_FIELDS.filter(f => f !== "macrofamilia");
   const chips = [];
@@ -1979,9 +2001,7 @@ function updateCompareBoundary(){
   compareBoundaryFrame = 0;
   const root = document.getElementById("macroled-productos");
   const bar = document.getElementById("compareBar");
-  const pagination = document.getElementById("pagination");
-  const gridShell = document.getElementById("gridShell");
-  if(!root || !bar || !pagination || getComputedStyle(bar).display === "none"){
+  if(!root || !bar || getComputedStyle(bar).display === "none"){
     if(root) root.style.removeProperty("--compare-boundary-lift");
     return;
   }
@@ -1993,19 +2013,21 @@ function updateCompareBoundary(){
     return;
   }
 
-  // Durante una actualización de filtros la paginación puede quedar vacía.
-  // En ese estado mantenemos la barra fija para evitar saltos hacia arriba.
-  if(gridShell?.classList.contains("is-filtering") || !pagination.childElementCount){
-    root.style.setProperty("--compare-boundary-lift", "0px");
-    return;
-  }
-
-  // La posición de reposo se calcula desde la paginación (no desde el final
-  // del contenedor, que ya incluye padding propio). Al alcanzarla, la barra
-  // queda exactamente a 2rem y luego se desplaza junto con el catálogo.
+  // El límite es el elemento más bajo del catálogo, no sólo la paginación.
+  // Webflow puede dejar que el sidebar desborde la altura del grid, por eso
+  // también medimos explícitamente filtros y resultados en el estado vacío.
   const barGap = parseFloat(getComputedStyle(bar).getPropertyValue("--compare-bar-gap")) || 0;
   const fixedTop = window.innerHeight - barGap - bar.offsetHeight;
-  const restingTop = pagination.getBoundingClientRect().bottom + 32;
+  const boundaryBottom = [
+    root,
+    root.querySelector(".filters-rail"),
+    root.querySelector("#filtersPanel"),
+    root.querySelector(".results-body")
+  ].filter(Boolean).reduce((bottom, element) =>
+    Math.max(bottom, element.getBoundingClientRect().bottom),
+    root.getBoundingClientRect().bottom
+  );
+  const restingTop = boundaryBottom - barGap - bar.offsetHeight;
   const lift = Math.max(0, fixedTop - restingTop);
   root.style.setProperty("--compare-boundary-lift", lift + "px");
 }
@@ -2578,12 +2600,7 @@ function setFiltersCollapsed(collapsed){
   if(!layoutEl) return;
   const isCollapsed = !!collapsed;
   layoutEl.classList.toggle("filters-collapsed", isCollapsed);
-  if(filtersExpandBtn){
-    const label = isCollapsed ? "Mostrar filtros" : "Ocultar filtros";
-    if(filtersExpandLabel) filtersExpandLabel.textContent = label;
-    filtersExpandBtn.title = label;
-    filtersExpandBtn.setAttribute("aria-label", label);
-  }
+  renderFiltersExpandLabel();
   try{ localStorage.setItem(FILTERS_COLLAPSED_KEY, collapsed ? "1" : "0"); }catch(_){}
 }
 
@@ -2661,14 +2678,15 @@ filtersApply.addEventListener("click", async () => {
   closeFiltersDrawer();
 });
 if(filtersClear){
-  filtersClear.addEventListener("click", () => {
+  filtersClear.addEventListener("click", async () => {
+    Object.values(state.selected).forEach(values => values.clear());
     Object.values(state.pending).forEach(values => values.clear());
-    state.pendingPotenciaMin = potenciaBounds.min;
-    state.pendingPotenciaMax = potenciaBounds.max;
+    resetPotenciaRange();
+    state.smartOnly = false;
     state.pendingSmartOnly = false;
-    goToListScreen();
-    renderMobileFilters(lastFacetCounts);
-    updatePendingResultsCount();
+    state.page = 1;
+    closeFiltersDrawer();
+    await loadAndRender();
   });
 }
 document.getElementById("fmnBack").addEventListener("click", goToListScreen);
@@ -2760,6 +2778,15 @@ function renderMobileFilters(facetCounts){
   if(hasSmartProductsInContext(state.pending, searching, state.pendingSmartOnly)){
     rows.push({ field: "smart", type: "switch", label: "Smart" });
   }
+  rows.forEach(row => {
+    if(row.field === "potencia"){
+      row.activeCount = isPotenciaRangeActive(state.pendingPotenciaMin, state.pendingPotenciaMax) ? 1 : 0;
+    } else if(row.field === "smart"){
+      row.activeCount = 0;
+    } else {
+      row.activeCount = state.pending[row.field]?.size || 0;
+    }
+  });
   const firstFilterRow = rows.find(row => !hierarchyFields.has(row.field));
   if(firstFilterRow) firstFilterRow.filtersStart = true;
   const hierarchyRows = rows.filter(row => hierarchyFields.has(row.field));
@@ -2773,11 +2800,11 @@ function renderMobileFilters(facetCounts){
 
   listEl.innerHTML = rows.map(r => {
     if(r.type === "switch"){
-      return `<label class="fmn-row fmn-switch-row${r.filtersStart ? " fmn-filters-start" : ""}${r.sectionEnd ? " fmn-section-end" : ""}">${smartSwitchHtml(state.pendingSmartOnly)}</label>`;
+      return `<label class="fmn-row fmn-switch-row${r.filtersStart ? " fmn-filters-start" : ""}${r.sectionEnd ? " fmn-section-end" : ""}">${smartSwitchHtml(state.pendingSmartOnly, undefined, r.activeCount)}</label>`;
     }
     return `
     <div class="fmn-row${r.type === "secondary" ? " fmn-secondary-row" : ""}${r.filtersStart ? " fmn-filters-start" : ""}${r.field === "view" ? " fmn-secondary-start" : ""}${r.sectionEnd ? " fmn-section-end" : ""}" data-field="${r.field}">
-      <span class="fmn-row-label">${FACET_ICONS[r.field] || ""}<span>${r.label}</span></span>
+      <span class="fmn-row-label">${r.type === "secondary" ? "" : (FACET_ICONS[r.field] || "")}<span>${r.label}${r.type !== "secondary" && r.activeCount ? `<span class="fmn-active-count">(${r.activeCount})</span>` : ""}</span></span>
       <span class="fmn-row-meta">${r.summary ? `<span>${r.summary}</span>` : ""}<span class="fmn-chev" aria-hidden="true">${ICON_FACET_CHEV}</span></span>
     </div>
   `;
@@ -2880,12 +2907,13 @@ function openDetailScreen(field){
     titleEl.textContent = "Tipo de vista";
     bodyEl.classList.remove("fmn-color-swatches");
     const options = [
-      { value: "grid", label: "Grilla" },
-      { value: "list", label: "Lista" }
+      { value: "grid", label: "Grilla", icon: "▦" },
+      { value: "list", label: "Lista", icon: "☰" }
     ];
     bodyEl.innerHTML = options.map(o => `
       <div class="fmn-option-row${state.view === o.value ? " active" : ""}" data-value="${o.value}">
         <span class="fmn-radio"></span><span>${o.label}</span>
+        <span class="fmn-view-option-icon" aria-hidden="true">${o.icon}</span>
       </div>
     `).join("");
     bodyEl.querySelectorAll(".fmn-option-row").forEach(row => {
@@ -2929,6 +2957,7 @@ function openDetailScreen(field){
         : cached
     );
     counts = filterSmartHierarchyCounts(counts, "macrofamilia", state.pending, state.pendingSmartOnly);
+    if(state.query) counts = counts.filter(c => Number(c.count) > 0);
     bodyEl.innerHTML = counts.map(c => {
       const checked = state.pending.macrofamilia.has(c.value);
       return `
