@@ -2022,6 +2022,12 @@
       stageBadge.hidden = !isNuevo;
     }
 
+    // Sincronizar smart-badge
+    const smartBadgeEl = document.getElementById("smart-badge");
+    if (smartBadgeEl) {
+      smartBadgeEl.hidden = !isSmartProduct(el, specs);
+    }
+
     syncActionDownloads(fichaUrl, catalogoUrl, manualUrl);
     syncFileCards({
       ficha: fichaUrl,

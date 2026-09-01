@@ -112,6 +112,11 @@
       return;
     }
 
+    // Abre automáticamente al agregar el primer producto
+    if (list.length > compareBarPrevCount) {
+      compareCollapsed = false;
+    }
+    
     if (
       compareBarPrevCount === 0 &&
       window.matchMedia("(max-width:900px)").matches
@@ -147,10 +152,16 @@
     const ctaDisabled = list.length < 2;
     body.innerHTML = `
       <div class="compare-items">${chips}${emptySlots}</div>
-      <a href="${buildCompareUrl()}" class="compare-cta${ctaDisabled ? " disabled" : ""}"
-         title="${ctaDisabled ? "Agregá al menos 2 productos para comparar" : ""}">
-        ${ICON_COMPARE} Comparar productos
-      </a>
+      <div class="compare-actions">
+        <a href="${buildCompareUrl()}" class="compare-cta${ctaDisabled ? " disabled" : ""}"
+           title="${ctaDisabled ? "Agregá al menos 2 productos para comparar" : ""}">
+          ${ICON_COMPARE} Comparar
+        </a>
+        <button type="button" class="compare-clear" id="compareClear" aria-label="Borrar todos los productos seleccionados">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>
+          Borrar
+        </button>
+      </div>
     `;
 
     body.querySelectorAll("[data-remove]").forEach((btn) => {
@@ -159,6 +170,12 @@
         renderCompareBar();
         syncCompareCheckboxes();
       });
+    });
+
+    document.getElementById("compareClear").addEventListener("click", () => {
+      window.MacroledCompare.clearCompare();
+      renderCompareBar();
+      syncCompareCheckboxes();
     });
 
     updateComparePadding();
