@@ -1,4 +1,17 @@
-﻿// Resguardo: si por lo que sea comparar.js no cargó (nombre de archivo
+﻿/* Webflow puede envolver el embed en un ancestro con transform/contain. Eso
+   convierte position:fixed en relativo al embed. Los flotantes viven en body
+   para quedar anclados al viewport real sin cambiar sus IDs ni su lógica. */
+function mountProductFloatingUi(){
+  ["compareBar", "aiLaunch", "aiBackdrop", "aiPanel"].forEach(id => {
+    const element = document.getElementById(id);
+    if(element && element.parentElement !== document.body){
+      document.body.appendChild(element);
+    }
+  });
+}
+mountProductFloatingUi();
+
+// Resguardo: si por lo que sea comparar.js no cargó (nombre de archivo
 // distinto, 404, etc.), esto evita que el checkbox "Comparar" quede roto —
 // en vez de un stub que no hace nada (y por eso el checkbox se destildaba
 // solo al instante), este fallback funciona en memoria para la sesión

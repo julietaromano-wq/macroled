@@ -1,3 +1,15 @@
+/* Webflow puede crear un contexto de posición dentro del embed. El asistente
+   se monta en body para que position:fixed tome siempre el viewport real. */
+function mountDownloadsFloatingUi(){
+  ["aiLaunch", "aiBackdrop", "aiPanel"].forEach(id => {
+    const element = document.getElementById(id);
+    if(element && element.parentElement !== document.body){
+      document.body.appendChild(element);
+    }
+  });
+}
+mountDownloadsFloatingUi();
+
 /* =========================================================
    CONFIG
    ========================================================= */

@@ -1931,6 +1931,21 @@ button.ai-launch,
   .ai-form{padding:12px 14px max(14px,env(safe-area-inset-bottom)) !important;}
 }
 
+/* Asistente portado a body: fixed queda referido al viewport, no al embed. */
+body > #aiLaunch.ai-launch{
+  position:fixed !important;
+  top:auto !important;
+  right:max(16px,env(safe-area-inset-right,0px)) !important;
+  bottom:max(20px,env(safe-area-inset-bottom,0px)) !important;
+  z-index:2147483645 !important;
+}
+body > #aiBackdrop.ai-backdrop{position:fixed !important;z-index:2147483646 !important;}
+body > #aiPanel.ai-panel{position:fixed !important;z-index:2147483647 !important;}
+body.assistant-open > #aiLaunch.ai-launch{
+  visibility:hidden !important;
+  pointer-events:none !important;
+}
+
 /* Overrides finales: asistente flotante independiente del alto del embed. */
 body.assistant-open .ai-launch{
   visibility:hidden !important;
