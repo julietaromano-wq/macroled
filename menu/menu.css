@@ -874,7 +874,7 @@ a.mm-group-label:hover {
 #mm-mobile .mm-mobile-bar {
   position: relative; z-index: 100;
   display: flex; align-items: center; justify-content: space-between;
-  padding: 10px 20px; background: #0077a8; color: #fff;
+  padding: 10px 20px; background: #004b6a; color: #fff;
   height: var(--mm-mobile-nav-height); box-sizing: border-box;
   overflow: visible;
   transition: background .22s ease, border-color .22s ease, color .22s ease, backdrop-filter .22s ease;
@@ -1020,7 +1020,7 @@ a.mm-group-label:hover {
   color: #0086b5; flex-shrink: 0; background: none; border: none; cursor: pointer; padding: 4px;
   font: inherit;
 }
-#mm-mobile .screen-title { font-size: 19px; font-weight: 700; color: #1c2530; }
+#mm-mobile .screen-title { font-size: 16px; font-weight: 700; color: #1c2530; }
 #mm-mobile .screen-body {
   flex: 1; min-height: 0; overflow-y: auto; -webkit-overflow-scrolling: touch;
   padding-bottom: env(safe-area-inset-bottom, 0px);
@@ -1059,7 +1059,7 @@ a.mm-group-label:hover {
 #mm-mobile .menu-list a {
   display: flex; align-items: center; justify-content: space-between; gap: 10px;
   width: 100%; padding: 22px 20px; background: none; border: none; text-align: left;
-  font-size: 16px; font-weight: 600; color: #1c2530; text-decoration: none; cursor: pointer;
+  font-size: 15px; font-weight: 600; color: #1c2530; text-decoration: none; cursor: pointer;
   font-family: inherit; box-sizing: border-box;
 }
 #mm-mobile .menu-list .item-label { display: flex; align-items: center; gap: 8px; min-width: 0; }
