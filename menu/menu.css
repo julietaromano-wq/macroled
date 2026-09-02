@@ -827,7 +827,7 @@ a.mm-group-label:hover {
    MENU MOBILE / TABLET — se activa desde 1100px
    ========================================================= */
 #mm-mobile {
-  --mm-mobile-nav-height: 68px;
+  --mm-mobile-nav-height: 60px;
   display: none;
   font-family: 'Noto Sans', sans-serif;
 }
@@ -872,7 +872,7 @@ a.mm-group-label:hover {
 #mm-mobile .mm-header-actions { display: flex; align-items: center; gap: 0; }
 #mm-mobile .mm-header-divider {
   width: 1px;
-  height: 68px;
+  height: 60px;
   margin: 0 12px;
   background: rgb(88 88 88 / 35%);
   flex-shrink: 0;
