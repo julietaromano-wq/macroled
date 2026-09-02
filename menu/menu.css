@@ -285,7 +285,7 @@ html.mm-scroll-lock body {
   #mm-ts-search-results .ts-arrow { flex-shrink: 0; color: #8a8580; display: flex; }
   #mm-ts-search-results .ts-nuevo {
     display: inline-block;
-    background: #ddca97;
+    background: #ecd87f;
     color: #3a3a3a;
     font-size: 10px;
     font-weight: 600;
@@ -474,7 +474,7 @@ html.mm-scroll-lock body {
   text-transform: uppercase;
   letter-spacing: 0.04em;
   line-height: 1;
-  background: #ddca97;
+  background: #ecd87f;
   color: var(--mm-text);
   padding: 4px 6px 3px;
   border-radius: 4px;
@@ -598,16 +598,24 @@ html.mm-scroll-lock body {
 }
 
 .mm-group-label {
+  display: inline-block;
   font-size: 15px;
   font-weight: 600;
   letter-spacing: 0.02em;
   color: var(--mm-tint-text);
   margin: 0 0 16px;
+  text-decoration: none;
+}
+
+a.mm-group-label:hover {
+  color: var(--mm-accent, #0086b5);
+  text-decoration: underline;
+  text-underline-offset: 3px;
 }
 
 .mm-tile-grid {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 28px 32px;
 }
 
@@ -814,9 +822,6 @@ html.mm-scroll-lock body {
 @media (max-width: 1439px) {
   .mm-promo { display: none; }
 }
-@media (min-width: 1440px) {
-  .mm-tile-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-}
 
 /* =========================================================
    MENU MOBILE / TABLET — se activa desde 1100px
@@ -828,8 +833,8 @@ html.mm-scroll-lock body {
   .mm-site-nav { display: none !important; }
   #mm-mobile { display: block; }
   #mm-mobile .mm-logo {
-    width: 124px;
-    max-width: 124px;
+    width: 110px;
+    max-width: 110px;
     color: #fff;
     line-height: 0;
     display: block;
@@ -841,7 +846,7 @@ html.mm-scroll-lock body {
   #mm-mobile .mm-logo svg,
   #mm-mobile .mm-logo-svg {
     display: block;
-    width: 124px;
+    width: 110px;
     max-width: 100%;
     height: auto;
     color: #fff;
@@ -855,30 +860,30 @@ html.mm-scroll-lock body {
   height: 72px; box-sizing: border-box;
   transition: background .22s ease, border-color .22s ease, color .22s ease, backdrop-filter .22s ease;
 }
-#mm-mobile .mm-logo { width: 124px; max-width: 124px; color: #fff; line-height: 0; }
+#mm-mobile .mm-logo { width: 110px; max-width: 110px; color: #fff; line-height: 0; }
 #mm-mobile .mm-logo svg,
 #mm-mobile .mm-logo-svg {
-  display: block; width: 124px; max-width: 100%; height: auto; color: #fff;
+  display: block; width: 110px; max-width: 100%; height: auto; color: #fff;
 }
-#mm-mobile .mm-header-actions { display: flex; align-items: center; gap: 12px; }
+#mm-mobile .mm-header-actions { display: flex; align-items: center; gap: 10px; }
 #mm-mobile .burger {
-  width: 40px; height: 40px; display: flex; flex-direction: column;
-  justify-content: center; align-items: center; gap: 7px;
+  width: 36px; height: 36px; display: flex; flex-direction: column;
+  justify-content: center; align-items: center; gap: 6px;
   background: none; border: none; cursor: pointer; padding: 0;
 }
 #mm-mobile .burger span {
-  display: block; width: 26px; height: 2.5px; background: #fff; border-radius: 2px;
+  display: block; width: 23px; height: 2.5px; background: #fff; border-radius: 2px;
   transition: transform .3s cubic-bezier(.4,0,.2,1), opacity .2s cubic-bezier(.4,0,.2,1);
 }
-#mm-mobile .burger.active span:nth-child(1) { transform: translateY(9.5px) rotate(45deg); }
+#mm-mobile .burger.active span:nth-child(1) { transform: translateY(8.5px) rotate(45deg); }
 #mm-mobile .burger.active span:nth-child(2) { opacity: 0; }
-#mm-mobile .burger.active span:nth-child(3) { transform: translateY(-9.5px) rotate(-45deg); }
+#mm-mobile .burger.active span:nth-child(3) { transform: translateY(-8.5px) rotate(-45deg); }
 #mm-mobile .search-trigger {
-  width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;
+  width: 36px; height: 36px; display: flex; align-items: center; justify-content: center;
   background: none; border: none; color: #fff; cursor: pointer;
   -webkit-tap-highlight-color: transparent;
 }
-#mm-mobile .search-trigger svg { width: 22px; height: 22px; }
+#mm-mobile .search-trigger svg { width: 20px; height: 20px; }
 
 #mm-mobile .search-overlay {
   position: fixed; inset: 0; height: 100dvh; background: #fff; z-index: 600;
@@ -928,7 +933,7 @@ html.mm-scroll-lock body {
 #mm-mobile .search-overlay-body .ts-sku { font-size: 12px; color: #8a94a0; margin-top: 2px; }
 #mm-mobile .search-overlay-body .ts-arrow { flex-shrink: 0; color: #8a94a0; display: flex; }
 #mm-mobile .search-overlay-body .ts-nuevo {
-  display: inline-block; background: #ddca97; color: #3a3a3a;
+  display: inline-block; background: #ecd87f; color: #3a3a3a;
   font-size: 10px; font-weight: 600; padding: 1px 6px; border-radius: 8px; margin-left: 6px;
 }
 #mm-mobile .search-overlay-body .ts-row-more,
@@ -997,11 +1002,26 @@ html.mm-scroll-lock body {
   text-transform: uppercase;
   color: #8a94a0;
 }
+#mm-mobile .menu-list li.mm-mobile-group-label a {
+  display: inline;
+  width: auto;
+  padding: 0;
+  font-size: inherit;
+  font-weight: inherit;
+  letter-spacing: inherit;
+  text-transform: inherit;
+  color: inherit;
+  text-decoration: none;
+}
+#mm-mobile .menu-list li.mm-mobile-group-label a:hover {
+  color: #0086b5;
+  text-decoration: underline;
+}
 #mm-mobile .menu-list button,
 #mm-mobile .menu-list a {
   display: flex; align-items: center; justify-content: space-between; gap: 10px;
   width: 100%; padding: 22px 20px; background: none; border: none; text-align: left;
-  font-size: 18px; font-weight: 600; color: #1c2530; text-decoration: none; cursor: pointer;
+  font-size: 16px; font-weight: 600; color: #1c2530; text-decoration: none; cursor: pointer;
   font-family: inherit; box-sizing: border-box;
 }
 #mm-mobile .menu-list .item-label { display: flex; align-items: center; gap: 8px; min-width: 0; }
