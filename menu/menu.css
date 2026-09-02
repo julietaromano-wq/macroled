@@ -874,7 +874,7 @@ a.mm-group-label:hover {
 #mm-mobile .mm-mobile-bar {
   position: relative; z-index: 100;
   display: flex; align-items: center; justify-content: space-between;
-  padding: 10px 20px; background: #004b6a; color: #fff;
+  padding: 10px 20px; background: var(--mm-navy, #00152b); color: #fff;
   height: var(--mm-mobile-nav-height); box-sizing: border-box;
   overflow: visible;
   transition: background .22s ease, border-color .22s ease, color .22s ease, backdrop-filter .22s ease;
