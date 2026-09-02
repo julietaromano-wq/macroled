@@ -1,0 +1,170 @@
+﻿<!--
+  WEBFLOW — Catálogo de PRODUCTOS (commit ee4ab83)
+  =================================================
+  IMPORTANTE: reemplazá TODO el bloque HTML embed + head + footer juntos.
+
+  HEAD:
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/julietaromano-wq/macroled@main/global/preload.css?v=20260901-14">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/julietaromano-wq/macroled@main/productos/styles.css?v=20260901-14">
+
+  FOOTER (antes de </body>):
+  <script src="https://cdn.jsdelivr.net/gh/julietaromano-wq/macroled@main/global/preload.js?v=20260901-14"></script>
+  <script src="https://cdn.jsdelivr.net/gh/julietaromano-wq/macroled@main/productos/comparar.js?v=20260901-14"></script>
+  <script src="https://cdn.jsdelivr.net/gh/julietaromano-wq/macroled@main/productos/script.js?v=20260901-14"></script>
+
+  EMBED (líneas 17–171):
+-->
+<div id="macroled-productos">
+<div class="crumb" id="breadcrumb">Inicio &nbsp;›&nbsp; <b>Productos</b></div>
+
+<div class="filters-backdrop" id="filtersBackdrop"></div>
+
+<div class="layout">
+  <div class="category-heading" id="categoryHeading">
+    <h1>Productos</h1>
+    <div class="showing" id="showingLabel">Cargando productos…</div>
+  </div>
+
+  <div class="results-toolbar">
+    <div class="results-search">
+      <button type="button" class="filters-expand-btn" id="filtersExpandBtn" title="Mostrar filtros">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="4" y1="6" x2="20" y2="6"/><circle cx="9" cy="6" r="2.2" fill="#fff"/><line x1="4" y1="12" x2="20" y2="12"/><circle cx="16" cy="12" r="2.2" fill="#fff"/><line x1="4" y1="18" x2="20" y2="18"/><circle cx="11" cy="18" r="2.2" fill="#fff"/></svg>
+        Filtros
+      </button>
+      <div class="search-bar">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" id="searchInput" name="ml-catalog-q" placeholder="Buscar por nombre, SKU o descripción..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" aria-label="Buscar productos">
+      </div>
+      <button class="filters-toggle" id="filtersToggle" type="button" title="Filtros">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="6" x2="20" y2="6"/><circle cx="9" cy="6" r="2.2" fill="#fff"/><line x1="4" y1="12" x2="20" y2="12"/><circle cx="16" cy="12" r="2.2" fill="#fff"/><line x1="4" y1="18" x2="20" y2="18"/><circle cx="11" cy="18" r="2.2" fill="#fff"/></svg>
+        Filtros
+      </button>
+      <div class="sort-dropdown" id="sortDropdown">
+        <button class="sort-trigger" id="sortTrigger" type="button" aria-haspopup="listbox" aria-expanded="false">
+          <span class="sort-current" id="sortCurrent">Ordenar por</span>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="sort-menu" id="sortMenu" role="listbox" aria-label="Ordenar productos" hidden>
+          <button type="button" class="sort-option" role="option" aria-selected="false" data-sort="nuevo:desc">Novedades</button>
+          <button type="button" class="sort-option" role="option" aria-selected="false" data-sort="alpha:asc">A–Z</button>
+        </div>
+      </div>
+      <select class="sort sort-native" id="sortSelect" tabindex="-1" aria-hidden="true">
+        <option value="" selected>Ordenar por</option>
+        <option value="nuevo:desc">Novedades</option>
+        <option value="alpha:asc">A–Z</option>
+      </select>
+      <div class="view-toggle">
+        <button id="btnGrid" class="active" title="Vista grilla">▦</button>
+        <button id="btnList" title="Vista lista">☰</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="filters-rail">
+    <div class="filters-desktop-only">
+      <div class="filters-desktop-heading">
+        <span class="filters-desktop-title">Filtros</span>
+        <button type="button" class="filters-collapse-btn" id="filtersCollapseBtn" title="Ocultar filtros" aria-label="Ocultar filtros">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="4" y1="6" x2="20" y2="6"/><circle cx="9" cy="6" r="2.2" fill="#fff"/><line x1="4" y1="12" x2="20" y2="12"/><circle cx="16" cy="12" r="2.2" fill="#fff"/><line x1="4" y1="18" x2="20" y2="18"/><circle cx="11" cy="18" r="2.2" fill="#fff"/></svg>
+        </button>
+      </div>
+      <div id="filtersPanel"></div>
+    </div>
+  </div>
+
+  <div class="results-body">
+    <div class="toolbar-top" id="chipsBar"></div>
+    <div id="categoryBanner" class="category-banner" hidden></div>
+    <div class="grid-shell" id="gridShell" aria-busy="true">
+      <div class="grid" id="grid"></div>
+      <script>
+        (function(){
+          var n = 18;
+          var card = '<article class="card card-skel" aria-hidden="true"><div class="media"><span class="skel skel-media"></span></div><div class="card-content"><span class="skel skel-title"></span><span class="skel skel-line"></span><span class="skel skel-line skel-short"></span></div></article>';
+          document.getElementById("grid").innerHTML = new Array(n + 1).join(card);
+        })();
+      </script>
+      <div class="grid-loading" id="gridLoading" aria-hidden="true">
+        <div class="grid-loading__card" role="status" aria-live="polite">
+          <div class="grid-loading__spinner" aria-hidden="true"></div>
+          <div class="grid-loading__text">Actualizando resultados…</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="pagination" id="pagination"></div>
+  </div>
+</div>
+
+<aside class="filters" id="filtersAside" aria-hidden="true">
+  <div class="filters-mobile-header">
+    <span>Filtros</span>
+    <button class="filters-close" id="filtersClose" aria-label="Cerrar filtros">×</button>
+  </div>
+  <div class="filters-mobile-nav" id="filtersMobileNav">
+    <div class="fmn-screen fmn-list active" id="fmnList"></div>
+    <div class="fmn-screen fmn-detail" id="fmnDetail">
+      <div class="fmn-detail-header">
+        <button class="fmn-back" id="fmnBack" aria-label="Volver">
+          <span class="fmn-back-icon" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" height="10" viewBox="0 -960 960 960" width="14" fill="currentColor"><path d="m321-80-71-71 329-329-329-329 71-71 400 400L321-80Z"/></svg></span>
+          <span class="fmn-detail-title" id="fmnDetailTitle"></span>
+        </button>
+      </div>
+      <div class="fmn-detail-body" id="fmnDetailBody"></div>
+    </div>
+  </div>
+  <div class="filters-mobile-footer">
+    <button class="filters-apply" id="filtersApply">Ver resultados</button>
+  </div>
+</aside>
+
+<div class="compare-bar" id="compareBar" style="display:none;">
+  <div class="compare-bar-inner">
+    <div class="compare-bar-header" id="compareBarHeader">
+      <div class="compare-bar-title">Productos seleccionados <span class="compare-count" id="compareCount">0</span></div>
+      <button class="compare-toggle" id="compareToggle" type="button" aria-label="Minimizar / expandir">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>
+      </button>
+    </div>
+    <div class="compare-bar-body" id="compareBarBody"></div>
+  </div>
+</div>
+
+<button type="button" class="ai-launch is-visible" id="aiLaunch" aria-label="Asistente" aria-haspopup="dialog" aria-controls="aiPanel" onclick="if(window.MacroledAssistantOpen){window.MacroledAssistantOpen(this);return false;}">
+  <span class="ai-launch-dot" aria-hidden="true"></span>
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M12 3a7 7 0 0 0-4 12.7V19l4-2 4 2v-3.3A7 7 0 0 0 12 3z"/><path d="M9.5 10h.01M14.5 10h.01"/></svg>
+  <span>Asistente</span>
+</button>
+
+<div class="ai-backdrop" id="aiBackdrop" hidden></div>
+<aside class="ai-panel" id="aiPanel" role="dialog" aria-modal="true" aria-labelledby="aiTitle" hidden>
+  <div class="ai-head">
+    <div class="ai-head-main">
+      <div class="ai-avatar" aria-hidden="true">
+        <svg class="ai-avatar-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+          <path d="M12 3a7 7 0 0 0-4 12.7V19l4-2 4 2v-3.3A7 7 0 0 0 12 3z"/>
+          <path d="M9.5 10h.01M14.5 10h.01"/>
+        </svg>
+        <span class="ai-avatar-online"></span>
+      </div>
+      <div class="ai-head-copy">
+        <h2 id="aiTitle">Asistente de producto</h2>
+        <p class="ai-head-sub">Estamos para ayudarte</p>
+      </div>
+    </div>
+    <button type="button" class="ai-close" id="aiClose" aria-label="Cerrar asistente">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+    </button>
+  </div>
+  <div class="ai-messages" id="aiMessages" aria-live="polite"></div>
+  <div class="ai-typing" id="aiTyping" aria-hidden="true"><span></span><span></span><span></span></div>
+  <div class="ai-suggestions" id="aiSuggestions"></div>
+  <form class="ai-form" id="aiForm">
+    <input type="text" id="aiInput" placeholder="Buscá un producto, SKU o característica…" autocomplete="off" aria-label="Pregunta">
+    <button type="submit" class="ai-send" aria-label="Enviar">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+    </button>
+  </form>
+</aside>
+</div><!-- /#macroled-productos -->

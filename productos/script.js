@@ -747,6 +747,7 @@ async function searchTypesense(){
       : FACET_FIELDS);
 
   const filterParts = [BASE_FILTER];
+  const ownFacetClauses = new Map();
   const prevColorFacet = (typeof lastFacetCounts !== "undefined" ? lastFacetCounts : []).find(f => f.field_name === "color");
   if(prevColorFacet) mergeColorFacetCounts(prevColorFacet.counts);
   coerceColorSelection(state.selected.color);
@@ -757,32 +758,42 @@ async function searchTypesense(){
       : [...state.selected[field]];
     if(vals.length){
       const escaped = vals.map(v => `\`${v}\``).join(",");
-      filterParts.push(`${field}:=[${escaped}]`);
+      const clause = `${field}:=[${escaped}]`;
+      filterParts.push(clause);
+      ownFacetClauses.set(field, clause);
     }
   }
   if(!searchingAll){
     if(activeMacro && state.selected.familia.size){
       const escaped = [...state.selected.familia].map(v => `\`${v}\``).join(",");
-      filterParts.push(`${FAMILIA_FIELD}:=[${escaped}]`);
+      const clause = `${FAMILIA_FIELD}:=[${escaped}]`;
+      filterParts.push(clause);
     }
     if(activeMacro && activeFamilia && state.selected.subfamilia.size){
       const escaped = [...state.selected.subfamilia].map(v => `\`${v}\``).join(",");
-      filterParts.push(`${SUBFAMILIA_FIELD}:=[${escaped}]`);
+      const clause = `${SUBFAMILIA_FIELD}:=[${escaped}]`;
+      filterParts.push(clause);
     }
     if(activeFamilia && state.selected.subfamilia.size){
       for(const field of EXTRA_FACET_FIELDS){
         const vals = [...state.selected[field]];
         if(vals.length){
           const escaped = vals.map(v => `\`${v}\``).join(",");
-          filterParts.push(`${field}:=[${escaped}]`);
+          const clause = `${field}:=[${escaped}]`;
+          filterParts.push(clause);
+          ownFacetClauses.set(field, clause);
         }
       }
     }
   }
   const potClause = potenciaFilterClause(state.potenciaMin, state.potenciaMax);
-  if(potClause) filterParts.push(potClause);
+  if(potClause){
+    filterParts.push(potClause);
+  }
   const smartClause = smartFilterClause(state.smartOnly);
-  if(smartClause) filterParts.push(smartClause);
+  if(smartClause){
+    filterParts.push(smartClause);
+  }
   const params = new URLSearchParams({
     q: state.query || "*",
     query_by: "nombre_typesense,sku,descripcion",
@@ -819,6 +830,36 @@ async function searchTypesense(){
       throw new Error(`Typesense ${res.status}: ${errText}`);
     }
     const data = await res.json();
+    // Facets disyuntivos: cada grupo con checkbox calcula sus opciones sin
+    // aplicarse a sí mismo, pero conserva todos los demás filtros activos.
+    // Así las alternativas compatibles mantienen su conteo real y se pueden
+    // combinar, en lugar de desaparecer o quedar artificialmente en cero.
+    const checkboxFacetFields = [
+      ...FACET_FIELDS.filter(field => field !== "macrofamilia"),
+      ...EXTRA_FACET_FIELDS
+    ];
+    const activeCheckboxFacets = checkboxFacetFields.filter(field => ownFacetClauses.has(field));
+    const disjunctiveFacets = await Promise.all(activeCheckboxFacets.map(async field => {
+      const ownClause = ownFacetClauses.get(field);
+      const facetParams = new URLSearchParams({
+        q: state.query || "*",
+        query_by: "nombre_typesense,sku,descripcion",
+        facet_by: field,
+        max_facet_values: "100",
+        per_page: "1",
+        page: "1",
+        filter_by: filterParts.filter(clause => clause !== ownClause).join(" && ")
+      });
+      const response = await typesenseDocumentsSearch(facetParams, signal);
+      if(!response.ok) return null;
+      const facetData = await response.json();
+      return (facetData.facet_counts || []).find(facet => facet.field_name === field) || null;
+    }));
+    const refreshedFields = new Set(disjunctiveFacets.filter(Boolean).map(facet => facet.field_name));
+    if(refreshedFields.size){
+      data.facet_counts = (data.facet_counts || []).filter(facet => !refreshedFields.has(facet.field_name));
+      data.facet_counts.push(...disjunctiveFacets.filter(Boolean));
+    }
     return alphabetical ? await buildAlphabeticalResults(data, params, signal) : data;
   }catch(err){
     // AbortError es esperado (cancelamos nosotros mismos la request vieja),
@@ -1101,6 +1142,7 @@ function renderFacets(facetCounts){
 
     const facetData = (facetCounts || []).find(f => f.field_name === field);
     let counts = sortFacetCounts(facetData ? facetData.counts : []);
+    if(field === "variante_temperatura_filtro") counts = filterTemperatureCounts(counts);
     if(field === "macrofamilia" && searching && macrofamiliaOptions.length){
       const byVal = {};
       counts.forEach(c => { byVal[c.value] = c.count; });
@@ -1142,8 +1184,9 @@ function renderFacets(facetCounts){
         return;
       }
       const row = document.createElement("label");
-      row.className = "facet-row";
       const checked = state.selected[field].has(c.value) ? "checked" : "";
+      const mutedOption = state.selected[field]?.size && !checked;
+      row.className = "facet-row" + (mutedOption ? " is-muted" : "");
       const dot = field === "variante_temperatura_filtro"
         ? `<span class="dot temp-dot" style="background:${tempDotColor(c.value)}" title="${tempCategoryLabel(c.value) || c.value}"></span>` : "";
       row.innerHTML = `
@@ -1269,27 +1312,20 @@ function resolveSubfamiliaCounts(facetCounts, macro, familia, selectedSet){
    RENDER: APPLIED FILTER CHIPS
    ========================================================= */
 function appliedFiltersCount(){
-  const selectedCount = Object.values(state.selected)
-    .reduce((total, values) => total + values.size, 0);
+  const navigationFields = new Set(["macrofamilia", "familia", "subfamilia"]);
+  const selectedCount = Object.entries(state.selected)
+    .reduce((total, [field, values]) => (
+      navigationFields.has(field) ? total : total + values.size
+    ), 0);
   return selectedCount
     + (isPotenciaRangeActive(state.potenciaMin, state.potenciaMax) ? 1 : 0)
     + (state.smartOnly ? 1 : 0);
 }
 
-function attributeFiltersCount(selected = state.selected, potenciaMin = state.potenciaMin, potenciaMax = state.potenciaMax, smartOnly = state.smartOnly){
-  const hierarchyFields = new Set(["macrofamilia", "familia", "subfamilia"]);
-  const selectedCount = Object.entries(selected).reduce((total, [field, values]) =>
-    hierarchyFields.has(field) ? total : total + values.size, 0
-  );
-  return selectedCount
-    + (isPotenciaRangeActive(potenciaMin, potenciaMax) ? 1 : 0)
-    + (smartOnly ? 1 : 0);
-}
-
 function renderFiltersExpandLabel(){
   if(!layoutEl || !filtersExpandBtn) return;
   const collapsed = layoutEl.classList.contains("filters-collapsed");
-  const count = attributeFiltersCount();
+  const count = appliedFiltersCount();
   const label = collapsed ? `Mostrar filtros${count ? ` (${count})` : ""}` : "Ocultar filtros";
   if(filtersExpandLabel) filtersExpandLabel.textContent = label;
   filtersExpandBtn.title = label;
@@ -1472,12 +1508,61 @@ function buildSmartBadge(doc){
   return `<span class="smart-badge">${ICON_WIFI}SMART</span>`;
 }
 
-// Paleta suave de temperatura (cálido / neutro / frío) — misma para specs y filtros
+// Lista blanca de colores de luz. Cualquier otro valor del facet se excluye.
 const TEMP_TONES = {
-  calido: { color: "#fff79b", label: "Cálido" },
-  neutro: { color: "#d9d9d9", label: "Neutro" },
-  frio:   { color: "#bce4fa", label: "Frío" }
+  calido:     { color: "#fff79b", label: "Cálido", order: 100 },
+  neutro:     { color: "#d9d9d9", label: "Neutro", order: 200 },
+  frio:       { color: "#bce4fa", label: "Frío", order: 300 },
+  rgb:        { color: "linear-gradient(135deg,#e74c3c 0%,#f1c40f 33%,#2ecc71 66%,#3498db 100%)", label: "RGB", order: 400 },
+  rgbw:       { color: "linear-gradient(135deg,#e74c3c 0%,#f1c40f 25%,#2ecc71 50%,#3498db 75%,#f5f5f5 100%)", label: "RGB+W", order: 410 },
+  frio_ambar: { color: "linear-gradient(135deg,#bce4fa 50%,#ffbf00 50%)", label: "Frío + Ámbar", order: 420 },
+  azul:       { color: "#1565c0", label: "Azul", order: 500 },
+  amarillo:   { color: "#fdd835", label: "Amarillo", order: 510 },
+  rojo:       { color: "#c62828", label: "Rojo", order: 520 },
+  verde:      { color: "#2e7d32", label: "Verde", order: 530 },
+  ambar:      { color: "#ffbf00", label: "Ámbar", order: 540 }
 };
+
+function normalizeTempText(value){
+  return String(value || "")
+    .trim()
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/\s+/g, " ");
+}
+
+function tempCategoryKey(value){
+  const raw = String(value || "").trim();
+  const norm = normalizeTempText(raw);
+  if(!norm) return null;
+
+  const kelvin = /^\d{3,5}\s*k?$/i.test(raw) ? Number.parseInt(raw, 10) : NaN;
+  if(Number.isFinite(kelvin)){
+    if(kelvin <= 3000) return "calido";
+    if(kelvin <= 4500) return "neutro";
+    return "frio";
+  }
+
+  if(/^rgb\s*\+\s*w$|^rgbw$/.test(norm)) return "rgbw";
+  if(/^rgb$/.test(norm)) return "rgb";
+  if(/^frio\s*\+\s*ambar$/.test(norm)) return "frio_ambar";
+  if(/^calido$/.test(norm)) return "calido";
+  if(/^neutro$/.test(norm)) return "neutro";
+  if(/^frio$/.test(norm)) return "frio";
+  if(/^azul$/.test(norm)) return "azul";
+  if(/^amarillo$/.test(norm)) return "amarillo";
+  if(/^rojo$/.test(norm)) return "rojo";
+  if(/^verde$/.test(norm)) return "verde";
+  if(/^ambar$/.test(norm)) return "ambar";
+  return null;
+}
+
+function filterTemperatureCounts(counts){
+  return (counts || [])
+    .filter(item => Boolean(tempCategoryKey(item.value)))
+    .sort((a, b) => TEMP_TONES[tempCategoryKey(a.value)].order - TEMP_TONES[tempCategoryKey(b.value)].order);
+}
 
 /* =========================================================
    COLOR FACET — círculos + unificación de variantes
@@ -1653,8 +1738,12 @@ function appendColorSwatches(container, counts, selectedSet, onToggle){
   list.forEach(c => {
     const label = colorLabel(c.value);
     const row = document.createElement("label");
-    row.className = "facet-row" + (!c.count && !selectedSet.has(c.value) ? " is-empty" : "");
-    const checked = selectedSet.has(c.value) ? "checked" : "";
+    const isSelected = selectedSet.has(c.value);
+    const isMuted = selectedSet.size > 0 && !isSelected;
+    row.className = "facet-row"
+      + (isMuted ? " is-muted" : "")
+      + (!c.count && !isSelected ? " is-empty" : "");
+    const checked = isSelected ? "checked" : "";
     const light = isLightColorKey(c.value) ? " light" : "";
     row.innerHTML = `
       <span class="cb-wrap">
@@ -1674,18 +1763,6 @@ function appendColorSwatches(container, counts, selectedSet, onToggle){
     }
     container.appendChild(row);
   });
-}
-
-function tempCategoryKey(value){
-  const raw = String(value || "").trim().toLowerCase();
-  if(/c[aá]lido/.test(raw)) return "calido";
-  if(/neutro/.test(raw)) return "neutro";
-  if(/fr[ií]o/.test(raw)) return "frio";
-  const k = parseInt(value, 10);
-  if(Number.isNaN(k)) return null;
-  if(k <= 3000) return "calido";
-  if(k <= 4500) return "neutro";
-  return "frio";
 }
 
 function tempCategoryColor(value){
@@ -2770,7 +2847,8 @@ function renderMobileFilters(facetCounts){
       }
     }
     const data = lastFacetCounts.find(f => f.field_name === field);
-    const counts = sortFacetCounts(data ? data.counts : []);
+    let counts = sortFacetCounts(data ? data.counts : []);
+    if(field === "variante_temperatura_filtro") counts = filterTemperatureCounts(counts);
     if(field !== "macrofamilia" && !counts.length) return;
     rows.push({ field, label: FMN_LABELS[field], summary: fmnSummary(field), counts });
   });
@@ -2779,7 +2857,9 @@ function renderMobileFilters(facetCounts){
     rows.push({ field: "smart", type: "switch", label: "Smart" });
   }
   rows.forEach(row => {
-    if(row.field === "potencia"){
+    if(hierarchyFields.has(row.field)){
+      row.activeCount = 0;
+    } else if(row.field === "potencia"){
       row.activeCount = isPotenciaRangeActive(state.pendingPotenciaMin, state.pendingPotenciaMax) ? 1 : 0;
     } else if(row.field === "smart"){
       row.activeCount = 0;
@@ -2818,13 +2898,14 @@ function renderMobileFilters(facetCounts){
 
 function fmnCheckboxRowHtml(field, c){
   const checked = state.pending[field].has(c.value);
+  const mutedOption = state.pending[field]?.size && !checked;
   const tempDot = field === "variante_temperatura_filtro"
     ? `<span class="dot temp-dot" style="background:${tempDotColor(c.value)}" title="${tempCategoryLabel(c.value) || c.value}"></span>` : "";
   const colorDot = field === "color"
     ? `<span class="dot color-dot${isLightColorKey(c.value) ? " light" : ""}" style="background:${colorSwatchBg(c.value)}" title="${colorLabel(c.value)}"></span>` : "";
   const label = field === "color" ? colorLabel(c.value) : c.value;
   return `
-    <div class="fmn-option-row${checked ? " active" : ""}${field === "color" && !c.count && !checked ? " is-empty" : ""}" data-value="${c.value}">
+    <div class="fmn-option-row${checked ? " active" : ""}${mutedOption ? " is-muted" : ""}${field === "color" && !c.count && !checked ? " is-empty" : ""}" data-value="${c.value}">
       <span class="fmn-checkbox">${checked ? ICON_CHECK : ""}</span>
       ${tempDot}${colorDot}<span>${label}</span>
       ${c.count !== null && c.count !== undefined ? `<span class="fmn-count">${c.count}</span>` : ""}
@@ -3064,6 +3145,7 @@ function openDetailScreen(field){
     bodyEl.classList.remove("fmn-color-swatches");
     const data = lastFacetCounts.find(f => f.field_name === field);
     let counts = sortFacetCounts(data ? data.counts : []);
+    if(field === "variante_temperatura_filtro") counts = filterTemperatureCounts(counts);
     if(field === "categoria"){
       counts = filterSmartHierarchyCounts(counts, field, state.pending, state.pendingSmartOnly);
     }

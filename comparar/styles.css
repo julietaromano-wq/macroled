@@ -213,7 +213,12 @@
     display:grid;
     grid-template-columns: repeat(4, minmax(180px, 1fr));
   }
-  .compare-grid{min-width:760px;}
+  /* mini-grid necesita el mismo min-width que compare-grid: son dos grids
+     independientes que calculan el ancho de columnas por su cuenta a
+     partir de su propio contenido, así que si uno de los dos no tiene piso
+     sus columnas terminan con anchos distintos por debajo de ~1100px y el
+     mini-header sticky queda desfasado del grid real al hacer scroll. */
+  .compare-grid, .mini-grid{min-width:760px;}
   .cell{
     padding:clamp(12px,2vw,15px) clamp(12px,2vw,16px);
     border-bottom:1px solid var(--line-soft);
@@ -893,7 +898,7 @@
   /* ---- Responsive screen ---- */
   @media screen and (max-width:1100px){
     .compare-grid, .mini-grid{grid-template-columns:minmax(160px,200px) repeat(3, minmax(200px,1fr));}
-    .compare-grid{min-width:720px;}
+    .compare-grid, .mini-grid{min-width:720px;}
   }
 
   /* Todo el tratamiento "mobile" (carrusel de comparación, mini-header,
@@ -936,7 +941,7 @@
     .compare-grid, .mini-grid{
       grid-template-columns: repeat(3, minmax(200px, 76vw));
     }
-    .compare-grid{min-width:0;}
+    .compare-grid, .mini-grid{min-width:0;}
     .compare-shell{
       /* "proximity" dejaba que el scroll con inercia se asiente a mitad de
          camino entre cards si no traía suficiente impulso; "mandatory"

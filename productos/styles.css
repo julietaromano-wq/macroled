@@ -3388,3 +3388,695 @@ body.filters-open button.ai-launch{
   }
 }
 
+/* Comparador: nombre del producto en tablet y desktop. */
+@media (min-width:641px){
+  #macroled-productos .compare-chip-name{
+    font-size:13px !important;
+  }
+}
+
+/* Controles principales visibles durante el scroll. */
+#macroled-productos .catalog-controls-row{
+  position:sticky !important;
+  top:0;
+  z-index:10020;
+  background:var(--bg-page);
+  transition:padding-top .18s ease;
+}
+#macroled-productos .catalog-controls-row.is-stuck{
+  padding-top:10px;
+}
+
+@media (min-width:901px){
+  #macroled-productos .layout.filters-collapsed
+    .catalog-controls-row > .filters-expand-btn,
+  #macroled-productos .layout.filters-collapsed
+    .catalog-controls-row > .filters-expand-btn:hover{
+    padding-right:16px;
+    border-right:1px solid #e3e7ec;
+  }
+}
+
+@media (min-width:901px){
+  #macroled-productos .grid.list{
+    grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+  }
+  #macroled-productos .layout.filters-collapsed .grid.list{
+    grid-template-columns:repeat(3,minmax(0,1fr)) !important;
+  }
+}
+
+/* Prueba de layout: controles secundarios debajo del buscador. */
+@media (min-width:901px){
+  #macroled-productos .layout{
+    row-gap:20px !important;
+  }
+  #macroled-productos .catalog-controls-row{
+    grid-column:1 / -1 !important;
+    grid-row:2 !important;
+    display:grid;
+    grid-template-columns:300px minmax(0,1fr);
+    column-gap:48px;
+    align-items:start;
+    min-width:0;
+    margin:0;
+    padding:0 0 10px;
+    min-height:44px;
+    border-bottom:1px solid #e3e7ec;
+  }
+  #macroled-productos .filters-rail{grid-row:3 !important;}
+  #macroled-productos .results-body{grid-row:3 !important;}
+  #macroled-productos .catalog-controls-main{
+    display:flex;
+    align-items:stretch;
+    min-width:0;
+  }
+  #macroled-productos .catalog-controls-row > .filters-expand-btn{
+    align-self:center;
+  }
+  #macroled-productos .catalog-controls-row .toolbar-top{
+    flex:1 1 auto;
+    min-width:0;
+    margin:0;
+    align-self:center;
+  }
+  #macroled-productos .catalog-controls-row .toolbar-top:not(:empty){
+    display:grid !important;
+    grid-template-columns:auto minmax(0,1fr) auto;
+    grid-template-rows:auto;
+    align-items:start;
+    column-gap:16px;
+    row-gap:8px;
+  }
+  #macroled-productos .catalog-controls-row .toolbar-top .label{
+    grid-column:1;
+    grid-row:1;
+    align-self:start;
+    padding-top:6px;
+    white-space:nowrap;
+  }
+  #macroled-productos .catalog-controls-row .chips-row{
+    grid-column:2;
+    grid-row:1;
+    display:flex;
+    flex-wrap:wrap;
+    align-items:center;
+    gap:8px;
+    min-width:0;
+  }
+  #macroled-productos .catalog-controls-row .clear-btn{
+    grid-column:3;
+    grid-row:1;
+    align-self:start;
+    margin-left:0;
+    height:32px;
+    padding:0;
+    border:0;
+    border-radius:0;
+    background:transparent;
+    color:var(--dark-blue-600);
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    line-height:1;
+    white-space:nowrap;
+  }
+  #macroled-productos .catalog-controls-row .clear-btn:hover{
+    border:0;
+    background:transparent;
+    color:var(--dark-blue-600);
+  }
+  #macroled-productos .catalog-controls-row .filters-expand-btn,
+  #macroled-productos .catalog-controls-row .sort-trigger{
+    min-height:0;
+    height:100%;
+    padding:0;
+    border:0;
+    border-radius:0;
+    background:transparent;
+    box-shadow:none;
+    color:var(--dark-blue-600);
+    align-self:start;
+    display:inline-flex;
+    align-items:center;
+    justify-content:flex-start;
+    gap:8px;
+    line-height:1;
+  }
+  #macroled-productos .catalog-controls-row .filters-expand-btn:hover,
+  #macroled-productos .catalog-controls-row .sort-trigger:hover{
+    border:0;
+    background:transparent;
+    color:var(--dark-blue--700);
+  }
+  #macroled-productos .catalog-controls-row .sort-trigger{
+    column-gap:8px;
+  }
+  #macroled-productos .catalog-controls-row .sort-current{
+    color:var(--dark-blue-600);
+  }
+  #macroled-productos .catalog-controls-row .sort-dropdown{
+    margin-left:auto;
+    align-self:start;
+    height:auto;
+  }
+  #macroled-productos .catalog-controls-row:has(.toolbar-top:not(:empty)) .sort-dropdown{
+    border-left:1px solid #e3e7ec;
+    padding-left:16px;
+    align-self:stretch;
+    display:flex;
+    align-items:flex-start;
+  }
+  #macroled-productos .layout.filters-collapsed .catalog-controls-row{
+    grid-column:1 !important;
+    grid-row:3 !important;
+    grid-template-columns:auto minmax(0,1fr);
+    column-gap:16px;
+  }
+  #macroled-productos .layout.filters-collapsed{
+    grid-template-rows:auto auto auto auto !important;
+  }
+  #macroled-productos .layout.filters-collapsed .results-body{grid-row:4 !important;}
+  #macroled-productos .layout.filters-collapsed
+    .catalog-controls-row:has(.toolbar-top:not(:empty))
+    .sort-dropdown{
+    border-left:1px solid #e3e7ec;
+    padding-left:16px;
+    align-self:stretch;
+    display:flex;
+    align-items:flex-start;
+  }
+}
+@media (min-width:901px) and (max-width:1200px){
+  #macroled-productos .catalog-controls-row{
+    grid-template-columns:260px minmax(0,1fr);
+    column-gap:32px;
+  }
+}
+
+/* Prueba de layout: búsqueda en la fila de controles y chips en el lateral. */
+@media (min-width:901px){
+  #macroled-productos .catalog-controls-main .results-search{
+    flex:1 1 auto;
+    width:auto;
+    min-width:0;
+  }
+  #macroled-productos .catalog-controls-main .sort-dropdown{
+    flex:none;
+    margin-left:16px;
+    padding-left:16px;
+    border-left:1px solid #e3e7ec;
+    align-self:stretch;
+    display:flex;
+    align-items:center;
+  }
+  #macroled-productos .catalog-controls-main .sort-trigger{
+    width:max-content;
+  }
+  #macroled-productos .catalog-controls-main .sort-prefix{
+    color:var(--dark-blue-600);
+    font-size:13px;
+    font-weight:500;
+  }
+  #macroled-productos .catalog-controls-main .sort-current,
+  #macroled-productos .catalog-controls-main .sort-trigger svg{
+    color:var(--dark-blue-600);
+    transition:color .15s ease;
+  }
+  #macroled-productos .catalog-controls-main .sort-trigger:hover .sort-current,
+  #macroled-productos .catalog-controls-main .sort-trigger:hover svg{
+    color:var(--btn-blue);
+  }
+  #macroled-productos .catalog-controls-row > .filters-expand-btn:hover{
+    color:var(--btn-blue);
+  }
+  #macroled-productos .filters-rail .toolbar-top:not(:empty){
+    display:flex !important;
+    flex-direction:column;
+    align-items:stretch;
+    gap:8px;
+    width:100%;
+    margin:0 0 16px;
+    padding:0 0 8px;
+    border-bottom:1px solid #e3e7ec;
+  }
+  #macroled-productos .filters-rail .toolbar-top .label{
+    width:100%;
+    padding:0;
+  }
+  #macroled-productos .filters-rail .chips-row{
+    display:flex;
+    flex-wrap:wrap;
+    align-items:center;
+    gap:8px;
+    width:100%;
+  }
+  #macroled-productos .filters-rail .clear-btn{
+    align-self:flex-start;
+    height:32px;
+    margin:0;
+    padding:0;
+    border:0;
+    background:transparent;
+    color:var(--ml-dark-blue-400,#334b63);
+  }
+}
+@media (max-width:900px){
+  #macroled-productos .catalog-controls-row{
+    display:block !important;
+    width:100% !important;
+    padding:0 !important;
+    border:0 !important;
+  }
+  #macroled-productos .catalog-controls-main{
+    display:block !important;
+    width:100% !important;
+  }
+  #macroled-productos .catalog-controls-main .sort-dropdown{
+    display:none !important;
+  }
+}
+/* Cierre/apertura fluido de la columna de filtros en desktop. */
+@media (min-width:901px){
+  #macroled-productos .layout{
+    transition:
+      grid-template-columns .58s cubic-bezier(.22,1,.36,1),
+      column-gap .58s cubic-bezier(.22,1,.36,1) !important;
+  }
+  #macroled-productos .category-heading{
+    width:300px !important;
+    min-width:300px !important;
+    max-width:300px !important;
+    position:relative !important;
+    z-index:31 !important;
+    overflow:visible !important;
+    background:var(--bg,#f5f6f8) !important;
+    transition:none !important;
+  }
+  #macroled-productos .filters-rail{
+    transition:
+      max-width .58s cubic-bezier(.22,1,.36,1),
+      width .58s cubic-bezier(.22,1,.36,1),
+      opacity .42s ease !important;
+  }
+  #macroled-productos .layout.filters-collapsed{
+    grid-template-columns:0 minmax(0,1fr) !important;
+    grid-template-rows:auto auto auto auto !important;
+    column-gap:0 !important;
+  }
+  #macroled-productos .layout.filters-collapsed .filters-rail{
+    display:block !important;
+    grid-column:1 !important;
+    grid-row:4 !important;
+    width:0 !important;
+    max-width:0 !important;
+    opacity:0 !important;
+    overflow:hidden !important;
+    pointer-events:none !important;
+  }
+  #macroled-productos .layout.filters-collapsed .category-heading{
+    grid-column:1 !important;
+    grid-row:1 !important;
+    width:300px !important;
+    max-width:300px !important;
+    position:relative !important;
+    z-index:31 !important;
+    overflow:visible !important;
+    background:var(--bg,#f5f6f8) !important;
+    transition:none !important;
+  }
+  #macroled-productos .layout.filters-collapsed .results-toolbar{
+    grid-column:2 !important;
+    grid-row:2 !important;
+  }
+  #macroled-productos .layout.filters-collapsed .catalog-controls-row{
+    grid-column:1 / -1 !important;
+    grid-row:3 !important;
+  }
+  #macroled-productos .layout.filters-collapsed .results-body{
+    grid-column:2 !important;
+    grid-row:4 !important;
+  }
+  #macroled-productos .layout.filters-collapsed .grid,
+  #macroled-productos .layout.filters-collapsed .grid.list{
+    grid-template-columns:repeat(4,minmax(0,1fr)) !important;
+  }
+}
+@media (min-width:901px) and (max-width:1200px){
+  #macroled-productos .category-heading,
+  #macroled-productos .layout.filters-collapsed .category-heading{
+    width:260px !important;
+    min-width:260px !important;
+    max-width:260px !important;
+  }
+}
+
+/* El encabezado no cambia al mostrar/ocultar filtros: solo se anima el área inferior. */
+@media (min-width:901px){
+  #macroled-productos .results-body{
+    grid-column:1 / -1 !important;
+    grid-row:3 !important;
+    margin-left:348px !important;
+    transition:margin-left .58s cubic-bezier(.22,1,.36,1) !important;
+  }
+  #macroled-productos .layout.filters-collapsed{
+    grid-template-columns:300px minmax(0,1fr) !important;
+    grid-template-rows:auto auto auto !important;
+    column-gap:16px !important;
+  }
+  #macroled-productos .layout.filters-collapsed .category-heading{
+    grid-column:1 !important;
+    grid-row:1 !important;
+  }
+  #macroled-productos .layout.filters-collapsed .results-toolbar{
+    grid-column:2 !important;
+    grid-row:1 !important;
+  }
+  #macroled-productos .layout.filters-collapsed .catalog-controls-row{
+    grid-column:1 / -1 !important;
+    grid-row:2 !important;
+    grid-template-columns:auto minmax(0,1fr);
+    column-gap:16px;
+  }
+  #macroled-productos .layout.filters-collapsed .filters-rail{
+    grid-column:1 !important;
+    grid-row:3 !important;
+  }
+  #macroled-productos .layout.filters-collapsed .results-body{
+    grid-column:1 / -1 !important;
+    grid-row:3 !important;
+    margin-left:0 !important;
+  }
+}
+@media (min-width:901px) and (max-width:1200px){
+  #macroled-productos .results-body{
+    margin-left:292px !important;
+  }
+  #macroled-productos .layout.filters-collapsed{
+    grid-template-columns:260px minmax(0,1fr) !important;
+    column-gap:16px !important;
+  }
+  #macroled-productos .layout.filters-collapsed .catalog-controls-row{
+    grid-template-columns:auto minmax(0,1fr);
+    column-gap:16px;
+  }
+  #macroled-productos .layout.filters-collapsed .results-body{
+    margin-left:0 !important;
+  }
+}
+
+@media (min-width:641px){
+  #macroled-productos .grid.list{
+    grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+  }
+  #macroled-productos .layout.filters-collapsed .grid.list{
+    grid-template-columns:repeat(3,minmax(0,1fr)) !important;
+  }
+}
+
+/* Borrar filtros: mismo tratamiento de texto que "Borrar" del comparador. */
+#macroled-productos .filters-rail .clear-btn,
+#macroled-productos .catalog-controls-row .clear-btn{
+  color:var(--ink-soft);
+  transition:color .15s,background .15s;
+}
+#macroled-productos .filters-rail .clear-btn:hover,
+#macroled-productos .catalog-controls-row .clear-btn:hover{
+  color:var(--ink);
+  background:transparent;
+}
+
+/* Comparador desktop: selector específico para prevalecer sobre Webflow. */
+@media (min-width:901px){
+  #macroled-productos .compare-cta{
+    padding:8px 32px;
+  }
+}
+
+/* Catálogo híbrido: base 09f45eb + cabecera desktop aprobada. */
+@media (min-width:901px){
+  #macroled-productos .layout,
+  #macroled-productos .layout.filters-collapsed{
+    grid-template-columns:300px minmax(0,1fr) !important;
+    grid-template-rows:auto auto !important;
+    column-gap:50px !important;
+    row-gap:28px !important;
+  }
+  #macroled-productos .category-heading,
+  #macroled-productos .layout.filters-collapsed .category-heading{
+    grid-column:1 !important;
+    grid-row:1 !important;
+    align-self:start !important;
+  }
+  #macroled-productos .catalog-controls-row,
+  #macroled-productos .layout.filters-collapsed .catalog-controls-row{
+    position:relative !important;
+    top:auto !important;
+    grid-column:2 !important;
+    grid-row:1 !important;
+    display:block !important;
+    width:100% !important;
+    padding:8px 0 0 !important;
+    border:0 !important;
+    background:transparent !important;
+    box-shadow:none !important;
+  }
+  #macroled-productos .catalog-controls-row.is-stuck{
+    box-shadow:none !important;
+  }
+  #macroled-productos .catalog-controls-main{
+    display:grid !important;
+    grid-template-columns:minmax(280px,1fr) auto auto !important;
+    grid-template-rows:46px !important;
+    align-items:stretch !important;
+    column-gap:10px !important;
+    row-gap:0 !important;
+    width:100% !important;
+  }
+  #macroled-productos .catalog-controls-main .results-search{
+    display:contents !important;
+  }
+  #macroled-productos .catalog-controls-main .search-bar{
+    grid-column:1 !important;
+    grid-row:1 !important;
+    width:100% !important;
+    margin:0 !important;
+  }
+  #macroled-productos .catalog-controls-main .sort-dropdown{
+    grid-column:2 !important;
+    grid-row:1 !important;
+    display:flex !important;
+    margin:0 !important;
+    padding:0 !important;
+    border:0 !important;
+    align-self:stretch !important;
+    width:max-content !important;
+  }
+  #macroled-productos .catalog-controls-main .sort-trigger{
+    width:max-content !important;
+    min-width:0 !important;
+    height:46px !important;
+    padding:0 14px !important;
+    border:1px solid var(--line) !important;
+    border-radius:10px !important;
+    background:#fff !important;
+    color:#5f6670 !important;
+  }
+  #macroled-productos .catalog-controls-main .view-toggle{
+    grid-column:3 !important;
+    grid-row:1 !important;
+    display:flex !important;
+    height:46px !important;
+    align-self:stretch !important;
+    background:#fff !important;
+  }
+  #macroled-productos .catalog-controls-main .view-toggle button{
+    min-width:36px !important;
+    height:44px !important;
+    padding:0 10px !important;
+    background:#fff !important;
+    color:var(--ink-soft) !important;
+  }
+  #macroled-productos .catalog-controls-main .view-toggle button.active{
+    background:var(--btn-blue,#00adef) !important;
+    color:#fff !important;
+  }
+  #macroled-productos .catalog-controls-main .filters-toggle{
+    display:none !important;
+  }
+  #macroled-productos .results-body > .toolbar-top{
+    display:grid !important;
+    grid-template-columns:auto minmax(0,1fr) auto !important;
+    align-items:start !important;
+    gap:10px !important;
+    width:100% !important;
+    min-height:0 !important;
+    margin:0 0 18px !important;
+    padding:0 !important;
+    border:0 !important;
+  }
+  #macroled-productos .results-body > .toolbar-top:empty{
+    display:none !important;
+    margin:0 !important;
+  }
+  #macroled-productos .results-body > .toolbar-top .label{
+    grid-column:1 !important;
+    grid-row:1 !important;
+    align-self:start !important;
+    display:flex !important;
+    align-items:center !important;
+    min-height:30px !important;
+    flex:none !important;
+    width:auto !important;
+    margin:0 !important;
+    padding:0 !important;
+  }
+  #macroled-productos .results-body > .toolbar-top .chips-row{
+    grid-column:2 !important;
+    grid-row:1 !important;
+    display:flex !important;
+    flex-wrap:wrap !important;
+    align-items:center !important;
+    gap:8px !important;
+    min-width:0 !important;
+  }
+  #macroled-productos .results-body > .toolbar-top .clear-btn{
+    grid-column:3 !important;
+    grid-row:1 !important;
+    align-self:start !important;
+    min-height:30px !important;
+    margin-left:0 !important;
+    color:#16294f !important;
+    background:transparent !important;
+    border:0 !important;
+    border-radius:0 !important;
+    box-shadow:none !important;
+    padding:0 !important;
+  }
+  #macroled-productos .filters-rail,
+  #macroled-productos .layout.filters-collapsed .filters-rail{
+    display:block !important;
+    grid-column:1 !important;
+    grid-row:2 !important;
+    width:300px !important;
+    max-width:300px !important;
+    opacity:1 !important;
+    overflow:visible !important;
+    pointer-events:auto !important;
+  }
+  #macroled-productos .results-body,
+  #macroled-productos .layout.filters-collapsed .results-body{
+    grid-column:2 !important;
+    grid-row:2 !important;
+    margin-left:0 !important;
+  }
+  #macroled-productos .filters-desktop-heading,
+  #macroled-productos .filters-expand-btn,
+  #macroled-productos .filters-collapse-btn{
+    display:none !important;
+  }
+}
+@media (min-width:901px) and (max-width:1200px){
+  #macroled-productos .layout,
+  #macroled-productos .layout.filters-collapsed{
+    grid-template-columns:260px minmax(0,1fr) !important;
+    column-gap:32px !important;
+  }
+  #macroled-productos .filters-rail,
+  #macroled-productos .layout.filters-collapsed .filters-rail{
+    width:260px !important;
+    max-width:260px !important;
+  }
+}
+
+/* Comparativa y asistente permanecen anclados al viewport. */
+#macroled-productos .compare-bar{
+  bottom:var(--compare-bar-gap,20px) !important;
+}
+
+#macroled-productos .sort-current,
+#macroled-productos .sort-trigger svg{
+  color:#5f6670 !important;
+}
+#macroled-productos .results-body > .toolbar-top .clear-btn:hover,
+#macroled-productos .results-body > .toolbar-top .clear-btn:focus-visible{
+  color:var(--btn-blue,#00adef) !important;
+  background:transparent !important;
+  border:0 !important;
+  box-shadow:none !important;
+}
+#macroled-productos .catalog-controls-main .sort-trigger:hover,
+#macroled-productos .catalog-controls-main .sort-trigger:focus-visible,
+#macroled-productos .catalog-controls-main .sort-trigger:hover .sort-current,
+#macroled-productos .catalog-controls-main .sort-trigger:focus-visible .sort-current,
+#macroled-productos .catalog-controls-main .sort-trigger:hover svg,
+#macroled-productos .catalog-controls-main .sort-trigger:focus-visible svg{
+  color:#16294f !important;
+}
+#macroled-productos .facet-row.is-muted,
+#macroled-productos .fmn-option-row.is-muted{
+  opacity:.45;
+}
+#macroled-productos .facet-row.is-muted:hover,
+#macroled-productos .fmn-option-row.is-muted:hover{
+  opacity:.72;
+}
+#macroled-productos .ai-launch{
+  bottom:max(20px,env(safe-area-inset-bottom,0px)) !important;
+}
+@media (max-width:640px){
+  #macroled-productos .ai-launch{
+    bottom:max(12px,env(safe-area-inset-bottom,0px)) !important;
+  }
+}
+
+/* Filtros aplicados en móvil: encabezado y acción en la misma línea. */
+@media (max-width:900px){
+  #macroled-productos .results-body > .toolbar-top{
+    display:grid !important;
+    grid-template-columns:minmax(0,1fr) auto !important;
+    grid-template-rows:auto auto !important;
+    align-items:center !important;
+    gap:12px 12px !important;
+    margin-bottom:20px !important;
+  }
+  #macroled-productos .results-body > .toolbar-top:empty{
+    display:none !important;
+  }
+  #macroled-productos .results-body > .toolbar-top .label{
+    grid-column:1 !important;
+    grid-row:1 !important;
+    margin:0 !important;
+  }
+  #macroled-productos .results-body > .toolbar-top .clear-btn{
+    grid-column:2 !important;
+    grid-row:1 !important;
+    justify-self:end !important;
+    width:auto !important;
+    height:auto !important;
+    min-height:0 !important;
+    margin:0 !important;
+    padding:0 !important;
+    border:0 !important;
+    border-radius:0 !important;
+    background:transparent !important;
+    box-shadow:none !important;
+    color:#16294f !important;
+  }
+  #macroled-productos .results-body > .toolbar-top .clear-btn:hover,
+  #macroled-productos .results-body > .toolbar-top .clear-btn:focus-visible{
+    border:0 !important;
+    background:transparent !important;
+    box-shadow:none !important;
+    color:var(--btn-blue,#00adef) !important;
+  }
+  #macroled-productos .results-body > .toolbar-top .chips-row{
+    grid-column:1 / -1 !important;
+    grid-row:2 !important;
+    display:flex !important;
+    flex-wrap:wrap !important;
+    gap:8px !important;
+    width:100% !important;
+    min-width:0 !important;
+  }
+}
