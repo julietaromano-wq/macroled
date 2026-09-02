@@ -2250,6 +2250,7 @@ body.assistant-open #macroled-productos .ai-launch{
 
 /* Flotantes portados a body: evita que el contenedor de Webflow capture fixed. */
 body > #compareBar.compare-bar{
+  --compare-bar-gap:20px;
   position:fixed !important;
   top:auto !important;
   bottom:calc(max(var(--compare-bar-gap,20px),env(safe-area-inset-bottom,0px)) + var(--product-floating-lift,0px)) !important;
@@ -3119,7 +3120,6 @@ body.assistant-open > #aiLaunch.ai-launch{
 #macroled-productos{
   position:relative !important;
   padding-bottom:var(--compare-bar-offset, 0px) !important;
-  transition:padding-bottom .2s ease;
 }
 #macroled-productos .compare-bar{
   --compare-bar-gap:20px;
@@ -4393,6 +4393,16 @@ body.assistant-open > #aiLaunch.ai-launch{
 }
 
 /* Overrides finales: flotantes independientes del alto del embed y del footer. */
+#macroled-productos{
+  /* El cambio de alto debe acompañar inmediatamente a la barra. Animar este
+     padding producía un hueco temporal y realimentaba el cálculo del footer. */
+  transition:none !important;
+}
+body.has-compare-bar #macroled-productos .layout{
+  /* La reserva de la barra ya incorpora los 32px de separación. Evita sumar
+     también los 60/40/28px de padding inferior propios del catálogo. */
+  padding-bottom:0 !important;
+}
 #macroled-productos .compare-bar{
   position:fixed !important;
   top:auto !important;

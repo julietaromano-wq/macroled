@@ -213,7 +213,7 @@
   color:#fff !important;
   border:none;
   border-radius:var(--radius-sm);
-  padding:9px 12px;
+  padding:9px 32px;
   font-size:12px;
   font-weight:700;
   cursor:pointer;
@@ -254,7 +254,7 @@ body.has-compare-bar .ai-launch{
   .compare-chip-sku{font-size:9px;}
   .compare-chip-remove{top:5px;right:5px;width:16px;height:16px;font-size:12px;}
   .compare-slot-empty{min-height:56px;font-size:15px;border-radius:9px;}
-  .compare-cta{padding:8px 10px;font-size:11px;gap:5px;}
+  .compare-cta{padding:8px 32px;font-size:11px;gap:5px;}
 }
 @media (max-width:640px){
   .compare-bar{

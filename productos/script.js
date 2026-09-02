@@ -19,7 +19,9 @@ function updateProductFloatingPosition(){
 
   // Flotan contra el viewport mientras estamos dentro del catálogo y se
   // detienen en su borde inferior para no invadir el footer de Webflow.
-  const lift = Math.max(0, Math.ceil(window.innerHeight - root.getBoundingClientRect().bottom));
+  // Conservamos el valor subpixel. Redondearlo hacia arriba hacía que la barra
+  // saltara un píxel al entrar o salir del límite con el footer.
+  const lift = Math.max(0, window.innerHeight - root.getBoundingClientRect().bottom);
   ["compareBar", "aiLaunch"].forEach(id => {
     const element = document.getElementById(id);
     if(element) element.style.setProperty("--product-floating-lift", lift + "px");
@@ -2135,7 +2137,7 @@ function updateComparePadding(){
   root.style.removeProperty("--compare-boundary-lift");
   const barGap = parseFloat(getComputedStyle(bar).getPropertyValue("--compare-bar-gap")) || 0;
   const contentGap = 32;
-  const offset = Math.ceil(bar.getBoundingClientRect().height + barGap + contentGap);
+  const offset = bar.getBoundingClientRect().height + barGap + contentGap;
   root.style.setProperty("--compare-bar-offset", offset + "px");
   document.body.classList.add("has-compare-bar");
   scheduleProductFloatingPosition();

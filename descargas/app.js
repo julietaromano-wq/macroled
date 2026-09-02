@@ -5,6 +5,10 @@ const TS_HOST = "https://typesense.coresagroup.com";
 const TS_API_KEY = "g0oiNYY8THGuU9jnCsvqIH1X9HtvYRCR";
 const COLLECTION = "Macroled_Prueba";
 const PER_PAGE = 18;
+const TYPESENSE_PAGE_SIZE = 250;
+const TYPESENSE_PAGE_CONCURRENCY = 4;
+const DOWNLOADS_CACHE_KEY = "macroled-descargas-v2";
+const DOWNLOADS_CACHE_TTL_MS = 5 * 60 * 1000;
 
 // Qué campo del documento de producto corresponde a cada tipo de descarga.
 // Si en el futuro sumás páginas/MB por SKU, agregá esos campos acá.
@@ -16,8 +20,15 @@ const PRODUCT_DOWNLOAD_FIELDS = [
 ];
 
 const TIPO_DESCARGA_CATALOGO = "Catálogo";
-const TIPO_REGISTRO_CATALOGO = "catalogo";
 const CATALOG_QUERY_BY = "nombre_typesense,descripcion,sku";
+// Evita transferir todas las especificaciones técnicas de cada producto.
+// Esta página sólo necesita estos campos para construir sus cards y filtros.
+const PRODUCT_INCLUDE_FIELDS = [
+  "id", "nombre_typesense", "descripcion", "sku", "macrofamilia", "subfamilia",
+  "variantes_sku", "es_principal", "nuevo", "tipo_registro", "tipo_descarga",
+  "multiimagen", "multiimage", "imagen", "imagen_portada",
+  "ficha_tecnica", "garantia_link", "manual", "manual_link", "manuales", "ies_link"
+].join(",");
 const CATALOG_INCLUDE_FIELDS = [
   "id", "nombre_typesense", "nombre", "descripcion", "sku",
   "macrofamilia", "subfamilia", "nuevo", "tipo_registro", "tipo_descarga", "tipo_archivo",
@@ -230,33 +241,47 @@ const state = {
   facetOpen: { tipo_descarga: true, tipo_archivo: false, macrofamilia: false }
 };
 
-// Trae TODOS los documentos que matcheen el filtro, paginando automáticamente.
+function typesenseSearchParams(filterBy, queryBy, includeFields, page){
+  const params = {
+    q: "*",
+    query_by: queryBy,
+    filter_by: filterBy,
+    per_page: String(TYPESENSE_PAGE_SIZE),
+    page: String(page)
+  };
+  if(includeFields) params.include_fields = includeFields;
+  return params;
+}
+
+async function fetchDocsPage(filterBy, queryBy, includeFields, page){
+  const params = typesenseSearchParams(filterBy, queryBy, includeFields, page);
+  const res = await fetch(`${TS_HOST}/collections/${COLLECTION}/documents/search?` + new URLSearchParams(params), {
+    headers: { "X-TYPESENSE-API-KEY": TS_API_KEY }
+  });
+  if(!res.ok) throw new Error(`Typesense (${filterBy}) página ${page}: ${res.status}`);
+  return res.json();
+}
+
+// Trae todos los documentos, pero después de conocer el total descarga las
+// páginas restantes en paralelo (con concurrencia acotada para no saturar API).
 async function fetchAllDocs(filterBy, queryBy, includeFields){
-  const perPage = 250;
-  let page = 1;
-  let allDocs = [];
-  while(true){
-    const params = {
-      q: "*",
-      query_by: queryBy,
-      filter_by: filterBy,
-      per_page: String(perPage),
-      page: String(page)
-    };
-    if(includeFields) params.include_fields = includeFields;
-    const res = await fetch(`${TS_HOST}/collections/${COLLECTION}/documents/search?` + new URLSearchParams(params), {
-      headers: { "X-TYPESENSE-API-KEY": TS_API_KEY }
-    });
+  const first = await fetchDocsPage(filterBy, queryBy, includeFields, 1);
+  const totalPages = Math.ceil((Number(first.found) || 0) / TYPESENSE_PAGE_SIZE);
+  const pages = new Array(totalPages);
+  pages[0] = (first.hits || []).map(hit => hit.document);
+  if(totalPages <= 1) return pages[0] || [];
 
-    if(!res.ok) throw new Error(`Typesense (${filterBy}) página ${page}: ${res.status}`);
-    const data = await res.json();
-    const docs = data.hits.map(h => h.document);
-    allDocs = allDocs.concat(docs);
-
-    if(docs.length < perPage) break;
-    page++;
+  let nextPage = 2;
+  async function worker(){
+    while(nextPage <= totalPages){
+      const page = nextPage++;
+      const data = await fetchDocsPage(filterBy, queryBy, includeFields, page);
+      pages[page - 1] = (data.hits || []).map(hit => hit.document);
+    }
   }
-  return allDocs;
+  const workers = Math.min(TYPESENSE_PAGE_CONCURRENCY, totalPages - 1);
+  await Promise.all(Array.from({ length: workers }, () => worker()));
+  return pages.flat();
 }
 
 async function fetchAllDocsSafe(filterBy, queryBy, includeFields){
@@ -279,17 +304,40 @@ function finishInitialPreload(){
   if(window.MacroledPreload) window.MacroledPreload.done();
 }
 
+function readDownloadsCache(){
+  try{
+    const cached = JSON.parse(sessionStorage.getItem(DOWNLOADS_CACHE_KEY) || "null");
+    if(!cached || !Array.isArray(cached.items) || Date.now() - cached.savedAt > DOWNLOADS_CACHE_TTL_MS) return null;
+    return cached.items;
+  }catch(_){
+    return null;
+  }
+}
+
+function writeDownloadsCache(items){
+  try{
+    sessionStorage.setItem(DOWNLOADS_CACHE_KEY, JSON.stringify({ savedAt: Date.now(), items }));
+  }catch(_){
+    // La carga sigue funcionando aunque el navegador bloquee o llene el storage.
+  }
+}
+
 async function loadAllDescargables(){
   document.getElementById("showingLabel").textContent = "Cargando…";
+  const cachedItems = readDownloadsCache();
+  if(cachedItems){
+    allItems = cachedItems;
+    render();
+    finishInitialPreload();
+    return;
+  }
   try{
-    const [productosRaw, porRegistro, porTipo] = await Promise.all([
-      fetchAllDocs("tipo_registro:=producto", "nombre_typesense,descripcion,sku"),
-      fetchAllDocsSafe(`tipo_registro:=${TIPO_REGISTRO_CATALOGO}`, CATALOG_QUERY_BY, CATALOG_INCLUDE_FIELDS),
+    const [productosRaw, porTipo] = await Promise.all([
+      fetchAllDocs("tipo_registro:=producto", "nombre_typesense,descripcion,sku", PRODUCT_INCLUDE_FIELDS),
       fetchAllDocsSafe(`tipo_descarga:=${TIPO_DESCARGA_CATALOGO}`, CATALOG_QUERY_BY, CATALOG_INCLUDE_FIELDS)
     ]);
 
     const catalogos = mergeUniqueDocs([
-      porRegistro,
       porTipo,
       productosRaw.filter(isCatalogDoc)
     ]);
@@ -299,6 +347,7 @@ async function loadAllDescargables(){
       ...expandCatalogos(catalogos),
       ...expandProductos(productos)
     ]);
+    writeDownloadsCache(allItems);
     render();
   }catch(err){
     console.error("Error cargando descargables:", err);

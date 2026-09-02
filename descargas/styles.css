@@ -1944,6 +1944,64 @@ body.assistant-open .ai-launch{
   margin-top:0 !important;
   margin-bottom:0 !important;
 }
+
+/* Cards responsive: contenido completo y acciones de altura uniforme. */
+@media (max-width:900px){
+  /* Los catálogos muestran descripción únicamente en vista lista. */
+  .grid:not(.list) .card-catalogo .card-desc{
+    display:none !important;
+  }
+  .grid:not(.list) .card-catalogo .card-title,
+  .grid:not(.list) .card:not(.card-skel) .card-title,
+  .grid.list .card .card-title{
+    display:block !important;
+    height:auto !important;
+    max-height:none !important;
+    overflow:visible !important;
+    white-space:normal !important;
+    text-overflow:clip !important;
+    -webkit-line-clamp:unset !important;
+    -webkit-box-orient:unset !important;
+  }
+  .grid .btn-download,
+  .grid a.btn-download{
+    box-sizing:border-box !important;
+    height:44px !important;
+    min-height:44px !important;
+    padding:0 16px !important;
+    line-height:1 !important;
+    white-space:nowrap !important;
+  }
+}
+
+@media (max-width:680px){
+  /* En lista, una miniatura mayor mejora la lectura sin quitarle espacio al texto. */
+  .grid.list .card,
+  .grid.list .card-catalogo{
+    grid-template-columns:96px minmax(0,1fr) !important;
+  }
+  .grid.list .card .media,
+  .grid.list .card-catalogo .media{
+    width:96px !important;
+    height:96px !important;
+    min-width:96px !important;
+    min-height:96px !important;
+    max-width:96px !important;
+    max-height:96px !important;
+  }
+  .grid.list .card .card-body,
+  .grid.list .card-info,
+  .grid.list .card-catalogo .card-body,
+  .grid.list .card-catalogo .card-info{
+    min-height:96px !important;
+  }
+  .card .media .badge-nuevo,
+  .grid.list .card .media .badge-nuevo{
+    max-width:none !important;
+    overflow:visible !important;
+    text-overflow:clip !important;
+  }
+}
 button.ai-launch,
 .ai-launch{
   position:fixed !important;
