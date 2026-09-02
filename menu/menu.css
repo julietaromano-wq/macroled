@@ -119,14 +119,25 @@ html.mm-scroll-lock body {
   .mm-logo {
     color: #00bdff;
     flex-shrink: 0;
-    width: 180px;
+    width: auto;
+    max-width: none;
     display: block;
     position: relative;
     z-index: 30;
     cursor: pointer;
     pointer-events: auto;
+    line-height: 1;
+    overflow: visible;
   }
-  .mm-logo svg { display: block; width: 100%; height: auto; pointer-events: none; }
+  .mm-logo svg,
+  .mm-logo-svg {
+    display: block;
+    width: 180px;
+    max-width: none;
+    height: auto;
+    pointer-events: none;
+    overflow: visible;
+  }
   .mm-site-nav .mm-links {
     flex: 1;
     min-width: 0;
@@ -837,44 +848,60 @@ a.mm-group-label:hover {
   .mm-site-nav { display: none !important; }
   #mm-mobile { display: block; }
   #mm-mobile .mm-logo {
-    width: 110px;
-    max-width: 110px;
+    width: auto;
+    max-width: none;
     color: #fff;
-    line-height: 0;
+    line-height: 1;
     display: block;
     position: relative;
     z-index: 30;
     cursor: pointer;
     pointer-events: auto;
+    overflow: visible;
+    flex-shrink: 0;
   }
   #mm-mobile .mm-logo svg,
   #mm-mobile .mm-logo-svg {
     display: block;
     width: 110px;
-    max-width: 100%;
+    max-width: none;
     height: auto;
     color: #fff;
+    overflow: visible;
   }
 }
 
 #mm-mobile .mm-mobile-bar {
   position: relative; z-index: 100;
   display: flex; align-items: center; justify-content: space-between;
-  padding: 10px 20px; background: var(--mm-navy, #00152b); color: #fff;
+  padding: 10px 20px; background: #0077a8; color: #fff;
   height: var(--mm-mobile-nav-height); box-sizing: border-box;
+  overflow: visible;
   transition: background .22s ease, border-color .22s ease, color .22s ease, backdrop-filter .22s ease;
 }
-#mm-mobile .mm-logo { width: 110px; max-width: 110px; color: #fff; line-height: 0; }
+#mm-mobile .mm-logo {
+  width: auto;
+  max-width: none;
+  color: #fff;
+  line-height: 1;
+  overflow: visible;
+  flex-shrink: 0;
+}
 #mm-mobile .mm-logo svg,
 #mm-mobile .mm-logo-svg {
-  display: block; width: 110px; max-width: 100%; height: auto; color: #fff;
+  display: block;
+  width: 110px;
+  max-width: none;
+  height: auto;
+  color: #fff;
+  overflow: visible;
 }
 #mm-mobile .mm-header-actions { display: flex; align-items: center; gap: 0; }
 #mm-mobile .mm-header-divider {
   width: 1px;
-  height: 60px;
+  height: var(--mm-mobile-nav-height);
   margin: 0 12px;
-  background: rgb(88 88 88 / 35%);
+  background: rgb(188 188 188 / 35%);
   flex-shrink: 0;
 }
 #mm-mobile .burger {
