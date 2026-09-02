@@ -11,6 +11,35 @@ function mountProductFloatingUi(){
 }
 mountProductFloatingUi();
 
+let productFloatingPositionFrame = 0;
+function updateProductFloatingPosition(){
+  productFloatingPositionFrame = 0;
+  const root = document.getElementById("macroled-productos");
+  if(!root) return;
+
+  // Flotan contra el viewport mientras estamos dentro del catálogo y se
+  // detienen en su borde inferior para no invadir el footer de Webflow.
+  const lift = Math.max(0, Math.ceil(window.innerHeight - root.getBoundingClientRect().bottom));
+  ["compareBar", "aiLaunch"].forEach(id => {
+    const element = document.getElementById(id);
+    if(element) element.style.setProperty("--product-floating-lift", lift + "px");
+  });
+}
+function scheduleProductFloatingPosition(){
+  if(productFloatingPositionFrame) return;
+  productFloatingPositionFrame = requestAnimationFrame(updateProductFloatingPosition);
+}
+window.addEventListener("scroll", scheduleProductFloatingPosition, { passive:true });
+window.addEventListener("resize", scheduleProductFloatingPosition);
+if("ResizeObserver" in window){
+  const productRoot = document.getElementById("macroled-productos");
+  if(productRoot){
+    const productFloatingObserver = new ResizeObserver(scheduleProductFloatingPosition);
+    productFloatingObserver.observe(productRoot);
+  }
+}
+scheduleProductFloatingPosition();
+
 // Resguardo: si por lo que sea comparar.js no cargó (nombre de archivo
 // distinto, 404, etc.), esto evita que el checkbox "Comparar" quede roto —
 // en vez de un stub que no hace nada (y por eso el checkbox se destildaba
@@ -2097,6 +2126,7 @@ function updateComparePadding(){
     root.style.removeProperty("--compare-bar-offset");
     root.style.removeProperty("--compare-boundary-lift");
     document.body.classList.remove("has-compare-bar");
+    scheduleProductFloatingPosition();
     return;
   }
 
@@ -2108,6 +2138,7 @@ function updateComparePadding(){
   const offset = Math.ceil(bar.getBoundingClientRect().height + barGap + contentGap);
   root.style.setProperty("--compare-bar-offset", offset + "px");
   document.body.classList.add("has-compare-bar");
+  scheduleProductFloatingPosition();
 }
 
 window.addEventListener("resize", updateComparePadding);

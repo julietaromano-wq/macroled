@@ -1936,6 +1936,14 @@ body.assistant-open .ai-launch{
   visibility:hidden !important;
   pointer-events:none !important;
 }
+
+/* Webflow define .card-body con margin-top:1em; evitamos sumar ese espacio
+   al padding interno propio de las cards de Descargas. */
+.results .card .card-body,
+.results .card-catalogo .card-body{
+  margin-top:0 !important;
+  margin-bottom:0 !important;
+}
 button.ai-launch,
 .ai-launch{
   position:fixed !important;

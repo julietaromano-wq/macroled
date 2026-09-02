@@ -2252,7 +2252,7 @@ body.assistant-open #macroled-productos .ai-launch{
 body > #compareBar.compare-bar{
   position:fixed !important;
   top:auto !important;
-  bottom:max(var(--compare-bar-gap,20px),env(safe-area-inset-bottom,0px)) !important;
+  bottom:calc(max(var(--compare-bar-gap,20px),env(safe-area-inset-bottom,0px)) + var(--product-floating-lift,0px)) !important;
   z-index:2147483644 !important;
   transform:none !important;
 }
@@ -2271,7 +2271,7 @@ body > #aiLaunch.ai-launch{
   position:fixed !important;
   top:auto !important;
   right:max(16px,env(safe-area-inset-right,0px)) !important;
-  bottom:max(20px,env(safe-area-inset-bottom,0px)) !important;
+  bottom:calc(max(20px,env(safe-area-inset-bottom,0px)) + var(--product-floating-lift,0px)) !important;
   z-index:2147483645 !important;
   width:auto !important;
   height:48px !important;
