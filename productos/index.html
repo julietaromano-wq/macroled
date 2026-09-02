@@ -40,6 +40,7 @@
       <div class="search-bar">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
         <input type="text" id="searchInput" name="ml-catalog-q" placeholder="Buscar por nombre, SKU o descripción..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" aria-label="Buscar productos">
+        <button type="button" class="search-clear" id="searchClear" aria-label="Borrar búsqueda" title="Borrar búsqueda" hidden>×</button>
       </div>
       <button class="filters-toggle" id="filtersToggle" type="button" title="Filtros">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="6" x2="20" y2="6"/><circle cx="9" cy="6" r="2.2" fill="#fff"/><line x1="4" y1="12" x2="20" y2="12"/><circle cx="16" cy="12" r="2.2" fill="#fff"/><line x1="4" y1="18" x2="20" y2="18"/><circle cx="11" cy="18" r="2.2" fill="#fff"/></svg>
@@ -73,7 +74,6 @@
 
   <div class="filters-rail">
     <div class="filters-desktop-only">
-      <div class="toolbar-top" id="chipsBar"></div>
       <div class="filters-desktop-heading">
         <span class="filters-desktop-title">Filtros</span>
         <button type="button" class="filters-collapse-btn" id="filtersCollapseBtn" title="Ocultar filtros" aria-label="Ocultar filtros">
@@ -85,6 +85,7 @@
   </div>
 
   <div class="results-body">
+    <div class="toolbar-top" id="chipsBar"></div>
     <div id="categoryBanner" class="category-banner" hidden></div>
     <div class="grid-shell" id="gridShell" aria-busy="true">
       <div class="grid" id="grid"></div>

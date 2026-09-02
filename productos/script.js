@@ -2076,90 +2076,34 @@ function buildCompareUrl(){
    localStorage vía compare.js, compartida con comparar.html
    ========================================================= */
 let compareBarPrevCount = 0;
-let compareBoundaryFrame = 0;
-
-function isExpandedMobileCompare(bar){
-  return window.matchMedia("(max-width: 640px)").matches && !bar.classList.contains("collapsed");
-}
-
-function updateCompareBoundary(){
-  compareBoundaryFrame = 0;
-  const root = document.getElementById("macroled-productos");
-  const bar = document.getElementById("compareBar");
-  if(!root || !bar || getComputedStyle(bar).display === "none"){
-    if(root) root.style.removeProperty("--compare-boundary-lift");
-    return;
-  }
-
-  // En mobile, abierto funciona como un modal superpuesto. No se ancla a la
-  // paginación ni empuja el contenido; para verla, el usuario lo contrae.
-  if(isExpandedMobileCompare(bar)){
-    root.style.setProperty("--compare-boundary-lift", "0px");
-    return;
-  }
-
-  // El límite es el elemento más bajo del catálogo, no sólo la paginación.
-  // Webflow puede dejar que el sidebar desborde la altura del grid, por eso
-  // también medimos explícitamente filtros y resultados en el estado vacío.
-  const barGap = parseFloat(getComputedStyle(bar).getPropertyValue("--compare-bar-gap")) || 0;
-  const fixedTop = window.innerHeight - barGap - bar.offsetHeight;
-  const boundaryBottom = [
-    root,
-    root.querySelector(".filters-rail"),
-    root.querySelector("#filtersPanel"),
-    root.querySelector(".results-body")
-  ].filter(Boolean).reduce((bottom, element) =>
-    Math.max(bottom, element.getBoundingClientRect().bottom),
-    root.getBoundingClientRect().bottom
-  );
-  const restingTop = boundaryBottom - barGap - bar.offsetHeight;
-  const lift = Math.max(0, fixedTop - restingTop);
-  root.style.setProperty("--compare-boundary-lift", lift + "px");
-}
-
-function scheduleCompareBoundaryUpdate(){
-  if(compareBoundaryFrame) return;
-  compareBoundaryFrame = requestAnimationFrame(updateCompareBoundary);
-}
-
 function updateComparePadding(){
   const root = document.getElementById("macroled-productos");
   const bar = document.getElementById("compareBar");
-  if(getComputedStyle(bar).display === "none"){
+  if(!root || !bar || getComputedStyle(bar).display === "none"){
+    if(!root) return;
     root.style.removeProperty("--compare-bar-offset");
     root.style.removeProperty("--compare-boundary-lift");
     document.body.classList.remove("has-compare-bar");
     return;
   }
-  if(isExpandedMobileCompare(bar)){
-    root.style.setProperty("--compare-bar-offset", "0px");
-    root.style.setProperty("--compare-boundary-lift", "0px");
-    document.body.classList.add("has-compare-bar");
-    return;
-  }
-  const pagination = document.getElementById("pagination");
-  const rootStyle = getComputedStyle(root);
-  const currentPadding = parseFloat(rootStyle.paddingBottom) || 0;
-  const trailingSpace = Math.max(0,
-    root.getBoundingClientRect().bottom - currentPadding - pagination.getBoundingClientRect().bottom
-  );
+
+  // La barra queda anclada al viewport. La reserva inferior sigue su altura
+  // real, incluso sin resultados o paginación, y se reajusta al contraerla.
+  root.style.removeProperty("--compare-boundary-lift");
   const barGap = parseFloat(getComputedStyle(bar).getPropertyValue("--compare-bar-gap")) || 0;
-  const paginationGap = 32; // 2rem entre la paginación y el comparador
-  const offset = Math.max(0, bar.offsetHeight + barGap + paginationGap - trailingSpace);
+  const contentGap = 32;
+  const offset = Math.ceil(bar.getBoundingClientRect().height + barGap + contentGap);
   root.style.setProperty("--compare-bar-offset", offset + "px");
   document.body.classList.add("has-compare-bar");
-  scheduleCompareBoundaryUpdate();
 }
 
-window.addEventListener("scroll", scheduleCompareBoundaryUpdate, { passive:true });
-window.addEventListener("resize", () => {
-  updateComparePadding();
-  scheduleCompareBoundaryUpdate();
-});
+window.addEventListener("resize", updateComparePadding);
 if("ResizeObserver" in window){
-  const compareBoundaryObserver = new ResizeObserver(scheduleCompareBoundaryUpdate);
-  compareBoundaryObserver.observe(document.getElementById("macroled-productos"));
-  compareBoundaryObserver.observe(document.getElementById("compareBar"));
+  const compareBar = document.getElementById("compareBar");
+  if(compareBar){
+    const compareBarObserver = new ResizeObserver(updateComparePadding);
+    compareBarObserver.observe(compareBar);
+  }
 }
 function renderCompareBar(){
   const bar = document.getElementById("compareBar");
@@ -2211,7 +2155,7 @@ function renderCompareBar(){
       </a>
       <button type="button" class="compare-clear" id="compareClear" aria-label="Borrar todos los productos seleccionados">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>
-        Borrar
+        Borrar todo
       </button>
     </div>
   `;
@@ -2544,7 +2488,6 @@ async function loadAndRender(){
     gridShell.classList.add("is-filtering");
     gridShell.setAttribute("aria-busy", "true");
     updateGridLoadingPosition();
-    scheduleCompareBoundaryUpdate();
   } else {
     showingLabel.textContent = "Cargando productos…";
   }
@@ -2581,7 +2524,7 @@ async function loadAndRender(){
     if(gridShell){
       gridShell.classList.remove("is-filtering");
       gridShell.setAttribute("aria-busy", "false");
-      scheduleCompareBoundaryUpdate();
+      updateComparePadding();
     }
   }
 }
@@ -2673,14 +2616,20 @@ function syncSearchInputFromState(){
   const el = document.getElementById("searchInput");
   if(!el) return;
   if(el.value !== state.query) el.value = state.query;
+  syncSearchClear();
 }
 
 let searchDebounce;
 const searchInput = document.getElementById("searchInput");
+const searchClear = document.getElementById("searchClear");
+function syncSearchClear(){
+  if(searchClear) searchClear.hidden = !searchInput?.value;
+}
 if(searchInput){
   let searchTouched = false;
   searchInput.addEventListener("focus", () => { searchTouched = true; });
   searchInput.addEventListener("input", (e) => {
+    syncSearchClear();
     // Autofill / restore del browser no tiene que filtrar el index al cargar.
     if(!searchTouched){
       syncSearchInputFromState();
@@ -2699,6 +2648,17 @@ if(searchInput){
     applySearchQuery(e.target.value);
     loadAndRender();
   });
+}
+if(searchClear && searchInput){
+  searchClear.addEventListener("click", () => {
+    clearTimeout(searchDebounce);
+    searchInput.value = "";
+    syncSearchClear();
+    applySearchQuery("");
+    loadAndRender();
+    searchInput.focus();
+  });
+  syncSearchClear();
 }
 function applyCatalogView(view){
   const next = view === "list" ? "list" : "grid";
