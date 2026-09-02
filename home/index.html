@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/home.css?v=20260827-29">
-  <link rel="stylesheet" href="css/newsletter.css?v=20260827-4">
+  <link rel="stylesheet" href="css/newsletter.css?v=20260902-4">
 </head>
 <body>
   <div id="macroled-home" class="ml-home">
@@ -251,9 +251,9 @@
         <path d="M3 7l9 7 9-7"/>
       </svg>
     </div>
-    <h2 id="nlTitle">Sumate a nuestro newsletter</h2>
+    <h2 id="nlTitle">Sumate a nuestro<br>newsletter</h2>
     <p class="nl-popup__sub">Completá tus datos para recibir novedades,<br>lanzamientos y contenido exclusivo.</p>
-    <form id="nlForm" class="nl-form">
+    <form id="nlForm" class="nl-form" data-newsletter-endpoint="/api/newsletter-macroled" novalidate>
       <div class="nl-field">
         <div class="nl-pill">
           <label class="nl-border-label" for="nl-nombre">Nombre</label>
@@ -266,19 +266,19 @@
           <input id="nl-email" type="email" name="email" placeholder="tu@email.com" required autocomplete="email">
         </div>
       </div>
-      <div class="nl-field">
-        <div class="nl-pill">
-          <label class="nl-border-label" for="nl-interes">Área de interés</label>
-          <div class="nl-select-wrap">
-            <select id="nl-interes" name="area_interes" required>
-              <option value="" disabled selected>Seleccioná una opción</option>
-              <option value="residencial">Residencial</option>
-              <option value="proyectos">Obras y proyectos</option>
-              <option value="arquitectura">Arquitectura</option>
-            </select>
-          </div>
+      <div class="nl-field nl-field--interests">
+        <p class="nl-interests-label" id="nl-interes-label">Área de interés</p>
+        <div class="nl-interest-tabs" role="group" aria-labelledby="nl-interes-label" data-interest-tabs>
+          <button type="button" class="nl-interest-tab" data-interest="residencial" aria-pressed="false">Residencial</button>
+          <button type="button" class="nl-interest-tab" data-interest="proyectos" aria-pressed="false">Obras y proyectos</button>
+          <button type="button" class="nl-interest-tab" data-interest="arquitectura" aria-pressed="false">Arquitectura</button>
         </div>
       </div>
+      <div class="nl-consent">
+        <input type="checkbox" id="nl-acepta" name="acepta_newsletter" value="true" required>
+        <label for="nl-acepta">Acepto recibir el Newsletter Macroled. Puedo darme de baja cuando quiera.</label>
+      </div>
+      <p class="nl-error" id="nlError" role="alert" hidden></p>
       <button type="submit" class="nl-submit">Suscribirme</button>
       <p class="nl-popup__note">Podés darte de baja cuando quieras.</p>
     </form>
@@ -294,6 +294,6 @@
   <script src="js/project-lines-concept.js?v=20260825-22"></script>
   <script src="js/home.js?v=20260824-97"></script>
   <script src="js/asistente.js?v=20260827-2"></script>
-  <script src="js/newsletter.js?v=20260812-1"></script>
+  <script src="js/newsletter.js?v=20260902-2"></script>
 </body>
 </html>
