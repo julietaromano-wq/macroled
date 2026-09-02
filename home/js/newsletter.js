@@ -1,7 +1,13 @@
 (function () {
   "use strict";
 
-  const DEFAULT_ENDPOINT = "/api/newsletter-macroled";
+  const DEFAULT_ENDPOINT = "https://n8n.coresagroup.com/webhook/newsletter-macroled";
+
+  const INTEREST_HUBSPOT_MAP = {
+    residencial: "residencial",
+    proyectos: "obras_y_proyectos",
+    arquitectura: "arquitectura"
+  };
 
   function initNewsletter() {
     const popup = document.getElementById("nlPopup");
@@ -21,7 +27,7 @@
     const getSelectedInterests = () => {
       if (!interestTabs) return [];
       return Array.prototype.map
-        .call(interestTabs.querySelectorAll('.nl-interest-tab[aria-pressed="true"]'), tab => tab.dataset.interest)
+        .call(interestTabs.querySelectorAll('.nl-interest-tab[aria-pressed="true"]'), tab => INTEREST_HUBSPOT_MAP[tab.dataset.interest])
         .filter(Boolean);
     };
 
