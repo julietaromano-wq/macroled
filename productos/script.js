@@ -768,11 +768,13 @@ async function searchTypesense(){
       const escaped = [...state.selected.familia].map(v => `\`${v}\``).join(",");
       const clause = `${FAMILIA_FIELD}:=[${escaped}]`;
       filterParts.push(clause);
+      ownFacetClauses.set(FAMILIA_FIELD, clause);
     }
     if(activeMacro && activeFamilia && state.selected.subfamilia.size){
       const escaped = [...state.selected.subfamilia].map(v => `\`${v}\``).join(",");
       const clause = `${SUBFAMILIA_FIELD}:=[${escaped}]`;
       filterParts.push(clause);
+      ownFacetClauses.set(SUBFAMILIA_FIELD, clause);
     }
     if(activeFamilia && state.selected.subfamilia.size){
       for(const field of EXTRA_FACET_FIELDS){
@@ -840,6 +842,8 @@ async function searchTypesense(){
     // combinar, en lugar de desaparecer o quedar artificialmente en cero.
     const checkboxFacetFields = [
       ...FACET_FIELDS.filter(field => field !== "macrofamilia"),
+      FAMILIA_FIELD,
+      SUBFAMILIA_FIELD,
       ...EXTRA_FACET_FIELDS
     ];
     const activeCheckboxFacets = checkboxFacetFields.filter(field => ownFacetClauses.has(field));
@@ -2366,6 +2370,9 @@ function renderBreadcrumb(){
   const holder = document.getElementById("breadcrumb");
   const active = [...state.selected.macrofamilia][0];
   const activeFamilia = [...state.selected.familia][0];
+  const activeSubfamilia = state.selected.subfamilia.size === 1 ? [...state.selected.subfamilia][0] : "";
+  const activeCategoria = state.selected.categoria.size === 1 ? [...state.selected.categoria][0] : "";
+  const productsUrl = "https://www.macroled.com.ar/productos";
 
   function clearToProductos(){
     state.query = "";
@@ -2398,26 +2405,73 @@ function renderBreadcrumb(){
     loadAndRender();
   }
 
+  function clearToFamily(){
+    state.selected.subfamilia.clear();
+    state.selected.categoria.clear();
+    state.page = 1;
+    loadAndRender();
+  }
+
+  function clearToSubfamily(){
+    state.selected.categoria.clear();
+    state.page = 1;
+    loadAndRender();
+  }
+
+  const items = [];
+  const addLink = (label, href, onClick) => items.push({ label, href, onClick });
+  const addCurrent = label => items.push({ label, current:true });
+
+  addLink("Inicio", "https://www.macroled.com.ar/");
+
   if(state.query){
-    holder.innerHTML = `Inicio &nbsp;›&nbsp; <a id="crumbProductos">Productos</a> &nbsp;›&nbsp; <b class="crumb-active">Resultados para "${state.query}"</b>`;
-    document.getElementById("crumbProductos").addEventListener("click", clearToProductos);
-    return;
+    addLink("Productos", productsUrl, clearToProductos);
+    addCurrent(`Resultados para "${state.query}"`);
+  }else if(!active){
+    addCurrent("Productos");
+  }else{
+    addLink("Productos", productsUrl, clearToProductos);
+
+    const macroUrl = `${productsUrl}?macrofamilia=${encodeURIComponent(active)}`;
+    if(activeFamilia || activeSubfamilia || activeCategoria) addLink(active, macroUrl, clearToMacro);
+    else addCurrent(active);
+
+    if(activeFamilia){
+      const familyUrl = `${macroUrl}&familia=${encodeURIComponent(activeFamilia)}`;
+      if(activeSubfamilia || activeCategoria) addLink(activeFamilia, familyUrl, clearToFamily);
+      else addCurrent(activeFamilia);
+
+      if(activeSubfamilia){
+        const subfamilyUrl = `${familyUrl}&subfamilia=${encodeURIComponent(activeSubfamilia)}`;
+        if(activeCategoria) addLink(activeSubfamilia, subfamilyUrl, clearToSubfamily);
+        else addCurrent(activeSubfamilia);
+
+        if(activeCategoria) addCurrent(activeCategoria);
+      }
+    }
   }
 
-  if(!active){
-    holder.innerHTML = `Inicio &nbsp;›&nbsp; <b>Productos</b>`;
-    return;
-  }
-
-  if(activeFamilia){
-    holder.innerHTML = `Inicio &nbsp;›&nbsp; <a id="crumbProductos">Productos</a> &nbsp;›&nbsp; <a id="crumbMacro">${active}</a> &nbsp;›&nbsp; <b class="crumb-active">${activeFamilia}</b>`;
-    document.getElementById("crumbProductos").addEventListener("click", clearToProductos);
-    document.getElementById("crumbMacro").addEventListener("click", clearToMacro);
-    return;
-  }
-
-  holder.innerHTML = `Inicio &nbsp;›&nbsp; <a id="crumbProductos">Productos</a> &nbsp;›&nbsp; <b class="crumb-active">${active}</b>`;
-  document.getElementById("crumbProductos").addEventListener("click", clearToProductos);
+  holder.replaceChildren();
+  items.forEach((item, index) => {
+    if(index) holder.append(document.createTextNode(" › "));
+    if(item.current){
+      const current = document.createElement("b");
+      current.className = "crumb-active";
+      current.textContent = item.label;
+      holder.append(current);
+      return;
+    }
+    const link = document.createElement("a");
+    link.href = item.href;
+    link.textContent = item.label;
+    if(item.onClick){
+      link.addEventListener("click", event => {
+        event.preventDefault();
+        item.onClick();
+      });
+    }
+    holder.append(link);
+  });
 }
 
 /* =========================================================

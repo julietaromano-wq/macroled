@@ -45,8 +45,9 @@
     line-height:1.5;overflow-wrap:anywhere;
   }
   .crumb b{color:var(--brand-dark);}
-  .crumb a{cursor:pointer;}
+  .crumb a{cursor:pointer;transition:color .12s ease,text-decoration-color .12s ease;}
   .crumb a:hover{text-decoration:underline;color:var(--dark-blue--700);}
+  .crumb a:focus-visible{outline:2px solid var(--brand);outline-offset:3px;border-radius:2px;}
   .crumb .crumb-active{color:var(--brand-dark);font-weight:700;}
 
   .layout{
