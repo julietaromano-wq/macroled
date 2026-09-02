@@ -108,15 +108,18 @@
      real, .cell.product-head .pname/.psku) y con wrap en vez de
      ellipsis — con nowrap+ellipsis un SKU/variante largo se veía cortado
      de golpe; con wrap simplemente pasa a una segunda línea y la fila
-     crece, mismo criterio que ya se usaba para .name. El text-align va con
-     !important: son clases genéricas (.name/.sku) y algo del lado de
-     Webflow las alinea a la izquierda con más prioridad — sin esto, el
-     texto queda a la izquierda pese a que .mini-info ya está centrado. */
-  .mini-cell .name{font-size:var(--fs-base);font-weight:700;color:var(--navy);line-height:1.3;overflow:hidden;white-space:normal;overflow-wrap:break-word;text-align:center !important;}
-  .mini-cell .sku{font-size:var(--fs-xs);font-weight:500;color:var(--muted);overflow:hidden;white-space:normal;overflow-wrap:break-word;text-align:center !important;margin-top:2px;}
+     crece, mismo criterio que ya se usaba para .name. Todo esto va con
+     !important porque .name/.sku son clases genéricas y Webflow tiene sus
+     propias clases globales con esos mismos nombres (de otro componente
+     del sitio) que les meten display:flex + justify-content:flex-end +
+     padding propio — con eso activo, text-align no hace nada (no aplica
+     a contenedores flex, ahí manda justify-content), así que hay que
+     resetear display/justify-content/align-items/padding acá también. */
+  .mini-cell .name{display:block !important;font-size:var(--fs-base);font-weight:700;color:var(--navy);line-height:1.3;overflow:hidden;white-space:normal;overflow-wrap:break-word;text-align:center !important;padding:0 !important;justify-content:normal !important;align-items:normal !important;}
+  .mini-cell .sku{display:block !important;font-size:var(--fs-xs);font-weight:500;color:var(--muted);overflow:hidden;white-space:normal;overflow-wrap:break-word;text-align:center !important;margin-top:2px;padding:0 !important;justify-content:normal !important;align-items:normal !important;}
   /* un escalón por debajo del SKU: mismo tamaño pero más liviana (peso
      normal + opacity) para que no compita con nombre/SKU por jerarquía */
-  .mini-cell .variant{font-size:var(--fs-xs);font-weight:400;color:var(--muted);opacity:.75;overflow:hidden;white-space:normal;overflow-wrap:break-word;text-align:center !important;}
+  .mini-cell .variant{display:block !important;font-size:var(--fs-xs);font-weight:400;color:var(--muted);opacity:.75;overflow:hidden;white-space:normal;overflow-wrap:break-word;text-align:center !important;padding:0 !important;justify-content:normal !important;align-items:normal !important;}
 
   /* switch "solo diferencias" para MOBILE — reemplaza al de adentro del
      grid (.header-label), que en mobile se saca del todo del flow (no hay
