@@ -1,6 +1,7 @@
 /* Barra flotante de comparar — global (productos, fichas, resto del sitio).
    No es el CSS de la página /comparar (eso sigue en comparar/styles.css). */
 .compare-bar{
+  --compare-bar-gap:20px;
   --ink:#141821;
   --ink-soft:#48525f;
   --brand:#00bdff;
@@ -12,11 +13,11 @@
   --font:'Noto Sans',sans-serif;
   position:fixed;
   left:20px;
-  bottom:20px;
+  bottom:calc(max(var(--compare-bar-gap),env(safe-area-inset-bottom,0px)) + var(--compare-bar-lift,var(--product-floating-lift,0px)));
   transform:none;
   width:calc(100% - 40px - 168px);
   z-index:10020;
-  transition:width .3s var(--ease),left .3s var(--ease),bottom .3s var(--ease);
+  transition:width .3s var(--ease),left .3s var(--ease);
   touch-action:manipulation;
   -webkit-text-size-adjust:100%;
   text-size-adjust:100%;
@@ -213,7 +214,7 @@
   color:#fff !important;
   border:none;
   border-radius:var(--radius-sm);
-  padding:9px 32px;
+  padding:9px 32px !important;
   font-size:12px;
   font-weight:700;
   cursor:pointer;
@@ -254,12 +255,13 @@ body.has-compare-bar .ai-launch{
   .compare-chip-sku{font-size:9px;}
   .compare-chip-remove{top:5px;right:5px;width:16px;height:16px;font-size:12px;}
   .compare-slot-empty{min-height:56px;font-size:15px;border-radius:9px;}
-  .compare-cta{padding:8px 32px;font-size:11px;gap:5px;}
+  .compare-bar a.compare-cta,
+  .compare-cta{padding:8px 32px !important;font-size:11px;gap:5px;}
 }
 @media (max-width:640px){
   .compare-bar{
+    --compare-bar-gap:12px;
     left:12px;
-    bottom:12px;
     width:calc(100% - 84px);
     max-width:none;
   }
@@ -286,9 +288,33 @@ body.has-compare-bar .ai-launch{
   }
   .compare-chip{width:100%;min-width:0;max-width:none;}
   .compare-slot-empty{display:none;}
-  .compare-cta{margin-left:0;width:100%;justify-content:center;}
+  .compare-bar a.compare-cta,
+  .compare-cta{margin-left:0;width:100%;justify-content:center;padding:9px 32px !important;}
   body.has-compare-bar .ai-launch{
     bottom:max(12px,env(safe-area-inset-bottom,0px));
   }
   body.assistant-open .compare-bar{display:none !important;}
+}
+
+/* La barra se porta a body para que transform/contain de Webflow no capture
+   position:fixed. Estos selectores también ganan frente a sus estilos globales. */
+body > #compareBar.compare-bar{
+  position:fixed !important;
+  top:auto !important;
+  left:20px !important;
+  bottom:calc(max(var(--compare-bar-gap,20px),env(safe-area-inset-bottom,0px)) + var(--compare-bar-lift,var(--product-floating-lift,0px))) !important;
+  z-index:899 !important;
+  transform:none !important;
+}
+body > #compareBar.compare-bar a.compare-cta{
+  padding:9px 32px !important;
+}
+@media (max-width:640px){
+  body > #compareBar.compare-bar{
+    --compare-bar-gap:12px;
+    left:12px !important;
+  }
+  body > #compareBar.compare-bar a.compare-cta{
+    padding:9px 32px !important;
+  }
 }
