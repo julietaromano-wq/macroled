@@ -826,7 +826,11 @@ a.mm-group-label:hover {
 /* =========================================================
    MENU MOBILE / TABLET — se activa desde 1100px
    ========================================================= */
-#mm-mobile { display: none; font-family: 'Noto Sans', sans-serif; }
+#mm-mobile {
+  --mm-mobile-nav-height: 68px;
+  display: none;
+  font-family: 'Noto Sans', sans-serif;
+}
 #mm-mobile ul, #mm-mobile ol { padding-left: 0; margin: 0; }
 
 @media (max-width: 1100px) {
@@ -856,8 +860,8 @@ a.mm-group-label:hover {
 #mm-mobile .mm-mobile-bar {
   position: relative; z-index: 100;
   display: flex; align-items: center; justify-content: space-between;
-  padding: 14px 20px; background: var(--mm-navy, #00152b); color: #fff;
-  height: 72px; box-sizing: border-box;
+  padding: 10px 20px; background: var(--mm-navy, #00152b); color: #fff;
+  height: var(--mm-mobile-nav-height); box-sizing: border-box;
   transition: background .22s ease, border-color .22s ease, color .22s ease, backdrop-filter .22s ease;
 }
 #mm-mobile .mm-logo { width: 110px; max-width: 110px; color: #fff; line-height: 0; }
@@ -865,7 +869,14 @@ a.mm-group-label:hover {
 #mm-mobile .mm-logo-svg {
   display: block; width: 110px; max-width: 100%; height: auto; color: #fff;
 }
-#mm-mobile .mm-header-actions { display: flex; align-items: center; gap: 10px; }
+#mm-mobile .mm-header-actions { display: flex; align-items: center; gap: 0; }
+#mm-mobile .mm-header-divider {
+  width: 1px;
+  height: 68px;
+  margin: 0 12px;
+  background: rgb(88 88 88 / 35%);
+  flex-shrink: 0;
+}
 #mm-mobile .burger {
   width: 36px; height: 36px; display: flex; flex-direction: column;
   justify-content: center; align-items: center; gap: 6px;
@@ -946,15 +957,15 @@ a.mm-group-label:hover {
 #mm-mobile .search-overlay-body .ts-row-footer { justify-content: center; }
 
 #mm-mobile .menu-overlay {
-  position: fixed; inset: 0; top: 72px;
+  position: fixed; inset: 0; top: var(--mm-mobile-nav-height);
   background: rgba(16,24,32,.4);
   opacity: 0; pointer-events: none; transition: opacity .3s cubic-bezier(.4,0,.2,1);
   z-index: 90;
 }
 #mm-mobile .menu-overlay.open { opacity: 1; pointer-events: auto; }
 #mm-mobile .menu-panel {
-  position: fixed; top: 72px; left: 0; right: 0;
-  height: calc(100dvh - 72px);
+  position: fixed; top: var(--mm-mobile-nav-height); left: 0; right: 0;
+  height: calc(100dvh - var(--mm-mobile-nav-height));
   background: #fff;
   transform: translateY(-8px) scaleY(.98); transform-origin: top;
   opacity: 0; pointer-events: none;
