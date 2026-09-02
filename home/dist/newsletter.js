@@ -1,6 +1,9 @@
 (function () {
   "use strict";
 
+  if (window.__ML_NEWSLETTER_INIT__) return;
+  window.__ML_NEWSLETTER_INIT__ = true;
+
   const DEFAULT_ENDPOINT = "https://n8n.coresagroup.com/webhook/newsletter-macroled";
 
   const INTEREST_HUBSPOT_MAP = {

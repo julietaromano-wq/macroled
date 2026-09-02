@@ -33,6 +33,7 @@ export async function build() {
   const css = await readFile(resolve(homeDirectory, "css", "home.css"), "utf8");
   await writeFile(resolve(distDirectory, "home.css"), css, "utf8");
 
+  // Keep standalone newsletter assets for older Webflow embeds; home.css/home.js already include them.
   const newsletterCss = await readFile(
     resolve(homeDirectory, "css", "newsletter.css"),
     "utf8",
