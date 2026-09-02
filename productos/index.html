@@ -53,18 +53,18 @@
       </div>
       <div class="sort-dropdown" id="sortDropdown">
         <button class="sort-trigger" id="sortTrigger" type="button" aria-haspopup="listbox" aria-expanded="false">
-          <span class="sort-current" id="sortCurrent">Destacados</span>
+          <span class="sort-current" id="sortCurrent">Ordenar por</span>
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
         </button>
         <div class="sort-menu" id="sortMenu" role="listbox" aria-label="Ordenar productos" hidden>
           <span class="sort-menu-title">Ordenar por:</span>
-          <button type="button" class="sort-option" role="option" aria-selected="true" data-sort="">Destacados</button>
+          <button type="button" class="sort-option" role="option" aria-selected="true" data-sort="">Predeterminado</button>
           <button type="button" class="sort-option" role="option" aria-selected="false" data-sort="nuevo:desc">Novedades</button>
           <button type="button" class="sort-option" role="option" aria-selected="false" data-sort="alpha:asc">A–Z</button>
         </div>
       </div>
       <select class="sort sort-native" id="sortSelect" tabindex="-1" aria-hidden="true">
-        <option value="" selected>Destacados</option>
+        <option value="" selected>Predeterminado</option>
         <option value="nuevo:desc">Novedades</option>
         <option value="alpha:asc">A–Z</option>
       </select>

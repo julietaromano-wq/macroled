@@ -587,7 +587,7 @@
   }
   .view-toggle{display:flex;border:1px solid var(--line);border-radius:10px;overflow:hidden;}
   .view-toggle button{
-    border:none;background:var(--bg-page);padding:8px 10px;cursor:pointer;font-size:15px;color:var(--ink-soft);
+    border:none;background:transparent;padding:8px 10px;cursor:pointer;font-size:15px;color:var(--ink-soft);
     transition:background .12s,color .12s;
   }
   .view-toggle button:hover:not(.active){background:var(--bg-card);}
@@ -3888,18 +3888,18 @@ body.filters-open button.ai-launch{
     display:flex !important;
     height:46px !important;
     align-self:stretch !important;
-    background:#fff !important;
+    background:transparent !important;
   }
   #macroled-productos .catalog-controls-main .view-toggle button{
     min-width:36px !important;
     height:44px !important;
     padding:0 10px !important;
-    background:#fff !important;
+    background:transparent !important;
     color:var(--ink-soft) !important;
   }
   #macroled-productos .catalog-controls-main .view-toggle button.active{
-    background:var(--btn-blue,#00adef) !important;
-    color:#fff !important;
+    background:#fff !important;
+    color:var(--dark-blue--700) !important;
   }
   #macroled-productos .catalog-controls-main .filters-toggle{
     display:none !important;

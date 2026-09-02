@@ -812,6 +812,10 @@ async function searchTypesense(){
     params.set("sort_by", "order:asc");
   }else if(state.sortBy === "nuevo:desc"){
     params.set("sort_by", "nuevo:desc");
+  }else{
+    // "Predeterminado": `ORDER` en la fuente se normaliza como `order` en el
+    // esquema de Typesense. Los valores menores deben aparecer primero.
+    params.set("sort_by", "order:asc");
   }
 
   try{
@@ -2536,10 +2540,13 @@ const sortDropdown = document.getElementById("sortDropdown");
 const sortTrigger = document.getElementById("sortTrigger");
 const sortMenu = document.getElementById("sortMenu");
 const sortCurrent = document.getElementById("sortCurrent");
+let sortHasBeenChosen = false;
 
 function syncSortDropdown(){
   const selectedOption = [...sortSelect.options].find(option => option.value === sortSelect.value);
-  sortCurrent.textContent = selectedOption?.textContent || "Destacados";
+  sortCurrent.textContent = (sortHasBeenChosen || sortSelect.value)
+    ? selectedOption?.textContent || "Predeterminado"
+    : "Ordenar por";
   sortMenu.querySelectorAll(".sort-option").forEach(option => {
     const active = option.dataset.sort === sortSelect.value;
     option.classList.toggle("active", active);
@@ -2562,6 +2569,7 @@ sortTrigger.addEventListener("click", () => {
 
 sortMenu.querySelectorAll(".sort-option").forEach(option => {
   option.addEventListener("click", () => {
+    sortHasBeenChosen = true;
     sortSelect.value = option.dataset.sort;
     syncSortDropdown();
     closeSortDropdown();
@@ -2577,6 +2585,7 @@ document.addEventListener("keydown", (event) => {
 });
 
 sortSelect.addEventListener("change", (e) => {
+  sortHasBeenChosen = true;
   syncSortDropdown();
   state.sortBy = e.target.value;
   state.page = 1;
@@ -2810,7 +2819,7 @@ function fmnSummary(field){
 function currentSortLabel(){
   const select = document.getElementById("sortSelect");
   const opt = [...select.options].find(o => o.value === state.pendingSortBy);
-  return opt ? opt.textContent : "Destacados";
+  return opt ? opt.textContent : "Predeterminado";
 }
 
 function goToListScreen(){
