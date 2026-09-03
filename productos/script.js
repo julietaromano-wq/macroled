@@ -2473,10 +2473,17 @@ function renderBreadcrumb(){
 
   holder.replaceChildren();
   items.forEach((item, index) => {
-    if(index) holder.append(document.createTextNode(" › "));
+    if(index){
+      const separator = document.createElement("span");
+      separator.className = "crumb-separator";
+      separator.setAttribute("aria-hidden", "true");
+      separator.textContent = "›";
+      holder.append(separator);
+    }
     if(item.current){
-      const current = document.createElement("b");
+      const current = document.createElement("span");
       current.className = "crumb-active";
+      current.setAttribute("aria-current", "page");
       current.textContent = item.label;
       holder.append(current);
       return;
