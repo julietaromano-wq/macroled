@@ -28,9 +28,9 @@ const MEGAMENU_DATA = [
       { name: "Filamento", count: "29 Productos", img: `${CDN}/filters:format(webp)/MACROLED/250/filamentonewn.png`, href: "/productos?macrofamilia=L%C3%A1mparas&familia=Filamento" },
       { name: "Bipin", count: "8 Productos", img: `${CDN}/filters:format(webp)/MACROLED/250/bipinnewn.png`, href: "#" },
       { name: "Par LED", count: "3 Productos", img: `${CDN}/filters:format(webp)/MACROLED/250/par-lednewn.png`, href: "#" },
-      { name: "Dicroicas", count: "10 Productos", img: `${CDN}/filters:format(webp)/MACROLED/250/ar111new.png`, href: "#" },
+      { name: "Dicroicas", count: "10 Productos", img: `${CDN}/filters:format(webp)/MACROLED/250/dricoicasnewn.png`, href: "#" },
       { name: "Tubos LED", count: "8 Productos", img: `${CDN}/filters:format(webp)/MACROLED/250/tubos.png`, href: "#" },
-      { name: "AR111", count: "11 Productos", img: `${CDN}/filters:format(webp)/MACROLED/250/dricoicasnewn.png`, href: "#" },
+      { name: "AR111", count: "11 Productos", img: `${CDN}/filters:format(webp)/MACROLED/250/ar111new.png`, href: "#" },
     ],
   },
   {
@@ -102,7 +102,7 @@ const MEGAMENU_DATA = [
         { name: "Despiece", count: "25 Productos", img: `${CDN}/filters:format(webp)/MACROLED/250/milan-bastidores.png`, href: "#" },
         { name: "Tapas", count: "75 Productos", img: `${CDN}/filters:format(webp)/MACROLED/250/milan-tapas.png`, href: "#" },
         { name: "Tapa Exterior", count: "3 Productos", img: `${CDN}/250x250/MACROLED/WEB/M-CR-EXT-B_FRONT.webp`, href: "#", isNew: true },
-        { name: "Luz guía", count: "10 Productos", img: `${CDN}/filters:format(webp)/250x250/MACROLED/WEB/portada_luz_pasillo.webp`, href: "#", isNew: true },
+        { name: "Luz guía", count: "10 Productos", img: `${CDN}/filters:format(webp)/250x250/MACROLED/WEB/portada_luz_pasillo.webp`, href: "/productos?macrofamilia=Interruptores+y+Tomas&familia=Monaco&subfamilia=Luz+gu%C3%ADa", isNew: true },
       ]},
     ],
   },
@@ -149,7 +149,6 @@ const MEGAMENU_DATA = [
     },
     layout: "flat",
     items: [
-      { name: "Solar", count: "28 Productos", img: `${CDN}/filters:format(webp)/MACROLED/250/solar.png`, href: "#" },
       { name: "Tortugas", count: "28 Productos", img: `${CDN}/filters:format(webp)/MACROLED/250/tortugas.png`, href: "#" },
       { name: "Estanco Premium", count: "28 Productos", img: `${CDN}/filters:format(webp)/MACROLED/250/lineales.png`, href: "#" },
       { name: "Estacas Móviles", count: "28 Productos", img: `${CDN}/filters:format(webp)/MACROLED/250/estacas-led-integrado.png`, href: "#" },
@@ -173,12 +172,13 @@ const MEGAMENU_DATA = [
         { name: "Industrial", count: "28 Productos", img: `${CDN}/filters:format(webp)/MACROLED/250/industrial.png`, href: "/productos?macrofamilia=Luminarias+de+Proyecto&familia=Reflector+Industrial" },
       ]},
       { group: "Galponeras", items: [
-        { name: "Highbay PRO", count: "28 Productos", img: `${CDN}/filters:format(webp)/MACROLED/250/PHB-200W-90D-857-CW.png`, href: "#" },
-        { name: "Highbay Standard", count: "28 Productos", img: `${CDN}/filters:format(webp)/MACROLED/250/SHB-200W.png`, href: "#" },
-        { name: "Highbay Classic", count: "28 Productos", img: `${CDN}/filters:format(webp)/MACROLED/250/galponeras-eco.webp`, href: "#" },
+        { name: "Highbay PRO 2026", count: "7 Productos", img: `${CDN}/filters:format(webp)/MACROLED/250/PHB-200W-90D-857-CW.png`, href: "#", isNew: true },
+        { name: "Highbay PRO", count: "3 Productos", img: `${CDN}/filters:format(webp)/MACROLED/250/PHB-200W-90D-857-CW.png`, href: "#" },
+        { name: "Highbay Classic", count: "4 Productos", img: `${CDN}/filters:format(webp)/MACROLED/250/galponeras-eco.webp`, href: "#" },
+        { name: "Highbay Standard", count: "4 Productos", img: `${CDN}/filters:format(webp)/MACROLED/250/SHB-200W.png`, href: "#" },
       ]},
       { group: "Luz de Calle", items: [
-        { name: "Luz de calle Standard", count: "28 Productos", img: `${CDN}/250x250/MACROLED/WEB/SLG2-100W-757-CW_FRONT.webp`, href: "#", isNew: true },
+        { name: "Standard", count: "28 Productos", img: `${CDN}/250x250/MACROLED/WEB/SLG2-100W-757-CW_FRONT.webp`, href: "#", isNew: true },
         { name: "Lumax", count: "28 Productos", img: `${CDN}/filters:format(webp)/MACROLED/250/lumax.png`, href: "#", isNew: true },
         { name: "Pública", count: "28 Productos", img: `${CDN}/filters:format(webp)/MACROLED/250/luz-de-calle.png`, href: "#" },
         { name: "Solar", count: "28 Productos", img: `${CDN}/filters:format(webp)/MACROLED/250/proyectoSolar.png`, href: "/productos?macrofamilia=Luminarias+de+Proyecto&familia=Solar" },
@@ -218,6 +218,7 @@ const MEGAMENU_DATA = [
       ]},
       { group: "Paneles de 6 a 36W", isNew: true, items: [
         { name: "6 a 36 Backlight CCT", count: "28 Productos", img: `${CDN}/250x250/MACROLED/WEB/GRAN-FORMATO-P40.webp`, href: "/productos?macrofamilia=Paneles&familia=6+a+36+Backlight+CCT" },
+        { name: "Downlight", count: "28 Productos", img: `${CDN}/500x500/filters:format(webp)/MACROLED/WEB/SDLR-36W-830-WW_FRONT.webp`, href: "/productos?macrofamilia=Paneles&familia=6+a+36W&subfamilia=Downlight", isNew: true },
       ]},
       { group: "Gran Formato", items: [
         { name: "Gran Formato 40W", count: "28 Productos", img: `${CDN}/250x250/MACROLED/WEB/GRAN-FORMATO-P40.webp`, href: "/productos?macrofamilia=Paneles&familia=Gran+Formato&subfamilia=Gran+Formato+40W" },
@@ -244,12 +245,12 @@ const MEGAMENU_DATA = [
     },
     layout: "flat",
     items: [
-      { name: "Reflectores PRO 2026", count: "28 Productos", img: `${CDN}/filters:format(webp)/250x250/MACROLED/WEB/REFLECTORES-PRO.webp`, href: "/productos?macrofamilia=Reflectores&familia=Reflectores+PRO+2026" },
-      { name: "Reflectores PRO 2025", count: "28 Productos", img: `${CDN}/filters:format(webp)/MACROLED/250/reflectores-pro.png`, href: "/productos?macrofamilia=Reflectores&familia=Reflectores+PRO+2025" },
-      { name: "Reflectores PRO Smart", count: "28 Productos", img: `${CDN}/filters:format(webp)/MACROLED/250/reflectores-smart.png`, href: "/productos?macrofamilia=Reflectores&familia=Reflectores+PRO+Smart", isSmart: true },
-      { name: "Reflectores Standard", count: "28 Productos", img: `${CDN}/filters:format(webp)/250x250/MACROLED/WEB/REFLECTORES-STANDARD.webp`, href: "/productos?macrofamilia=Reflectores&familia=Reflectores+Standard" },
-      { name: "Reflectores Classic", count: "14 Productos", img: `${CDN}/filters:format(webp)/250x250/MACROLED/WEB/REFLECTORES-CLASSIC.webp`, href: "/productos?macrofamilia=Reflectores&familia=Reflectores+Classic" },
-      { name: "Reflectores Solar", count: "14 Productos", img: `${CDN}/filters:format(webp)/MACROLED/250/reflector-solar.png`, href: "/productos?macrofamilia=Reflectores&familia=Reflectores+Solar" },
+      { name: "Reflectores PRO 2026", count: "16 Productos", img: `${CDN}/filters:format(webp)/250x250/MACROLED/WEB/REFLECTORES-PRO.webp`, href: "/productos?macrofamilia=Reflectores&familia=Reflectores+PRO+2026", isNew: true },
+      { name: "Reflectores PRO 2025", count: "10 Productos", img: `${CDN}/filters:format(webp)/MACROLED/250/reflectores-pro.png`, href: "/productos?macrofamilia=Reflectores&familia=Reflectores+PRO+2025" },
+      { name: "Reflectores Smart", count: "2 Productos", img: `${CDN}/filters:format(webp)/MACROLED/250/reflectores-smart.png`, href: "/productos?macrofamilia=Reflectores&familia=Reflectores+Smart", isSmart: true },
+      { name: "Reflectores Standard", count: "9 Productos", img: `${CDN}/filters:format(webp)/250x250/MACROLED/WEB/REFLECTORES-STANDARD.webp`, href: "/productos?macrofamilia=Reflectores&familia=Reflectores+Standard" },
+      { name: "Reflectores Classic", count: "10 Productos", img: `${CDN}/filters:format(webp)/250x250/MACROLED/WEB/REFLECTORES-CLASSIC.webp`, href: "/productos?macrofamilia=Reflectores&familia=Reflectores+Classic" },
+      { name: "Reflectores ECO", count: "7 Productos", img: `${CDN}/2000x2000/filters:format(webp)/MACROLED/2000/7428325574281a.png`, href: "/productos?macrofamilia=Reflectores&familia=Reflectores+ECO" },
     ],
   },
   {
@@ -271,7 +272,7 @@ const MEGAMENU_DATA = [
       { name: "Sensores", count: "5 Productos", img: `${CDN}/filters:format(webp)/MACROLED/250/sensores.png`, href: "/productos?macrofamilia=Tiras+LED&familia=Sensores", isNew: true },
       { name: "Accesorios", count: "22 Productos", img: `${CDN}/filters:format(webp)/MACROLED/250/conectores-tiras-LED-2.png`, href: "/productos?macrofamilia=Tiras+LED&familia=Tiras+SMD&subfamilia=Conectores", isNew: true },
       { name: "Controladoras", count: "11 Productos", img: `${CDN}/filters:format(webp)/MACROLED/250/controladoras.png`, href: "/productos?macrofamilia=Tiras+LED&familia=Controladoras", isSmart: true },
-      { name: "Fuentes", count: "Powerswicht", img: `${CDN}/filters:format(webp)/MACROLED/250/fuentes.png`, href: "#" },
+      { name: "Fuentes", count: "Powerswitch", img: `${CDN}/filters:format(webp)/MACROLED/250/fuentes.png`, href: "https://www.powerswitch.com.ar/fuentes", targetBlank: true },
     ],
   },
   {
@@ -320,12 +321,12 @@ const MEGAMENU_DATA = [
     },
     layout: "flat",
     items: [
-      { name: "Controladoras RGB", count: "11 Productos", img: `${CDN}/filters:format(webp)/MACROLED/250/controladoras.png`, href: "#" },
-      { name: "Skyline", count: "126 Productos", img: `${CDN}/filters:format(webp)/MACROLED/250/skyline.png`, href: "#" },
-      { name: "Lámparas", count: "2 Productos", img: `${CDN}/filters:format(webp)/MACROLED/250/smartnew.png`, href: "#" },
-      { name: "Reflectores", count: "2 Productos", img: `${CDN}/filters:format(webp)/MACROLED/250/reflectores-smart.png`, href: "#" },
-      { name: "Teclas y Tomas", count: "20 Productos", img: `${CDN}/filters:format(webp)/MACROLED/250/roma.png`, href: "#" },
-      { name: "Sensores", count: "8 Productos", img: `${CDN}/filters:format(webp)/MACROLED/250/sensores-smart.png`, href: "#" },
+      { name: "Controladoras", count: "11 Productos", img: `${CDN}/filters:format(webp)/MACROLED/250/controladoras.png`, href: "/productos?macrofamilia=Tiras+LED&familia=Controladoras&smart=1" },
+      { name: "Skyline", count: "126 Productos", img: `${CDN}/filters:format(webp)/MACROLED/250/skyline.png`, href: "/productos?macrofamilia=Rieles+Magn%C3%A9ticos&smart=1" },
+      { name: "Lámparas", count: "2 Productos", img: `${CDN}/filters:format(webp)/MACROLED/250/smartnew.png`, href: "/productos?macrofamilia=L%C3%A1mparas&smart=1" },
+      { name: "Reflectores", count: "2 Productos", img: `${CDN}/filters:format(webp)/MACROLED/250/reflectores-smart.png`, href: "/productos?macrofamilia=Reflectores&smart=1" },
+      { name: "Teclas y Tomas", count: "20 Productos", img: `${CDN}/filters:format(webp)/MACROLED/250/roma.png`, href: "/productos?macrofamilia=Interruptores+y+Tomas&smart=1" },
+      { name: "Sensores", count: "8 Productos", img: `${CDN}/filters:format(webp)/MACROLED/250/sensores-smart.png`, href: "/productos?macrofamilia=Sensores+y+Fotoc%C3%A9lulas&smart=1" },
     ],
   },
 ];
@@ -393,9 +394,6 @@ if (typeof module !== "undefined") module.exports = MEGAMENU_DATA;
   var FAMILIA_ALIAS = {
     "Titan": "TITAN",
     "Olimpus": "OLIMPUS",
-    "Lumax": "Luz de Calle LUMAX",
-    "Luz de calle Standard": "Luz de Calle Standard",
-    "Highbay PRO": "Highbay PRO 2026",
     "Inalámbricas": "Luminarias Inalámbricas",
     "De Mesa": "Luminarias de Mesa",
     "De Pie": "Luminarias de Pie"
@@ -429,6 +427,11 @@ if (typeof module !== "undefined") module.exports = MEGAMENU_DATA;
         }
       });
       (family.groups || []).forEach(function (g) {
+        if (GROUP_AS_FAMILIA[family.id] && g.group) {
+          g.href = catalogUrl(family.label, g.group);
+        } else if (g.href) {
+          g.href = localizeHref(g.href);
+        }
         (g.items || []).forEach(function (item) {
           if (item.href && item.href !== "#") {
             item.href = localizeHref(item.href);
@@ -454,6 +457,185 @@ if (typeof module !== "undefined") module.exports = MEGAMENU_DATA;
   window.MACROLED_MENU.saveCatalogQuery = saveCatalogQuery;
   window.MACROLED_MENU.ALL_PRODUCTS_URL = ALL_PRODUCTS_URL;
   window.MACROLED_MENU.HOME_URL = HOME_URL;
+})();
+
+/* =========================================================
+   Conteos live desde Typesense (multi_search, per_page:0).
+   No bloquea el menú: pinta con el count estático y lo
+   reemplaza cuando llega la respuesta.
+   Items con smart=1 se omiten (Typesense no filtra smart
+   sin cargar SKUs; se deja el count hardcodeado).
+   ========================================================= */
+(function () {
+  var TS_HOST = "https://typesense.coresagroup.com";
+  var TS_API_KEY = "g0oiNYY8THGuU9jnCsvqIH1X9HtvYRCR";
+  var COLLECTION = "Macroled_Prueba";
+  var BASE_FILTER = "tipo_registro:=producto && es_principal:true";
+  var QUERY_BY = "nombre_typesense,sku,descripcion";
+  var BATCH_SIZE = 40;
+
+  function formatCount(n) {
+    n = Number(n) || 0;
+    return n === 1 ? "1 Producto" : n + " Productos";
+  }
+
+  function escapeTsValue(v) {
+    return "`" + String(v == null ? "" : v).replace(/`/g, "") + "`";
+  }
+
+  function isSmartParam(raw) {
+    var v = String(raw || "").trim().toLowerCase();
+    return v === "1" || v === "si" || v === "true" || v === "yes";
+  }
+
+  function parseCatalogHref(href) {
+    if (!href || href === "#") return null;
+    try {
+      var url = new URL(href, window.location.href);
+      var path = url.pathname.replace(/\/+$/, "") || "/";
+      if (path !== "/productos" && path !== "/nuevo-productos") return null;
+      var macro = (url.searchParams.get("macrofamilia") || "").trim();
+      var familia = (url.searchParams.get("familia") || "").trim();
+      var subfamilia = (url.searchParams.get("subfamilia") || "").trim();
+      var smart = isSmartParam(url.searchParams.get("smart"));
+      if (!macro && !familia && !subfamilia) return null;
+      return { macrofamilia: macro, familia: familia, subfamilia: subfamilia, smart: smart };
+    } catch (err) {
+      return null;
+    }
+  }
+
+  function buildFilterBy(parsed) {
+    var parts = [BASE_FILTER];
+    if (parsed.macrofamilia) parts.push("macrofamilia:=[" + escapeTsValue(parsed.macrofamilia) + "]");
+    if (parsed.familia) parts.push("familia:=[" + escapeTsValue(parsed.familia) + "]");
+    if (parsed.subfamilia) parts.push("subfamilia:=[" + escapeTsValue(parsed.subfamilia) + "]");
+    return parts.join(" && ");
+  }
+
+  function collectTargets(data) {
+    var targets = [];
+    (data || []).forEach(function (family) {
+      function add(item) {
+        if (!item) return;
+        var parsed = parseCatalogHref(item.href);
+        if (!parsed || parsed.smart) return;
+        targets.push({
+          item: item,
+          href: item.href,
+          filterBy: buildFilterBy(parsed),
+        });
+      }
+      (family.items || []).forEach(add);
+      (family.groups || []).forEach(function (g) {
+        (g.items || []).forEach(add);
+      });
+    });
+    return targets;
+  }
+
+  function applyCountsToDom() {
+    var root = document.getElementById("macroled-menu");
+    if (!root) return;
+    var data = window.MEGAMENU_DATA || [];
+    var byHref = Object.create(null);
+    data.forEach(function (family) {
+      function mapItem(item) {
+        if (item && item.href && item.count) byHref[item.href] = item.count;
+      }
+      (family.items || []).forEach(mapItem);
+      (family.groups || []).forEach(function (g) {
+        (g.items || []).forEach(mapItem);
+      });
+    });
+    root.querySelectorAll(".mm-tile[data-mm-count-key]").forEach(function (tile) {
+      var key = tile.getAttribute("data-mm-count-key");
+      var label = byHref[key];
+      if (!label) return;
+      var span = tile.querySelector("[data-mm-count]");
+      if (span) span.textContent = label;
+    });
+  }
+
+  function multiSearch(searches) {
+    return fetch(TS_HOST + "/multi_search", {
+      method: "POST",
+      headers: {
+        "X-TYPESENSE-API-KEY": TS_API_KEY,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ searches: searches }),
+    }).then(function (res) {
+      if (!res.ok) throw new Error("Typesense multi_search " + res.status);
+      return res.json();
+    });
+  }
+
+  function hydrateCounts() {
+    var data = window.MEGAMENU_DATA;
+    if (!data || !data.length) return;
+
+    var targets = collectTargets(data);
+    if (!targets.length) return;
+
+    var filterIndex = Object.create(null);
+    var uniqueFilters = [];
+    targets.forEach(function (t) {
+      if (filterIndex[t.filterBy] == null) {
+        filterIndex[t.filterBy] = uniqueFilters.length;
+        uniqueFilters.push(t.filterBy);
+      }
+    });
+
+    var batches = [];
+    for (var i = 0; i < uniqueFilters.length; i += BATCH_SIZE) {
+      batches.push(uniqueFilters.slice(i, i + BATCH_SIZE));
+    }
+
+    var foundByFilter = Object.create(null);
+
+    Promise.all(
+      batches.map(function (filterBatch) {
+        var searches = filterBatch.map(function (filterBy) {
+          return {
+            collection: COLLECTION,
+            q: "*",
+            query_by: QUERY_BY,
+            filter_by: filterBy,
+            per_page: 0,
+          };
+        });
+        return multiSearch(searches).then(function (payload) {
+          var results = (payload && payload.results) || [];
+          filterBatch.forEach(function (filterBy, idx) {
+            var result = results[idx] || {};
+            if (result.error) return;
+            foundByFilter[filterBy] = Number(result.found) || 0;
+          });
+        });
+      })
+    )
+      .then(function () {
+        targets.forEach(function (t) {
+          if (!(t.filterBy in foundByFilter)) return;
+          t.item.count = formatCount(foundByFilter[t.filterBy]);
+        });
+        applyCountsToDom();
+      })
+      .catch(function (err) {
+        console.warn("No se pudieron actualizar los conteos del menú:", err);
+      });
+  }
+
+  window.MACROLED_MENU = window.MACROLED_MENU || {};
+  window.MACROLED_MENU.applyMenuCountsToDom = applyCountsToDom;
+  window.MACROLED_MENU.hydrateMenuCounts = hydrateCounts;
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", hydrateCounts);
+  } else {
+    hydrateCounts();
+  }
 })();
 
 (function () {
@@ -518,12 +700,16 @@ if (typeof module !== "undefined") module.exports = MEGAMENU_DATA;
   }
 
   function renderTile(item) {
+    var href = item.href && item.href !== "#" ? item.href : "#";
+    var blankAttrs = item.targetBlank
+      ? ' target="_blank" rel="noopener noreferrer"'
+      : "";
     return `
-      <a class="mm-tile" href="${escapeHtml(item.href && item.href !== "#" ? item.href : "#")}">
+      <a class="mm-tile" href="${escapeHtml(href)}" data-mm-count-key="${escapeHtml(href)}"${blankAttrs}>
         <img class="mm-tile-img" src="${escapeHtml(item.img)}" alt="" loading="lazy" />
         <div class="mm-tile-text">
           <h4>${escapeHtml(item.name)}</h4>
-          <span>${escapeHtml(item.count)}</span>
+          <span data-mm-count>${escapeHtml(item.count || "")}</span>
         </div>
         ${item.isNew || item.isSmart ? `
         <span class="mm-tile-badges">
@@ -535,9 +721,15 @@ if (typeof module !== "undefined") module.exports = MEGAMENU_DATA;
   }
 
   function renderGroupSection(group) {
+    var labelHtml = "";
+    if (group.group) {
+      labelHtml = group.href
+        ? `<a class="mm-group-label" href="${escapeHtml(group.href)}">${escapeHtml(group.group)}</a>`
+        : `<div class="mm-group-label">${escapeHtml(group.group)}</div>`;
+    }
     return `
       <div class="mm-group-section">
-        ${group.group ? `<div class="mm-group-label">${escapeHtml(group.group)}</div>` : ""}
+        ${labelHtml}
         <div class="mm-tile-grid">${group.items.map((item) => renderTile({
           ...item,
           isNew: item.isNew || group.isNew,
@@ -1057,6 +1249,7 @@ if (typeof module !== "undefined") module.exports = MEGAMENU_DATA;
     return {
       label: item.name,
       href: href,
+      targetBlank: !!item.targetBlank,
       isNew: !!(item.isNew || extra.isNew),
       isSmart: !!(item.isSmart || extra.isSmart),
     };
@@ -1068,7 +1261,7 @@ if (typeof module !== "undefined") module.exports = MEGAMENU_DATA;
       (family.groups || []).forEach(function (g) {
         var flags = { isNew: g.isNew, isSmart: g.isSmart };
         if (g.group) {
-          items.push({ label: g.group, isGroupLabel: true });
+          items.push({ label: g.group, isGroupLabel: true, href: g.href || "" });
         }
         (g.items || []).forEach(function (it) {
           items.push(leafFromItem(it, flags));
@@ -1300,6 +1493,9 @@ if (typeof module !== "undefined") module.exports = MEGAMENU_DATA;
       '<div class="screen-body"><ul class="menu-list">' +
         (node.items || []).map(function (item, i) {
           if (item.isGroupLabel) {
+            if (item.href) {
+              return '<li class="mm-mobile-group-label"><a href="' + esc(item.href) + '">' + esc(item.label) + "</a></li>";
+            }
             return '<li class="mm-mobile-group-label">' + esc(item.label) + "</li>";
           }
           var label = '<span class="item-label">' + esc(item.label) + badgesHtml(item) + "</span>";

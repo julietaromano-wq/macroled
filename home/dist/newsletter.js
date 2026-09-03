@@ -1,181 +1,213 @@
 (function () {
   "use strict";
 
+  if (window.__ML_NEWSLETTER_INIT__) return;
+  window.__ML_NEWSLETTER_INIT__ = true;
+
+  const DEFAULT_ENDPOINT = "https://n8n.coresagroup.com/webhook/newsletter-macroled";
+
+  const INTEREST_HUBSPOT_MAP = {
+    residencial: "residencial",
+    proyectos: "obras_y_proyectos",
+    arquitectura: "arquitectura"
+  };
+
   function initNewsletter() {
-  const popup = document.getElementById("nlPopup");
-  const backdrop = document.getElementById("nlBackdrop");
-  const form = document.getElementById("nlForm");
-  const closeBtn = document.getElementById("nlClose");
-  const success = document.getElementById("nlSuccess");
+    const popup = document.getElementById("nlPopup");
+    const backdrop = document.getElementById("nlBackdrop");
+    const form = document.getElementById("nlForm");
+    const closeBtn = document.getElementById("nlClose");
+    const success = document.getElementById("nlSuccess");
+    const errorEl = document.getElementById("nlError");
+    const submitBtn = form ? form.querySelector(".nl-submit") : null;
+    const interestTabs = form ? form.querySelector("[data-interest-tabs]") : null;
 
-  if (!popup || !form) return;
+    if (!popup || !form) return;
 
-  let lastTrigger = null;
+    let lastTrigger = null;
+    let submitting = false;
 
-  function initCustomSelect(wrap) {
-    const select = wrap.querySelector("select");
-    if (!select || wrap.dataset.enhanced === "1") return;
-    wrap.dataset.enhanced = "1";
-    select.classList.add("nl-select-native");
+    const getSelectedInterests = () => {
+      if (!interestTabs) return [];
+      return Array.prototype.map
+        .call(interestTabs.querySelectorAll('.nl-interest-tab[aria-pressed="true"]'), tab => INTEREST_HUBSPOT_MAP[tab.dataset.interest])
+        .filter(Boolean);
+    };
 
-    const trigger = document.createElement("button");
-    trigger.type = "button";
-    trigger.className = "nl-select-trigger";
-    trigger.setAttribute("aria-haspopup", "listbox");
-    trigger.innerHTML = '<span class="nl-select-trigger-text"></span><span class="nl-select-chevron" aria-hidden="true"></span>';
-
-    const menu = document.createElement("div");
-    menu.className = "nl-select-menu";
-    menu.setAttribute("role", "listbox");
-
-    const menuViewport = document.createElement("div");
-    menuViewport.className = "nl-select-menu__viewport";
-    menu.appendChild(menuViewport);
-
-    const labelText = trigger.querySelector(".nl-select-trigger-text");
-
-    const syncFromSelect = () => {
-      const selected = select.options[select.selectedIndex];
-      const isPlaceholder = !selected || selected.disabled || selected.value === "";
-      labelText.textContent = selected ? selected.textContent : "";
-      trigger.classList.toggle("is-placeholder", isPlaceholder);
-      menu.querySelectorAll(".nl-select-option").forEach(btn => {
-        btn.classList.toggle("is-active", btn.dataset.value === select.value && select.value !== "");
+    const clearInterestTabs = () => {
+      if (!interestTabs) return;
+      interestTabs.querySelectorAll(".nl-interest-tab").forEach(tab => {
+        tab.setAttribute("aria-pressed", "false");
+        tab.classList.remove("is-active");
       });
     };
 
-    const closeMenu = () => {
-      wrap.classList.remove("nl-select-open");
-      trigger.setAttribute("aria-expanded", "false");
-      menu.style.removeProperty("max-height");
-      menu.style.removeProperty("--nl-menu-max-height");
-    };
+    if (interestTabs) {
+      interestTabs.addEventListener("click", event => {
+        const tab = event.target.closest(".nl-interest-tab");
+        if (!tab || !interestTabs.contains(tab)) return;
 
-    const openMenu = () => {
-      document.querySelectorAll(".nl-select-wrap.nl-select-open").forEach(other => {
-        if (other !== wrap) other.classList.remove("nl-select-open");
+        const next = tab.getAttribute("aria-pressed") !== "true";
+        tab.setAttribute("aria-pressed", next ? "true" : "false");
+        tab.classList.toggle("is-active", next);
+        clearError();
       });
-      wrap.classList.add("nl-select-open");
-      trigger.setAttribute("aria-expanded", "true");
-
-      const popupBottom = popup.getBoundingClientRect().bottom;
-      const menuTop = menu.getBoundingClientRect().top;
-      const availableHeight = Math.max(0, Math.floor(popupBottom - menuTop - 16));
-      const menuMaxHeight = Math.min(220, availableHeight);
-      menu.style.maxHeight = `${menuMaxHeight}px`;
-      menu.style.setProperty("--nl-menu-max-height", `${menuMaxHeight}px`);
-    };
-
-    Array.prototype.forEach.call(select.options, opt => {
-      if (opt.disabled || opt.value === "") return;
-
-      const btn = document.createElement("button");
-      btn.type = "button";
-      btn.className = "nl-select-option";
-      btn.textContent = opt.textContent;
-      btn.dataset.value = opt.value;
-      btn.addEventListener("click", () => {
-        select.value = opt.value;
-        select.dispatchEvent(new Event("change", { bubbles: true }));
-        syncFromSelect();
-        closeMenu();
-      });
-      menuViewport.appendChild(btn);
-    });
-
-    trigger.addEventListener("click", event => {
-      event.preventDefault();
-      if (wrap.classList.contains("nl-select-open")) closeMenu();
-      else openMenu();
-    });
-
-    wrap.appendChild(trigger);
-    wrap.appendChild(menu);
-    syncFromSelect();
-    select.addEventListener("change", syncFromSelect);
-  }
-
-  popup.querySelectorAll(".nl-select-wrap").forEach(initCustomSelect);
-
-  const closeSelects = () => {
-    popup.querySelectorAll(".nl-select-wrap.nl-select-open").forEach(wrap => {
-      wrap.classList.remove("nl-select-open");
-    });
-  };
-
-  const openPopup = trigger => {
-    lastTrigger = trigger || document.activeElement;
-    popup.classList.remove("is-success");
-    if (success) success.hidden = true;
-    form.hidden = false;
-    if (backdrop) {
-      backdrop.hidden = false;
-      backdrop.removeAttribute("hidden");
     }
-    popup.hidden = false;
-    popup.removeAttribute("hidden");
-    document.body.classList.add("newsletter-open");
-    requestAnimationFrame(() => {
+
+    const clearError = () => {
+      if (!errorEl) return;
+      errorEl.hidden = true;
+      errorEl.textContent = "";
+    };
+
+    const showError = message => {
+      if (!errorEl) return;
+      errorEl.textContent = message;
+      errorEl.hidden = false;
+      errorEl.removeAttribute("hidden");
+    };
+
+    const setSubmitting = active => {
+      submitting = active;
+      if (!submitBtn) return;
+      submitBtn.disabled = active;
+      submitBtn.classList.toggle("is-loading", active);
+      submitBtn.textContent = active ? "Enviando…" : "Suscribirme";
+    };
+
+    const showSuccess = () => {
+      form.hidden = true;
+      popup.classList.add("is-success");
+      if (success) {
+        success.hidden = false;
+        success.removeAttribute("hidden");
+      }
+    };
+
+    const openPopup = trigger => {
+      lastTrigger = trigger || document.activeElement;
+      popup.classList.remove("is-success");
+      clearError();
+      setSubmitting(false);
+      if (success) success.hidden = true;
+      form.hidden = false;
+      if (backdrop) {
+        backdrop.hidden = false;
+        backdrop.removeAttribute("hidden");
+      }
+      popup.hidden = false;
+      popup.removeAttribute("hidden");
+      document.body.classList.add("newsletter-open");
       requestAnimationFrame(() => {
-        popup.classList.add("is-open");
-        if (backdrop) backdrop.classList.add("is-open");
+        requestAnimationFrame(() => {
+          popup.classList.add("is-open");
+          if (backdrop) backdrop.classList.add("is-open");
+        });
       });
-    });
-    const first = popup.querySelector("#nl-nombre");
-    if (first) first.focus();
-  };
-
-  const closePopup = () => {
-    closeSelects();
-    popup.classList.remove("is-open");
-    if (backdrop) backdrop.classList.remove("is-open");
-    document.body.classList.remove("newsletter-open");
-    const finish = () => {
-      popup.hidden = true;
-      if (backdrop) backdrop.hidden = true;
-      if (lastTrigger && typeof lastTrigger.focus === "function") lastTrigger.focus();
+      const first = popup.querySelector("#nl-nombre");
+      if (first) first.focus();
     };
-    window.setTimeout(finish, 280);
-  };
 
-  document.addEventListener("click", event => {
-    const button = event.target.closest("[data-newsletter-open]");
-    if (!button) return;
+    const closePopup = () => {
+      if (submitting) return;
+      popup.classList.remove("is-open");
+      if (backdrop) backdrop.classList.remove("is-open");
+      document.body.classList.remove("newsletter-open");
+      const finish = () => {
+        popup.hidden = true;
+        if (backdrop) backdrop.hidden = true;
+        if (lastTrigger && typeof lastTrigger.focus === "function") lastTrigger.focus();
+      };
+      window.setTimeout(finish, 280);
+    };
 
-    event.preventDefault();
-    openPopup(button);
-  });
+    document.addEventListener("click", event => {
+      const button = event.target.closest("[data-newsletter-open]");
+      if (!button) return;
 
-  if (closeBtn) closeBtn.addEventListener("click", closePopup);
-  if (backdrop) backdrop.addEventListener("click", closePopup);
+      event.preventDefault();
+      openPopup(button);
+    });
 
-  document.addEventListener("click", event => {
-    if (!event.target.closest(".nl-select-wrap")) closeSelects();
-  });
+    if (closeBtn) closeBtn.addEventListener("click", closePopup);
+    if (backdrop) backdrop.addEventListener("click", closePopup);
 
-  document.addEventListener("keydown", event => {
-    if (event.key !== "Escape") return;
-    if (popup.querySelector(".nl-select-open")) {
-      closeSelects();
-      return;
-    }
-    if (popup.classList.contains("is-open")) closePopup();
-  });
+    document.addEventListener("keydown", event => {
+      if (event.key !== "Escape") return;
+      if (popup.classList.contains("is-open")) closePopup();
+    });
 
-  form.addEventListener("submit", event => {
-    event.preventDefault();
-    const interest = form.querySelector("#nl-interes");
-    if (interest && !interest.value) {
-      interest.closest(".nl-select-wrap")?.querySelector(".nl-select-trigger")?.focus();
-      return;
-    }
-    form.hidden = true;
-    popup.classList.add("is-success");
-    if (success) {
-      success.hidden = false;
-      success.removeAttribute("hidden");
-    }
-  });
+    form.addEventListener("submit", async event => {
+      event.preventDefault();
+      if (submitting) return;
+
+      clearError();
+
+      const emailInput = form.querySelector("#nl-email");
+      const consent = form.querySelector("#nl-acepta");
+      const email = (emailInput && emailInput.value ? emailInput.value : "").trim();
+      const intereses = getSelectedInterests();
+
+      if (!email || (emailInput && typeof emailInput.checkValidity === "function" && !emailInput.checkValidity())) {
+        showError("Ingresá un email válido.");
+        if (emailInput) emailInput.focus();
+        return;
+      }
+
+      if (!intereses.length) {
+        showError("Seleccioná al menos un área de interés.");
+        interestTabs?.querySelector(".nl-interest-tab")?.focus();
+        return;
+      }
+
+      if (!consent || !consent.checked) {
+        showError("Tenés que aceptar recibir el newsletter para continuar.");
+        if (consent) consent.focus();
+        return;
+      }
+
+      const endpoint =
+        form.getAttribute("data-newsletter-endpoint") ||
+        (window.MACROLED_HOME_CONFIG && window.MACROLED_HOME_CONFIG.newsletterEndpoint) ||
+        DEFAULT_ENDPOINT;
+
+      const payload = {
+        email,
+        intereses,
+        acepta_newsletter: true
+      };
+
+      setSubmitting(true);
+
+      try {
+        const res = await fetch(endpoint, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+
+        if (!res.ok) {
+          let message = "No pudimos completar la suscripción. Intentá de nuevo.";
+          try {
+            const data = await res.json();
+            if (data && data.error) message = data.error;
+          } catch (_) {
+            /* ignore non-JSON error bodies */
+          }
+          showError(message);
+          setSubmitting(false);
+          return;
+        }
+
+        form.reset();
+        clearInterestTabs();
+        setSubmitting(false);
+        showSuccess();
+      } catch (_) {
+        showError("No pudimos conectar con el servidor. Intentá de nuevo.");
+        setSubmitting(false);
+      }
+    });
   }
 
   if (document.readyState === "loading") {

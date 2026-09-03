@@ -5,6 +5,10 @@ const TS_HOST = "https://typesense.coresagroup.com";
 const TS_API_KEY = "g0oiNYY8THGuU9jnCsvqIH1X9HtvYRCR";
 const COLLECTION = "Macroled_Prueba";
 const PER_PAGE = 18;
+const TYPESENSE_PAGE_SIZE = 250;
+const TYPESENSE_PAGE_CONCURRENCY = 4;
+const DOWNLOADS_CACHE_KEY = "macroled-descargas-v2";
+const DOWNLOADS_CACHE_TTL_MS = 5 * 60 * 1000;
 
 // Qué campo del documento de producto corresponde a cada tipo de descarga.
 // Si en el futuro sumás páginas/MB por SKU, agregá esos campos acá.
@@ -16,8 +20,15 @@ const PRODUCT_DOWNLOAD_FIELDS = [
 ];
 
 const TIPO_DESCARGA_CATALOGO = "Catálogo";
-const TIPO_REGISTRO_CATALOGO = "catalogo";
 const CATALOG_QUERY_BY = "nombre_typesense,descripcion,sku";
+// Evita transferir todas las especificaciones técnicas de cada producto.
+// Esta página sólo necesita estos campos para construir sus cards y filtros.
+const PRODUCT_INCLUDE_FIELDS = [
+  "id", "nombre_typesense", "descripcion", "sku", "macrofamilia", "subfamilia",
+  "variantes_sku", "es_principal", "nuevo", "tipo_registro", "tipo_descarga",
+  "multiimagen", "multiimage", "imagen", "imagen_portada",
+  "ficha_tecnica", "garantia_link", "manual", "manual_link", "manuales", "ies_link"
+].join(",");
 const CATALOG_INCLUDE_FIELDS = [
   "id", "nombre_typesense", "nombre", "descripcion", "sku",
   "macrofamilia", "subfamilia", "nuevo", "tipo_registro", "tipo_descarga", "tipo_archivo",
@@ -102,6 +113,7 @@ let allItems = []; // productos + catálogos, ya expandidos a nivel "un descarga
 
 const FACET_FIELDS_UI = ["tipo_descarga", "tipo_archivo", "macrofamilia"];
 const FACET_LABELS_UI = { tipo_descarga: "Tipo de descarga", tipo_archivo: "Tipo de archivo", macrofamilia: "Macrofamilia" };
+const FACET_ICONS_UI = { tipo_descarga: ICON_DOWNLOAD, tipo_archivo: ICON_FILE, macrofamilia: ICON_GRID };
 
 function isCatalogoTipo(value){
   return /^cat[aá]logos?$/i.test(String(value || "").trim());
@@ -117,6 +129,25 @@ function isGeneralItem(it){
   const macro = String((it && it.macrofamilia) || "").trim();
   const nombre = String((it && it.nombre) || "").trim();
   return /^general$/i.test(macro) || /\bgeneral\b/i.test(nombre);
+}
+
+const CATALOGO_ORDER = [
+  "general", "proyectos", "skyline", "lineales pro", "interruptores y tomas",
+  "monaco", "lima", "tiras y perfiles", "inalambricas"
+];
+
+function normalizedOrderText(value){
+  return String(value || "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .trim()
+    .toLowerCase();
+}
+
+function catalogoOrderIndex(it){
+  const searchable = `${normalizedOrderText(it?.macrofamilia)} ${normalizedOrderText(it?.nombre)}`;
+  const index = CATALOGO_ORDER.findIndex(label => searchable.includes(label));
+  return index === -1 ? CATALOGO_ORDER.length : index;
 }
 
 function isCatalogDoc(doc){
@@ -148,19 +179,20 @@ function fileTypeFromUrl(url, fallback){
   return m[1].toUpperCase();
 }
 
+function compareDescargables(a, b){
+  const ac = isCatalogoItem(a) ? 0 : 1;
+  const bc = isCatalogoItem(b) ? 0 : 1;
+  if(ac !== bc) return ac - bc;
+  if(ac === 0){
+    const orderDiff = catalogoOrderIndex(a) - catalogoOrderIndex(b);
+    if(orderDiff) return orderDiff;
+    return String(a.nombre || "").localeCompare(String(b.nombre || ""), "es", { sensitivity: "base" });
+  }
+  return 0;
+}
+
 function sortDescargables(list){
-  return [...list].sort((a, b) => {
-    const ac = isCatalogoItem(a) ? 0 : 1;
-    const bc = isCatalogoItem(b) ? 0 : 1;
-    if(ac !== bc) return ac - bc;
-    if(ac === 0){
-      const ag = isGeneralItem(a) ? 0 : 1;
-      const bg = isGeneralItem(b) ? 0 : 1;
-      if(ag !== bg) return ag - bg;
-      return String(a.nombre || "").localeCompare(String(b.nombre || ""), "es", { sensitivity: "base" });
-    }
-    return 0;
-  });
+  return [...list].sort(compareDescargables);
 }
 
 function sortFacetEntries(field, entries){
@@ -204,38 +236,52 @@ const state = {
   pending: { tipo_descarga: new Set(), tipo_archivo: new Set(), macrofamilia: new Set() },
   pendingSortBy: "",
   sortBy: "",
-  view: "list",
+  view: "grid",
   page: 1,
   facetOpen: { tipo_descarga: true, tipo_archivo: false, macrofamilia: false }
 };
 
-// Trae TODOS los documentos que matcheen el filtro, paginando automáticamente.
+function typesenseSearchParams(filterBy, queryBy, includeFields, page){
+  const params = {
+    q: "*",
+    query_by: queryBy,
+    filter_by: filterBy,
+    per_page: String(TYPESENSE_PAGE_SIZE),
+    page: String(page)
+  };
+  if(includeFields) params.include_fields = includeFields;
+  return params;
+}
+
+async function fetchDocsPage(filterBy, queryBy, includeFields, page){
+  const params = typesenseSearchParams(filterBy, queryBy, includeFields, page);
+  const res = await fetch(`${TS_HOST}/collections/${COLLECTION}/documents/search?` + new URLSearchParams(params), {
+    headers: { "X-TYPESENSE-API-KEY": TS_API_KEY }
+  });
+  if(!res.ok) throw new Error(`Typesense (${filterBy}) página ${page}: ${res.status}`);
+  return res.json();
+}
+
+// Trae todos los documentos, pero después de conocer el total descarga las
+// páginas restantes en paralelo (con concurrencia acotada para no saturar API).
 async function fetchAllDocs(filterBy, queryBy, includeFields){
-  const perPage = 250;
-  let page = 1;
-  let allDocs = [];
-  while(true){
-    const params = {
-      q: "*",
-      query_by: queryBy,
-      filter_by: filterBy,
-      per_page: String(perPage),
-      page: String(page)
-    };
-    if(includeFields) params.include_fields = includeFields;
-    const res = await fetch(`${TS_HOST}/collections/${COLLECTION}/documents/search?` + new URLSearchParams(params), {
-      headers: { "X-TYPESENSE-API-KEY": TS_API_KEY }
-    });
+  const first = await fetchDocsPage(filterBy, queryBy, includeFields, 1);
+  const totalPages = Math.ceil((Number(first.found) || 0) / TYPESENSE_PAGE_SIZE);
+  const pages = new Array(totalPages);
+  pages[0] = (first.hits || []).map(hit => hit.document);
+  if(totalPages <= 1) return pages[0] || [];
 
-    if(!res.ok) throw new Error(`Typesense (${filterBy}) página ${page}: ${res.status}`);
-    const data = await res.json();
-    const docs = data.hits.map(h => h.document);
-    allDocs = allDocs.concat(docs);
-
-    if(docs.length < perPage) break;
-    page++;
+  let nextPage = 2;
+  async function worker(){
+    while(nextPage <= totalPages){
+      const page = nextPage++;
+      const data = await fetchDocsPage(filterBy, queryBy, includeFields, page);
+      pages[page - 1] = (data.hits || []).map(hit => hit.document);
+    }
   }
-  return allDocs;
+  const workers = Math.min(TYPESENSE_PAGE_CONCURRENCY, totalPages - 1);
+  await Promise.all(Array.from({ length: workers }, () => worker()));
+  return pages.flat();
 }
 
 async function fetchAllDocsSafe(filterBy, queryBy, includeFields){
@@ -258,17 +304,40 @@ function finishInitialPreload(){
   if(window.MacroledPreload) window.MacroledPreload.done();
 }
 
+function readDownloadsCache(){
+  try{
+    const cached = JSON.parse(sessionStorage.getItem(DOWNLOADS_CACHE_KEY) || "null");
+    if(!cached || !Array.isArray(cached.items) || Date.now() - cached.savedAt > DOWNLOADS_CACHE_TTL_MS) return null;
+    return cached.items;
+  }catch(_){
+    return null;
+  }
+}
+
+function writeDownloadsCache(items){
+  try{
+    sessionStorage.setItem(DOWNLOADS_CACHE_KEY, JSON.stringify({ savedAt: Date.now(), items }));
+  }catch(_){
+    // La carga sigue funcionando aunque el navegador bloquee o llene el storage.
+  }
+}
+
 async function loadAllDescargables(){
   document.getElementById("showingLabel").textContent = "Cargando…";
+  const cachedItems = readDownloadsCache();
+  if(cachedItems){
+    allItems = cachedItems;
+    render();
+    finishInitialPreload();
+    return;
+  }
   try{
-    const [productosRaw, porRegistro, porTipo] = await Promise.all([
-      fetchAllDocs("tipo_registro:=producto", "nombre_typesense,descripcion,sku"),
-      fetchAllDocsSafe(`tipo_registro:=${TIPO_REGISTRO_CATALOGO}`, CATALOG_QUERY_BY, CATALOG_INCLUDE_FIELDS),
+    const [productosRaw, porTipo] = await Promise.all([
+      fetchAllDocs("tipo_registro:=producto", "nombre_typesense,descripcion,sku", PRODUCT_INCLUDE_FIELDS),
       fetchAllDocsSafe(`tipo_descarga:=${TIPO_DESCARGA_CATALOGO}`, CATALOG_QUERY_BY, CATALOG_INCLUDE_FIELDS)
     ]);
 
     const catalogos = mergeUniqueDocs([
-      porRegistro,
       porTipo,
       productosRaw.filter(isCatalogDoc)
     ]);
@@ -278,6 +347,7 @@ async function loadAllDescargables(){
       ...expandCatalogos(catalogos),
       ...expandProductos(productos)
     ]);
+    writeDownloadsCache(allItems);
     render();
   }catch(err){
     console.error("Error cargando descargables:", err);
@@ -475,10 +545,9 @@ function getFilteredItems(){
 
   if(state.sortBy === "nuevo"){
     list = [...list].sort((a, b) => {
-      const ac = isCatalogoItem(a) ? 0 : 1;
-      const bc = isCatalogoItem(b) ? 0 : 1;
-      if(ac !== bc) return ac - bc;
-      return (b.nuevo ? 1 : 0) - (a.nuevo ? 1 : 0);
+      const newestDiff = (b.nuevo ? 1 : 0) - (a.nuevo ? 1 : 0);
+      if(newestDiff) return newestDiff;
+      return compareDescargables(a, b);
     });
   }else{
     list = sortDescargables(list);
@@ -568,16 +637,19 @@ function renderFacets(searchFilteredList){
 }
 
 function renderChips(){
+  renderFiltersCount();
   const bar = document.getElementById("chipsBar");
   const chips = [];
   ["tipo_descarga", "tipo_archivo", "macrofamilia"].forEach(field => {
     state.selected[field].forEach(v => chips.push({ field, value: v }));
   });
-  if(!chips.length && !state.query){ bar.style.display = "none"; return; }
+  // La búsqueda no es un filtro aplicado: no debe crear una fila vacía ni
+  // mostrar "Borrar filtros" cuando no hay facets seleccionados.
+  if(!chips.length){ bar.style.display = "none"; bar.innerHTML = ""; return; }
   bar.style.display = "flex";
-  bar.innerHTML = `<span class="label">Filtros activados</span>` +
-    chips.map(c => `<span class="chip" data-field="${c.field}" data-value="${c.value}">${c.value}<button>×</button></span>`).join("") +
-    `<button class="clear-btn" id="clearAll">Limpiar filtros</button>`;
+  bar.innerHTML = `<div class="chips-row">` +
+    chips.map(c => `<span class="chip" data-field="${c.field}" data-value="${c.value}">${c.value}<button type="button" aria-label="Quitar filtro">×</button></span>`).join("") +
+    `</div><button type="button" class="clear-btn" id="clearAll">Borrar filtros</button>`;
 
   bar.querySelectorAll(".chip button").forEach(btn => {
     btn.addEventListener("click", (e) => {
@@ -588,6 +660,17 @@ function renderChips(){
     });
   });
   document.getElementById("clearAll").addEventListener("click", clearAllFilters);
+}
+
+function renderFiltersCount(){
+  const badge = document.getElementById("filtersCount");
+  if(!badge) return;
+  const count = FACET_FIELDS_UI.reduce((total, field) => total + state.selected[field].size, 0);
+  badge.textContent = String(count);
+  badge.hidden = count === 0;
+  const label = count ? `Filtros, ${count} aplicado${count === 1 ? "" : "s"}` : "Filtros";
+  filtersToggle?.setAttribute("aria-label", label);
+  filtersToggle?.setAttribute("title", label);
 }
 
 function clearAllFilters(){
@@ -633,6 +716,7 @@ function cardTemplate(it, idx){
       <div class="card-body">
         <div class="card-info">
           <div class="card-title">${escAttr(it.nombre)}</div>
+          ${!esCatalogo && it.sku ? `<div class="card-sku">SKU: ${escAttr(it.sku)}</div>` : ""}
           ${descHtml}
           ${seccionTipo}
         </div>
@@ -658,7 +742,35 @@ function renderCards(list){
   grid.innerHTML = pageItems.map((it, i) => cardTemplate(it, i)).join("");
   grid.querySelectorAll(".media img").forEach(bindImgFallback);
   grid.setAttribute("aria-busy", "false");
+  requestAnimationFrame(alignGridTypeTabsByRow);
 }
+
+function alignGridTypeTabsByRow(){
+  const grid = document.getElementById("grid");
+  if(!grid) return;
+  const tabs = [...grid.querySelectorAll(".card:not(.card-skel) .type-tabs")];
+  tabs.forEach(tab => tab.style.removeProperty("--type-tabs-row-height"));
+  if(grid.classList.contains("list")) return;
+
+  const rows = new Map();
+  tabs.forEach(tab => {
+    const card = tab.closest(".card");
+    const rowTop = Math.round(card.offsetTop);
+    if(!rows.has(rowTop)) rows.set(rowTop, []);
+    rows.get(rowTop).push(tab);
+  });
+
+  rows.forEach(rowTabs => {
+    const requiredHeight = Math.max(...rowTabs.map(tab => tab.scrollHeight));
+    rowTabs.forEach(tab => tab.style.setProperty("--type-tabs-row-height", `${requiredHeight}px`));
+  });
+}
+
+let alignGridTabsFrame = 0;
+window.addEventListener("resize", () => {
+  cancelAnimationFrame(alignGridTabsFrame);
+  alignGridTabsFrame = requestAnimationFrame(alignGridTypeTabsByRow);
+});
 
 function bindImgFallback(img){
   if(!img || img.dataset.fbBound) return;
@@ -754,35 +866,25 @@ function renderPagination(list){
   });
 }
 
-function renderMobileCategoryHeading(count){
-  const holder = document.getElementById("mobileCategoryHeading");
-  const activeMacro = [...state.selected.macrofamilia][0];
-  const activeTipo = [...state.selected.tipo_descarga][0];
-  const titulo = state.query ? `Resultados para "${state.query}"` : (activeMacro || activeTipo || "");
-
-  if(!titulo){
-    holder.classList.remove("active");
-    holder.innerHTML = "";
-    return;
-  }
-  holder.classList.add("active");
-  holder.innerHTML = `<h1>${titulo}</h1><div class="count">${count} resultados</div>`;
-}
-
 function render(){
   const list = getFilteredItems();
   renderFacets(getSearchFilteredItems());
   renderChips();
   renderCards(list);
   renderPagination(list);
-  renderMobileCategoryHeading(list.length);
   const shown = Math.min(PER_PAGE, list.length - (state.page - 1) * PER_PAGE);
   document.getElementById("showingLabel").innerHTML =
     `<span class="showing-full">Mostrando </span>${shown} de ${list.length} descargables`;
 }
 
 let searchDebounce;
-document.getElementById("searchInput").addEventListener("input", (e) => {
+const downloadSearchInput = document.getElementById("searchInput");
+const downloadSearchClear = document.getElementById("searchClear");
+function syncDownloadSearchClear(){
+  if(downloadSearchClear) downloadSearchClear.hidden = !downloadSearchInput.value;
+}
+downloadSearchInput.addEventListener("input", (e) => {
+  syncDownloadSearchClear();
   clearTimeout(searchDebounce);
   searchDebounce = setTimeout(() => {
     state.query = e.target.value;
@@ -790,21 +892,79 @@ document.getElementById("searchInput").addEventListener("input", (e) => {
     render();
   }, 200);
 });
+downloadSearchClear?.addEventListener("click", () => {
+  clearTimeout(searchDebounce);
+  downloadSearchInput.value = "";
+  state.query = "";
+  state.page = 1;
+  syncDownloadSearchClear();
+  render();
+  downloadSearchInput.focus();
+});
+syncDownloadSearchClear();
 
 document.getElementById("sortSelect").addEventListener("change", (e) => {
   state.sortBy = e.target.value;
+  syncSortControl();
   render();
 });
-document.getElementById("btnGrid").addEventListener("click", () => {
-  document.getElementById("grid").classList.remove("list");
-  document.getElementById("btnGrid").classList.add("active");
-  document.getElementById("btnList").classList.remove("active");
+
+const sortDropdown = document.getElementById("sortDropdown");
+const sortTrigger = document.getElementById("sortTrigger");
+const sortMenu = document.getElementById("sortMenu");
+const sortSelect = document.getElementById("sortSelect");
+
+function syncSortControl(){
+  if(!sortSelect) return;
+  const selectedOption = [...sortSelect.options].find(option => option.value === sortSelect.value);
+  document.getElementById("sortCurrent").textContent = sortSelect.value
+    ? (selectedOption?.textContent || "Ordenar por")
+    : "Ordenar por";
+  sortMenu?.querySelectorAll(".sort-option").forEach(option => {
+    const active = option.dataset.sort === sortSelect.value;
+    option.classList.toggle("active", active);
+    option.setAttribute("aria-selected", String(active));
+  });
+}
+
+function closeSortMenu(){
+  sortDropdown?.classList.remove("open");
+  if(sortMenu) sortMenu.hidden = true;
+  sortTrigger?.setAttribute("aria-expanded", "false");
+}
+
+sortTrigger?.addEventListener("click", () => {
+  const willOpen = !sortDropdown.classList.contains("open");
+  closeSortMenu();
+  if(willOpen){
+    sortDropdown.classList.add("open");
+    sortMenu.hidden = false;
+    sortTrigger.setAttribute("aria-expanded", "true");
+  }
 });
-document.getElementById("btnList").addEventListener("click", () => {
-  document.getElementById("grid").classList.add("list");
-  document.getElementById("btnList").classList.add("active");
-  document.getElementById("btnGrid").classList.remove("active");
+sortMenu?.addEventListener("click", (e) => {
+  const option = e.target.closest(".sort-option");
+  if(!option) return;
+  sortSelect.value = option.dataset.sort;
+  sortSelect.dispatchEvent(new Event("change", { bubbles:true }));
+  closeSortMenu();
 });
+document.addEventListener("click", (e) => {
+  if(sortDropdown && !sortDropdown.contains(e.target)) closeSortMenu();
+});
+document.addEventListener("keydown", (e) => {
+  if(e.key === "Escape") closeSortMenu();
+});
+syncSortControl();
+function applyDownloadsView(view){
+  state.view = view === "list" ? "list" : "grid";
+  document.getElementById("grid").classList.toggle("list", state.view === "list");
+  document.getElementById("btnGrid").classList.toggle("active", state.view === "grid");
+  document.getElementById("btnList").classList.toggle("active", state.view === "list");
+  if(state.view === "grid") requestAnimationFrame(alignGridTypeTabsByRow);
+}
+document.getElementById("btnGrid").addEventListener("click", () => applyDownloadsView("grid"));
+document.getElementById("btnList").addEventListener("click", () => applyDownloadsView("list"));
 
 const filtersAside = document.getElementById("filtersAside");
 const filtersBackdrop = document.getElementById("filtersBackdrop");
@@ -822,11 +982,7 @@ function setFiltersCollapsed(collapsed){
   try{ localStorage.setItem(FILTERS_COLLAPSED_KEY, collapsed ? "1" : "0"); }catch(_){}
 }
 function initFiltersCollapsed(){
-  let collapsed = false;
-  try{ collapsed = localStorage.getItem(FILTERS_COLLAPSED_KEY) === "1"; }catch(_){}
-  // En mobile el collapse de escritorio no aplica; evitamos estados raros
-  if(window.matchMedia("(max-width:900px)").matches) collapsed = false;
-  setFiltersCollapsed(collapsed);
+  setFiltersCollapsed(false);
 }
 
 function syncPendingFromCommitted(){
@@ -864,6 +1020,7 @@ filtersApply.addEventListener("click", () => {
   FACET_FIELDS_UI.forEach(f => { state.selected[f] = new Set(state.pending[f]); });
   state.sortBy = state.pendingSortBy;
   document.getElementById("sortSelect").value = state.sortBy;
+  syncSortControl();
   state.page = 1;
   render();
   closeFiltersDrawer();
@@ -884,25 +1041,30 @@ function fmnSummary(field){
 function currentSortLabel(){
   const select = document.getElementById("sortSelect");
   const opt = [...select.options].find(o => o.value === state.pendingSortBy);
-  return opt && opt.value ? opt.textContent : "";
+  return opt ? opt.textContent : "Predeterminado";
 }
 
 function renderMobileFilters(){
   const listEl = document.getElementById("fmnList");
   const searchFiltered = getSearchFilteredItems();
 
-  const rows = [{ field: "sort", label: "Ordenar por", summary: currentSortLabel() }];
+  const rows = [];
 
   FACET_FIELDS_UI.forEach(field => {
     const baseParaEsteGrupo = applyFacetFilters(searchFiltered, field, state.pending);
     const counts = computeFacetCounts(field, baseParaEsteGrupo);
-    rows.push({ field, label: FACET_LABELS_UI[field], summary: fmnSummary(field), counts });
+    rows.push({ field, label: FACET_LABELS_UI[field], summary: fmnSummary(field), counts, type: "filter" });
   });
 
+  rows.push(
+    { field: "sort", label: "Ordenar por", summary: currentSortLabel(), type: "secondary", secondaryStart: true },
+    { field: "view", label: "Tipo de vista", summary: state.view === "list" ? "Lista" : "Grilla", type: "secondary" }
+  );
+
   listEl.innerHTML = rows.map(r => `
-    <div class="fmn-row" data-field="${r.field}">
-      <span>${r.label}</span>
-      <span class="fmn-row-meta">${r.summary ? `<span>${r.summary}</span>` : ""}<span>›</span></span>
+    <div class="fmn-row${r.type === "secondary" ? " fmn-secondary-row" : ""}${r.secondaryStart ? " fmn-secondary-start" : ""}" data-field="${r.field}">
+      <span class="fmn-row-label">${r.type === "filter" ? FACET_ICONS_UI[r.field] : ""}<span>${r.label}${r.type === "filter" && state.pending[r.field].size ? `<span class="fmn-active-count">(${state.pending[r.field].size})</span>` : ""}</span></span>
+      <span class="fmn-row-meta">${r.summary ? `<span>${r.summary}</span>` : ""}<span class="fmn-chev">${ICON_CHEVRON}</span></span>
     </div>
   `).join("");
 
@@ -915,10 +1077,33 @@ function openDetailScreen(field){
   const titleEl = document.getElementById("fmnDetailTitle");
   const bodyEl = document.getElementById("fmnDetailBody");
 
+  if(field === "view"){
+    titleEl.textContent = "Tipo de vista";
+    const options = [
+      { value: "grid", label: "Grilla", icon: "▦" },
+      { value: "list", label: "Lista", icon: "☰" }
+    ];
+    bodyEl.innerHTML = options.map(o => `
+      <div class="fmn-option-row${state.view === o.value ? " active" : ""}" data-value="${o.value}">
+        <span class="fmn-radio"></span><span>${o.label}</span>
+        <span class="fmn-view-option-icon" aria-hidden="true">${o.icon}</span>
+      </div>
+    `).join("");
+    bodyEl.querySelectorAll(".fmn-option-row").forEach(row => {
+      row.addEventListener("click", () => {
+        applyDownloadsView(row.dataset.value);
+        closeFiltersDrawer();
+      });
+    });
+    document.getElementById("fmnList").classList.remove("active");
+    document.getElementById("fmnDetail").classList.add("active");
+    return;
+  }
+
   if(field === "sort"){
     titleEl.textContent = "Ordenar por";
     const select = document.getElementById("sortSelect");
-    const options = [...select.options].filter(o => o.value !== "");
+    const options = [...select.options];
     bodyEl.innerHTML = options.map(o => `
       <div class="fmn-option-row${state.pendingSortBy === o.value ? " active" : ""}" data-value="${o.value}">
         <span class="fmn-radio"></span><span>${o.textContent}</span>
@@ -927,9 +1112,10 @@ function openDetailScreen(field){
     bodyEl.querySelectorAll(".fmn-option-row").forEach(row => {
       row.addEventListener("click", () => {
         const val = row.dataset.value;
-        state.pendingSortBy = state.pendingSortBy === val ? "" : val;
-        renderMobileFilters();
-        openDetailScreen("sort");
+        state.pendingSortBy = val;
+        select.value = val;
+        select.dispatchEvent(new Event("change", { bubbles:true }));
+        closeFiltersDrawer();
       });
     });
     document.getElementById("fmnList").classList.remove("active");

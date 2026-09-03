@@ -27,32 +27,32 @@
    */
   const MANUAL_CATEGORIES = {
     interior: [
-      { ...category("Lineales PRO", "lineales-pro"), href: "https://macroled.webflow.io/productos?macrofamilia=Lineales+PRO", image: "https://d1zltvqju4u8ql.cloudfront.net/fit-in/350x350/MACROLED/WEB/PORTADA-LINEALES-PRO.webp", badge: "Nuevo" },
-      { ...category("Skyline", "luminarias-skyline"), href: "https://macroled.webflow.io/productos?macrofamilia=Rieles+Magn%C3%A9ticos&familia=Luminarias", image: "https://s3.coresagroup.com/MACROLED/250/skyline.png", badge: "Nuevo" },
-      { ...category("Artefactos para lámparas", "artefactos-para-lamparas"), href: "https://macroled.webflow.io/productos?macrofamilia=Artefactos+para+L%C3%A1mparas", image: "https://s3.coresagroup.com/MACROLED/250/policarbonato-embutir-ar111.png" },
-      { ...category("Paneles", "paneles"), href: "https://macroled.webflow.io/productos?macrofamilia=Paneles", image: "https://d1zltvqju4u8ql.cloudfront.net/fit-in/250x250/MACROLED/WEB/GRAN-FORMATO-BACKLIGHT.webp" },
-      { ...category("Tiras Led", "tiras-led"), href: "https://macroled.webflow.io/productos?macrofamilia=Tiras+LED", image: "https://d1zltvqju4u8ql.cloudfront.net/fit-in/250x250/filters:format(png)/MACROLED/1000/0742832556316a.png" },
-      { ...category("Lámparas", "lamparas"), href: "https://macroled.webflow.io/productos?macrofamilia=L%C3%A1mparas", image: "https://d1zltvqju4u8ql.cloudfront.net/fit-in/250x250/filters:format(png)/MACROLED/1000/7428325565203a.png" }
+      { ...category("Lineales PRO", "lineales-pro"), href: "https://www.macroled.com.ar/productos?macrofamilia=Lineales+PRO", image: "https://d1zltvqju4u8ql.cloudfront.net/fit-in/350x350/MACROLED/WEB/PORTADA-LINEALES-PRO.webp", badge: "Nuevo" },
+      { ...category("Skyline", "luminarias-skyline"), href: "https://www.macroled.com.ar/productos?macrofamilia=Rieles+Magn%C3%A9ticos&familia=Luminarias", image: "https://s3.coresagroup.com/MACROLED/250/skyline.png", badge: "Nuevo" },
+      { ...category("Artefactos para lámparas", "artefactos-para-lamparas"), href: "https://www.macroled.com.ar/productos?macrofamilia=Artefactos+para+L%C3%A1mparas", image: "https://s3.coresagroup.com/MACROLED/250/policarbonato-embutir-ar111.png" },
+      { ...category("Paneles", "paneles"), href: "https://www.macroled.com.ar/productos?macrofamilia=Paneles", image: "https://d1zltvqju4u8ql.cloudfront.net/fit-in/250x250/MACROLED/WEB/GRAN-FORMATO-BACKLIGHT.webp" },
+      { ...category("Tiras Led", "tiras-led"), href: "https://www.macroled.com.ar/productos?macrofamilia=Tiras+LED", image: "https://d1zltvqju4u8ql.cloudfront.net/fit-in/250x250/filters:format(png)/MACROLED/1000/0742832556316a.png" },
+      { ...category("Lámparas", "lamparas"), href: "https://www.macroled.com.ar/productos?macrofamilia=L%C3%A1mparas", image: "https://d1zltvqju4u8ql.cloudfront.net/fit-in/250x250/filters:format(png)/MACROLED/1000/7428325565203a.png" }
     ],
     monaco: [
-      { ...category("Armadas", "monaco-armadas"), href: "https://macroled.webflow.io/productos?macrofamilia=Interruptores+y+Tomas&familia=Monaco&subfamilia=Armadas", image: "https://s3.coresagroup.com/MACROLED/250/milan.png" },
-      { ...category("Despiece", "monaco-bastidor-modulos"), href: "https://macroled.webflow.io/productos?macrofamilia=Interruptores+y+Tomas&familia=Monaco&subfamilia=Despiece", image: "https://s3.coresagroup.com/MACROLED/250/milan-bastidores.png" },
-      { ...category("Luz guía", "monaco-luz-pasillo"), href: "https://macroled.webflow.io/productos?macrofamilia=Interruptores+y+Tomas&familia=Monaco&subfamilia=Luz+de+pasillo", image: "https://d1zltvqju4u8ql.cloudfront.net/fit-in/2000x2000/MACROLED/WEB/portada_luz_pasillo.webp" },
-      { ...category("Tapas", "monaco-tapas"), href: "https://macroled.webflow.io/productos?macrofamilia=Interruptores+y+Tomas&familia=Monaco&subfamilia=Tapas", image: "https://s3.coresagroup.com/MACROLED/250/milan-tapas.png" }
+      { ...category("Armadas", "monaco-armadas"), href: "https://www.macroled.com.ar/productos?macrofamilia=Interruptores+y+Tomas&familia=Monaco&subfamilia=Armadas", image: "https://s3.coresagroup.com/MACROLED/250/milan.png" },
+      { ...category("Despiece", "monaco-bastidor-modulos"), href: "https://www.macroled.com.ar/productos?macrofamilia=Interruptores+y+Tomas&familia=Monaco&subfamilia=Despiece", image: "https://s3.coresagroup.com/MACROLED/250/milan-bastidores.png" },
+      { ...category("Tapas", "monaco-tapas"), href: "https://www.macroled.com.ar/productos?macrofamilia=Interruptores+y+Tomas&familia=Monaco&subfamilia=Tapas", image: "https://s3.coresagroup.com/MACROLED/250/milan-tapas.png" },
+      { ...category("Luz guía", "monaco-luz-pasillo"), href: "https://www.macroled.com.ar/productos?macrofamilia=Interruptores+y+Tomas&familia=Monaco&subfamilia=Luz+gu%C3%ADa", image: "https://d1zltvqju4u8ql.cloudfront.net/fit-in/2000x2000/MACROLED/WEB/portada_luz_pasillo.webp" }
     ],
     exterior: [
-      { ...category("Reflectores", "reflectores"), href: "https://macroled.webflow.io/productos?macrofamilia=Reflectores", image: "https://s3.coresagroup.com/MACROLED/250/reflectores-smart.png" },
-      { ...category("Tortugas", "tortugas"), href: "https://macroled.webflow.io/productos?macrofamilia=Luminarias+Integradas+Exterior&familia=Tortugas", image: "https://s3.coresagroup.com/MACROLED/250/tortugas.png" },
-      { ...category("Estacas", "estacas"), href: "https://macroled.webflow.io/productos?macrofamilia=Luminarias+Integradas+Exterior&familia=Estacas+M%C3%B3viles", image: "https://s3.coresagroup.com/MACROLED/250/estacas-led-integrado.png" },
-      { ...category("Guirnaldas", "guirnaldas"), href: "https://macroled.webflow.io/productos?macrofamilia=Artefactos+para+L%C3%A1mparas&familia=Guirnaldas", image: "https://d1zltvqju4u8ql.cloudfront.net/fit-in/250x250/filters:format(png)/MACROLED/1000/7428325574946a.png" }
+      { ...category("Reflectores", "reflectores"), href: "https://www.macroled.com.ar/productos?macrofamilia=Reflectores", image: "https://s3.coresagroup.com/MACROLED/250/reflectores-smart.png" },
+      { ...category("Tortugas", "tortugas"), href: "https://www.macroled.com.ar/productos?macrofamilia=Luminarias+Integradas+Exterior&familia=Tortugas", image: "https://s3.coresagroup.com/MACROLED/250/tortugas.png" },
+      { ...category("Estacas", "estacas"), href: "https://www.macroled.com.ar/productos?macrofamilia=Luminarias+Integradas+Exterior&familia=Estacas+M%C3%B3viles", image: "https://s3.coresagroup.com/MACROLED/250/estacas-led-integrado.png" },
+      { ...category("Guirnaldas", "guirnaldas"), href: "https://www.macroled.com.ar/productos?macrofamilia=Artefactos+para+L%C3%A1mparas&familia=Guirnaldas", image: "https://d1zltvqju4u8ql.cloudfront.net/fit-in/250x250/filters:format(png)/MACROLED/1000/7428325574946a.png" }
     ],
     proyectos: [
-      { ...category("Luz de calle\nStandard", "proyectos-luz-calle-standard"), href: "https://macroled.webflow.io/productos?macrofamilia=Luminarias+de+Proyecto&familia=Luz+de+Calle&subfamilia=Luz+de+Calle+Standard", image: "https://d1zltvqju4u8ql.cloudfront.net/fit-in/250x250/MACROLED/WEB/SLG2-100W-757-CW_FRONT.webp", badge: "Nuevo" },
-      { ...category("Highbay PRO", "proyectos-highbay-pro"), href: "https://macroled.webflow.io/productos?macrofamilia=Luminarias+de+Proyecto&familia=Galponeras&subfamilia=Highbay+PRO+2026", image: "https://s3.coresagroup.com/MACROLED/250/PHB-200W-90D-857-CW.png" },
-      { ...category("Reflectores PRO", "proyectos-reflectores-pro"), href: "https://macroled.webflow.io/productos?macrofamilia=Reflectores&familia=Reflectores+PRO+2026&pot_min=0&pot_max=1800", image: "https://d1zltvqju4u8ql.cloudfront.net/fit-in/250x250//MACROLED/WEB/PFL-400W-030D-857-CW_FRONT.webp" },
-      { ...category("Olimpus", "proyectos-olimpus"), href: "https://macroled.webflow.io/productos?macrofamilia=Luminarias+de+Proyecto&familia=Reflectores&subfamilia=OLIMPUS", image: "https://s3.coresagroup.com/MACROLED/250/olimpus.png" },
-      { ...category("Highbay Standard", "proyectos-highbay-standard"), href: "https://macroled.webflow.io/productos?macrofamilia=Luminarias+de+Proyecto&familia=Galponeras&subfamilia=Highbay+Standard", image: "https://s3.coresagroup.com/MACROLED/250/SHB-200W.png" },
-      { ...category("Focus", "proyectos-focus"), href: "https://macroled.webflow.io/productos?macrofamilia=Luminarias+de+Proyecto&familia=Reflectores&subfamilia=Focus", image: "https://s3.coresagroup.com/MACROLED/250/focus.png" }
+      { ...category("Luz de calle\nStandard", "proyectos-luz-calle-standard"), href: "https://www.macroled.com.ar/productos?macrofamilia=Luminarias+de+Proyecto&familia=Luz+de+Calle&subfamilia=Standard", image: "https://d1zltvqju4u8ql.cloudfront.net/fit-in/250x250/MACROLED/WEB/SLG2-100W-757-CW_FRONT.webp", badge: "Nuevo" },
+      { ...category("Highbay PRO", "proyectos-highbay-pro"), href: "https://www.macroled.com.ar/productos?macrofamilia=Luminarias+de+Proyecto&familia=Galponeras&subfamilia=Highbay+PRO+2026", image: "https://s3.coresagroup.com/MACROLED/250/PHB-200W-90D-857-CW.png" },
+      { ...category("Reflectores PRO", "proyectos-reflectores-pro"), href: "https://www.macroled.com.ar/productos?macrofamilia=Reflectores&familia=Reflectores+PRO+2026", image: "https://d1zltvqju4u8ql.cloudfront.net/fit-in/250x250//MACROLED/WEB/PFL-400W-030D-857-CW_FRONT.webp" },
+      { ...category("Olimpus", "proyectos-olimpus"), href: "https://www.macroled.com.ar/productos?macrofamilia=Luminarias+de+Proyecto&familia=Reflectores&subfamilia=OLIMPUS", image: "https://s3.coresagroup.com/MACROLED/250/olimpus.png" },
+      { ...category("Highbay Standard", "proyectos-highbay-standard"), href: "https://www.macroled.com.ar/productos?macrofamilia=Luminarias+de+Proyecto&familia=Galponeras&subfamilia=Highbay+Standard", image: "https://s3.coresagroup.com/MACROLED/250/SHB-200W.png" },
+      { ...category("Focus", "proyectos-focus"), href: "https://www.macroled.com.ar/productos?macrofamilia=Luminarias+de+Proyecto&familia=Reflectores&subfamilia=Focus", image: "https://s3.coresagroup.com/MACROLED/250/focus.png" }
     ].map((item) => ({
       ...item,
       subtitle: "Proyecto lumínico"
@@ -80,7 +80,8 @@
             id: "monaco",
             image: "https://cdn.prod.website-files.com/65f1fdd7248b6709fdebe904/69a977bb0fe12ec5b81b7e9b_monaco-cover%20copia.webp",
             imageFit: "contain",
-            href: "https://macroled.webflow.io/productos?macrofamilia=Interruptores+y+Tomas&familia=Monaco",
+            href: "https://www.macroled.com.ar/productos?macrofamilia=Interruptores+y+Tomas&familia=Monaco",
+            catalogHref: "https://s3.coresagroup.com/MACROLED/catalogos/Macroled_Monaco.pdf",
             titleEmphasis: "Mónaco",
             content: { mode: "static", categoryGroup: "monaco" }
           },
@@ -88,7 +89,7 @@
             ...line("Reflectores PRO", "La combinación ideal entre rendimiento y practicidad. Reflectores para exterior pensados para iluminar accesos, fachadas, patios y áreas abiertas con una instalación versátil y una luz confiable.", "#16283a", "#e4ebf0", "image-right"),
             image: "https://cdn.prod.website-files.com/65f1fdd7248b6709fdebe904/699cb28af6cdd53e774759f0_FAMILIA%20REFLECTORES%20PRO.webp",
             imageFit: "contain-right",
-            href: "https://macroled.webflow.io/productos?macrofamilia=Reflectores&familia=Reflectores+PRO+2026",
+            href: "https://www.macroled.com.ar/productos?macrofamilia=Reflectores&familia=Reflectores+PRO+2026",
             titleEmphasis: "PRO",
             content: {
               mode: "typesense",
@@ -106,7 +107,8 @@
             image: "https://s3.coresagroup.com/MACROLED/250/skyline.png",
             imageFit: "contain-centered",
             visualTheme: "silver-dark",
-            href: "https://macroled.webflow.io/productos?macrofamilia=Rieles+Magn%C3%A9ticos&familia=Luminarias",
+            href: "https://www.macroled.com.ar/productos?macrofamilia=Rieles+Magn%C3%A9ticos&familia=Luminarias",
+            catalogHref: "https://s3.coresagroup.com/MACROLED/catalogos/Macroled_Skyline.pdf",
             titleEmphasis: "Skyline",
             titleEmphasisWeight: 600,
             content: {
@@ -649,7 +651,7 @@
       badge: "Nueva línea",
       productImage: "https://d1zltvqju4u8ql.cloudfront.net/fit-in/1000x1000/MACROLED/WEB/SLG2-200W-757-NM3-CW_FRONT.webp",
       ambientImage: "https://s3.coresagroup.com/MACROLED/WEB/HOME/streetlight_ambient.png",
-      href: "https://macroled.webflow.io/productos?macrofamilia=Luminarias+de+Proyecto&familia=Luz+de+Calle&subfamilia=Luz+de+Calle+Standard"
+      href: "https://www.macroled.com.ar/productos?macrofamilia=Luminarias+de+Proyecto&familia=Luz+de+Calle&subfamilia=Standard"
     },
     {
       id: "invictus",
@@ -657,7 +659,7 @@
       subtitle: "Para grandes áreas, fachadas y espacios deportivos.",
       productImage: "https://s3.coresagroup.com/MACROLED/WEB/HOME/invictus.png?v=20260821-1",
       ambientImage: "https://s3.coresagroup.com/MACROLED/WEB/HOME/invictus_ambient.png",
-      href: "https://macroled.webflow.io/productos?macrofamilia=Luminarias+de+Proyecto&familia=Reflectores&subfamilia=Invictus"
+      href: "https://www.macroled.com.ar/productos?macrofamilia=Luminarias+de+Proyecto&familia=Reflectores&subfamilia=Invictus"
     },
     {
       id: "highbay",
@@ -665,7 +667,7 @@
       subtitle: "Para naves industriales y espacios de gran altura.",
       productImage: "https://d1zltvqju4u8ql.cloudfront.net/fit-in/1000x1000/MACROLED/WEB/PHB-100W-90D-857-CW_FRONT.webp",
       ambientImage: "https://s3.coresagroup.com/MACROLED/WEB/HOME/highbay_ambient.png",
-      href: "https://macroled.webflow.io/productos?macrofamilia=Luminarias+de+Proyecto&familia=Galponeras&subfamilia=Highbay+PRO+2026"
+      href: "https://www.macroled.com.ar/productos?macrofamilia=Luminarias+de+Proyecto&familia=Galponeras&subfamilia=Highbay+PRO+2026"
     }
   ];
 
@@ -773,7 +775,10 @@
   function lineTemplate(item) {
     const mode = item.content?.mode || "typesense";
     const lineId = item.id ? ` data-line="${esc(item.id)}"` : "";
-    return `<article class="ml-featured ml-shell"${lineId} data-theme="${esc(item.theme)}" data-visual-theme="${esc(item.visualTheme || "solid")}" data-layout="${esc(item.layout)}" data-image-fit="${esc(item.imageFit || "cover")}" data-description-lines="${Number(item.descriptionLines || 0)}" data-button-tone="${buttonTone(item.textColor)}" data-content-mode="${esc(mode)}" style="--line-bg:${esc(item.theme)};--line-color:${esc(item.textColor)};--title-emphasis-weight:${Number(item.titleEmphasisWeight || 600)}"><div class="ml-featured__story"><div class="ml-featured__media"><img src="${esc(item.image)}" alt="" loading="lazy" width="1600" height="1000"></div><div class="ml-featured__copy"><h3>${emphasize(item.title, item.titleEmphasis)}</h3><p>${emphasize(item.description, item.descriptionEmphasis)}</p><div class="ml-featured__actions"><a class="ml-button ml-button--primary" href="${esc(item.href)}">Ver productos</a><a class="ml-button--tertiary ml-featured__resource-link" href="${esc(item.catalogHref || "#")}">Ver catálogo <span aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 12h14m-6-6 6 6-6 6"/></svg></span></a></div></div></div>${lineContentTemplate(item)}</article>`;
+    const catalogLink = item.catalogHref
+      ? `<a class="ml-button--tertiary ml-featured__resource-link" href="${esc(item.catalogHref)}" target="_blank" rel="noopener noreferrer">Ver catálogo <span aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 12h14m-6-6 6 6-6 6"/></svg></span></a>`
+      : "";
+    return `<article class="ml-featured ml-shell"${lineId} data-theme="${esc(item.theme)}" data-visual-theme="${esc(item.visualTheme || "solid")}" data-layout="${esc(item.layout)}" data-image-fit="${esc(item.imageFit || "cover")}" data-description-lines="${Number(item.descriptionLines || 0)}" data-button-tone="${buttonTone(item.textColor)}" data-content-mode="${esc(mode)}" style="--line-bg:${esc(item.theme)};--line-color:${esc(item.textColor)};--title-emphasis-weight:${Number(item.titleEmphasisWeight || 600)}"><div class="ml-featured__story"><div class="ml-featured__media"><img src="${esc(item.image)}" alt="" loading="lazy" width="1600" height="1000"></div><div class="ml-featured__copy"><h3>${emphasize(item.title, item.titleEmphasis)}</h3><p>${emphasize(item.description, item.descriptionEmphasis)}</p><div class="ml-featured__actions"><a class="ml-button ml-button--primary" href="${esc(item.href)}">Ver productos</a>${catalogLink}</div></div></div>${lineContentTemplate(item)}</article>`;
   }
 
   function renderSections() {
@@ -1890,6 +1895,228 @@
   }, { once: true });
 })(window);
 
+
+/* ===== Newsletter popup (merged from js/newsletter.js) ===== */
+
+(function () {
+  "use strict";
+
+  if (window.__ML_NEWSLETTER_INIT__) return;
+  window.__ML_NEWSLETTER_INIT__ = true;
+
+  const DEFAULT_ENDPOINT = "https://n8n.coresagroup.com/webhook/newsletter-macroled";
+
+  const INTEREST_HUBSPOT_MAP = {
+    residencial: "residencial",
+    proyectos: "obras_y_proyectos",
+    arquitectura: "arquitectura"
+  };
+
+  function initNewsletter() {
+    const popup = document.getElementById("nlPopup");
+    const backdrop = document.getElementById("nlBackdrop");
+    const form = document.getElementById("nlForm");
+    const closeBtn = document.getElementById("nlClose");
+    const success = document.getElementById("nlSuccess");
+    const errorEl = document.getElementById("nlError");
+    const submitBtn = form ? form.querySelector(".nl-submit") : null;
+    const interestTabs = form ? form.querySelector("[data-interest-tabs]") : null;
+
+    if (!popup || !form) return;
+
+    let lastTrigger = null;
+    let submitting = false;
+
+    const getSelectedInterests = () => {
+      if (!interestTabs) return [];
+      return Array.prototype.map
+        .call(interestTabs.querySelectorAll('.nl-interest-tab[aria-pressed="true"]'), tab => INTEREST_HUBSPOT_MAP[tab.dataset.interest])
+        .filter(Boolean);
+    };
+
+    const clearInterestTabs = () => {
+      if (!interestTabs) return;
+      interestTabs.querySelectorAll(".nl-interest-tab").forEach(tab => {
+        tab.setAttribute("aria-pressed", "false");
+        tab.classList.remove("is-active");
+      });
+    };
+
+    if (interestTabs) {
+      interestTabs.addEventListener("click", event => {
+        const tab = event.target.closest(".nl-interest-tab");
+        if (!tab || !interestTabs.contains(tab)) return;
+
+        const next = tab.getAttribute("aria-pressed") !== "true";
+        tab.setAttribute("aria-pressed", next ? "true" : "false");
+        tab.classList.toggle("is-active", next);
+        clearError();
+      });
+    }
+
+    const clearError = () => {
+      if (!errorEl) return;
+      errorEl.hidden = true;
+      errorEl.textContent = "";
+    };
+
+    const showError = message => {
+      if (!errorEl) return;
+      errorEl.textContent = message;
+      errorEl.hidden = false;
+      errorEl.removeAttribute("hidden");
+    };
+
+    const setSubmitting = active => {
+      submitting = active;
+      if (!submitBtn) return;
+      submitBtn.disabled = active;
+      submitBtn.classList.toggle("is-loading", active);
+      submitBtn.textContent = active ? "Enviando…" : "Suscribirme";
+    };
+
+    const showSuccess = () => {
+      form.hidden = true;
+      popup.classList.add("is-success");
+      if (success) {
+        success.hidden = false;
+        success.removeAttribute("hidden");
+      }
+    };
+
+    const openPopup = trigger => {
+      lastTrigger = trigger || document.activeElement;
+      popup.classList.remove("is-success");
+      clearError();
+      setSubmitting(false);
+      if (success) success.hidden = true;
+      form.hidden = false;
+      if (backdrop) {
+        backdrop.hidden = false;
+        backdrop.removeAttribute("hidden");
+      }
+      popup.hidden = false;
+      popup.removeAttribute("hidden");
+      document.body.classList.add("newsletter-open");
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          popup.classList.add("is-open");
+          if (backdrop) backdrop.classList.add("is-open");
+        });
+      });
+      const first = popup.querySelector("#nl-nombre");
+      if (first) first.focus();
+    };
+
+    const closePopup = () => {
+      if (submitting) return;
+      popup.classList.remove("is-open");
+      if (backdrop) backdrop.classList.remove("is-open");
+      document.body.classList.remove("newsletter-open");
+      const finish = () => {
+        popup.hidden = true;
+        if (backdrop) backdrop.hidden = true;
+        if (lastTrigger && typeof lastTrigger.focus === "function") lastTrigger.focus();
+      };
+      window.setTimeout(finish, 280);
+    };
+
+    document.addEventListener("click", event => {
+      const button = event.target.closest("[data-newsletter-open]");
+      if (!button) return;
+
+      event.preventDefault();
+      openPopup(button);
+    });
+
+    if (closeBtn) closeBtn.addEventListener("click", closePopup);
+    if (backdrop) backdrop.addEventListener("click", closePopup);
+
+    document.addEventListener("keydown", event => {
+      if (event.key !== "Escape") return;
+      if (popup.classList.contains("is-open")) closePopup();
+    });
+
+    form.addEventListener("submit", async event => {
+      event.preventDefault();
+      if (submitting) return;
+
+      clearError();
+
+      const emailInput = form.querySelector("#nl-email");
+      const consent = form.querySelector("#nl-acepta");
+      const email = (emailInput && emailInput.value ? emailInput.value : "").trim();
+      const intereses = getSelectedInterests();
+
+      if (!email || (emailInput && typeof emailInput.checkValidity === "function" && !emailInput.checkValidity())) {
+        showError("Ingresá un email válido.");
+        if (emailInput) emailInput.focus();
+        return;
+      }
+
+      if (!intereses.length) {
+        showError("Seleccioná al menos un área de interés.");
+        interestTabs?.querySelector(".nl-interest-tab")?.focus();
+        return;
+      }
+
+      if (!consent || !consent.checked) {
+        showError("Tenés que aceptar recibir el newsletter para continuar.");
+        if (consent) consent.focus();
+        return;
+      }
+
+      const endpoint =
+        form.getAttribute("data-newsletter-endpoint") ||
+        (window.MACROLED_HOME_CONFIG && window.MACROLED_HOME_CONFIG.newsletterEndpoint) ||
+        DEFAULT_ENDPOINT;
+
+      const payload = {
+        email,
+        intereses,
+        acepta_newsletter: true
+      };
+
+      setSubmitting(true);
+
+      try {
+        const res = await fetch(endpoint, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+
+        if (!res.ok) {
+          let message = "No pudimos completar la suscripción. Intentá de nuevo.";
+          try {
+            const data = await res.json();
+            if (data && data.error) message = data.error;
+          } catch (_) {
+            /* ignore non-JSON error bodies */
+          }
+          showError(message);
+          setSubmitting(false);
+          return;
+        }
+
+        form.reset();
+        clearInterestTabs();
+        setSubmitting(false);
+        showSuccess();
+      } catch (_) {
+        showError("No pudimos conectar con el servidor. Intentá de nuevo.");
+        setSubmitting(false);
+      }
+    });
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initNewsletter, { once: true });
+  } else {
+    initNewsletter();
+  }
+})();
+
 /* Source: home/js/asistente.js */
 (function (window) {
   "use strict";
@@ -2180,4 +2407,3 @@
     syncLaunch();
   }
 })();
-

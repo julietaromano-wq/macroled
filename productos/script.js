@@ -1,4 +1,48 @@
-﻿// Resguardo: si por lo que sea comparar.js no cargó (nombre de archivo
+﻿/* Webflow puede envolver el embed en un ancestro con transform/contain. Eso
+   convierte position:fixed en relativo al embed. Los flotantes viven en body
+   para quedar anclados al viewport real sin cambiar sus IDs ni su lógica. */
+function mountProductFloatingUi(){
+  ["compareBar", "aiLaunch", "aiBackdrop", "aiPanel"].forEach(id => {
+    const element = document.getElementById(id);
+    if(element && element.parentElement !== document.body){
+      document.body.appendChild(element);
+    }
+  });
+}
+mountProductFloatingUi();
+
+let productFloatingPositionFrame = 0;
+function updateProductFloatingPosition(){
+  productFloatingPositionFrame = 0;
+  const root = document.getElementById("macroled-productos");
+  if(!root) return;
+
+  // Flotan contra el viewport mientras estamos dentro del catálogo y se
+  // detienen en su borde inferior para no invadir el footer de Webflow.
+  // Conservamos el valor subpixel. Redondearlo hacia arriba hacía que la barra
+  // saltara un píxel al entrar o salir del límite con el footer.
+  const lift = Math.max(0, window.innerHeight - root.getBoundingClientRect().bottom);
+  ["compareBar", "aiLaunch"].forEach(id => {
+    const element = document.getElementById(id);
+    if(element) element.style.setProperty("--product-floating-lift", lift + "px");
+  });
+}
+function scheduleProductFloatingPosition(){
+  if(productFloatingPositionFrame) return;
+  productFloatingPositionFrame = requestAnimationFrame(updateProductFloatingPosition);
+}
+window.addEventListener("scroll", scheduleProductFloatingPosition, { passive:true });
+window.addEventListener("resize", scheduleProductFloatingPosition);
+if("ResizeObserver" in window){
+  const productRoot = document.getElementById("macroled-productos");
+  if(productRoot){
+    const productFloatingObserver = new ResizeObserver(scheduleProductFloatingPosition);
+    productFloatingObserver.observe(productRoot);
+  }
+}
+scheduleProductFloatingPosition();
+
+// Resguardo: si por lo que sea comparar.js no cargó (nombre de archivo
 // distinto, 404, etc.), esto evita que el checkbox "Comparar" quede roto —
 // en vez de un stub que no hace nada (y por eso el checkbox se destildaba
 // solo al instante), este fallback funciona en memoria para la sesión
@@ -768,11 +812,13 @@ async function searchTypesense(){
       const escaped = [...state.selected.familia].map(v => `\`${v}\``).join(",");
       const clause = `${FAMILIA_FIELD}:=[${escaped}]`;
       filterParts.push(clause);
+      ownFacetClauses.set(FAMILIA_FIELD, clause);
     }
     if(activeMacro && activeFamilia && state.selected.subfamilia.size){
       const escaped = [...state.selected.subfamilia].map(v => `\`${v}\``).join(",");
       const clause = `${SUBFAMILIA_FIELD}:=[${escaped}]`;
       filterParts.push(clause);
+      ownFacetClauses.set(SUBFAMILIA_FIELD, clause);
     }
     if(activeFamilia && state.selected.subfamilia.size){
       for(const field of EXTRA_FACET_FIELDS){
@@ -812,6 +858,10 @@ async function searchTypesense(){
     params.set("sort_by", "order:asc");
   }else if(state.sortBy === "nuevo:desc"){
     params.set("sort_by", "nuevo:desc");
+  }else{
+    // "Predeterminado": `ORDER` en la fuente se normaliza como `order` en el
+    // esquema de Typesense. Los valores menores deben aparecer primero.
+    params.set("sort_by", "order:asc");
   }
 
   try{
@@ -836,6 +886,8 @@ async function searchTypesense(){
     // combinar, en lugar de desaparecer o quedar artificialmente en cero.
     const checkboxFacetFields = [
       ...FACET_FIELDS.filter(field => field !== "macrofamilia"),
+      FAMILIA_FIELD,
+      SUBFAMILIA_FIELD,
       ...EXTRA_FACET_FIELDS
     ];
     const activeCheckboxFacets = checkboxFacetFields.filter(field => ownFacetClauses.has(field));
@@ -2068,90 +2120,36 @@ function buildCompareUrl(){
    localStorage vía compare.js, compartida con comparar.html
    ========================================================= */
 let compareBarPrevCount = 0;
-let compareBoundaryFrame = 0;
-
-function isExpandedMobileCompare(bar){
-  return window.matchMedia("(max-width: 640px)").matches && !bar.classList.contains("collapsed");
-}
-
-function updateCompareBoundary(){
-  compareBoundaryFrame = 0;
-  const root = document.getElementById("macroled-productos");
-  const bar = document.getElementById("compareBar");
-  if(!root || !bar || getComputedStyle(bar).display === "none"){
-    if(root) root.style.removeProperty("--compare-boundary-lift");
-    return;
-  }
-
-  // En mobile, abierto funciona como un modal superpuesto. No se ancla a la
-  // paginación ni empuja el contenido; para verla, el usuario lo contrae.
-  if(isExpandedMobileCompare(bar)){
-    root.style.setProperty("--compare-boundary-lift", "0px");
-    return;
-  }
-
-  // El límite es el elemento más bajo del catálogo, no sólo la paginación.
-  // Webflow puede dejar que el sidebar desborde la altura del grid, por eso
-  // también medimos explícitamente filtros y resultados en el estado vacío.
-  const barGap = parseFloat(getComputedStyle(bar).getPropertyValue("--compare-bar-gap")) || 0;
-  const fixedTop = window.innerHeight - barGap - bar.offsetHeight;
-  const boundaryBottom = [
-    root,
-    root.querySelector(".filters-rail"),
-    root.querySelector("#filtersPanel"),
-    root.querySelector(".results-body")
-  ].filter(Boolean).reduce((bottom, element) =>
-    Math.max(bottom, element.getBoundingClientRect().bottom),
-    root.getBoundingClientRect().bottom
-  );
-  const restingTop = boundaryBottom - barGap - bar.offsetHeight;
-  const lift = Math.max(0, fixedTop - restingTop);
-  root.style.setProperty("--compare-boundary-lift", lift + "px");
-}
-
-function scheduleCompareBoundaryUpdate(){
-  if(compareBoundaryFrame) return;
-  compareBoundaryFrame = requestAnimationFrame(updateCompareBoundary);
-}
-
 function updateComparePadding(){
   const root = document.getElementById("macroled-productos");
   const bar = document.getElementById("compareBar");
-  if(getComputedStyle(bar).display === "none"){
+  if(!root || !bar || getComputedStyle(bar).display === "none"){
+    if(!root) return;
     root.style.removeProperty("--compare-bar-offset");
     root.style.removeProperty("--compare-boundary-lift");
     document.body.classList.remove("has-compare-bar");
+    scheduleProductFloatingPosition();
     return;
   }
-  if(isExpandedMobileCompare(bar)){
-    root.style.setProperty("--compare-bar-offset", "0px");
-    root.style.setProperty("--compare-boundary-lift", "0px");
-    document.body.classList.add("has-compare-bar");
-    return;
-  }
-  const pagination = document.getElementById("pagination");
-  const rootStyle = getComputedStyle(root);
-  const currentPadding = parseFloat(rootStyle.paddingBottom) || 0;
-  const trailingSpace = Math.max(0,
-    root.getBoundingClientRect().bottom - currentPadding - pagination.getBoundingClientRect().bottom
-  );
+
+  // La barra queda anclada al viewport. La reserva inferior sigue su altura
+  // real, incluso sin resultados o paginación, y se reajusta al contraerla.
+  root.style.removeProperty("--compare-boundary-lift");
   const barGap = parseFloat(getComputedStyle(bar).getPropertyValue("--compare-bar-gap")) || 0;
-  const paginationGap = 32; // 2rem entre la paginación y el comparador
-  const offset = Math.max(0, bar.offsetHeight + barGap + paginationGap - trailingSpace);
+  const contentGap = 32;
+  const offset = bar.getBoundingClientRect().height + barGap + contentGap;
   root.style.setProperty("--compare-bar-offset", offset + "px");
   document.body.classList.add("has-compare-bar");
-  scheduleCompareBoundaryUpdate();
+  scheduleProductFloatingPosition();
 }
 
-window.addEventListener("scroll", scheduleCompareBoundaryUpdate, { passive:true });
-window.addEventListener("resize", () => {
-  updateComparePadding();
-  scheduleCompareBoundaryUpdate();
-});
+window.addEventListener("resize", updateComparePadding);
 if("ResizeObserver" in window){
-  const compareBoundaryObserver = new ResizeObserver(scheduleCompareBoundaryUpdate);
-  compareBoundaryObserver.observe(document.getElementById("macroled-productos"));
-  compareBoundaryObserver.observe(document.getElementById("compareBar"));
+  const compareBar = document.getElementById("compareBar");
+  if(compareBar){
+    const compareBarObserver = new ResizeObserver(updateComparePadding);
+    compareBarObserver.observe(compareBar);
+  }
 }
 function renderCompareBar(){
   const bar = document.getElementById("compareBar");
@@ -2203,7 +2201,7 @@ function renderCompareBar(){
       </a>
       <button type="button" class="compare-clear" id="compareClear" aria-label="Borrar todos los productos seleccionados">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>
-        Borrar
+        Borrar todo
       </button>
     </div>
   `;
@@ -2362,6 +2360,9 @@ function renderBreadcrumb(){
   const holder = document.getElementById("breadcrumb");
   const active = [...state.selected.macrofamilia][0];
   const activeFamilia = [...state.selected.familia][0];
+  const activeSubfamilia = state.selected.subfamilia.size === 1 ? [...state.selected.subfamilia][0] : "";
+  const activeCategoria = state.selected.categoria.size === 1 ? [...state.selected.categoria][0] : "";
+  const productsUrl = "https://www.macroled.com.ar/productos";
 
   function clearToProductos(){
     state.query = "";
@@ -2394,26 +2395,73 @@ function renderBreadcrumb(){
     loadAndRender();
   }
 
+  function clearToFamily(){
+    state.selected.subfamilia.clear();
+    state.selected.categoria.clear();
+    state.page = 1;
+    loadAndRender();
+  }
+
+  function clearToSubfamily(){
+    state.selected.categoria.clear();
+    state.page = 1;
+    loadAndRender();
+  }
+
+  const items = [];
+  const addLink = (label, href, onClick) => items.push({ label, href, onClick });
+  const addCurrent = label => items.push({ label, current:true });
+
+  addLink("Inicio", "https://www.macroled.com.ar/");
+
   if(state.query){
-    holder.innerHTML = `Inicio &nbsp;›&nbsp; <a id="crumbProductos">Productos</a> &nbsp;›&nbsp; <b class="crumb-active">Resultados para "${state.query}"</b>`;
-    document.getElementById("crumbProductos").addEventListener("click", clearToProductos);
-    return;
+    addLink("Productos", productsUrl, clearToProductos);
+    addCurrent(`Resultados para "${state.query}"`);
+  }else if(!active){
+    addCurrent("Productos");
+  }else{
+    addLink("Productos", productsUrl, clearToProductos);
+
+    const macroUrl = `${productsUrl}?macrofamilia=${encodeURIComponent(active)}`;
+    if(activeFamilia || activeSubfamilia || activeCategoria) addLink(active, macroUrl, clearToMacro);
+    else addCurrent(active);
+
+    if(activeFamilia){
+      const familyUrl = `${macroUrl}&familia=${encodeURIComponent(activeFamilia)}`;
+      if(activeSubfamilia || activeCategoria) addLink(activeFamilia, familyUrl, clearToFamily);
+      else addCurrent(activeFamilia);
+
+      if(activeSubfamilia){
+        const subfamilyUrl = `${familyUrl}&subfamilia=${encodeURIComponent(activeSubfamilia)}`;
+        if(activeCategoria) addLink(activeSubfamilia, subfamilyUrl, clearToSubfamily);
+        else addCurrent(activeSubfamilia);
+
+        if(activeCategoria) addCurrent(activeCategoria);
+      }
+    }
   }
 
-  if(!active){
-    holder.innerHTML = `Inicio &nbsp;›&nbsp; <b>Productos</b>`;
-    return;
-  }
-
-  if(activeFamilia){
-    holder.innerHTML = `Inicio &nbsp;›&nbsp; <a id="crumbProductos">Productos</a> &nbsp;›&nbsp; <a id="crumbMacro">${active}</a> &nbsp;›&nbsp; <b class="crumb-active">${activeFamilia}</b>`;
-    document.getElementById("crumbProductos").addEventListener("click", clearToProductos);
-    document.getElementById("crumbMacro").addEventListener("click", clearToMacro);
-    return;
-  }
-
-  holder.innerHTML = `Inicio &nbsp;›&nbsp; <a id="crumbProductos">Productos</a> &nbsp;›&nbsp; <b class="crumb-active">${active}</b>`;
-  document.getElementById("crumbProductos").addEventListener("click", clearToProductos);
+  holder.replaceChildren();
+  items.forEach((item, index) => {
+    if(index) holder.append(document.createTextNode(" › "));
+    if(item.current){
+      const current = document.createElement("b");
+      current.className = "crumb-active";
+      current.textContent = item.label;
+      holder.append(current);
+      return;
+    }
+    const link = document.createElement("a");
+    link.href = item.href;
+    link.textContent = item.label;
+    if(item.onClick){
+      link.addEventListener("click", event => {
+        event.preventDefault();
+        item.onClick();
+      });
+    }
+    holder.append(link);
+  });
 }
 
 /* =========================================================
@@ -2486,7 +2534,6 @@ async function loadAndRender(){
     gridShell.classList.add("is-filtering");
     gridShell.setAttribute("aria-busy", "true");
     updateGridLoadingPosition();
-    scheduleCompareBoundaryUpdate();
   } else {
     showingLabel.textContent = "Cargando productos…";
   }
@@ -2523,7 +2570,7 @@ async function loadAndRender(){
     if(gridShell){
       gridShell.classList.remove("is-filtering");
       gridShell.setAttribute("aria-busy", "false");
-      scheduleCompareBoundaryUpdate();
+      updateComparePadding();
     }
   }
 }
@@ -2536,10 +2583,13 @@ const sortDropdown = document.getElementById("sortDropdown");
 const sortTrigger = document.getElementById("sortTrigger");
 const sortMenu = document.getElementById("sortMenu");
 const sortCurrent = document.getElementById("sortCurrent");
+let sortHasBeenChosen = false;
 
 function syncSortDropdown(){
   const selectedOption = [...sortSelect.options].find(option => option.value === sortSelect.value);
-  sortCurrent.textContent = selectedOption?.textContent || "Destacados";
+  sortCurrent.textContent = (sortHasBeenChosen || sortSelect.value)
+    ? selectedOption?.textContent || "Predeterminado"
+    : "Ordenar por";
   sortMenu.querySelectorAll(".sort-option").forEach(option => {
     const active = option.dataset.sort === sortSelect.value;
     option.classList.toggle("active", active);
@@ -2562,6 +2612,7 @@ sortTrigger.addEventListener("click", () => {
 
 sortMenu.querySelectorAll(".sort-option").forEach(option => {
   option.addEventListener("click", () => {
+    sortHasBeenChosen = true;
     sortSelect.value = option.dataset.sort;
     syncSortDropdown();
     closeSortDropdown();
@@ -2577,6 +2628,7 @@ document.addEventListener("keydown", (event) => {
 });
 
 sortSelect.addEventListener("change", (e) => {
+  sortHasBeenChosen = true;
   syncSortDropdown();
   state.sortBy = e.target.value;
   state.page = 1;
@@ -2610,14 +2662,20 @@ function syncSearchInputFromState(){
   const el = document.getElementById("searchInput");
   if(!el) return;
   if(el.value !== state.query) el.value = state.query;
+  syncSearchClear();
 }
 
 let searchDebounce;
 const searchInput = document.getElementById("searchInput");
+const searchClear = document.getElementById("searchClear");
+function syncSearchClear(){
+  if(searchClear) searchClear.hidden = !searchInput?.value;
+}
 if(searchInput){
   let searchTouched = false;
   searchInput.addEventListener("focus", () => { searchTouched = true; });
   searchInput.addEventListener("input", (e) => {
+    syncSearchClear();
     // Autofill / restore del browser no tiene que filtrar el index al cargar.
     if(!searchTouched){
       syncSearchInputFromState();
@@ -2636,6 +2694,17 @@ if(searchInput){
     applySearchQuery(e.target.value);
     loadAndRender();
   });
+}
+if(searchClear && searchInput){
+  searchClear.addEventListener("click", () => {
+    clearTimeout(searchDebounce);
+    searchInput.value = "";
+    syncSearchClear();
+    applySearchQuery("");
+    loadAndRender();
+    searchInput.focus();
+  });
+  syncSearchClear();
 }
 function applyCatalogView(view){
   const next = view === "list" ? "list" : "grid";
@@ -2810,7 +2879,7 @@ function fmnSummary(field){
 function currentSortLabel(){
   const select = document.getElementById("sortSelect");
   const opt = [...select.options].find(o => o.value === state.pendingSortBy);
-  return opt ? opt.textContent : "Destacados";
+  return opt ? opt.textContent : "Predeterminado";
 }
 
 function goToListScreen(){

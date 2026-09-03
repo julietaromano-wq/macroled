@@ -52,6 +52,8 @@
   var fillStartedAt = 0;
   var completing = false;
   var waiting = false;
+  var booted = false;
+  var readyBeforeBoot = false;
 
   // Rellena completo en ~2.2s; si Typesense tarda más, titila
   var IDLE_FILL_MS = 2200;
@@ -172,15 +174,29 @@
 
   function done() {
     if (finished) return;
+    // En una recarga con datos cacheados, la página puede avisar que terminó
+    // antes de DOMContentLoaded y, por lo tanto, antes de crear el overlay.
+    // Guardamos la señal para que boot() la procese una vez montado el preload.
+    if (!booted) {
+      readyBeforeBoot = true;
+      return;
+    }
     finished = true;
     stopWaitingPulse();
     completeFill(hideOverlay);
   }
 
   function boot() {
+    if (booted) return;
+    booted = true;
     document.documentElement.classList.add("ml-loading");
     ensureMarkup();
     startIdleFill();
+
+    if (readyBeforeBoot) {
+      done();
+      return;
+    }
 
     var mode = (document.documentElement.getAttribute("data-ml-preload") || "dom").toLowerCase();
     if (mode === "dom") {
