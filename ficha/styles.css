@@ -167,13 +167,16 @@ main{padding:calc(48px + clamp(12px,2vw,24px)) clamp(12px,2vw,24px) 0;}
 .thumbs{
   grid-area:thumbs;
   display:flex;flex-direction:column;gap:10px;
-  max-height:none;
   overflow:visible;
+  /* Alto fijado por JS (syncThumbsHeight en script.js) para que la columna
+     de miniaturas nunca pase el alto de la imagen principal — cae acá,
+     no hasta el botón Compartir. Sin JS todavía corrido, cae a su alto
+     natural (sin scroll de todas formas, ver .thumb más abajo). */
 }
 .thumb{
-  width:100%;aspect-ratio:1;padding:0;border-radius:10px;
+  width:100%;max-height:88px;padding:0;border-radius:10px;
   border:2px solid transparent;background:var(--paper);
-  cursor:pointer;overflow:hidden;flex:none;
+  cursor:pointer;overflow:hidden;flex:1 1 0;min-height:0;
   transition:border-color .15s,background .15s;
 }
 .thumb img{width:100%;height:100%;object-fit:contain;padding:6px;}
@@ -365,7 +368,6 @@ main{padding:calc(48px + clamp(12px,2vw,24px)) clamp(12px,2vw,24px) 0;}
 .lead{
   margin:0 0 clamp(16px,2.2vw,25px);
   font-size:15px;line-height:1.55;color:#7e8691;
-  max-width:45ch;
   text-wrap:pretty;
 }
 
@@ -970,7 +972,7 @@ body.assistant-open .ai-launch{
   .compare-chip-sku{font-size:13px;}
   .compare-chip-remove{font-size:16px;}
   .compare-checkbox{font-size:16px;}
-  .compare-row{font-size:12px;}
+  .compare-row{font-size:14px;}
   .compare-bar-body{
     flex-direction:column;
     align-items:stretch;
@@ -1010,7 +1012,10 @@ body.assistant-open .ai-launch{
 .tabs{
   display:flex;gap:4px;border-bottom:1px solid var(--line);
   margin-bottom:8px;
-  touch-action:pan-x pan-y;
+  /* Solo scroll horizontal (mobile la hace swipeable) — con pan-y habilitado
+     acá tambien, un swipe vertical que arrancaba sobre las tabs quedaba
+     "atrapado" por este elemento en vez de scrollear la página normalmente. */
+  touch-action:pan-x;
 }
 .tab{
   appearance:none;border:none;background:transparent;
@@ -2041,27 +2046,10 @@ body.assistant-open .ai-launch{
 
 /* —— Responsive layout —— */
 
-/* Large tablet / small desktop: tighten hero columns */
+/* Tablet: mismo corte que el navbar global (menu.css pasa a hamburguesa acá
+   tambien, 1100px) — el hero pasa directo al layout apilado de tablet en vez
+   de achicarse primero a 2 columnas angostas, que quedaba peor. */
 @media (max-width:1100px){
-  .hero{
-    grid-template-columns:minmax(0,1fr) minmax(0,1fr);
-    gap:28px;
-  }
-  .gallery{grid-template-columns:72px minmax(0,1fr);}
-  .hero .info{max-width:none;padding:0;}
-  .compat-grid{grid-template-columns:repeat(3,1fr);}
-
-  /* "Agregar a comparación" y "Preguntá por este producto" quedaban chicas
-     frente al resto de la tipografía cuando el hero pasa a columnas más
-     angostas — se suben un poco a partir de acá. */
-  .compare-row,.btn-ai{font-size:14px;}
-  .compare-row{min-height:44px;gap:10px;}
-  .compare-row .cb-wrap,.compare-row .cb{width:18px;height:18px;}
-  .compare-row .cb svg{width:11px;height:11px;}
-}
-
-/* Tablet: stack hero, hide nav */
-@media (max-width:960px){
   .hero{
     grid-template-columns:1fr;
     gap:28px;
@@ -2082,7 +2070,14 @@ body.assistant-open .ai-launch{
   .trust{grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:16px 14px;}
   .compat-grid{grid-template-columns:repeat(2,1fr);}
   .footer-top{grid-template-columns:1fr 1fr;gap:28px;}
-  .lead{max-width:none;}
+
+  /* "Agregar a comparación" y "Preguntá por este producto" quedaban chicas
+     frente al resto de la tipografía cuando el hero pasa a columnas más
+     angostas — se suben un poco a partir de acá. */
+  .compare-row,.btn-ai{font-size:14px;}
+  .compare-row{min-height:44px;gap:10px;}
+  .compare-row .cb-wrap,.compare-row .cb{width:18px;height:18px;}
+  .compare-row .cb svg{width:11px;height:11px;}
 }
 
 /* Small tablet */
@@ -2247,23 +2242,26 @@ body.assistant-open .ai-launch{
   .btn,.btn-primary,.btn-ghost{width:100%;flex-basis:auto;flex:none;}
   #btn-ficha{font-size:.875rem;}
 
-  /* Mobile: solo comparar; el launch flotante alcanza para preguntar */
+  /* Mobile: comparar y preguntá apilados, uno arriba del otro */
   .cta-utility{
     display:flex !important;
     grid-template-columns:none !important;
-    align-items:center !important;
+    flex-direction:column;
+    align-items:flex-start !important;
     justify-content:flex-start;
+    gap:6px;
   }
   .compare-row{
     justify-content:flex-start;
     width:auto !important;
     margin-left:-8px;
     padding:8px 10px;
-    font-size:12px;
+    font-size:14px;
   }
-  .cta-utility .btn-ai,
-  #openAssistantFromCta{
-    display:none !important;
+  .cta-utility .btn-ai{
+    margin-left:-8px !important;
+    padding:8px 10px !important;
+    font-size:14px;
   }
 
   .trust{
@@ -2530,13 +2528,18 @@ body.assistant-open .ai-launch{
 }
 
 @media (max-width:640px){
-  .compare-row{font-size:12px;}
+  .compare-row{font-size:14px;}
   .cta-utility{
     display:flex !important;
     grid-template-columns:none !important;
+    flex-direction:column;
+    align-items:flex-start !important;
+    gap:6px;
   }
-  .cta-utility .btn-ai,
-  #openAssistantFromCta{
-    display:none !important;
+  .cta-utility .btn-ai{
+    justify-self:auto;
+    margin-left:-8px !important;
+    padding:8px 10px !important;
+    font-size:14px;
   }
 }

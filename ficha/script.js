@@ -173,6 +173,32 @@
     }).join("");
   }
 
+  /**
+   * Mantiene la columna vertical de miniaturas (desktop/tablet) siempre del
+   * mismo alto que la imagen principal — nunca se pasa hasta el botón
+   * Compartir, y nunca hace scroll interno: si no entran todas a tamaño
+   * completo, .thumb (flex:1 1 0) las achica para que las N entren justo.
+   * En mobile la galería cambia a fila horizontal (ver CSS ≤640px), así que
+   * ahí no tocamos el alto.
+   */
+  function syncThumbsHeight() {
+    if (!thumbsEl || !stageEl) return;
+    if (window.matchMedia("(max-width:640px)").matches) {
+      thumbsEl.style.height = "";
+      return;
+    }
+    const h = stageEl.getBoundingClientRect().height;
+    thumbsEl.style.height = h ? `${h}px` : "";
+  }
+
+  if (stageEl && thumbsEl) {
+    if ("ResizeObserver" in window) {
+      new ResizeObserver(syncThumbsHeight).observe(stageEl);
+    } else {
+      window.addEventListener("resize", syncThumbsHeight);
+    }
+  }
+
   function syncZoomBg() {
     const g = GALLERY[activeIndex];
     if (!g || !zoomPane || isVideoType(g.type)) {
@@ -2541,15 +2567,20 @@
     return { openAssistant, closeAssistant, renderSuggestions, ask };
   }
 
-  /* Webflow pisa button/label con width:100% / display:block; forzamos la fila en runtime. */
+  /* Webflow pisa button/label con width:100% / display:block; forzamos acá
+     el layout en runtime. En mobile (≤640px) comparar y preguntá van
+     apilados uno arriba del otro; de ahí para arriba, en la misma fila. */
   function hardenCtaUtility() {
     const row = document.querySelector(".cta-utility");
     if (!row) return;
-    row.style.setProperty("display", "grid", "important");
-    row.style.setProperty("grid-template-columns", "minmax(0,1fr) auto", "important");
-    row.style.setProperty("align-items", "center", "important");
+    const stacked = window.matchMedia("(max-width:640px)").matches;
+    row.style.setProperty("display", stacked ? "flex" : "grid", "important");
+    row.style.setProperty("flex-direction", stacked ? "column" : "row", "important");
+    row.style.setProperty("grid-template-columns", stacked ? "none" : "minmax(0,1fr) auto", "important");
+    row.style.setProperty("align-items", stacked ? "flex-start" : "center", "important");
     row.style.setProperty("width", "100%", "important");
-    row.style.setProperty("column-gap", "12px", "important");
+    row.style.setProperty("column-gap", stacked ? "0" : "12px", "important");
+    row.style.setProperty("row-gap", stacked ? "6px" : "0", "important");
     const compare = row.querySelector(".compare-row");
     const ask = row.querySelector(".btn-ai");
     if (compare) {
@@ -2561,8 +2592,8 @@
     if (ask) {
       ask.style.setProperty("display", "inline-flex", "important");
       ask.style.setProperty("width", "auto", "important");
-      ask.style.setProperty("justify-self", "end", "important");
-      ask.style.setProperty("margin", "0", "important");
+      ask.style.setProperty("justify-self", stacked ? "auto" : "end", "important");
+      ask.style.setProperty("margin", stacked ? "0 0 0 -8px" : "0", "important");
       ask.style.setProperty("border", "none", "important");
       ask.style.setProperty("background", "transparent", "important");
       ask.style.setProperty("white-space", "nowrap", "important");
@@ -2574,6 +2605,7 @@
     document.addEventListener("DOMContentLoaded", hardenCtaUtility);
   }
   window.addEventListener("load", hardenCtaUtility);
+  window.addEventListener("resize", hardenCtaUtility);
 
   function getFichaPayload(question) {
     const ctx = window.__mlProductCtx || PRODUCT_CTX || {};
