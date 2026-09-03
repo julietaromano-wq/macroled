@@ -1420,7 +1420,7 @@ loadAllDescargables();
 
   try {
     window.MacroledAssistant.init({
-      greeting: `Hola, soy el asistente de <b>Macroled</b>. Preguntame por un producto o su documentación técnica.`,
+      greeting: `Hola, soy el asistente de <b>productos Macroled</b>. Preguntame por un producto o su documentación técnica.`,
       getPayload,
       fallbackHtml: () =>
         `No pude responder esa consulta técnica. Probá reformular la pregunta o revisá la ficha / manual del producto.`,

@@ -54,7 +54,7 @@
 .compare-bar-title{
   font-size:14px;
   font-weight:700;
-  color:var(--ink);
+  color:#16294f !important;
   display:flex;
   align-items:center;
   gap:8px;
@@ -92,8 +92,14 @@
   flex:none;
 }
 .compare-toggle:hover{background:var(--bg-card);}
+.compare-toggle svg{
+  width:16px !important;
+  height:16px !important;
+  transform:none !important;
+  transition:transform .2s;
+}
 .compare-bar.collapsed .compare-bar-body{display:none;}
-.compare-bar.collapsed .compare-toggle svg{transform:rotate(180deg);}
+.compare-bar.collapsed .compare-toggle svg{transform:rotate(180deg) !important;}
 .compare-bar-body{
   display:flex;
   align-items:stretch;
@@ -176,7 +182,7 @@
 }
 .compare-chip-name{
   font-size:12px;
-  font-weight:700;
+  font-weight:600;
   color:var(--ink);
   line-height:1.25;
   display:-webkit-box;
@@ -229,6 +235,31 @@
 .compare-cta svg{width:14px;height:14px;}
 .compare-cta:hover{background:var(--btn-blue-dark);color:#fff !important;}
 .compare-cta.disabled{background:#c3c9d6;cursor:not-allowed;pointer-events:none;}
+.compare-actions{
+  display:flex;
+  flex-direction:column;
+  align-items:stretch;
+  justify-content:center;
+  gap:5px;
+  flex:0 0 auto;
+}
+.compare-clear{
+  border:0 !important;
+  background:transparent !important;
+  color:var(--ink-soft) !important;
+  padding:3px 32px !important;
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  gap:5px !important;
+  font-size:14px !important;
+  font-weight:600 !important;
+  line-height:1.2 !important;
+  cursor:pointer;
+  border-radius:6px;
+}
+.compare-clear svg{width:14px !important;height:14px !important;flex:none !important;}
+.compare-clear:hover{color:var(--ink) !important;background:transparent !important;}
 
 body.has-compare-bar .ai-launch{
   bottom:max(20px,env(safe-area-inset-bottom,0px));
@@ -308,6 +339,22 @@ body > #compareBar.compare-bar{
 }
 body > #compareBar.compare-bar a.compare-cta{
   padding:9px 32px !important;
+}
+body > #compareBar.compare-bar .compare-bar-title,
+body > #compareBar.compare-bar .compare-chip-name,
+body > #compareBar.compare-bar .compare-cta,
+body > #compareBar.compare-bar .compare-clear{
+  font-family:var(--font) !important;
+  font-size:14px !important;
+  font-weight:600 !important;
+  line-height:1.2 !important;
+}
+body > #compareBar.compare-bar .compare-bar-title{
+  font-weight:700 !important;
+  color:#16294f !important;
+}
+body > #compareBar.compare-bar .compare-chip-name{
+  font-weight:600 !important;
 }
 @media (max-width:640px){
   body > #compareBar.compare-bar{
