@@ -45,7 +45,7 @@
     max-width:1500px;margin:0 auto;box-sizing:border-box;
     line-height:1.5;overflow-wrap:anywhere;
   }
-  .crumb a{color:var(--ink-soft);cursor:pointer;text-decoration:none;transition:color .15s ease;}
+  .crumb a{color:var(--ink-soft);cursor:pointer;text-decoration:none;transition:color .15s ease;flex:0 1 auto !important;}
   .crumb a:hover{text-decoration:underline;color:var(--dark-blue--700);}
   .crumb .crumb-separator{color:var(--ink-soft);font-weight:400;}
   .crumb a:focus-visible{outline:2px solid var(--brand);outline-offset:3px;border-radius:2px;}

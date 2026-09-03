@@ -45,7 +45,7 @@
   .search-box svg{flex:none;}
 
   .crumb{display:flex;align-items:center;flex-wrap:wrap;gap:8px;padding:16px 40px 0;font-family:var(--font);font-size:13px;font-weight:400;color:var(--ink-soft);max-width:1400px;margin:0 auto;box-sizing:border-box;line-height:1.5;}
-  .crumb a{color:var(--ink-soft);cursor:pointer;text-decoration:none;transition:color .15s ease;}
+  .crumb a{color:var(--ink-soft);cursor:pointer;text-decoration:none;transition:color .15s ease;flex:0 1 auto !important;}
   .crumb a:hover{text-decoration:underline;color:var(--dark-blue--700);}
   .crumb a:focus-visible{outline:2px solid var(--brand);outline-offset:3px;border-radius:2px;}
   .crumb .crumb-separator{color:var(--ink-soft);font-weight:400;}
