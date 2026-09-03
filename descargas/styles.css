@@ -1888,7 +1888,7 @@ button.ai-launch,
   position:fixed !important;
   top:auto !important;
   right:max(16px,env(safe-area-inset-right,0px)) !important;
-  bottom:max(20px,env(safe-area-inset-bottom,0px)) !important;
+  bottom:calc(max(20px,env(safe-area-inset-bottom,0px)) + var(--floating-ui-lift,0px)) !important;
   z-index:2147483645 !important;
   width:auto !important;
   height:48px !important;
@@ -2010,7 +2010,7 @@ button.ai-launch,
   position:fixed !important;
   top:auto !important;
   right:max(16px,env(safe-area-inset-right,0px)) !important;
-  bottom:max(20px,env(safe-area-inset-bottom,0px)) !important;
+  bottom:calc(max(20px,env(safe-area-inset-bottom,0px)) + var(--floating-ui-lift,0px)) !important;
   z-index:2147483645 !important;
   width:auto !important;
   height:48px !important;

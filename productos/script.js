@@ -2202,6 +2202,11 @@ function renderCompareBar(){
 
   bar.style.display = "block";
   bar.classList.toggle("collapsed", state.compareCollapsed);
+  const toggle = document.getElementById("compareToggle");
+  if(toggle){
+    toggle.setAttribute("aria-expanded", String(!state.compareCollapsed));
+    toggle.setAttribute("aria-label", state.compareCollapsed ? "Expandir comparación" : "Contraer comparación");
+  }
   countEl.textContent = list.length;
 
   const chips = list.map(p => {
@@ -2760,6 +2765,11 @@ document.getElementById("btnList").addEventListener("click", () => applyCatalogV
 document.getElementById("compareBarHeader").addEventListener("click", () => {
   state.compareCollapsed = !state.compareCollapsed;
   document.getElementById("compareBar").classList.toggle("collapsed", state.compareCollapsed);
+  const toggle = document.getElementById("compareToggle");
+  if(toggle){
+    toggle.setAttribute("aria-expanded", String(!state.compareCollapsed));
+    toggle.setAttribute("aria-label", state.compareCollapsed ? "Expandir comparación" : "Contraer comparación");
+  }
   updateComparePadding();
 });
 

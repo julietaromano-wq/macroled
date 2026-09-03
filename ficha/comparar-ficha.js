@@ -127,6 +127,11 @@
 
     bar.style.display = "block";
     bar.classList.toggle("collapsed", compareCollapsed);
+    const toggle = document.getElementById("compareToggle");
+    if(toggle){
+      toggle.setAttribute("aria-expanded", String(!compareCollapsed));
+      toggle.setAttribute("aria-label", compareCollapsed ? "Expandir comparación" : "Contraer comparación");
+    }
     countEl.textContent = list.length;
 
     const chips = list
@@ -251,6 +256,11 @@
     document.getElementById("compareBarHeader")?.addEventListener("click", () => {
       compareCollapsed = !compareCollapsed;
       bar.classList.toggle("collapsed", compareCollapsed);
+      const toggle = document.getElementById("compareToggle");
+      if(toggle){
+        toggle.setAttribute("aria-expanded", String(!compareCollapsed));
+        toggle.setAttribute("aria-label", compareCollapsed ? "Expandir comparación" : "Contraer comparación");
+      }
       updateComparePadding();
     });
 

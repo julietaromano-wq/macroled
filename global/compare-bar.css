@@ -95,11 +95,11 @@
 .compare-toggle svg{
   width:16px !important;
   height:16px !important;
-  transform:none !important;
+  transform:rotate(180deg) !important;
   transition:transform .2s;
 }
 .compare-bar.collapsed .compare-bar-body{display:none;}
-.compare-bar.collapsed .compare-toggle svg{transform:rotate(180deg) !important;}
+.compare-bar.collapsed .compare-toggle svg{transform:none !important;}
 .compare-bar-body{
   display:flex;
   align-items:stretch;
