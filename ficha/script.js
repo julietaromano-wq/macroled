@@ -188,7 +188,12 @@
       return;
     }
     const h = stageEl.getBoundingClientRect().height;
-    thumbsEl.style.height = h ? `${h}px` : "";
+    /* Guarda defensiva: un stage real nunca mide menos que esto (aspect-ratio:1
+       sobre una columna angosta). Si por lo que sea llega una medición chica o
+       en 0 (layout todavía no asentado, elemento oculto, etc.), no la aplicamos
+       — mejor dejar el alto que ya había (o el fallback de .thumb) antes que
+       aplastar las miniaturas a una tira invisible. */
+    if (h >= 120) thumbsEl.style.height = `${h}px`;
   }
 
   if (stageEl && thumbsEl) {
@@ -197,6 +202,7 @@
     } else {
       window.addEventListener("resize", syncThumbsHeight);
     }
+    window.addEventListener("load", syncThumbsHeight);
   }
 
   function syncZoomBg() {
