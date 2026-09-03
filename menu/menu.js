@@ -31,6 +31,7 @@ const MEGAMENU_DATA = [
       { name: "Dicroicas", count: "10 Productos", img: `${CDN}/filters:format(webp)/MACROLED/250/dricoicasnewn.png`, href: "#" },
       { name: "Tubos LED", count: "8 Productos", img: `${CDN}/filters:format(webp)/MACROLED/250/tubos.png`, href: "#" },
       { name: "AR111", count: "11 Productos", img: `${CDN}/filters:format(webp)/MACROLED/250/ar111new.png`, href: "#" },
+      { name: "Smart", count: "2 Productos", img: `${CDN}/filters:format(webp)/MACROLED/250/smartnew.png`, href: "/productos?macrofamilia=L%C3%A1mparas&smart=1", isSmart: true },
     ],
   },
   {
@@ -177,6 +178,11 @@ const MEGAMENU_DATA = [
         { name: "Highbay Classic", count: "4 Productos", img: `${CDN}/filters:format(webp)/MACROLED/250/galponeras-eco.webp`, href: "#" },
         { name: "Highbay Standard", count: "4 Productos", img: `${CDN}/filters:format(webp)/MACROLED/250/SHB-200W.png`, href: "#" },
       ]},
+      { group: "Gran Formato", href: "/productos?macrofamilia=Paneles&familia=Gran+Formato", items: [
+        { name: "Gran Formato Backlight", count: "28 Productos", img: `${CDN}/250x250/MACROLED/WEB/GRAN-FORMATO-P40.webp`, href: "/productos?macrofamilia=Paneles&familia=Gran+Formato&subfamilia=Backlight", isNew: true },
+        { name: "Gran Formato 48W", count: "28 Productos", img: `${CDN}/250x250/MACROLED/WEB/GRAN-FORMATO-P40.webp`, href: "/productos?macrofamilia=Paneles&familia=Gran+Formato&subfamilia=48W" },
+        { name: "Gran Formato 40W", count: "28 Productos", img: `${CDN}/250x250/MACROLED/WEB/GRAN-FORMATO-P40.webp`, href: "/productos?macrofamilia=Paneles&familia=Gran+Formato&subfamilia=40W" },
+      ]},
       { group: "Luz de Calle", items: [
         { name: "Standard", count: "28 Productos", img: `${CDN}/250x250/MACROLED/WEB/SLG2-100W-757-CW_FRONT.webp`, href: "#", isNew: true },
         { name: "Lumax", count: "28 Productos", img: `${CDN}/filters:format(webp)/MACROLED/250/lumax.png`, href: "#", isNew: true },
@@ -212,22 +218,22 @@ const MEGAMENU_DATA = [
     },
     layout: "grouped",
     groups: [
-      { group: "Paneles de 6 a 24W", items: [
+      { group: "Paneles de 6 a 24W", href: "/productos?macrofamilia=Paneles&familia=6+a+24W", items: [
         { name: "Embutir", count: "28 Productos", img: `${CDN}/filters:format(webp)/MACROLED/250/embutir-negro.png`, href: "/productos?macrofamilia=Paneles&familia=6+a+24W&subfamilia=Embutir" },
         { name: "Plafón", count: "28 Productos", img: `${CDN}/filters:format(webp)/MACROLED/250/plafon-platil.png`, href: "/productos?macrofamilia=Paneles&familia=6+a+24W&subfamilia=Plaf%C3%B3n" },
       ]},
-      { group: "Paneles de 6 a 36W", isNew: true, items: [
+      { group: "Paneles de 6 a 36W", href: "/productos?macrofamilia=Paneles&familia=6+a+36W", isNew: true, items: [
         { name: "6 a 36 Backlight CCT", count: "28 Productos", img: `${CDN}/250x250/MACROLED/WEB/GRAN-FORMATO-P40.webp`, href: "/productos?macrofamilia=Paneles&familia=6+a+36+Backlight+CCT" },
-        { name: "Downlight", count: "28 Productos", img: `${CDN}/500x500/filters:format(webp)/MACROLED/WEB/SDLR-36W-830-WW_FRONT.webp`, href: "/productos?macrofamilia=Paneles&familia=6+a+36W&subfamilia=Downlight", isNew: true },
       ]},
-      { group: "Gran Formato", items: [
-        { name: "Gran Formato 40W", count: "28 Productos", img: `${CDN}/250x250/MACROLED/WEB/GRAN-FORMATO-P40.webp`, href: "/productos?macrofamilia=Paneles&familia=Gran+Formato&subfamilia=Gran+Formato+40W" },
-        { name: "Gran Formato 48W", count: "28 Productos", img: `${CDN}/250x250/MACROLED/WEB/GRAN-FORMATO-P40.webp`, href: "/productos?macrofamilia=Paneles&familia=Gran+Formato&subfamilia=Gran+Formato+48W" },
-        { name: "Gran Formato Backlight", count: "28 Productos", img: `${CDN}/250x250/MACROLED/WEB/GRAN-FORMATO-P40.webp`, href: "/productos?macrofamilia=Paneles&familia=Gran+Formato+Backlight", isNew: true },
+      { group: "Gran Formato", href: "/productos?macrofamilia=Paneles&familia=Gran+Formato", items: [
+        { name: "Downlight", count: "28 Productos", img: `${CDN}/500x500/filters:format(webp)/MACROLED/WEB/SDLR-36W-830-WW_FRONT.webp`, href: "http://127.0.0.1:5503/productos/?macrofamilia=Paneles&familia=Gran+Formato&subfamilia=Downlight", isNew: true },
+        { name: "Gran Formato Backlight", count: "28 Productos", img: `${CDN}/250x250/MACROLED/WEB/GRAN-FORMATO-P40.webp`, href: "/productos?macrofamilia=Paneles&familia=Gran+Formato&subfamilia=Backlight", isNew: true },
+        { name: "Gran Formato 48W", count: "28 Productos", img: `${CDN}/250x250/MACROLED/WEB/GRAN-FORMATO-P40.webp`, href: "/productos?macrofamilia=Paneles&familia=Gran+Formato&subfamilia=48W" },
+        { name: "Gran Formato 40W", count: "28 Productos", img: `${CDN}/250x250/MACROLED/WEB/GRAN-FORMATO-P40.webp`, href: "/productos?macrofamilia=Paneles&familia=Gran+Formato&subfamilia=40W" },
       ]},
-      { group: "Móviles y COB", items: [
-        { name: "Móviles", count: "28 Productos", img: `${CDN}/filters:format(webp)/MACROLED/250/moviles.png`, href: "/productos?macrofamilia=Paneles&familia=M%C3%B3viles" },
-        { name: "COB", count: "28 Productos", img: `${CDN}/filters:format(webp)/MACROLED/250/premium.png`, href: "/productos?macrofamilia=Paneles&familia=COB" },
+      { group: "Móviles y COB", href: "http://127.0.0.1:5503/productos/?macrofamilia=Paneles&familia=M%C3%B3viles+y+COB", items: [
+        { name: "Móviles", count: "28 Productos", img: `${CDN}/filters:format(webp)/MACROLED/250/moviles.png`, href: "http://127.0.0.1:5503/productos/?macrofamilia=Paneles&familia=M%C3%B3viles+y+COB&subfamilia=M%C3%B3viles" },
+        { name: "COB", count: "28 Productos", img: `${CDN}/filters:format(webp)/MACROLED/250/premium.png`, href: "http://127.0.0.1:5503/productos/?macrofamilia=Paneles&familia=M%C3%B3viles+y+COB&subfamilia=COB" },
       ]},
       { group: "Otros", items: [
         { name: "Drivers", count: "28 Productos", img: `${CDN}/250x250/MACROLED/WEB/DRIVERS.webp`, href: "/productos?macrofamilia=Paneles&familia=Drivers" },
