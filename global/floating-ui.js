@@ -6,10 +6,11 @@
     var launch = document.getElementById("aiLaunch");
     var bar = document.getElementById("compareBar");
     var reference = launch || bar;
-    if (!reference || document.documentElement.dataset.floatingUiBound === "1") return;
+    if (!reference || document.documentElement.dataset.floatingUiBound === "1") return false;
     document.documentElement.dataset.floatingUiBound = "1";
 
-    var boundary = document.querySelector("[data-floating-boundary], [data-compare-boundary], #productos-relacionados");
+    var related = document.getElementById("productos-relacionados");
+    var boundary = document.querySelector("[data-floating-boundary], [data-compare-boundary]");
     if (!boundary) boundary = reference.closest("#macroled-productos, #macroled-home, #layout, main");
     if (!boundary) boundary = document.querySelector("#macroled-productos, #macroled-home, #layout, main");
 
@@ -18,6 +19,7 @@
     });
 
     var frame = 0;
+    var relatedBaseMargin = related ? (parseFloat(getComputedStyle(related).marginBottom) || 0) : 0;
     function getFooterTop() {
       var nodes = document.querySelectorAll("[data-floating-footer], footer, [class*='footer'], [id*='footer']");
       var top = null;
@@ -31,8 +33,15 @@
 
     function updatePosition() {
       frame = 0;
+      var barVisible = bar && getComputedStyle(bar).display !== "none";
+      var barReserve = barVisible ? bar.getBoundingClientRect().height + 32 : 0;
+      if (related) related.style.marginBottom = (relatedBaseMargin + barReserve) + "px";
+
       var stopTop = null;
-      if (boundary && boundary.isConnected && boundary.getClientRects().length) {
+      /* En Ficha, el espacio reservado después de relacionados hace que el
+         footer sea el límite correcto. En el resto se usa el contenedor local. */
+      if (related) stopTop = getFooterTop();
+      if (stopTop === null && boundary && boundary.isConnected && boundary.getClientRects().length) {
         stopTop = boundary.getBoundingClientRect().bottom;
       }
       if (stopTop === null) stopTop = getFooterTop();
@@ -58,11 +67,22 @@
       });
     }
     schedulePosition();
+    return true;
+  }
+
+  function bootFloatingUi() {
+    if (initFloatingUi()) return;
+    /* Algunos Code Embeds de Webflow se insertan después del primer intento. */
+    if (!window.MutationObserver) return;
+    var observer = new MutationObserver(function () {
+      if (initFloatingUi()) observer.disconnect();
+    });
+    observer.observe(document.documentElement, { childList: true, subtree: true });
   }
 
   if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", initFloatingUi, { once: true });
+    document.addEventListener("DOMContentLoaded", bootFloatingUi, { once: true });
   } else {
-    initFloatingUi();
+    bootFloatingUi();
   }
 })();
