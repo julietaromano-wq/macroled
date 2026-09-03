@@ -9,22 +9,35 @@
     if (!reference || document.documentElement.dataset.floatingUiBound === "1") return;
     document.documentElement.dataset.floatingUiBound = "1";
 
-    var boundary = reference.closest("[data-floating-boundary], [data-compare-boundary], #macroled-productos, main");
-    var footer = document.querySelector("[data-floating-footer], footer, .footer_component, .footer-wrapper, .footer");
+    var boundary = reference.closest("[data-floating-boundary], [data-compare-boundary], #macroled-productos, #macroled-home, main");
+    if (!boundary) boundary = document.querySelector("[data-floating-boundary], [data-compare-boundary], #macroled-productos, #macroled-home, main");
 
     [bar, launch, document.getElementById("aiBackdrop"), document.getElementById("aiPanel")].forEach(function (element) {
       if (element && element.parentElement !== document.body) document.body.appendChild(element);
     });
 
     var frame = 0;
+    function getFooterTop() {
+      var nodes = document.querySelectorAll("[data-floating-footer], footer, [class*='footer'], [id*='footer']");
+      var top = null;
+      nodes.forEach(function (node) {
+        var rect = node.getBoundingClientRect();
+        if (rect.width <= 0 || rect.height <= 0) return;
+        if (top === null || rect.top < top) top = rect.top;
+      });
+      return top;
+    }
+
     function updatePosition() {
       frame = 0;
-      var stopTop = null;
-      if (footer && footer.isConnected) stopTop = footer.getBoundingClientRect().top;
-      else if (boundary && boundary.isConnected) stopTop = boundary.getBoundingClientRect().bottom;
+      var stopTop = getFooterTop();
+      if (stopTop === null && boundary && boundary.isConnected) {
+        stopTop = boundary.getBoundingClientRect().bottom;
+      }
 
       var lift = stopTop === null ? 0 : Math.max(0, window.innerHeight - stopTop);
       if (launch) launch.style.setProperty("--floating-ui-lift", lift + "px");
+      if (bar) bar.style.setProperty("--compare-bar-lift", lift + "px");
     }
 
     function schedulePosition() {
@@ -36,8 +49,11 @@
     if ("ResizeObserver" in window) {
       var observer = new ResizeObserver(schedulePosition);
       if (boundary) observer.observe(boundary);
-      if (footer) observer.observe(footer);
       if (launch) observer.observe(launch);
+      if (bar) observer.observe(bar);
+      document.querySelectorAll("[data-floating-footer], footer, [class*='footer'], [id*='footer']").forEach(function (node) {
+        observer.observe(node);
+      });
     }
     schedulePosition();
   }
