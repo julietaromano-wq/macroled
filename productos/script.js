@@ -1958,8 +1958,9 @@ function cardTemplate(doc){
   const tempHtml = buildLuzMediaDots(doc);
   const metaInner = tempHtml;
 
+  const cardTag = productHref ? "a" : "div";
   return `
-    <div class="card"${productHref ? ` role="link" tabindex="0"` : ""} data-sku="${escAttr(sku)}"${productHref ? ` data-href="${escAttr(productHref)}"` : ""}>
+    <${cardTag} class="card"${productHref ? ` href="${escAttr(productHref)}"` : ""} data-sku="${escAttr(sku)}"${productHref ? ` data-href="${escAttr(productHref)}"` : ""}>
       <div class="media">
         <div class="media-frame${firstImg ? " is-loading" : ""}">
           ${buildNuevoBadge(doc)}
@@ -1991,29 +1992,19 @@ function cardTemplate(doc){
           </label>
         </div>
       </div>
-    </div>
+    </${cardTag}>
   `;
 }
 
 function wireCardLinks(){
-  document.querySelectorAll(".card[data-href]").forEach(card => {
-    const go = () => {
-      const href = card.dataset.href;
-      if(href) window.location.href = href;
-    };
+  // La card es un <a href> real: click normal, click central y clic derecho > "abrir en pestaña nueva"
+  // funcionan de forma nativa. Solo bloqueamos la navegación cuando el click cae en un control interno
+  // (Comparar, flechas de imagen, dots) para que ese control haga lo suyo en vez de abrir la ficha.
+  document.querySelectorAll("a.card[data-href]").forEach(card => {
     card.addEventListener("click", (e) => {
-      // Franja inferior: nunca abre la ficha (solo Comparar selecciona)
-      if(e.target.closest(".compare-row, .nav-arrow, .temp-dots, a, button, input, label")){
-        e.stopPropagation();
-        return;
+      if(e.target.closest(".compare-row, .nav-arrow, .temp-dots, button, input, label")){
+        e.preventDefault();
       }
-      go();
-    });
-    card.addEventListener("keydown", (e) => {
-      if(e.key !== "Enter" && e.key !== " ") return;
-      if(e.target.closest(".compare-row, .nav-arrow, .temp-dots, a, button, input, label")) return;
-      e.preventDefault();
-      go();
     });
   });
 }
