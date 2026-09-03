@@ -2173,7 +2173,10 @@
     if (!opts.skipHistory && link && link !== "#") {
       const path = link.startsWith("/") ? link : "/" + link;
       if (window.location.pathname !== path) {
-        window.history.pushState({ sku }, "", path);
+        /* replaceState (no pushState): cambiar de variante no debe apilar
+           entradas de historial — si no, "atrás" recorre cada variante
+           visitada en vez de volver directo a /productos. */
+        window.history.replaceState({ sku }, "", path);
       }
     }
 
