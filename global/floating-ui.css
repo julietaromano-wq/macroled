@@ -29,6 +29,7 @@
   box-shadow:0 12px 32px rgba(0,21,43,.28) !important;
   transition:transform .45s cubic-bezier(.22,.61,.36,1),opacity .4s cubic-bezier(.22,.61,.36,1),background .2s cubic-bezier(.22,.61,.36,1),box-shadow .2s cubic-bezier(.22,.61,.36,1),visibility .4s !important;
 }
+.ai-launch:hover,
 .ai-launch.is-visible:hover{
   background:#021c38 !important;
   color:#fff !important;

@@ -145,12 +145,27 @@ const HIGHBAY_PRO_BANNER = {
   video: "https://s3.coresagroup.com/MACROLED/video/productos/HIGHBAYPRO_HORIZONTAL_EXPORT.mp4",
   poster: `${CDN_HOST}/fit-in/1600x500/filters:format(webp)/MACROLED/250/PHB-200W-90D-857-CW.png`,
 };
+const LUZ_CALLE_STANDARD_BANNER = {
+  video: "https://s3.coresagroup.com/MACROLED/video/productos/LUZCALLESTANDARD_1080p_alta.mp4",
+  poster: `${CDN_HOST}/fit-in/1600x500/filters:format(webp)/MACROLED/WEB/SLG2-100W-757-CW_FRONT.webp`,
+};
 const FAMILIA_BANNERS = {
 };
 const SUBFAMILIA_BANNERS = {
   "Highbay PRO 2026": HIGHBAY_PRO_BANNER,
   "HIGHBAY PRO 2026": HIGHBAY_PRO_BANNER,
 };
+/* Banners que sólo deben aparecer con macrofamilia + familia + subfamilia
+   exactas a la vez (para subfamilias con nombre genérico, como "Standard",
+   que se repite en más de una familia y no alcanza con SUBFAMILIA_BANNERS). */
+const COMBO_BANNERS = [
+  {
+    macrofamilia: "Luminarias de Proyecto",
+    familia: "Luz de Calle",
+    subfamilia: "Standard",
+    data: LUZ_CALLE_STANDARD_BANNER,
+  },
+];
 
 const BANNER_ICON_PAUSE = `<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg>`;
 const BANNER_ICON_PLAY = `<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>`;
@@ -163,6 +178,9 @@ function allBannerVideoUrls(){
     Object.keys(map).forEach(k => {
       if(map[k] && map[k].video) urls.push(map[k].video);
     });
+  });
+  COMBO_BANNERS.forEach(c => {
+    if(c.data && c.data.video) urls.push(c.data.video);
   });
   return urls;
 }
@@ -220,8 +238,22 @@ function lookupBannerKey(map, name){
   return Object.keys(map).find(k => normalizeBannerKey(k) === nName) || "";
 }
 
+/* Busca un banner que exija macrofamilia + familia + subfamilia exactas a la vez. */
+function matchComboBanner(familia, macro, subList){
+  if(subList.length !== 1) return null;
+  const sub = subList[0];
+  const combo = COMBO_BANNERS.find(c =>
+    normalizeBannerKey(c.macrofamilia) === normalizeBannerKey(macro) &&
+    normalizeBannerKey(c.familia) === normalizeBannerKey(familia) &&
+    normalizeBannerKey(c.subfamilia) === normalizeBannerKey(sub)
+  );
+  return combo ? combo.data : null;
+}
+
 function lookupBannerData(familia, macro, subfamilias){
   const subList = [...(subfamilias || [])];
+  const comboData = matchComboBanner(familia, macro, subList);
+  if(comboData) return comboData;
   if(subList.length === 1){
     const sub = subList[0];
     const subKey = lookupBannerKey(SUBFAMILIA_BANNERS, sub);
@@ -279,6 +311,13 @@ function renderCategoryBanner(){
   if(isHighbayProFamilia(activeFamilia) || activeSubfamilias.some(isHighbayPro2026)){
     prefetchBannerVideo(HIGHBAY_PRO_BANNER.video);
   }
+  COMBO_BANNERS.forEach(c => {
+    if(!c.data || !c.data.video) return;
+    if(normalizeBannerKey(activeMacro) === normalizeBannerKey(c.macrofamilia) &&
+       normalizeBannerKey(activeFamilia) === normalizeBannerKey(c.familia)){
+      prefetchBannerVideo(c.data.video);
+    }
+  });
 
   if(!data){
     _activeBannerKey = "";

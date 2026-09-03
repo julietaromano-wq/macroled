@@ -9,8 +9,9 @@
     if (!reference || document.documentElement.dataset.floatingUiBound === "1") return;
     document.documentElement.dataset.floatingUiBound = "1";
 
-    var boundary = reference.closest("[data-floating-boundary], [data-compare-boundary], #macroled-productos, #macroled-home, main");
-    if (!boundary) boundary = document.querySelector("[data-floating-boundary], [data-compare-boundary], #macroled-productos, #macroled-home, main");
+    var boundary = document.querySelector("[data-floating-boundary], [data-compare-boundary], #productos-relacionados");
+    if (!boundary) boundary = reference.closest("#macroled-productos, #macroled-home, #layout, main");
+    if (!boundary) boundary = document.querySelector("#macroled-productos, #macroled-home, #layout, main");
 
     [bar, launch, document.getElementById("aiBackdrop"), document.getElementById("aiPanel")].forEach(function (element) {
       if (element && element.parentElement !== document.body) document.body.appendChild(element);
@@ -30,10 +31,11 @@
 
     function updatePosition() {
       frame = 0;
-      var stopTop = getFooterTop();
-      if (stopTop === null && boundary && boundary.isConnected) {
+      var stopTop = null;
+      if (boundary && boundary.isConnected && boundary.getClientRects().length) {
         stopTop = boundary.getBoundingClientRect().bottom;
       }
+      if (stopTop === null) stopTop = getFooterTop();
 
       var lift = stopTop === null ? 0 : Math.max(0, window.innerHeight - stopTop);
       if (launch) launch.style.setProperty("--floating-ui-lift", lift + "px");
