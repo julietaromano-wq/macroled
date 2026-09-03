@@ -167,9 +167,8 @@ main{padding:calc(48px + clamp(12px,2vw,24px)) clamp(12px,2vw,24px) 0;}
 .thumbs{
   grid-area:thumbs;
   display:flex;flex-direction:column;gap:10px;
-  max-height:min(480px,70vh);
-  overflow-x:hidden;overflow-y:auto;
-  scrollbar-gutter:stable;
+  max-height:none;
+  overflow:visible;
 }
 .thumb{
   width:100%;aspect-ratio:1;padding:0;border-radius:10px;
@@ -474,7 +473,7 @@ main{padding:calc(48px + clamp(12px,2vw,24px)) clamp(12px,2vw,24px) 0;}
 
 /* —— Trust block: línea divisoria simple, sin fondo de color —— */
 .trust{
-  display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:14px 12px;
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(100px,1fr));gap:14px 12px;
   margin:clamp(18px,2.5vw,25px) 0 0;
   padding-top:clamp(18px,2.5vw,25px);
   background:transparent;
@@ -1820,22 +1819,26 @@ body.assistant-open .ai-launch{
   left:auto;
   bottom:max(20px,env(safe-area-inset-bottom,0px));
   z-index:501;
-  display:inline-flex;align-items:center;gap:10px;
+  display:inline-flex;align-items:center;justify-content:center;gap:10px;
+  width:auto;height:48px;
   padding:8px 18px 8px 14px;border:none;border-radius:999px;
-  background:var(--navy);color:#fff;
-  font-size:15px;font-weight:600;cursor:pointer;
+  background:var(--navy) !important;color:#fff !important;
+  font-size:15px !important;font-weight:600 !important;cursor:pointer;
   box-shadow:0 12px 32px rgba(0,21,43,.28);
   transition:transform var(--btn-dur) var(--ease),background var(--btn-dur) var(--ease),box-shadow var(--btn-dur) var(--ease),visibility .2s,bottom .3s var(--ease);
 }
 .ai-launch:hover{
-  background:#021c38;
+  background:#021c38 !important;
+  color:#fff !important;
   transform:translateY(-2px);
   box-shadow:0 16px 36px rgba(0,21,43,.34);
 }
-.ai-launch svg{flex:none;}
+.ai-launch svg{flex:none;width:18px;height:18px;color:#fff !important;stroke:#fff !important;}
+.ai-launch > span{color:#fff !important;font-size:15px !important;font-weight:600 !important;line-height:1.2 !important;}
 .ai-launch-dot{
   width:8px;height:8px;border-radius:50%;background:var(--brand);
   box-shadow:0 0 0 3px rgba(0,189,255,.25);
+  flex:none;
 }
 
 .ai-backdrop{
@@ -2047,6 +2050,14 @@ body.assistant-open .ai-launch{
   .gallery{grid-template-columns:72px minmax(0,1fr);}
   .hero .info{max-width:none;padding:0;}
   .compat-grid{grid-template-columns:repeat(3,1fr);}
+
+  /* "Agregar a comparación" y "Preguntá por este producto" quedaban chicas
+     frente al resto de la tipografía cuando el hero pasa a columnas más
+     angostas — se suben un poco a partir de acá. */
+  .compare-row,.btn-ai{font-size:14px;}
+  .compare-row{min-height:44px;gap:10px;}
+  .compare-row .cb-wrap,.compare-row .cb{width:18px;height:18px;}
+  .compare-row .cb svg{width:11px;height:11px;}
 }
 
 /* Tablet: stack hero, hide nav */
@@ -2058,8 +2069,7 @@ body.assistant-open .ai-launch{
   }
   .gallery{
     position:static;
-    max-width:560px;
-    margin:0 auto;
+    max-width:none;
     width:100%;
   }
   .stage{aspect-ratio:1;}
@@ -2069,7 +2079,7 @@ body.assistant-open .ai-launch{
     padding:0;
   }
   .mainnav{display:none;}
-  .trust{grid-template-columns:repeat(2,minmax(0,1fr));gap:14px 12px;}
+  .trust{grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:16px 14px;}
   .compat-grid{grid-template-columns:repeat(2,1fr);}
   .footer-top{grid-template-columns:1fr 1fr;gap:28px;}
   .lead{max-width:none;}
@@ -2321,13 +2331,19 @@ body.assistant-open .ai-launch{
   .footer-top{grid-template-columns:1fr;gap:28px;}
   .nl{max-width:none;}
 
-  .ai-launch span:last-child{display:none;}
   .ai-launch{
-    width:52px;height:52px;padding:0;
+    width:56px;height:56px;padding:0;gap:0;
     border-radius:50%;
     justify-content:center;
   }
-  .ai-launch-dot{display:none;}
+  .ai-launch svg{width:24px;height:24px;}
+  .ai-launch > span:not(.ai-launch-dot){display:none;}
+  .ai-launch-dot{
+    display:block;position:absolute;right:2px;bottom:2px;
+    width:12px;height:12px;
+    border:2px solid #fff;background:#22c55e;
+    box-shadow:none;
+  }
 
   .share-toast{
     left:16px;right:16px;bottom:max(20px,env(safe-area-inset-bottom));
