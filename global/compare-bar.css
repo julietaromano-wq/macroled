@@ -336,6 +336,7 @@ body > #compareBar.compare-bar{
   bottom:calc(max(var(--compare-bar-gap,20px),env(safe-area-inset-bottom,0px)) + var(--compare-bar-lift,var(--product-floating-lift,0px))) !important;
   z-index:899 !important;
   transform:none !important;
+  transition:width .3s var(--ease),left .3s var(--ease) !important;
 }
 body > #compareBar.compare-bar a.compare-cta{
   padding:9px 32px !important;
