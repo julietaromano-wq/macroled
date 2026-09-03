@@ -223,7 +223,7 @@ const MEGAMENU_DATA = [
         { name: "Plafón", count: "28 Productos", img: `${CDN}/filters:format(webp)/MACROLED/250/plafon-platil.png`, href: "/productos?macrofamilia=Paneles&familia=6+a+24W&subfamilia=Plaf%C3%B3n" },
       ]},
       { group: "Paneles de 6 a 36W", href: "/productos?macrofamilia=Paneles&familia=6+a+36W", isNew: true, items: [
-        { name: "6 a 36 Backlight CCT", count: "28 Productos", img: `${CDN}/250x250/MACROLED/WEB/GRAN-FORMATO-P40.webp`, href: "/productos?macrofamilia=Paneles&familia=6+a+36+Backlight+CCT" },
+        { name: "6 a 36 Backlight CCT", count: "28 Productos", img: `${CDN}/250x250/MACROLED/WEB/GRAN-FORMATO-P40.webp`, href: "https://www.macroled.com.ar/productos?macrofamilia=Paneles&familia=6+a+36W&subfamilia=6+a+36+Backlight+CCT" },
       ]},
       { group: "Gran Formato", href: "/productos?macrofamilia=Paneles&familia=Gran+Formato", items: [
         { name: "Downlight", count: "28 Productos", img: `${CDN}/500x500/filters:format(webp)/MACROLED/WEB/SDLR-36W-830-WW_FRONT.webp`, href: "http://127.0.0.1:5503/productos/?macrofamilia=Paneles&familia=Gran+Formato&subfamilia=Downlight", isNew: true },
