@@ -10,9 +10,11 @@
     document.documentElement.dataset.floatingUiBound = "1";
 
     var related = document.getElementById("productos-relacionados");
-    var boundary = document.querySelector("[data-floating-boundary], [data-compare-boundary]");
-    if (!boundary) boundary = reference.closest("#macroled-productos, #macroled-home, #layout, main");
-    if (!boundary) boundary = document.querySelector("#macroled-productos, #macroled-home, #layout, main");
+    var boundary = related ||
+      document.getElementById("macroled-productos") ||
+      document.getElementById("macroled-home") ||
+      document.getElementById("layout") ||
+      document.querySelector("[data-floating-boundary], [data-compare-boundary], main");
 
     [bar, launch, document.getElementById("aiBackdrop"), document.getElementById("aiPanel")].forEach(function (element) {
       if (element && element.parentElement !== document.body) document.body.appendChild(element);
@@ -34,7 +36,7 @@
     function updatePosition() {
       frame = 0;
       var barVisible = bar && getComputedStyle(bar).display !== "none";
-      var barReserve = barVisible ? bar.getBoundingClientRect().height + 32 : 0;
+      var barReserve = barVisible ? bar.getBoundingClientRect().height + 16 : 0;
       if (related) related.style.marginBottom = (relatedBaseMargin + barReserve) + "px";
 
       var stopTop = null;

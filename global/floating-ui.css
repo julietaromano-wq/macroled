@@ -30,11 +30,16 @@
   transition:transform .45s cubic-bezier(.22,.61,.36,1),opacity .4s cubic-bezier(.22,.61,.36,1),background .2s cubic-bezier(.22,.61,.36,1),box-shadow .2s cubic-bezier(.22,.61,.36,1),visibility .4s !important;
 }
 .ai-launch:hover,
-.ai-launch.is-visible:hover{
+.ai-launch.is-visible:hover,
+body > #aiLaunch.ai-launch:hover{
   background:#021c38 !important;
   color:#fff !important;
   transform:translateY(-2px) !important;
   box-shadow:0 16px 36px rgba(0,21,43,.34) !important;
+}
+body > #aiLaunch.ai-launch{
+  transition:transform .45s cubic-bezier(.22,.61,.36,1),opacity .4s cubic-bezier(.22,.61,.36,1),background .2s cubic-bezier(.22,.61,.36,1),box-shadow .2s cubic-bezier(.22,.61,.36,1),visibility .4s !important;
+  will-change:transform,box-shadow;
 }
 .ai-launch svg{
   flex:none !important;

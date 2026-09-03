@@ -318,7 +318,8 @@ body.has-compare-bar .ai-launch{
     flex:none;
   }
   .compare-chip{width:100%;min-width:0;max-width:none;}
-  .compare-slot-empty{display:none;}
+  .compare-slot-empty,
+  body > #compareBar.compare-bar .compare-slot-empty{display:none !important;}
   .compare-bar a.compare-cta,
   .compare-cta{margin-left:0;width:100%;justify-content:center;padding:9px 32px !important;}
   body.has-compare-bar .ai-launch{
