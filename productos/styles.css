@@ -2874,6 +2874,22 @@ body.assistant-open > #aiLaunch.ai-launch{
   margin:0 0 10px !important;
   color:#16294f !important;
 }
+#macroled-productos .card-title-list{
+  display:none !important;
+}
+#macroled-productos .grid.list .card{
+  flex-wrap:wrap !important;
+}
+#macroled-productos .grid.list .card > .card-title-list{
+  display:block !important;
+  flex:0 0 100% !important;
+  width:100% !important;
+  margin:0 !important;
+  padding:0 !important;
+}
+#macroled-productos .grid.list .card .ml-card-body > .card-title{
+  display:none !important;
+}
 #macroled-productos .card .specs{
   display:grid !important;
   margin:0 !important;
@@ -2901,8 +2917,8 @@ body.assistant-open > #aiLaunch.ai-launch{
   #macroled-productos .layout{
     display:flex !important;
     flex-direction:column !important;
-    gap:16px !important;
-    padding:16px 16px 40px !important;
+    gap:0 !important;
+    padding:20px 16px 40px !important;
   }
   #macroled-productos .results-toolbar{
     flex-direction:column !important;
@@ -2915,7 +2931,8 @@ body.assistant-open > #aiLaunch.ai-launch{
     display:flex !important;
     align-items:stretch !important;
     width:100% !important;
-    gap:10px !important;
+    gap:8px !important;
+    margin-bottom:16px !important;
   }
   #macroled-productos .results-search .search-bar{
     flex:1 1 0% !important;
@@ -2949,7 +2966,7 @@ body.assistant-open > #aiLaunch.ai-launch{
   #macroled-productos .category-heading{
     order:-1 !important;
     width:100% !important;
-    margin:0 0 8px !important;
+    margin:0 0 24px !important;
   }
   #macroled-productos .category-heading h1{
     font-size:28px !important;
@@ -4459,4 +4476,11 @@ body.assistant-open #macroled-productos .ai-launch{
   #macroled-productos .ai-head-copy h2{font-size:20px !important;}
   #macroled-productos .ai-head-sub{font-size:15px !important;}
   #macroled-productos .ai-form{padding:12px 14px max(14px,env(safe-area-inset-bottom)) !important;}
+}
+
+@media (max-width:900px){
+  #macroled-productos .card,
+  #macroled-productos .grid.list .card{
+    padding:.7rem !important;
+  }
 }

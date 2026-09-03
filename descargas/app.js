@@ -42,6 +42,7 @@ const ICON_DOWNLOAD = `<svg width="14" height="14" viewBox="0 0 24 24" fill="non
 const ICON_FILE = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>`;
 const ICON_GRID = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>`;
 const ICON_CHEVRON = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>`;
+const ICON_FACET_CHEV = `<svg xmlns="http://www.w3.org/2000/svg" height="10" viewBox="0 -960 960 960" width="14" fill="currentColor" aria-hidden="true"><path d="m321-80-71-71 329-329-329-329 71-71 400 400L321-80Z"/></svg>`;
 
 /* Mismo pipeline que productos/comparar: multiimagen a veces viene como JSON
    anidado, a veces como objetos {url}, y el primer ítem puede ser un video.
@@ -610,7 +611,7 @@ function renderFacets(searchFilteredList){
 
     group.innerHTML = `
       <div class="facet-title" data-field="${field}">
-        <span class="ft-label">${icon}<span>${label}</span></span><span class="chev">⌃</span>
+        <span class="ft-label">${icon}<span>${label}</span></span><span class="chev">${ICON_FACET_CHEV}</span>
       </div>
       <div class="facet-body">${rowsHtml}</div>
     `;
@@ -873,8 +874,8 @@ function render(){
   renderCards(list);
   renderPagination(list);
   const shown = Math.min(PER_PAGE, list.length - (state.page - 1) * PER_PAGE);
-  document.getElementById("showingLabel").innerHTML =
-    `<span class="showing-full">Mostrando </span>${shown} de ${list.length} descargables`;
+  document.getElementById("showingLabel").textContent =
+    `${shown} de ${list.length} descargables`;
 }
 
 let searchDebounce;
