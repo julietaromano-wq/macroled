@@ -1961,7 +1961,6 @@ function cardTemplate(doc){
   const cardTag = productHref ? "a" : "div";
   return `
     <${cardTag} class="card"${productHref ? ` href="${escAttr(productHref)}"` : ""} data-sku="${escAttr(sku)}"${productHref ? ` data-href="${escAttr(productHref)}"` : ""}>
-      <div class="card-title card-title-list">${doc.nombre_typesense || "Producto sin nombre"}</div>
       <div class="media">
         <div class="media-frame${firstImg ? " is-loading" : ""}">
           ${buildNuevoBadge(doc)}

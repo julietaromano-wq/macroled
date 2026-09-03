@@ -747,7 +747,7 @@
   .grid.list .card .ml-card-body{
     padding:0;min-width:0;margin:0;
     flex:1 1 auto;
-    display:flex;flex-direction:column;justify-content:center;gap:16px;
+    display:flex;flex-direction:column;justify-content:flex-start;gap:16px;
   }
   .grid.list .card-title{
     font-size:16px;line-height:1.3;margin:0;
@@ -2530,7 +2530,7 @@ body.assistant-open > #aiLaunch.ai-launch{
   flex:1 1 auto !important;
   display:flex !important;
   flex-direction:column !important;
-  justify-content:center !important;
+  justify-content:flex-start !important;
   gap:16px !important;
 }
 #macroled-productos .grid.list .card-title{
@@ -2797,7 +2797,7 @@ body.assistant-open > #aiLaunch.ai-launch{
   flex:1 1 auto !important;
   display:flex !important;
   flex-direction:column !important;
-  justify-content:center !important;
+  justify-content:flex-start !important;
   gap:16px !important;
 }
 @media (max-width:900px){
@@ -2873,22 +2873,6 @@ body.assistant-open > #aiLaunch.ai-launch{
   line-height:1.35 !important;
   margin:0 0 10px !important;
   color:#16294f !important;
-}
-#macroled-productos .card-title-list{
-  display:none !important;
-}
-#macroled-productos .grid.list .card{
-  flex-wrap:wrap !important;
-}
-#macroled-productos .grid.list .card > .card-title-list{
-  display:block !important;
-  flex:0 0 100% !important;
-  width:100% !important;
-  margin:0 !important;
-  padding:0 !important;
-}
-#macroled-productos .grid.list .card .ml-card-body > .card-title{
-  display:none !important;
 }
 #macroled-productos .card .specs{
   display:grid !important;
