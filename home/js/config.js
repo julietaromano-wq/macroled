@@ -34,8 +34,8 @@
     monaco: [
       { ...category("Armadas", "monaco-armadas"), href: "https://www.macroled.com.ar/productos?macrofamilia=Interruptores+y+Tomas&familia=Monaco&subfamilia=Armadas", image: "https://s3.coresagroup.com/MACROLED/250/milan.png" },
       { ...category("Despiece", "monaco-bastidor-modulos"), href: "https://www.macroled.com.ar/productos?macrofamilia=Interruptores+y+Tomas&familia=Monaco&subfamilia=Despiece", image: "https://s3.coresagroup.com/MACROLED/250/milan-bastidores.png" },
-      { ...category("Luz guía", "monaco-luz-pasillo"), href: "https://www.macroled.com.ar/productos?macrofamilia=Interruptores+y+Tomas&familia=Monaco&subfamilia=Luz+gu%C3%ADa", image: "https://d1zltvqju4u8ql.cloudfront.net/fit-in/2000x2000/MACROLED/WEB/portada_luz_pasillo.webp" },
-      { ...category("Tapas", "monaco-tapas"), href: "https://www.macroled.com.ar/productos?macrofamilia=Interruptores+y+Tomas&familia=Monaco&subfamilia=Tapas", image: "https://s3.coresagroup.com/MACROLED/250/milan-tapas.png" }
+      { ...category("Tapas", "monaco-tapas"), href: "https://www.macroled.com.ar/productos?macrofamilia=Interruptores+y+Tomas&familia=Monaco&subfamilia=Tapas", image: "https://s3.coresagroup.com/MACROLED/250/milan-tapas.png" },
+      { ...category("Luz guía", "monaco-luz-pasillo"), href: "https://www.macroled.com.ar/productos?macrofamilia=Interruptores+y+Tomas&familia=Monaco&subfamilia=Luz+gu%C3%ADa", image: "https://d1zltvqju4u8ql.cloudfront.net/fit-in/2000x2000/MACROLED/WEB/portada_luz_pasillo.webp" }
     ],
     exterior: [
       { ...category("Reflectores", "reflectores"), href: "https://www.macroled.com.ar/productos?macrofamilia=Reflectores", image: "https://s3.coresagroup.com/MACROLED/250/reflectores-smart.png" },
@@ -44,7 +44,7 @@
       { ...category("Guirnaldas", "guirnaldas"), href: "https://www.macroled.com.ar/productos?macrofamilia=Artefactos+para+L%C3%A1mparas&familia=Guirnaldas", image: "https://d1zltvqju4u8ql.cloudfront.net/fit-in/250x250/filters:format(png)/MACROLED/1000/7428325574946a.png" }
     ],
     proyectos: [
-      { ...category("Luz de calle\nStandard", "proyectos-luz-calle-standard"), href: "https://www.macroled.com.ar/productos?macrofamilia=Luminarias+de+Proyecto&familia=Luz+de+Calle&subfamilia=Luz+de+Calle+Standard", image: "https://d1zltvqju4u8ql.cloudfront.net/fit-in/250x250/MACROLED/WEB/SLG2-100W-757-CW_FRONT.webp", badge: "Nuevo" },
+      { ...category("Luz de calle\nStandard", "proyectos-luz-calle-standard"), href: "https://www.macroled.com.ar/productos?macrofamilia=Luminarias+de+Proyecto&familia=Luz+de+Calle&subfamilia=Standard", image: "https://d1zltvqju4u8ql.cloudfront.net/fit-in/250x250/MACROLED/WEB/SLG2-100W-757-CW_FRONT.webp", badge: "Nuevo" },
       { ...category("Highbay PRO", "proyectos-highbay-pro"), href: "https://www.macroled.com.ar/productos?macrofamilia=Luminarias+de+Proyecto&familia=Galponeras&subfamilia=Highbay+PRO+2026", image: "https://s3.coresagroup.com/MACROLED/250/PHB-200W-90D-857-CW.png" },
       { ...category("Reflectores PRO", "proyectos-reflectores-pro"), href: "https://www.macroled.com.ar/productos?macrofamilia=Reflectores&familia=Reflectores+PRO+2026", image: "https://d1zltvqju4u8ql.cloudfront.net/fit-in/250x250//MACROLED/WEB/PFL-400W-030D-857-CW_FRONT.webp" },
       { ...category("Olimpus", "proyectos-olimpus"), href: "https://www.macroled.com.ar/productos?macrofamilia=Luminarias+de+Proyecto&familia=Reflectores&subfamilia=OLIMPUS", image: "https://s3.coresagroup.com/MACROLED/250/olimpus.png" },
