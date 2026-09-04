@@ -240,9 +240,9 @@ html.mm-scroll-lock body {
     display: block;
     pointer-events: none;
   }
-  #mm-ts-search-wrapper .search-btn .icon-close { display: none; }
-  #mm-ts-search-wrapper.is-open .search-btn .icon-search { display: none; }
-  #mm-ts-search-wrapper.is-open .search-btn .icon-close { display: block; }
+  #mm-ts-search-wrapper .search-btn .icon-close { display: none !important; }
+  #mm-ts-search-wrapper.is-open .search-btn .icon-search { display: none !important; }
+  #mm-ts-search-wrapper.is-open .search-btn .icon-close { display: block !important; }
   #mm-ts-search-results {
     display: none;
     position: absolute;
@@ -451,7 +451,7 @@ html.mm-scroll-lock body {
   width: 100%;
   gap: 8px;
   padding: 8px 8px 8px 12px;
-  margin-bottom: 8px;
+  margin-bottom: 10px;
   border: none;
   background: none;
   border-radius: 6px;
