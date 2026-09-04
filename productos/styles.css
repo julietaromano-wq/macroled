@@ -4478,3 +4478,10 @@ body.assistant-open #macroled-productos .ai-launch{
     padding:.7rem !important;
   }
 }
+
+/* Vista lista: centra verticalmente el título y los atributos en el espacio
+   disponible sobre la acción de comparar, en todos los tamaños de pantalla. */
+#macroled-productos .grid.list .card .ml-card-body{
+  justify-content:center !important;
+  transform:translateY(-8px);
+}

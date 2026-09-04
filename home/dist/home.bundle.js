@@ -28,7 +28,7 @@
   const MANUAL_CATEGORIES = {
     interior: [
       { ...category("Lineales PRO", "lineales-pro"), href: "https://www.macroled.com.ar/productos?macrofamilia=Lineales+PRO", image: "https://d1zltvqju4u8ql.cloudfront.net/fit-in/350x350/MACROLED/WEB/PORTADA-LINEALES-PRO.webp", badge: "Nuevo" },
-      { ...category("Skyline", "luminarias-skyline"), href: "https://www.macroled.com.ar/productos?macrofamilia=Rieles+Magn%C3%A9ticos&familia=Luminarias", image: "https://s3.coresagroup.com/MACROLED/250/skyline.png", badge: "Nuevo" },
+      { ...category("Skyline", "luminarias-skyline"), href: "https://www.macroled.com.ar/productos?macrofamilia=Skyline&familia=Luminarias", image: "https://s3.coresagroup.com/MACROLED/250/skyline.png", badge: "Nuevo" },
       { ...category("Artefactos para lámparas", "artefactos-para-lamparas"), href: "https://www.macroled.com.ar/productos?macrofamilia=Artefactos+para+L%C3%A1mparas", image: "https://s3.coresagroup.com/MACROLED/250/policarbonato-embutir-ar111.png" },
       { ...category("Paneles", "paneles"), href: "https://www.macroled.com.ar/productos?macrofamilia=Paneles", image: "https://d1zltvqju4u8ql.cloudfront.net/fit-in/250x250/MACROLED/WEB/GRAN-FORMATO-BACKLIGHT.webp" },
       { ...category("Tiras Led", "tiras-led"), href: "https://www.macroled.com.ar/productos?macrofamilia=Tiras+LED", image: "https://d1zltvqju4u8ql.cloudfront.net/fit-in/250x250/filters:format(png)/MACROLED/1000/0742832556316a.png" },
@@ -49,7 +49,7 @@
     proyectos: [
       { ...category("Luz de calle\nStandard", "proyectos-luz-calle-standard"), href: "https://www.macroled.com.ar/productos?macrofamilia=Luminarias+de+Proyecto&familia=Luz+de+Calle&subfamilia=Standard", image: "https://d1zltvqju4u8ql.cloudfront.net/fit-in/250x250/MACROLED/WEB/SLG2-100W-757-CW_FRONT.webp", badge: "Nuevo" },
       { ...category("Highbay PRO", "proyectos-highbay-pro"), href: "https://www.macroled.com.ar/productos?macrofamilia=Luminarias+de+Proyecto&familia=Galponeras&subfamilia=Highbay+PRO+2026", image: "https://s3.coresagroup.com/MACROLED/250/PHB-200W-90D-857-CW.png" },
-      { ...category("Reflectores PRO", "proyectos-reflectores-pro"), href: "https://www.macroled.com.ar/productos?macrofamilia=Reflectores&familia=Reflectores+PRO+2026", image: "https://d1zltvqju4u8ql.cloudfront.net/fit-in/250x250//MACROLED/WEB/PFL-400W-030D-857-CW_FRONT.webp" },
+      { ...category("Reflectores PRO", "proyectos-reflectores-pro"), href: "https://www.macroled.com.ar/productos?macrofamilia=Luminarias+Exterior&familia=Reflectores&subfamilia=Reflectores+PRO+2026", image: "https://d1zltvqju4u8ql.cloudfront.net/fit-in/250x250//MACROLED/WEB/PFL-400W-030D-857-CW_FRONT.webp" },
       { ...category("Olimpus", "proyectos-olimpus"), href: "https://www.macroled.com.ar/productos?macrofamilia=Luminarias+de+Proyecto&familia=Reflectores&subfamilia=OLIMPUS", image: "https://s3.coresagroup.com/MACROLED/250/olimpus.png" },
       { ...category("Highbay Standard", "proyectos-highbay-standard"), href: "https://www.macroled.com.ar/productos?macrofamilia=Luminarias+de+Proyecto&familia=Galponeras&subfamilia=Highbay+Standard", image: "https://s3.coresagroup.com/MACROLED/250/SHB-200W.png" },
       { ...category("Focus", "proyectos-focus"), href: "https://www.macroled.com.ar/productos?macrofamilia=Luminarias+de+Proyecto&familia=Reflectores&subfamilia=Focus", image: "https://s3.coresagroup.com/MACROLED/250/focus.png" }
@@ -89,13 +89,16 @@
             ...line("Reflectores PRO", "La combinación ideal entre rendimiento y practicidad. Reflectores para exterior pensados para iluminar accesos, fachadas, patios y áreas abiertas con una instalación versátil y una luz confiable.", "#16283a", "#e4ebf0", "image-right"),
             image: "https://cdn.prod.website-files.com/65f1fdd7248b6709fdebe904/699cb28af6cdd53e774759f0_FAMILIA%20REFLECTORES%20PRO.webp",
             imageFit: "contain-right",
-            href: "https://www.macroled.com.ar/productos?macrofamilia=Reflectores&familia=Reflectores+PRO+2026",
+            href: "https://www.macroled.com.ar/productos?macrofamilia=Luminarias+Exterior&familia=Reflectores&subfamilia=Reflectores+PRO+2026",
             titleEmphasis: "PRO",
             content: {
               mode: "typesense",
               query: {
-                typesenseField: "familia",
-                typesenseValue: "Reflectores PRO 2026",
+                typesenseFilters: [
+                  { field: "macrofamilia", value: "Luminarias Exterior" },
+                  { field: "familia", value: "Reflectores" },
+                  { field: "subfamilia", value: "Reflectores PRO 2026" }
+                ],
                 productCount: 4,
                 fetchCount: 80,
                 randomizeBy: "nombre_typesense"
@@ -107,7 +110,7 @@
             image: "https://s3.coresagroup.com/MACROLED/250/skyline.png",
             imageFit: "contain-centered",
             visualTheme: "silver-dark",
-            href: "https://www.macroled.com.ar/productos?macrofamilia=Rieles+Magn%C3%A9ticos&familia=Luminarias",
+            href: "https://www.macroled.com.ar/productos?macrofamilia=Skyline&familia=Luminarias",
             catalogHref: "https://s3.coresagroup.com/MACROLED/catalogos/Macroled_Skyline.pdf",
             titleEmphasis: "Skyline",
             titleEmphasisWeight: 600,
@@ -115,7 +118,7 @@
               mode: "typesense",
               query: {
                 typesenseFilters: [
-                  { field: "macrofamilia", value: "Rieles Magnéticos" },
+                  { field: "macrofamilia", value: "Skyline" },
                   { field: "familia", value: "Luminarias" }
                 ],
                 productCount: 4,
