@@ -7,7 +7,7 @@ const COLLECTION = "Macroled_Prueba";
 const PER_PAGE = 18;
 const TYPESENSE_PAGE_SIZE = 250;
 const TYPESENSE_PAGE_CONCURRENCY = 4;
-const DOWNLOADS_CACHE_KEY = "macroled-descargas-v6";
+const DOWNLOADS_CACHE_KEY = "macroled-descargas-v7";
 const DOWNLOADS_CACHE_TTL_MS = 5 * 60 * 1000;
 
 // Qué campo del documento de producto corresponde a cada tipo de descarga.
@@ -24,7 +24,7 @@ const CATALOG_QUERY_BY = "nombre_typesense,descripcion,sku";
 // Evita transferir todas las especificaciones técnicas de cada producto.
 // Esta página sólo necesita estos campos para construir sus cards y filtros.
 const PRODUCT_INCLUDE_FIELDS = [
-  "id", "nombre_typesense", "descripcion", "sku", "macrofamilia", "subfamilia",
+  "id", "nombre_typesense", "descripcion", "sku", "order", "macrofamilia", "subfamilia",
   "rango_temperatura", "nuevo", "tipo_registro", "tipo_descarga",
   "multiimagen", "multiimage", "imagen", "imagen_portada",
   "ficha_tecnica", "garantia_link", "manual", "manual_link", "manuales", "ies_link"
@@ -138,6 +138,25 @@ const CATALOGO_ORDER = [
   "monaco", "lima", "tiras y perfiles", "inalambricas"
 ];
 
+// Orden editorial del filtro de macrofamilias en Descargas. "General" se
+// conserva primero para los catálogos que no tienen macrofamilia asignada.
+const MACROFAMILIA_FILTER_ORDER = [
+  "general",
+  "lamparas",
+  "artefactos para lamparas",
+  "luminarias interior",
+  "luminarias exterior",
+  "luminarias integradas exterior",
+  "luminarias de proyecto",
+  "skyline",
+  "tiras led",
+  "decorativas",
+  "monaco",
+  "interruptores y tomas",
+  "sensores y fotocelulas",
+  "luces de auto"
+];
+
 function normalizedOrderText(value){
   return String(value || "")
     .normalize("NFD")
@@ -190,7 +209,11 @@ function compareDescargables(a, b){
     if(orderDiff) return orderDiff;
     return String(a.nombre || "").localeCompare(String(b.nombre || ""), "es", { sensitivity: "base" });
   }
-  return 0;
+  const aOrder = Number(a.order);
+  const bOrder = Number(b.order);
+  const aValue = Number.isFinite(aOrder) ? aOrder : Number.MAX_SAFE_INTEGER;
+  const bValue = Number.isFinite(bOrder) ? bOrder : Number.MAX_SAFE_INTEGER;
+  return aValue - bValue;
 }
 
 function sortDescargables(list){
@@ -210,10 +233,12 @@ function sortFacetEntries(field, entries){
   }
   if(field === "macrofamilia"){
     return entries.sort((a, b) => {
-      const ag = /^general$/i.test(a[0]) ? 0 : 1;
-      const bg = /^general$/i.test(b[0]) ? 0 : 1;
-      if(ag !== bg) return ag - bg;
-      return b[1] - a[1];
+      const ia = MACROFAMILIA_FILTER_ORDER.indexOf(normalizedOrderText(a[0]));
+      const ib = MACROFAMILIA_FILTER_ORDER.indexOf(normalizedOrderText(b[0]));
+      const da = ia === -1 ? MACROFAMILIA_FILTER_ORDER.length : ia;
+      const db = ib === -1 ? MACROFAMILIA_FILTER_ORDER.length : ib;
+      if(da !== db) return da - db;
+      return String(a[0]).localeCompare(String(b[0]), "es", { sensitivity: "base" });
     });
   }
   return entries.sort((a, b) => b[1] - a[1]);
@@ -427,6 +452,7 @@ function expandProductos(productos){
       origen: "producto",
       nombre: doc.nombre_typesense, descripcion: doc.descripcion || "",
       sku: doc.sku, macrofamilia: doc.macrofamilia, subfamilia: doc.subfamilia || null,
+      order: doc.order,
       temperaturas: parseTemperaturas(doc.rango_temperatura),
       nuevo: !!doc.nuevo,
       imagen: imgs[0] || null,
@@ -917,7 +943,9 @@ downloadSearchClear?.addEventListener("click", () => {
 });
 syncDownloadSearchClear();
 
+let sortHasBeenChosen = false;
 document.getElementById("sortSelect").addEventListener("change", (e) => {
+  sortHasBeenChosen = true;
   state.sortBy = e.target.value;
   syncSortControl();
   render();
@@ -931,8 +959,8 @@ const sortSelect = document.getElementById("sortSelect");
 function syncSortControl(){
   if(!sortSelect) return;
   const selectedOption = [...sortSelect.options].find(option => option.value === sortSelect.value);
-  document.getElementById("sortCurrent").textContent = sortSelect.value
-    ? (selectedOption?.textContent || "Ordenar por")
+  document.getElementById("sortCurrent").textContent = (sortHasBeenChosen || sortSelect.value)
+    ? (selectedOption?.textContent || "Predeterminado")
     : "Ordenar por";
   sortMenu?.querySelectorAll(".sort-option").forEach(option => {
     const active = option.dataset.sort === sortSelect.value;

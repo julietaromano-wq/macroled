@@ -715,6 +715,45 @@ function sortFacetCounts(counts, labelFn){
   );
 }
 
+/* Orden comercial de macrofamilias. Es compartido por el sidebar de
+   desktop/tablet y el detalle del drawer mobile. Las opciones nuevas que no
+   estén contempladas acá se agregan al final en orden alfabético. */
+const MACROFAMILIA_ORDER = [
+  "Lámparas",
+  "Artefactos para Lámparas",
+  "Luminarias Interior",
+  "Luminarias Exterior",
+  "Luminarias de Proyecto",
+  "Skyline",
+  "Tiras LED",
+  "Decorativas",
+  "Mónaco",
+  "Interruptores y Tomas",
+  "Sensores y Fotocélulas",
+  "Luces de Auto"
+];
+
+function normalizeMacrofamiliaOrderKey(value){
+  return String(value || "").trim().toLocaleLowerCase("es")
+    .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+    .replace(/^luminarias integradas? /, "luminarias ")
+    .replace(/^rieles magneticos$/, "skyline");
+}
+
+const MACROFAMILIA_ORDER_INDEX = new Map(
+  MACROFAMILIA_ORDER.map((value, index) => [normalizeMacrofamiliaOrderKey(value), index])
+);
+
+function sortMacrofamiliaCounts(counts){
+  return [...(counts || [])].sort((a, b) => {
+    const aIndex = MACROFAMILIA_ORDER_INDEX.get(normalizeMacrofamiliaOrderKey(a.value));
+    const bIndex = MACROFAMILIA_ORDER_INDEX.get(normalizeMacrofamiliaOrderKey(b.value));
+    const aRank = aIndex == null ? Number.MAX_SAFE_INTEGER : aIndex;
+    const bRank = bIndex == null ? Number.MAX_SAFE_INTEGER : bIndex;
+    return aRank - bRank || String(a.value || "").localeCompare(String(b.value || ""), "es", { sensitivity: "base", numeric: true });
+  });
+}
+
 /* Dimerizable: solo mostrar el filtro si hay alguna opción distinta de "No"
    (Sí, Con smartphone, etc.) en el contexto actual de facets. */
 function isDimerizableNoValue(value){
@@ -745,7 +784,7 @@ async function loadMacrofamiliaOptions(){
     if(!res.ok) return;
     const data = await res.json();
     const facet = (data.facet_counts || []).find(f => f.field_name === "macrofamilia");
-    macrofamiliaOptions = sortFacetCounts(facet ? facet.counts : []);
+    macrofamiliaOptions = sortMacrofamiliaCounts(facet ? facet.counts : []);
   }catch(err){
     console.error("No se pudo cargar la lista completa de macrofamilias:", err);
   }
@@ -1162,8 +1201,9 @@ function renderFacets(facetCounts){
       const subfamBody = subfamGroup.querySelector(".facet-body");
       subfamCounts.forEach(c => {
         const row = document.createElement("label");
-        row.className = "facet-row";
-        const checked = state.selected.subfamilia.has(c.value) ? "checked" : "";
+        const isSelected = state.selected.subfamilia.has(c.value);
+        row.className = "facet-row" + (isSelected ? " active" : "");
+        const checked = isSelected ? "checked" : "";
         row.innerHTML = `
           <span class="cb-wrap">
             <input type="checkbox" data-field="${SUBFAMILIA_FIELD}" data-value="${c.value}" ${checked}>
@@ -1197,8 +1237,9 @@ function renderFacets(facetCounts){
       const body = group.querySelector(".facet-body");
       counts.forEach(c => {
         const row = document.createElement("label");
-        row.className = "facet-row";
-        const checked = state.selected[field].has(c.value) ? "checked" : "";
+        const isSelected = state.selected[field].has(c.value);
+        row.className = "facet-row" + (isSelected ? " active" : "");
+        const checked = isSelected ? "checked" : "";
         row.innerHTML = `
           <span class="cb-wrap">
             <input type="checkbox" data-field="${field}" data-value="${c.value}" ${checked}>
@@ -1232,7 +1273,9 @@ function renderFacets(facetCounts){
     }
 
     const facetData = (facetCounts || []).find(f => f.field_name === field);
-    let counts = sortFacetCounts(facetData ? facetData.counts : []);
+    let counts = field === "macrofamilia"
+      ? sortMacrofamiliaCounts(facetData ? facetData.counts : [])
+      : sortFacetCounts(facetData ? facetData.counts : []);
     if(field === "variante_temperatura_filtro") counts = filterTemperatureCounts(counts);
     if(field === "macrofamilia" && searching && macrofamiliaOptions.length){
       const byVal = {};
@@ -1276,8 +1319,7 @@ function renderFacets(facetCounts){
       }
       const row = document.createElement("label");
       const checked = state.selected[field].has(c.value) ? "checked" : "";
-      const mutedOption = state.selected[field]?.size && !checked;
-      row.className = "facet-row" + (mutedOption ? " is-muted" : "");
+      row.className = "facet-row" + (checked ? " active" : "");
       const dot = field === "variante_temperatura_filtro"
         ? `<span class="dot temp-dot" style="background:${tempDotColor(c.value)}" title="${tempCategoryLabel(c.value) || c.value}"></span>` : "";
       row.innerHTML = `
@@ -1830,9 +1872,8 @@ function appendColorSwatches(container, counts, selectedSet, onToggle){
     const label = colorLabel(c.value);
     const row = document.createElement("label");
     const isSelected = selectedSet.has(c.value);
-    const isMuted = selectedSet.size > 0 && !isSelected;
     row.className = "facet-row"
-      + (isMuted ? " is-muted" : "")
+      + (isSelected ? " active" : "")
       + (!c.count && !isSelected ? " is-empty" : "");
     const checked = isSelected ? "checked" : "";
     const light = isLightColorKey(c.value) ? " light" : "";
@@ -2963,7 +3004,9 @@ function renderMobileFilters(facetCounts){
       }
     }
     const data = lastFacetCounts.find(f => f.field_name === field);
-    let counts = sortFacetCounts(data ? data.counts : []);
+    let counts = field === "macrofamilia"
+      ? sortMacrofamiliaCounts(data ? data.counts : [])
+      : sortFacetCounts(data ? data.counts : []);
     if(field === "variante_temperatura_filtro") counts = filterTemperatureCounts(counts);
     if(field !== "macrofamilia" && !counts.length) return;
     rows.push({ field, label: FMN_LABELS[field], summary: fmnSummary(field), counts });
@@ -3148,7 +3191,7 @@ function openDetailScreen(field){
     const live = (lastFacetCounts.find(f => f.field_name === "macrofamilia") || {}).counts || [];
     const liveByVal = {};
     live.forEach(c => { liveByVal[c.value] = c.count; });
-    let counts = sortFacetCounts(
+    let counts = sortMacrofamiliaCounts(
       Boolean(state.query) && cached.length
         ? cached.map(c => ({ value: c.value, count: liveByVal[c.value] != null ? liveByVal[c.value] : 0 }))
         : cached
