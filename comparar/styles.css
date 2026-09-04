@@ -929,6 +929,7 @@
       min-height:46px;
       font-size:14px;
     }
+    .print-btn .print-btn-full{display:none;}
     /* en mobile el switch de "solo diferencias" de adentro del grid
        (.header-label) se saca del flow: se usa #diffBar en su lugar,
        siempre visible arriba de la tabla mientras la fila de productos
@@ -1242,15 +1243,6 @@
     .ai-launch{animation:none !important;}
   }
   @media screen and (max-width:640px){
-    .ai-launch{
-      width:auto;height:44px;padding:8px 16px 8px 11px;
-      border-radius:999px;
-      justify-content:center;
-    }
-    .ai-launch svg,
-    .ai-launch img,
-    .ai-launch-icon{width:18px;height:18px;}
-    .ai-launch-dot{width:8px;height:8px;}
     .ai-panel{width:100%;}
     .ai-head{padding:24px 16px 14px;}
     .ai-avatar{width:48px;height:48px;}
@@ -1314,73 +1306,10 @@
   max-width:100%;
 }
 
-/* Capas fijas en Webflow: menú (100000) < mini-comparativa < modal < asistente */
+/* Capas fijas en Webflow: menú (100000) < mini-comparativa < modal < asistente.
+   La apariencia/posición de .ai-launch la define global/floating-ui.css. */
 .mini-compare-bar{z-index:100010 !important;}
 .modal-overlay{z-index:100020 !important;}
-button.ai-launch,
-.ai-launch{
-  z-index:2147483645 !important;
-  width:auto !important;
-  height:48px !important;
-  padding:8px 18px 8px 14px !important;
-  border-radius:999px !important;
-  background:#00152B !important;
-  color:#fff !important;
-  font-family:var(--font) !important;
-  font-size:15px !important;
-  font-weight:600 !important;
-  -webkit-text-fill-color:#fff !important;
-}
-@media (max-width:640px){
-  button.ai-launch,
-  .ai-launch{
-    width:auto !important;
-    height:44px !important;
-    padding:8px 16px 8px 11px !important;
-  }
-}
-button.ai-launch > span,
-.ai-launch > span,
-button.ai-launch svg,
-.ai-launch svg,
-button.ai-launch img,
-.ai-launch img{
-  opacity:1 !important;
-  visibility:visible !important;
-}
-button.ai-launch .ai-launch-dot,
-.ai-launch .ai-launch-dot{
-  display:block !important;
-  position:static !important;
-  right:auto !important;
-  bottom:auto !important;
-  width:8px !important;
-  height:8px !important;
-  border-radius:50% !important;
-  background:#00bdff !important;
-  border:none !important;
-  color:transparent !important;
-  font-size:0 !important;
-  box-shadow:0 0 0 3px rgba(0,189,255,.25) !important;
-}
-button.ai-launch svg,
-.ai-launch svg{
-  color:#fff !important;
-  stroke:#fff !important;
-  fill:none !important;
-  -webkit-text-fill-color:#fff !important;
-}
-button.ai-launch > span:not(.ai-launch-dot),
-.ai-launch > span:not(.ai-launch-dot){
-  color:#fff !important;
-  -webkit-text-fill-color:#fff !important;
-}
-button.ai-launch svg .ai-icon-spark,
-.ai-launch svg .ai-icon-spark,
-.ai-avatar svg .ai-icon-spark{
-  fill:#fff !important;
-  stroke:none !important;
-}
 .ai-backdrop{z-index:2147483646 !important;}
 .ai-panel{z-index:2147483647 !important;}
 @media screen and (max-width:480px){
