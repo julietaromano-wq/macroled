@@ -877,6 +877,9 @@ if (typeof module !== "undefined") module.exports = MEGAMENU_DATA;
       }
     }
 
+    window.MACROLED_MENU = window.MACROLED_MENU || {};
+    window.MACROLED_MENU.closeMegamenu = close;
+
     function stopPageScroll(e) {
       if (!root.classList.contains("is-open")) return;
       var target = e.target;
@@ -1061,6 +1064,9 @@ if (typeof module !== "undefined") module.exports = MEGAMENU_DATA;
     }
 
     function openSearch() {
+      if (window.MACROLED_MENU && typeof window.MACROLED_MENU.closeMegamenu === "function") {
+        window.MACROLED_MENU.closeMegamenu();
+      }
       wrapper.classList.add("is-open");
       if (searchBox) searchBox.classList.add("is-open");
       input.setAttribute("aria-expanded", "true");
