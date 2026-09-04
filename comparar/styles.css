@@ -1089,18 +1089,17 @@
     visibility:visible !important;
   }
   .ai-launch-dot{
-    display:block !important;
-    position:static !important;
-    width:8px !important;
-    height:8px !important;
+    display:block;
+    width:8px;
+    height:8px;
     flex:none;
     border-radius:50%;
-    background:#00bdff !important;
-    border:none !important;
-    box-shadow:0 0 0 3px rgba(0,189,255,.25) !important;
-    color:transparent !important;
-    font-size:0 !important;
-    line-height:0 !important;
+    background:#00bdff;
+    border:none;
+    box-shadow:0 0 0 3px rgba(0,189,255,.25);
+    color:transparent;
+    font-size:0;
+    line-height:0;
   }
 
   .ai-backdrop{
@@ -1244,23 +1243,39 @@
   }
   @media screen and (max-width:640px){
     .ai-launch{
-      width:56px;height:56px;padding:0;gap:0;border-radius:50%;
-      justify-content:center;
+      bottom:max(12px,env(safe-area-inset-bottom,0px));
+      width:56px !important;
+      height:56px !important;
+      padding:0 !important;
+      gap:0 !important;
+      border-radius:50% !important;
+      justify-content:center !important;
     }
     .ai-launch svg,
     .ai-launch img,
-    .ai-launch-icon{width:24px;height:24px;}
-    .ai-launch > span:not(.ai-launch-dot){display:none;}
+    .ai-launch-icon{
+      width:24px !important;
+      height:24px !important;
+    }
+    .ai-launch > span:not(.ai-launch-dot){
+      display:none !important;
+    }
     .ai-launch-dot{
-      position:absolute;right:2px;bottom:2px;
-      width:12px;height:12px;border:2px solid #fff;
-      background:#22c55e;box-shadow:none;
+      display:block !important;
+      position:absolute !important;
+      right:2px !important;
+      bottom:2px !important;
+      width:12px !important;
+      height:12px !important;
+      border:2px solid #fff !important;
+      background:#22c55e !important;
+      box-shadow:none !important;
     }
     .ai-panel{width:100%;}
     .ai-head{padding:24px 16px 14px;}
     .ai-avatar{width:48px;height:48px;}
-    .ai-head-copy h2{font-size:17px;}
-    .ai-head-sub{font-size:14px;}
+    .ai-head-copy h2{font-size:20px;}
+    .ai-head-sub{font-size:15px;}
     .ai-form{padding:12px 14px max(14px,env(safe-area-inset-bottom));}
     #aiInput,
     .ai-form input,
