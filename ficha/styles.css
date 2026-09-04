@@ -382,6 +382,19 @@ main{padding:calc(48px + clamp(12px,2vw,24px)) clamp(12px,2vw,24px) 0;}
 .meta b{color:var(--ink);font-weight:500;font-variant-numeric:tabular-nums;}
 .meta .dot{width:3px;height:3px;border-radius:50%;background:#c5cad3;}
 
+.sku-copy-btn{
+  display:inline-flex;align-items:center;justify-content:center;
+  margin-left:8px;padding:4px;border:0;background:#eef0f3;color:var(--muted);
+  cursor:pointer;border-radius:6px;vertical-align:middle;line-height:0;
+  transition:color .15s ease,background-color .15s ease;
+}
+.sku-copy-btn:hover{color:var(--ink);background:#e2e5ea;}
+.sku-copy-btn:focus-visible{outline:2px solid var(--ink);outline-offset:2px;}
+.sku-copy-btn.copied{color:#1a9c5b;}
+.sku-copy-btn .sku-copy-check{display:none;}
+.sku-copy-btn.copied .sku-copy-icon{display:none;}
+.sku-copy-btn.copied .sku-copy-check{display:inline-block;}
+
 .chars-label{
   display:block;margin:0 0 10px;
   font-size:var(--fs-xs);font-weight:600;letter-spacing:.1em;text-transform:uppercase;

@@ -2913,6 +2913,37 @@
     }
   }
 
+  (function initSkuCopyBtn() {
+    const btn = document.getElementById("sku-copy-btn");
+    if (!btn) return;
+    let resetTimer = null;
+    btn.addEventListener("click", () => {
+      const sku = (document.getElementById("ficha-sku")?.textContent || "").trim();
+      if (!sku) return;
+      const markCopied = () => {
+        btn.classList.add("copied");
+        btn.setAttribute("aria-label", "SKU copiado");
+        clearTimeout(resetTimer);
+        resetTimer = setTimeout(() => {
+          btn.classList.remove("copied");
+          btn.setAttribute("aria-label", "Copiar SKU");
+        }, 1500);
+      };
+      if (navigator.clipboard?.writeText) {
+        navigator.clipboard.writeText(sku).then(markCopied).catch(() => {});
+      } else {
+        const ta = document.createElement("textarea");
+        ta.value = sku;
+        ta.style.position = "fixed";
+        ta.style.opacity = "0";
+        document.body.appendChild(ta);
+        ta.select();
+        try { document.execCommand("copy"); markCopied(); } catch (e) {}
+        document.body.removeChild(ta);
+      }
+    });
+  })();
+
   waitForCmsAndBoot();
   /* Red de seguridad: si por lo que sea bootFicha tarda de más, no dejamos
      la ficha oculta más de 1.2s (peor caso normal: el embed CMS ya está en
