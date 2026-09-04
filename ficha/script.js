@@ -2258,14 +2258,6 @@
 
     dimensionKeys = resolveDimensions(heroItem, siblings);
 
-    console.log("[variantes]", {
-      hero: (heroItem.getAttribute("data-sku") || "").trim(),
-      hermanas: siblings.length,
-      skus: siblings.map((el) => (el.getAttribute("data-sku") || "").trim()),
-      atributoDeclarado: (heroItem.getAttribute("data-nombre-attr-variantes") || "").trim() || "(vacío)",
-      dimension: dimensionKeys[0] || "(fallback por nombre/SKU)",
-    });
-
     if (siblings.length <= 1) {
       variantsTarget.hidden = true;
       console.warn(
@@ -2304,7 +2296,7 @@
   }
 
   /* —— AI assistant —— */
-  const CONTACTO_URL = "https://macroled.com.ar/contacto"; // TODO: reemplazar por la URL real de contacto
+  const CONTACTO_URL = "https://macroled.com.ar/contacto";
 
   const PRODUCT_CTX = (window.__mlProductCtx = {
     name: "Space Blanca",
@@ -2565,8 +2557,36 @@
       ask(q);
     });
 
+    function getFocusableEls() {
+      const selector =
+        'a[href], button:not([disabled]), textarea:not([disabled]), input:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])';
+      return Array.from(aiPanel.querySelectorAll(selector)).filter(
+        (el) => el.offsetParent !== null
+      );
+    }
+
     document.addEventListener("keydown", (e) => {
-      if (e.key === "Escape" && aiPanel.classList.contains("is-open")) closeAssistant();
+      if (!aiPanel.classList.contains("is-open")) return;
+      if (e.key === "Escape") {
+        closeAssistant();
+        return;
+      }
+      if (e.key === "Tab") {
+        const focusable = getFocusableEls();
+        if (!focusable.length) return;
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+        if (e.shiftKey && document.activeElement === first) {
+          e.preventDefault();
+          last.focus();
+        } else if (!e.shiftKey && document.activeElement === last) {
+          e.preventDefault();
+          first.focus();
+        } else if (!aiPanel.contains(document.activeElement)) {
+          e.preventDefault();
+          first.focus();
+        }
+      }
     });
 
     addMsg("bot", greeting);

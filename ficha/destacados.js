@@ -664,7 +664,6 @@
 
   function scheduleReload(reason) {
     if (isLoading) return;
-    if (reason) console.log("[relacionados] reintento:", reason);
     window.clearTimeout(reloadTimer);
     reloadTimer = window.setTimeout(() => {
       loadRelatedProducts();
@@ -699,13 +698,6 @@
     const familia = ctx.familia || "";
     const macrofamilia = ctx.macrofamilia || "";
 
-    console.log("[relacionados] contexto CMS:", {
-      sku,
-      nombre,
-      familia,
-      macrofamilia,
-    });
-
     if (!familia && !macrofamilia) {
       console.warn(
         "[relacionados] faltan data-family / data-macrofamilia en .cms-product-item."
@@ -726,7 +718,6 @@
         { nombre, familia, macrofamilia },
         sku
       );
-      console.log("[relacionados] filtros Typesense a probar:", filters);
 
       /* Acumulamos de lo mas especifico a lo mas general hasta llenar el
          carrusel. Antes se elegia un solo nivel, asi que una familia chica
@@ -750,11 +741,6 @@
           added += 1;
         });
 
-        console.log(
-          `[relacionados] ${step.label} -> found: ${data.found}, nuevos: ${added}, acumulado: ${picked.size}`,
-          "q:",
-          step.query
-        );
         if (picked.size >= RELATED_COUNT) break;
       }
 
@@ -779,23 +765,6 @@
       const html = docs.map((doc) => cardTemplate(doc)).join("");
       const cardCount = paintCards(liveTargets, html);
       paintedOk = cardCount > 0;
-      console.log(
-        "[relacionados] cards inyectadas:",
-        cardCount,
-        "en",
-        liveTargets.length,
-        "bloque(s)"
-      );
-      const first = liveTargets[0]?.track?.querySelector(".ml-product-card");
-      if (first) {
-        const r = first.getBoundingClientRect();
-        console.log("[relacionados] primera card rect:", {
-          w: Math.round(r.width),
-          h: Math.round(r.height),
-          top: Math.round(r.top),
-          sectionDisplay: getComputedStyle(liveTargets[0].section).display,
-        });
-      }
     } catch (error) {
       if (token !== loadToken) return;
       console.error("[relacionados] Error cargando productos relacionados:", error);

@@ -1386,8 +1386,36 @@ loadAllDescargables();
       aiInput.value = "";
       ask(q);
     });
+    function getFocusableEls() {
+      const selector =
+        'a[href], button:not([disabled]), textarea:not([disabled]), input:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])';
+      return Array.from(aiPanel.querySelectorAll(selector)).filter(
+        (el) => el.offsetParent !== null
+      );
+    }
+
     document.addEventListener("keydown", (e) => {
-      if (e.key === "Escape" && aiPanel.classList.contains("is-open")) closeAssistant();
+      if (!aiPanel.classList.contains("is-open")) return;
+      if (e.key === "Escape") {
+        closeAssistant();
+        return;
+      }
+      if (e.key === "Tab") {
+        const focusable = getFocusableEls();
+        if (!focusable.length) return;
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+        if (e.shiftKey && document.activeElement === first) {
+          e.preventDefault();
+          last.focus();
+        } else if (!e.shiftKey && document.activeElement === last) {
+          e.preventDefault();
+          first.focus();
+        } else if (!aiPanel.contains(document.activeElement)) {
+          e.preventDefault();
+          first.focus();
+        }
+      }
     });
 
     addMsg("bot", greeting);
