@@ -7,7 +7,7 @@ const COLLECTION = "Macroled_Prueba";
 const PER_PAGE = 18;
 const TYPESENSE_PAGE_SIZE = 250;
 const TYPESENSE_PAGE_CONCURRENCY = 4;
-const DOWNLOADS_CACHE_KEY = "macroled-descargas-v2";
+const DOWNLOADS_CACHE_KEY = "macroled-descargas-v6";
 const DOWNLOADS_CACHE_TTL_MS = 5 * 60 * 1000;
 
 // Qué campo del documento de producto corresponde a cada tipo de descarga.
@@ -25,7 +25,7 @@ const CATALOG_QUERY_BY = "nombre_typesense,descripcion,sku";
 // Esta página sólo necesita estos campos para construir sus cards y filtros.
 const PRODUCT_INCLUDE_FIELDS = [
   "id", "nombre_typesense", "descripcion", "sku", "macrofamilia", "subfamilia",
-  "variantes_sku", "es_principal", "nuevo", "tipo_registro", "tipo_descarga",
+  "rango_temperatura", "nuevo", "tipo_registro", "tipo_descarga",
   "multiimagen", "multiimage", "imagen", "imagen_portada",
   "ficha_tecnica", "garantia_link", "manual", "manual_link", "manuales", "ies_link"
 ].join(",");
@@ -39,6 +39,7 @@ const TIPO_DESCARGA_ORDER = ["Catálogo", "Ficha técnica", "Manual", "Garantía
 
 const ICON_CHECK = `<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`;
 const ICON_DOWNLOAD = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>`;
+const ICON_COPY = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>`;
 const ICON_FILE = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>`;
 const ICON_GRID = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>`;
 const ICON_CHEVRON = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>`;
@@ -360,70 +361,51 @@ async function loadAllDescargables(){
   }
 }
 
-function parseVariantesSku(raw, ownSku){
-  if(!raw) return [];
-  const arr = Array.isArray(raw) ? raw : String(raw).split(/[;,]/);
-  return arr.map(s => (s || "").trim()).filter(s => s && s !== ownSku);
+function parseTemperaturas(raw){
+  if(raw == null || raw === "") return [];
+  const values = Array.isArray(raw) ? raw : String(raw).split(/[;,]/);
+  return values
+    .map(value => String(value || "").trim())
+    .filter((value, index, list) => value && list.indexOf(value) === index);
 }
 
-function agruparPorVariantes(items){
-  const bySku = new Map(items.map(it => [it.sku, it]));
-  const visitados = new Set();
-  const grupos = [];
+const TEMPERATURA_TONOS = {
+  calido: { label: "Cálido", color: "#fff79b" },
+  neutro: { label: "Neutro", color: "#d9d9d9" },
+  frio: { label: "Frío", color: "#bce4fa" },
+  rgb: { label: "RGB", color: "linear-gradient(135deg,#e74c3c 0%,#f1c40f 33%,#2ecc71 66%,#3498db 100%)" },
+  rgbw: { label: "RGB+W", color: "linear-gradient(135deg,#e74c3c 0%,#f1c40f 25%,#2ecc71 50%,#3498db 75%,#f5f5f5 100%)" },
+  frio_ambar: { label: "Frío + Ámbar", color: "linear-gradient(135deg,#bce4fa 50%,#ffbf00 50%)" },
+  azul: { label: "Azul", color: "#1565c0" },
+  amarillo: { label: "Amarillo", color: "#fdd835" },
+  rojo: { label: "Rojo", color: "#c62828" },
+  verde: { label: "Verde", color: "#2e7d32" },
+  ambar: { label: "Ámbar", color: "#ffbf00" }
+};
 
-  items.forEach(it => {
-    if(!it.sku || visitados.has(it.sku)) return;
-    const skusDelGrupo = new Set();
-    const stack = [it.sku];
-    while(stack.length){
-      const s = stack.pop();
-      if(skusDelGrupo.has(s)) continue;
-      skusDelGrupo.add(s);
-      const doc = bySku.get(s);
-      if(doc) (doc.variantesSku || []).forEach(v => stack.push(v));
-    }
-    skusDelGrupo.forEach(s => visitados.add(s));
-    grupos.push([...skusDelGrupo].map(s => bySku.get(s)).filter(Boolean));
-  });
-
-  return grupos.map(fusionarGrupoDeVariantes);
+function temperaturaTono(value){
+  const raw = String(value || "").trim();
+  const normalized = raw.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s+/g, " ");
+  const kelvin = /^\d{3,5}\s*k?$/i.test(raw) ? Number.parseInt(raw, 10) : NaN;
+  let key = null;
+  if(Number.isFinite(kelvin)) key = kelvin <= 3000 ? "calido" : kelvin <= 4500 ? "neutro" : "frio";
+  else if(/^rgb\s*\+\s*w$|^rgbw$/.test(normalized)) key = "rgbw";
+  else if(/^rgb$/.test(normalized)) key = "rgb";
+  else if(/^frio\s*\+\s*ambar$/.test(normalized)) key = "frio_ambar";
+  else if(TEMPERATURA_TONOS[normalized]) key = normalized;
+  return key ? TEMPERATURA_TONOS[key] : (raw ? { label: raw, color: "#d9d9d9" } : null);
 }
 
-function fusionarGrupoDeVariantes(docs){
-  if(docs.length === 1) return docs[0];
-
-  const base = docs[0];
-  const todosSku = docs.map(d => d.sku).filter(Boolean);
-
-  const descargasPorTipo = {};
-  docs.forEach(doc => {
-    doc.descargas.forEach(d => {
-      if(!descargasPorTipo[d.tipo_descarga]) descargasPorTipo[d.tipo_descarga] = d;
-    });
+function buildTemperaturaMedia(temperaturas){
+  const tones = [];
+  (temperaturas || []).forEach(value => {
+    const tone = temperaturaTono(value);
+    if(tone && !tones.some(current => current.label === tone.label)) tones.push(tone);
   });
-
-  const ordenados = [...docs].sort((a, b) => (b.esPrincipal ? 1 : 0) - (a.esPrincipal ? 1 : 0));
-  const imagenes = [];
-  ordenados.forEach(doc => {
-    (doc.imagenes || (doc.imagen ? [doc.imagen] : [])).forEach(u => {
-      if(u && !imagenes.includes(u)) imagenes.push(u);
-    });
-  });
-
-  return {
-    origen: "producto",
-    nombre: base.nombre,
-    descripcion: base.descripcion,
-    sku: base.sku,
-    variantesSku: todosSku.filter(s => s !== base.sku),
-    macrofamilia: base.macrofamilia,
-    subfamilia: base.subfamilia,
-    nuevo: docs.some(d => d.nuevo),
-    imagen: imagenes[0] || null,
-    imagenes,
-    descargas: Object.values(descargasPorTipo),
-    _active: 0
-  };
+  if(!tones.length) return "";
+  return `<span class="media-temperature" aria-label="Temperatura de color">${tones.map(tone =>
+    `<span class="media-temperature-item"><span>${escAttr(tone.label)}</span><span class="media-temperature-dot" style="background:${escAttr(tone.color)}" aria-hidden="true"></span></span>`
+  ).join("")}</span>`;
 }
 
 // Cada producto es UNA card con todas sus descargas disponibles adentro
@@ -445,8 +427,7 @@ function expandProductos(productos){
       origen: "producto",
       nombre: doc.nombre_typesense, descripcion: doc.descripcion || "",
       sku: doc.sku, macrofamilia: doc.macrofamilia, subfamilia: doc.subfamilia || null,
-      variantesSku: parseVariantesSku(doc.variantes_sku, doc.sku),
-      esPrincipal: doc.es_principal === true || doc.es_principal === "true",
+      temperaturas: parseTemperaturas(doc.rango_temperatura),
       nuevo: !!doc.nuevo,
       imagen: imgs[0] || null,
       imagenes: imgs,
@@ -455,7 +436,9 @@ function expandProductos(productos){
     };
   });
 
-  return agruparPorVariantes(items).filter(it => it.descargas.length > 0);
+  // En Descargas cada SKU debe conservar su propia card, sus archivos y su
+  // temperatura. Las variantes solo se agrupan en la página de Productos.
+  return items.filter(it => it.sku && it.descargas.length > 0);
 }
 
 // NOTA: los documentos de catálogo se identifican por tipo_descarga = Catálogo
@@ -501,7 +484,6 @@ function getSearchFilteredItems(){
   const directMatches = list.filter(it =>
     (it.nombre || "").toLowerCase().includes(q) ||
     (it.sku || "").toLowerCase().includes(q) ||
-    (it.variantesSku || []).some(v => v.toLowerCase().includes(q)) ||
     (it.descripcion || "").toLowerCase().includes(q)
   );
 
@@ -705,6 +687,7 @@ function cardTemplate(it, idx){
   const descHtml = desc && desc.toLowerCase() !== String(it.nombre || "").trim().toLowerCase()
     ? `<p class="card-desc">${escAttr(desc)}</p>`
     : "";
+  const temperaturaMedia = !esCatalogo ? buildTemperaturaMedia(it.temperaturas) : "";
 
   return `
     <div class="card${esCatalogo ? " card-catalogo" : ""}" data-idx="${idx}">
@@ -713,11 +696,12 @@ function cardTemplate(it, idx){
         ${thumb
           ? `<img src="${escAttr(thumb)}" alt="${escAttr(it.nombre)}" loading="lazy" decoding="async" data-idx="0" data-origs="${escAttr(JSON.stringify(origs))}">`
           : `<span class="file-icon">${ICON_FILE}</span>`}
+        ${temperaturaMedia}
       </div>
       <div class="card-body">
         <div class="card-info">
           <div class="card-title">${escAttr(it.nombre)}</div>
-          ${!esCatalogo && it.sku ? `<div class="card-sku">SKU: ${escAttr(it.sku)}</div>` : ""}
+          ${!esCatalogo && it.sku ? `<div class="card-sku-row"><span class="card-sku"><span class="card-sku-label">SKU:</span> <span class="card-sku-value">${escAttr(it.sku)}</span></span><button type="button" class="copy-sku" data-sku="${escAttr(it.sku)}" aria-label="Copiar SKU ${escAttr(it.sku)}" title="Copiar SKU">${ICON_COPY}</button></div>` : ""}
           ${descHtml}
           ${seccionTipo}
         </div>
@@ -821,6 +805,35 @@ function updateCardActiveTab(cardEl, item){
 }
 
 document.getElementById("grid").addEventListener("click", (e) => {
+  const copyButton = e.target.closest(".copy-sku");
+  if(copyButton){
+    const sku = copyButton.dataset.sku || "";
+    const copyPromise = navigator.clipboard && window.isSecureContext
+      ? navigator.clipboard.writeText(sku)
+      : new Promise((resolve, reject) => {
+          const input = document.createElement("textarea");
+          input.value = sku;
+          input.setAttribute("readonly", "");
+          input.style.position = "fixed";
+          input.style.opacity = "0";
+          document.body.appendChild(input);
+          input.select();
+          try{ document.execCommand("copy") ? resolve() : reject(new Error("No se pudo copiar")); }
+          catch(err){ reject(err); }
+          finally{ input.remove(); }
+        });
+    copyPromise.then(() => {
+      copyButton.classList.add("copied");
+      copyButton.setAttribute("aria-label", `SKU ${sku} copiado`);
+      copyButton.title = "Copiado";
+      setTimeout(() => {
+        copyButton.classList.remove("copied");
+        copyButton.setAttribute("aria-label", `Copiar SKU ${sku}`);
+        copyButton.title = "Copiar SKU";
+      }, 1400);
+    }).catch(() => {});
+    return;
+  }
   const tab = e.target.closest(".type-tab");
   if(!tab) return;
   const cardEl = tab.closest(".card");

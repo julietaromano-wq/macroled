@@ -1689,16 +1689,111 @@ select.sort-native{
 }
 
 /* Prueba visual: SKU secundario debajo del nombre en descargables de producto. */
-.card:not(.card-catalogo) .card-title:has(+ .card-sku){
+.card:not(.card-catalogo) .card-title:has(+ .card-sku-row){
   padding-bottom:4px !important;
 }
-.card-sku{
+.card-sku-row{
+  display:flex;
+  align-items:center;
+  gap:5px;
   margin:0 0 20px;
-  color:#7a828d;
+}
+.card-sku{
+  margin:0;
   font-size:11px;
   font-weight:500;
   line-height:1.35;
   letter-spacing:.01em;
+}
+.card-sku-label{color:#4f5a68;}
+.card-sku-value{color:#141821;}
+.copy-sku{
+  display:inline-flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  width:22px !important;
+  height:22px !important;
+  min-width:22px !important;
+  min-height:22px !important;
+  margin:0 !important;
+  padding:0 !important;
+  border:0 !important;
+  border-radius:5px !important;
+  background:transparent !important;
+  color:#48525f !important;
+  cursor:pointer;
+  box-shadow:none !important;
+}
+.copy-sku:focus-visible{
+  outline:2px solid rgba(0,134,181,.35) !important;
+  outline-offset:2px !important;
+}
+@media (hover:hover) and (pointer:fine){
+  .copy-sku:hover{
+    background:transparent !important;
+    color:#141821 !important;
+  }
+}
+.copy-sku:active,
+.copy-sku.copied{
+  background:transparent !important;
+  color:#0086b5 !important;
+}
+.copy-sku svg{display:block;width:13px;height:13px;}
+.media-temperature{
+  position:absolute;
+  right:8px;
+  bottom:8px;
+  z-index:2;
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  width:max-content;
+  max-width:calc(100% - 16px);
+  padding:5px 9px;
+  overflow:hidden;
+  border:1px solid var(--line);
+  border-radius:999px;
+  background:#fff;
+  color:var(--colortext);
+  box-shadow:0 1px 3px rgba(20,24,33,.06);
+  font-size:12px;
+  font-weight:600;
+  line-height:1;
+  white-space:nowrap;
+  pointer-events:none;
+}
+.media-temperature-item{
+  display:inline-flex;
+  align-items:center;
+  gap:5px;
+  min-width:0;
+}
+.media-temperature-dot{
+  display:inline-block;
+  width:10px;
+  height:10px;
+  flex:none;
+  border:1px solid rgba(0,0,0,.06);
+  border-radius:50%;
+}
+.grid.list .media-temperature{
+  right:6px;
+  bottom:6px;
+  gap:5px;
+  padding:4px 6px;
+  max-width:calc(100% - 12px);
+}
+@media (max-width:680px){
+  .media-temperature{
+    right:5px;
+    bottom:5px;
+    gap:5px;
+    max-width:calc(100% - 10px);
+    padding:4px 7px;
+    font-size:11px;
+  }
+  .media-temperature-dot{width:8px;height:8px;}
 }
 
 /* Bottom sheet mobile alineado al patrón de filtros de Productos. */
