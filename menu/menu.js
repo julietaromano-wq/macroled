@@ -13,15 +13,15 @@
 const CDN = "https://d1zltvqju4u8ql.cloudfront.net/fit-in";
 
 const LINEALES_PRO_ITEMS = [
-  { name: "Lineales", count: "6 Productos", img: `${CDN}/250x250/MACROLED/WEB/LP-FCP-1200-30W-B-CCT_FRONT.webp`, href: "/productos?macrofamilia=Lineales+PRO&familia=Lineales+PRO" },
-  { name: "Lente Difusor", count: "9 Productos", img: `${CDN}/180x180/MACROLED/WEB/PORTADA-DIFUSORES-LINEALES-PRO.webp`, href: "/productos?macrofamilia=Lineales+PRO&familia=Lente+Difusor" },
-  { name: "Conectores", count: "3 Productos", img: `${CDN}/140x140/MACROLED/WEB/PORTADA-CONECTORES-LINEALES-PRO.webp`, href: "/productos?macrofamilia=Lineales+PRO&familia=Conectores" },
-  { name: "Accesorios", count: "4 Productos", img: `${CDN}/180x180/MACROLED/WEB/LP-SUSP_PERS.webp`, href: "/productos?macrofamilia=Lineales+PRO&familia=Accesorios" },
-  { name: "Driver", count: "5 Productos", img: `${CDN}/140x140/MACROLED/WEB/PORTADA-DRIVERS-LINEALES-PRO.webp`, href: "/productos?macrofamilia=Lineales+PRO&familia=Driver" },
+  { name: "Lineales", count: "6 Productos", img: `${CDN}/250x250/MACROLED/WEB/LP-FCP-1200-30W-B-CCT_FRONT.webp`, href: "/productos?macrofamilia=Luminarias+de+Proyecto&familia=Lineales+PRO&subfamilia=Lineales+PRO" },
+  { name: "Lente Difusor", count: "9 Productos", img: `${CDN}/180x180/MACROLED/WEB/PORTADA-DIFUSORES-LINEALES-PRO.webp`, href: "/productos?macrofamilia=Luminarias+de+Proyecto&familia=Lineales+PRO&subfamilia=Lente+Difusor" },
+  { name: "Conectores", count: "3 Productos", img: `${CDN}/140x140/MACROLED/WEB/PORTADA-CONECTORES-LINEALES-PRO.webp`, href: "/productos?macrofamilia=Luminarias+de+Proyecto&familia=Lineales+PRO&subfamilia=Conectores" },
+  { name: "Accesorios", count: "4 Productos", img: `${CDN}/180x180/MACROLED/WEB/LP-SUSP_PERS.webp`, href: "/productos?macrofamilia=Luminarias+de+Proyecto&familia=Lineales+PRO&subfamilia=Accesorios" },
+  { name: "Driver", count: "5 Productos", img: `${CDN}/140x140/MACROLED/WEB/PORTADA-DRIVERS-LINEALES-PRO.webp`, href: "/productos?macrofamilia=Luminarias+de+Proyecto&familia=Lineales+PRO&subfamilia=Driver" },
 ];
 const LINEALES_PRO_GROUP = {
   group: "Lineales PRO",
-  href: "/productos?macrofamilia=Lineales+PRO",
+  href: "/productos?macrofamilia=Luminarias+de+Proyecto&familia=Lineales+PRO",
   isNew: true,
   items: LINEALES_PRO_ITEMS,
 };
@@ -84,7 +84,7 @@ const MEGAMENU_DATA = [
   {
     id: "luminarias-int",
     label: "Luminarias Interior",
-    viewAllHref: "/productos?macrofamilia=Luminarias+Integradas+Interior",
+    viewAllHref: "/productos?macrofamilia=Luminarias+Interior",
     promo: {
       tagline: "Confort lumínico para cada espacio interior",
       subtitle: "Soluciones integradas que combinan estética y eficiencia para hogares, oficinas y comercios.",
@@ -92,23 +92,23 @@ const MEGAMENU_DATA = [
     layout: "grouped",
     groups: [
       { group: null, items: [
-        { name: "Listones LED", count: "28 Productos", img: `${CDN}/filters:format(webp)/MACROLED/250/liston-led.png`, href: "/productos?macrofamilia=Luminarias+Integradas+Interior&familia=Listones+LED" },
-        { name: "Luces de Emergencia", count: "28 Productos", img: `${CDN}/filters:format(webp)/MACROLED/250/emergencia.png`, href: "/productos?macrofamilia=Luminarias+Integradas+Interior&familia=Luces+de+Emergencia" },
+        { name: "Listones LED", count: "28 Productos", img: `${CDN}/filters:format(webp)/MACROLED/250/liston-led.png`, href: "/productos?macrofamilia=Luminarias+Interior&familia=Listones+LED" },
+        { name: "Luces de Emergencia", count: "28 Productos", img: `${CDN}/filters:format(webp)/MACROLED/250/emergencia.png`, href: "/productos?macrofamilia=Luminarias+Interior&familia=Luces+de+Emergencia" },
       ]},
-      { group: "Paneles", href: "/productos?macrofamilia=Paneles", items: [
-        { name: "6 a 24W", count: "28 Productos", img: `${CDN}/filters:format(webp)/MACROLED/250/plafon-platil.png`, href: "/productos?macrofamilia=Paneles&familia=6+a+24W" },
-        { name: "6 a 36 Backlight CCT", count: "28 Productos", img: `${CDN}/250x250/MACROLED/WEB/GRAN-FORMATO-P40.webp`, href: "/productos?macrofamilia=Paneles&familia=6+a+36W&subfamilia=6+a+36+Backlight+CCT", isNew: true },
-        { name: "Móviles", count: "28 Productos", img: `${CDN}/filters:format(webp)/MACROLED/250/moviles.png`, href: "/productos?macrofamilia=Paneles&familia=M%C3%B3viles+y+COB&subfamilia=M%C3%B3viles" },
-        { name: "COB", count: "28 Productos", img: `${CDN}/filters:format(webp)/MACROLED/250/premium.png`, href: "/productos?macrofamilia=Paneles&familia=M%C3%B3viles+y+COB&subfamilia=COB" },
-        { name: "Drivers", count: "28 Productos", img: `${CDN}/250x250/MACROLED/WEB/DRIVERS.webp`, href: "/productos?macrofamilia=Paneles&familia=Drivers" },
-        { name: "Accesorios", count: "28 Productos", img: `${CDN}/filters:format(webp)/MACROLED/250/accesorios-paneles.png`, href: "/productos?macrofamilia=Paneles&familia=Accesorios" },
+      { group: "Paneles", href: "/productos?macrofamilia=Luminarias+Interior&familia=Paneles", items: [
+        { name: "6 a 24W", count: "28 Productos", img: `${CDN}/filters:format(webp)/MACROLED/250/plafon-platil.png`, href: "/productos?macrofamilia=Luminarias+Interior&familia=Paneles&subfamilia=6+a+24W" },
+        { name: "6 a 36 Backlight CCT", count: "28 Productos", img: `${CDN}/250x250/MACROLED/WEB/GRAN-FORMATO-P40.webp`, href: "/productos?macrofamilia=Luminarias+Interior&familia=Paneles&subfamilia=6+a+36+Backlight+CCT", isNew: true },
+        { name: "Móviles", count: "4 Productos", img: `${CDN}/filters:format(webp)/MACROLED/250/moviles.png`, href: "/productos?macrofamilia=Luminarias+Interior&familia=Paneles&subfamilia=M%C3%B3viles" },
+        { name: "COB", count: "1 Producto", img: `${CDN}/filters:format(webp)/MACROLED/250/premium.png`, href: "/productos?macrofamilia=Luminarias+Interior&familia=Paneles&subfamilia=COB" },
+        { name: "Drivers", count: "28 Productos", img: `${CDN}/250x250/MACROLED/WEB/DRIVERS.webp`, href: "/productos?macrofamilia=Luminarias+Interior&familia=Paneles&subfamilia=Drivers" },
+        { name: "Accesorios", count: "28 Productos", img: `${CDN}/filters:format(webp)/MACROLED/250/accesorios-paneles.png`, href: "/productos?macrofamilia=Luminarias+Interior&familia=Paneles&subfamilia=Accesorios" },
       ]},
     ],
   },
   {
     id: "luminarias-ext",
     label: "Luminarias Exterior",
-    viewAllHref: "/productos?macrofamilia=Luminarias+Integradas+Exterior",
+    viewAllHref: "/productos?macrofamilia=Luminarias+Exterior",
     promo: {
       tagline: "Iluminación que resiste todo, en cualquier lugar",
       subtitle: "Soluciones robustas con protección IP para exteriores, fachadas, jardines y espacios públicos.",
@@ -116,18 +116,18 @@ const MEGAMENU_DATA = [
     layout: "grouped",
     groups: [
       { group: null, items: [
-        { name: "Tortugas", count: "28 Productos", img: `${CDN}/filters:format(webp)/MACROLED/250/tortugas.png`, href: "/productos?macrofamilia=Luminarias+Integradas+Exterior&familia=Tortugas" },
-        { name: "Estanco Premium", count: "28 Productos", img: `${CDN}/filters:format(webp)/MACROLED/250/lineales.png`, href: "/productos?macrofamilia=Luminarias+Integradas+Exterior&familia=Estanco+Premium" },
-        { name: "Estacas Móviles", count: "28 Productos", img: `${CDN}/filters:format(webp)/MACROLED/250/estacas-led-integrado.png`, href: "/productos?macrofamilia=Luminarias+Integradas+Exterior&familia=Estacas+M%C3%B3viles" },
-        { name: "Solar", count: "28 Productos", img: `${CDN}/2000x2000/MACROLED/WEB/ASP-1.5W-IP54WW_FRONT.webp`, href: "/productos?macrofamilia=Luminarias+de+Proyecto&familia=Solar" },
+        { name: "Tortugas", count: "28 Productos", img: `${CDN}/filters:format(webp)/MACROLED/250/tortugas.png`, href: "/productos?macrofamilia=Luminarias+Exterior&familia=Tortugas" },
+        { name: "Estanco Premium", count: "28 Productos", img: `${CDN}/filters:format(webp)/MACROLED/250/lineales.png`, href: "/productos?macrofamilia=Luminarias+Exterior&familia=Estanco+Premium" },
+        { name: "Estacas Móviles", count: "28 Productos", img: `${CDN}/filters:format(webp)/MACROLED/250/estacas-led-integrado.png`, href: "/productos?macrofamilia=Luminarias+Exterior&familia=Estacas+M%C3%B3viles" },
+        { name: "Solar", count: "28 Productos", img: `${CDN}/2000x2000/MACROLED/WEB/ASP-1.5W-IP54WW_FRONT.webp`, href: "/productos?macrofamilia=Luminarias+Exterior&familia=Solar" },
       ]},
-      { group: "Reflectores", href: "/productos?macrofamilia=Reflectores", items: [
-        { name: "Reflectores PRO 2026", count: "16 Productos", img: `${CDN}/filters:format(webp)/250x250/MACROLED/WEB/REFLECTORES-PRO.webp`, href: "/productos?macrofamilia=Reflectores&familia=Reflectores+PRO+2026", isNew: true },
-        { name: "Reflectores PRO 2025", count: "10 Productos", img: `${CDN}/filters:format(webp)/MACROLED/250/reflectores-pro.png`, href: "/productos?macrofamilia=Reflectores&familia=Reflectores+PRO+2025" },
-        { name: "Reflectores Smart", count: "2 Productos", img: `${CDN}/filters:format(webp)/MACROLED/250/reflectores-smart.png`, href: "/productos?macrofamilia=Reflectores&familia=Reflectores+Smart", isSmart: true },
-        { name: "Reflectores Standard", count: "9 Productos", img: `${CDN}/filters:format(webp)/250x250/MACROLED/WEB/REFLECTORES-STANDARD.webp`, href: "/productos?macrofamilia=Reflectores&familia=Reflectores+Standard" },
-        { name: "Reflectores Classic", count: "10 Productos", img: `${CDN}/filters:format(webp)/MACROLED/WEB/REFLECTORES-CLASSIC.webp`, href: "/productos?macrofamilia=Reflectores&familia=Reflectores+Classic" },
-        { name: "Reflectores ECO", count: "7 Productos", img: `${CDN}/2000x2000/filters:format(webp)/MACROLED/2000/7428325574281a.png`, href: "/productos?macrofamilia=Reflectores&familia=Reflectores+ECO" },
+      { group: "Reflectores", href: "/productos?macrofamilia=Luminarias+Exterior&familia=Reflectores", items: [
+        { name: "Reflectores PRO 2026", count: "16 Productos", img: `${CDN}/filters:format(webp)/250x250/MACROLED/WEB/REFLECTORES-PRO.webp`, href: "/productos?macrofamilia=Luminarias+Exterior&familia=Reflectores&subfamilia=Reflectores+PRO+2026", isNew: true },
+        { name: "Reflectores PRO 2025", count: "10 Productos", img: `${CDN}/filters:format(webp)/MACROLED/250/reflectores-pro.png`, href: "/productos?macrofamilia=Luminarias+Exterior&familia=Reflectores&subfamilia=Reflectores+PRO+2025" },
+        { name: "Reflectores Smart", count: "2 Productos", img: `${CDN}/filters:format(webp)/MACROLED/250/reflectores-smart.png`, href: "/productos?macrofamilia=Luminarias+Exterior&familia=Reflectores&subfamilia=Reflectores+Smart", isSmart: true },
+        { name: "Reflectores Standard", count: "9 Productos", img: `${CDN}/filters:format(webp)/250x250/MACROLED/WEB/REFLECTORES-STANDARD.webp`, href: "/productos?macrofamilia=Luminarias+Exterior&familia=Reflectores&subfamilia=Reflectores+Standard" },
+        { name: "Reflectores Classic", count: "10 Productos", img: `${CDN}/filters:format(webp)/MACROLED/WEB/REFLECTORES-CLASSIC.webp`, href: "/productos?macrofamilia=Luminarias+Exterior&familia=Reflectores&subfamilia=Reflectores+Classic" },
+        { name: "Reflectores ECO", count: "7 Productos", img: `${CDN}/2000x2000/filters:format(webp)/MACROLED/2000/7428325574281a.png`, href: "/productos?macrofamilia=Luminarias+Exterior&familia=Reflectores&subfamilia=Reflectores+ECO" },
       ]},
     ],
   },
@@ -147,7 +147,7 @@ const MEGAMENU_DATA = [
         { name: "Titan", count: "28 Productos", img: `${CDN}/filters:format(webp)/MACROLED/250/titan.png`, href: "#" },
         { name: "Focus", count: "28 Productos", img: `${CDN}/filters:format(webp)/MACROLED/250/focus.png`, href: "#" },
         { name: "Olimpus", count: "28 Productos", img: `${CDN}/filters:format(webp)/MACROLED/250/olimpus.png`, href: "#" },
-        { name: "Industrial", count: "28 Productos", img: `${CDN}/filters:format(webp)/MACROLED/250/industrial.png`, href: "/productos?macrofamilia=Luminarias+de+Proyecto&familia=Reflector+Industrial" },
+        { name: "Industrial", count: "28 Productos", img: `${CDN}/filters:format(webp)/MACROLED/250/industrial.png`, href: "/productos?macrofamilia=Luminarias+de+Proyecto&familia=Reflectores&subfamilia=Reflector+Industrial" },
       ]},
       { group: "Galponeras", items: [
         { name: "Highbay PRO 2026", count: "7 Productos", img: `${CDN}/filters:format(webp)/MACROLED/250/PHB-200W-90D-857-CW.png`, href: "#", isNew: true },
@@ -155,17 +155,17 @@ const MEGAMENU_DATA = [
         { name: "Highbay Classic", count: "4 Productos", img: `${CDN}/filters:format(webp)/MACROLED/250/galponeras-eco.webp`, href: "#" },
         { name: "Highbay Standard", count: "4 Productos", img: `${CDN}/filters:format(webp)/MACROLED/250/SHB-200W.png`, href: "#" },
       ]},
-      { group: "Gran Formato", href: "/productos?macrofamilia=Paneles&familia=Gran+Formato", items: [
-        { name: "Downlight", count: "28 Productos", img: `${CDN}/500x500/filters:format(webp)/MACROLED/WEB/SDLR-36W-830-WW_FRONT.webp`, href: "/productos?macrofamilia=Paneles&familia=Gran+Formato&subfamilia=Downlight", isNew: true },
-        { name: "Gran Formato Backlight", count: "28 Productos", img: `${CDN}/250x250/MACROLED/WEB/GRAN-FORMATO-P40.webp`, href: "/productos?macrofamilia=Paneles&familia=Gran+Formato&subfamilia=Backlight", isNew: true },
-        { name: "Gran Formato 48W", count: "28 Productos", img: `${CDN}/250x250/MACROLED/WEB/GRAN-FORMATO-P40.webp`, href: "/productos?macrofamilia=Paneles&familia=Gran+Formato&subfamilia=48W" },
-        { name: "Gran Formato 40W", count: "28 Productos", img: `${CDN}/250x250/MACROLED/WEB/GRAN-FORMATO-P40.webp`, href: "/productos?macrofamilia=Paneles&familia=Gran+Formato&subfamilia=40W" },
+      { group: "Gran Formato", href: "/productos?macrofamilia=Luminarias+de+Proyecto&familia=Gran+Formato", items: [
+        { name: "Downlight", count: "28 Productos", img: `${CDN}/500x500/filters:format(webp)/MACROLED/WEB/SDLR-36W-830-WW_FRONT.webp`, href: "/productos?macrofamilia=Luminarias+de+Proyecto&familia=Gran+Formato&subfamilia=Downlight", isNew: true },
+        { name: "Gran Formato Backlight", count: "28 Productos", img: `${CDN}/250x250/MACROLED/WEB/GRAN-FORMATO-P40.webp`, href: "/productos?macrofamilia=Luminarias+de+Proyecto&familia=Gran+Formato&subfamilia=Backlight", isNew: true },
+        { name: "Gran Formato 48W", count: "28 Productos", img: `${CDN}/250x250/MACROLED/WEB/GRAN-FORMATO-P40.webp`, href: "/productos?macrofamilia=Luminarias+de+Proyecto&familia=Gran+Formato&subfamilia=48W" },
+        { name: "Gran Formato 40W", count: "28 Productos", img: `${CDN}/250x250/MACROLED/WEB/GRAN-FORMATO-P40.webp`, href: "/productos?macrofamilia=Luminarias+de+Proyecto&familia=Gran+Formato&subfamilia=40W" },
       ]},
       { group: "Luz de Calle", items: [
         { name: "Standard", count: "28 Productos", img: `${CDN}/250x250/MACROLED/WEB/SLG2-100W-757-CW_FRONT.webp`, href: "#", isNew: true },
         { name: "Lumax", count: "28 Productos", img: `${CDN}/filters:format(webp)/MACROLED/250/lumax.png`, href: "#", isNew: true },
         { name: "Pública", count: "28 Productos", img: `${CDN}/filters:format(webp)/MACROLED/250/luz-de-calle.png`, href: "#" },
-        { name: "Solar", count: "28 Productos", img: `${CDN}/filters:format(webp)/MACROLED/250/proyectoSolar.png`, href: "/productos?macrofamilia=Luminarias+de+Proyecto&familia=Solar" },
+        { name: "Solar", count: "28 Productos", img: `${CDN}/filters:format(webp)/MACROLED/250/proyectoSolar.png`, href: "/productos?macrofamilia=Luminarias+Exterior&familia=Solar" },
       ]},
       { group: "Farolas", items: [
         { name: "PRO", count: "28 Productos", img: `${CDN}/filters:format(webp)/MACROLED/250/farolas.png`, href: "#" },
@@ -175,16 +175,16 @@ const MEGAMENU_DATA = [
   {
     id: "rieles-magneticos",
     label: "Skyline",
-    viewAllHref: "/productos?macrofamilia=Rieles+Magn%C3%A9ticos",
+    viewAllHref: "/productos?macrofamilia=Skyline",
     promo: {
       tagline: "Macroled Skyline",
       subtitle: "La línea Macroled Skyline redefine la iluminación arquitectónica con un sistema de rieles magnéticos de 48V, pensado para ofrecer seguridad, versatilidad y una estética premium en cualquier tipo de espacio.",
     },
     layout: "flat",
     items: [
-      { name: "Luminarias", count: "28 Productos", img: `${CDN}/filters:format(webp)/MACROLED/250/skyline.png`, href: "/productos?macrofamilia=Rieles+Magn%C3%A9ticos&familia=Luminarias" },
-      { name: "Rieles y Accesorios", count: "28 Productos", img: `${CDN}/filters:format(webp)/MACROLED/250/skyline-rieles.png`, href: "/productos?macrofamilia=Rieles+Magn%C3%A9ticos&familia=Rieles+y+Accesorios" },
-      { name: "Fuentes", count: "28 Productos", img: `${CDN}/filters:format(webp)/MACROLED/250/skyline-fuentes.png`, href: "/productos?macrofamilia=Rieles+Magn%C3%A9ticos&familia=Fuentes" },
+      { name: "Luminarias", count: "28 Productos", img: `${CDN}/filters:format(webp)/MACROLED/250/skyline.png`, href: "/productos?macrofamilia=Skyline&familia=Luminarias" },
+      { name: "Rieles y Accesorios", count: "28 Productos", img: `${CDN}/filters:format(webp)/MACROLED/250/skyline-rieles.png`, href: "/productos?macrofamilia=Skyline&familia=Rieles+y+Accesorios" },
+      { name: "Fuentes", count: "28 Productos", img: `${CDN}/filters:format(webp)/MACROLED/250/skyline-fuentes.png`, href: "/productos?macrofamilia=Skyline&familia=Fuentes" },
     ],
   },
   {
@@ -227,18 +227,18 @@ const MEGAMENU_DATA = [
   {
     id: "monaco",
     label: "Mónaco",
-    viewAllHref: "/productos?macrofamilia=Interruptores+y+Tomas&familia=Monaco",
+    viewAllHref: "/productos?macrofamilia=M%C3%B3naco",
     promo: {
       tagline: "El detalle que hace la diferencia",
       subtitle: "Línea Mónaco con diseño moderno y terminaciones premium para todo tipo de proyecto.",
     },
     layout: "flat",
     items: [
-      { name: "Armadas", count: "87 Productos", img: "https://s3.coresagroup.com/MACROLED/250/milan.png", href: "/productos?macrofamilia=Interruptores+y+Tomas&familia=Monaco&subfamilia=Armadas" },
-      { name: "Despiece", count: "25 Productos", img: `${CDN}/filters:format(webp)/MACROLED/250/milan-bastidores.png`, href: "/productos?macrofamilia=Interruptores+y+Tomas&familia=Monaco&subfamilia=Despiece" },
-      { name: "Tapas", count: "75 Productos", img: `${CDN}/filters:format(webp)/MACROLED/250/milan-tapas.png`, href: "/productos?macrofamilia=Interruptores+y+Tomas&familia=Monaco&subfamilia=Tapas" },
-      { name: "Luz guía", count: "10 Productos", img: `${CDN}/filters:format(webp)/250x250/MACROLED/WEB/portada_luz_pasillo.webp`, href: "/productos?macrofamilia=Interruptores+y+Tomas&familia=Monaco&subfamilia=Luz+gu%C3%ADa", isNew: true },
-      { name: "Tapa Exterior", count: "3 Productos", img: `${CDN}/250x250/MACROLED/WEB/M-CR-EXT-B_FRONT.webp`, href: "/productos?macrofamilia=Interruptores+y+Tomas&familia=Monaco&subfamilia=Tapa+Exterior", isNew: true },
+      { name: "Armadas", count: "87 Productos", img: "https://s3.coresagroup.com/MACROLED/250/milan.png", href: "/productos?macrofamilia=M%C3%B3naco&familia=Armadas" },
+      { name: "Despiece", count: "25 Productos", img: `${CDN}/filters:format(webp)/MACROLED/250/milan-bastidores.png`, href: "/productos?macrofamilia=M%C3%B3naco&familia=Despiece" },
+      { name: "Tapas", count: "75 Productos", img: `${CDN}/filters:format(webp)/MACROLED/250/milan-tapas.png`, href: "/productos?macrofamilia=M%C3%B3naco&familia=Tapas" },
+      { name: "Luz guía", count: "10 Productos", img: `${CDN}/filters:format(webp)/250x250/MACROLED/WEB/portada_luz_pasillo.webp`, href: "/productos?macrofamilia=M%C3%B3naco&familia=Luz+Gu%C3%ADa", isNew: true },
+      { name: "Tapa Exterior", count: "3 Productos", img: `${CDN}/250x250/MACROLED/WEB/M-CR-EXT-B_FRONT.webp`, href: "/productos?macrofamilia=M%C3%B3naco&familia=Tapa+exterior", isNew: true },
     ],
   },
   {
@@ -357,9 +357,18 @@ if (typeof module !== "undefined") module.exports = MEGAMENU_DATA;
   var FAMILIA_ALIAS = {
     "Titan": "TITAN",
     "Olimpus": "OLIMPUS",
+    "Industrial": "Reflector Industrial",
     "Inalámbricas": "Luminarias Inalámbricas",
     "De Mesa": "Luminarias de Mesa",
-    "De Pie": "Luminarias de Pie"
+    "De Pie": "Luminarias de Pie",
+    "LIMA": "Lima",
+    "ROMA": "Roma",
+    "TOKIO": "Tokio",
+    "KINETIC": "Kinetic",
+    "Faros y Barras": "Faros y barras",
+    "Luz guía": "Luz Guía",
+    "Tapa Exterior": "Tapa exterior",
+    "Par LED": "PAR LED"
   };
   function aliasName(name) {
     return FAMILIA_ALIAS[name] || name;
@@ -966,8 +975,10 @@ if (typeof module !== "undefined") module.exports = MEGAMENU_DATA;
       .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
   }
 
-  var TS_FILTER = "tipo_registro:=producto && es_principal:true";
+  // Búsqueda del menú: todos los productos (no solo es_principal / "producto final").
+  var TS_FILTER = "tipo_registro:=producto";
   var TS_QUERY_BY = "nombre_typesense,sku,descripcion";
+  var TS_SORT_BY = "order:asc";
   var CDN_HOST = "https://d1zltvqju4u8ql.cloudfront.net";
 
   function productName(doc) {
@@ -1091,6 +1102,7 @@ if (typeof module !== "undefined") module.exports = MEGAMENU_DATA;
         q: query,
         query_by: TS_QUERY_BY,
         filter_by: TS_FILTER,
+        sort_by: TS_SORT_BY,
         per_page: 5,
       }).then(function (result) {
         renderResults(result.hits || [], result.found || 0, query);
@@ -1378,7 +1390,11 @@ if (typeof module !== "undefined") module.exports = MEGAMENU_DATA;
         return;
       }
       tsClient.collections("Macroled_Prueba").documents().search({
-        q: query, query_by: TS_QUERY_BY, filter_by: TS_FILTER, per_page: 5,
+        q: query,
+        query_by: TS_QUERY_BY,
+        filter_by: TS_FILTER,
+        sort_by: TS_SORT_BY,
+        per_page: 5,
       }).then(function (result) {
         var hits = result.hits || [];
         var found = result.found || 0;
