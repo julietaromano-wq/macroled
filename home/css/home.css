@@ -5777,7 +5777,7 @@ a.ml-news-card:focus-visible .ml-news-card__arrow {
   --ml-type-h5-tracking: -0.01em;
 
   --ml-type-h6-size: clamp(1.2rem, calc(1.1rem + 0.5vw), 1.4rem);
-  --ml-type-h6-weight: 500;
+  --ml-type-h6-weight: 600;
   --ml-type-h6-leading: 1.3;
   --ml-type-h6-tracking: 0;
 

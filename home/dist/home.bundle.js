@@ -166,8 +166,8 @@
         title: "Expo Construir",
         description: "Presentamos nuestros últimos lanzamientos: las líneas Mónaco, Lima, Macroled ARQ, Skyline, Kyo, Taö y Höshi, pensadas para proyectos arquitectónicos.",
         href: "/novedades/expo-construir",
-        image: "https://s3.coresagroup.com/MACROLED/WEB/HOME/expo.jpg",
-        hoverImage: "https://s3.coresagroup.com/MACROLED/WEB/HOME/expo_hover.jpg",
+        image: "https://s3.coresagroup.com/MACROLED/WEB/HOME/expo_hover.jpg",
+        hoverImage: "https://s3.coresagroup.com/MACROLED/WEB/HOME/expo.jpg",
         zoomDefaultImage: true
       },
       {
