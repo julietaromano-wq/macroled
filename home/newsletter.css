@@ -452,6 +452,7 @@ body.mlg-newsletter-open {
   background: transparent;
 }
 
+/* Checkbox de consentimiento deshabilitado temporalmente.
 .mlg-newsletter-consent {
   display: flex;
   align-items: flex-start;
@@ -480,6 +481,7 @@ body.mlg-newsletter-open {
   color: var(--mlg-newsletter-muted);
   cursor: pointer;
 }
+*/
 
 .mlg-newsletter-error {
   margin: 0;
