@@ -1552,7 +1552,7 @@
       {
         key: "catalogo",
         url: catalogoUrl,
-        primaryLabel: "Descargar catálogo",
+        primaryLabel: "Catálogo",
         secondaryLabel: "Catálogo",
       },
       {
