@@ -103,6 +103,182 @@ const FACET_LABELS = {
   categoria: "Categoría"
 };
 
+/* Tag "Nuevo" al costado del filtro — mismas líneas que el megamenú (isNew).
+   Si menu.js ya cargó, se lee de MEGAMENU_DATA. Si no, se usa el fallback. */
+const MEGAMENU_NEW_FACET_ALIAS = {
+  "Titan": "TITAN",
+  "Olimpus": "OLIMPUS",
+  "Industrial": "Reflector Industrial",
+  "Inalámbricas": "Luminarias Inalámbricas",
+  "De Mesa": "Luminarias de Mesa",
+  "De Pie": "Luminarias de Pie",
+  "LIMA": "Lima",
+  "ROMA": "Roma",
+  "TOKIO": "Tokio",
+  "KINETIC": "Kinetic",
+  "Faros y Barras": "Faros y barras",
+  "Luz guía": "Luz Guía",
+  "Tapa Exterior": "Tapa exterior",
+  "Par LED": "PAR LED"
+};
+const MEGAMENU_NEW_FACETS_FALLBACK = [
+  { field: "familia", value: "Lineales PRO", macrofamilia: "Luminarias de Proyecto" },
+  { field: "subfamilia", value: "Lineales", macrofamilia: "Luminarias de Proyecto", familia: "Lineales PRO" },
+  { field: "subfamilia", value: "Lineales PRO", macrofamilia: "Luminarias de Proyecto", familia: "Lineales PRO" },
+  { field: "subfamilia", value: "Lente Difusor", macrofamilia: "Luminarias de Proyecto", familia: "Lineales PRO" },
+  { field: "subfamilia", value: "Conectores", macrofamilia: "Luminarias de Proyecto", familia: "Lineales PRO" },
+  { field: "subfamilia", value: "Accesorios", macrofamilia: "Luminarias de Proyecto", familia: "Lineales PRO" },
+  { field: "subfamilia", value: "Driver", macrofamilia: "Luminarias de Proyecto", familia: "Lineales PRO" },
+  { field: "subfamilia", value: "6 a 36 Backlight CCT", macrofamilia: "Luminarias Interior", familia: "Paneles" },
+  { field: "subfamilia", value: "Reflectores PRO 2026", macrofamilia: "Luminarias Exterior", familia: "Reflectores" },
+  { field: "familia", value: "Highbay PRO 2026", macrofamilia: "Luminarias de Proyecto" },
+  { field: "subfamilia", value: "Highbay PRO 2026", macrofamilia: "Luminarias de Proyecto", familia: "Galponeras" },
+  { field: "categoria", value: "Downlight PRO", macrofamilia: "Luminarias de Proyecto", familia: "Paneles" },
+  { field: "categoria", value: "Downlight Standard", macrofamilia: "Luminarias de Proyecto", familia: "Paneles" },
+  { field: "subfamilia", value: "Backlight 36W", macrofamilia: "Luminarias de Proyecto", familia: "Paneles" },
+  { field: "subfamilia", value: "Standard", macrofamilia: "Luminarias de Proyecto", familia: "Luz de Calle" },
+  { field: "subfamilia", value: "Lumax", macrofamilia: "Luminarias de Proyecto", familia: "Luz de Calle" },
+  { field: "subfamilia", value: "PLAE", macrofamilia: "Luminarias de Proyecto", familia: "Luz de Calle" },
+  { field: "familia", value: "Tiras COB", macrofamilia: "Tiras LED" },
+  { field: "familia", value: "Tiras Neón", macrofamilia: "Tiras LED" },
+  { field: "familia", value: "Perfiles de Aluminio", macrofamilia: "Tiras LED" },
+  { field: "familia", value: "Sensores", macrofamilia: "Tiras LED" },
+  { field: "subfamilia", value: "Conectores", macrofamilia: "Tiras LED", familia: "Tiras SMD" },
+  { field: "familia", value: "Luz Guía", macrofamilia: "Mónaco" },
+  { field: "familia", value: "Tapa exterior", macrofamilia: "Mónaco" },
+  { field: "familia", value: "Lima", macrofamilia: "Interruptores y Tomas" }
+];
+let _megamenuNewFacets = null;
+
+function normalizeFacetKey(value){
+  return String(value || "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .trim()
+    .toLowerCase();
+}
+
+function parseMegamenuCatalogHref(href){
+  if(!href || href === "#") return null;
+  try{
+    const url = new URL(href, "https://www.macroled.com.ar");
+    const path = url.pathname.replace(/\/+$/, "") || "/";
+    if(path !== "/productos" && path !== "/nuevo-productos") return null;
+    return {
+      macrofamilia: (url.searchParams.get("macrofamilia") || "").trim(),
+      familia: (url.searchParams.get("familia") || "").trim(),
+      subfamilia: (url.searchParams.get("subfamilia") || "").trim(),
+      categorias: url.searchParams.getAll("categoria").map(v => String(v || "").trim()).filter(Boolean)
+    };
+  }catch(_){
+    return null;
+  }
+}
+
+function inferMegamenuCatalogTarget(family, group, item){
+  const parsed = parseMegamenuCatalogHref(item && item.href);
+  if(parsed && (parsed.familia || parsed.subfamilia || parsed.categorias.length)) return parsed;
+  const alias = MEGAMENU_NEW_FACET_ALIAS[item && item.name] || (item && item.name) || "";
+  const familyId = family && family.id;
+  if(group && group.group){
+    if(familyId === "luminarias-proyecto" || familyId === "interruptores-tomas"){
+      return { macrofamilia: family.label, familia: group.group, subfamilia: alias, categorias: [] };
+    }
+    if(familyId === "artefactos-lamparas"){
+      return {
+        macrofamilia: family.label,
+        familia: alias,
+        subfamilia: group.group === "Otros" ? "" : group.group,
+        categorias: []
+      };
+    }
+  }
+  return { macrofamilia: family && family.label, familia: alias, subfamilia: "", categorias: [] };
+}
+
+function addMegamenuNewFacet(entries, field, value, ctx){
+  if(!value) return;
+  entries.push({
+    field,
+    valueKey: normalizeFacetKey(value),
+    macroKey: normalizeFacetKey(ctx && ctx.macrofamilia),
+    familiaKey: normalizeFacetKey(ctx && ctx.familia)
+  });
+}
+
+function collectItemNewFacet(entries, family, group, item, inheritedNew){
+  if(!item || !(item.isNew || inheritedNew)) return;
+  const parsed = inferMegamenuCatalogTarget(family, group, item);
+  const ctx = {
+    macrofamilia: parsed.macrofamilia || (family && family.label) || "",
+    familia: parsed.familia || ""
+  };
+  if(parsed.categorias.length){
+    const nameKey = normalizeFacetKey(item.name);
+    const match = parsed.categorias.find(c => normalizeFacetKey(c) === nameKey);
+    if(match) addMegamenuNewFacet(entries, "categoria", match, ctx);
+    return;
+  }
+  if(parsed.subfamilia){
+    addMegamenuNewFacet(entries, "subfamilia", parsed.subfamilia, ctx);
+    return;
+  }
+  if(parsed.familia) addMegamenuNewFacet(entries, "familia", parsed.familia, ctx);
+}
+
+function extractNewFacetsFromMenu(data){
+  const entries = [];
+  (data || []).forEach(family => {
+    (family.items || []).forEach(item => collectItemNewFacet(entries, family, null, item, family.isNew));
+    (family.groups || []).forEach(group => {
+      if(group && group.isNew && group.group){
+        const parsed = parseMegamenuCatalogHref(group.href);
+        addMegamenuNewFacet(entries, "familia", (parsed && parsed.familia) || group.group, {
+          macrofamilia: (parsed && parsed.macrofamilia) || family.label,
+          familia: ""
+        });
+      }
+      (group.items || []).forEach(item => collectItemNewFacet(entries, family, group, item, group.isNew));
+    });
+  });
+  return entries;
+}
+
+function getMegamenuNewFacets(){
+  if(_megamenuNewFacets) return _megamenuNewFacets;
+  if(typeof window !== "undefined" && window.MEGAMENU_DATA && window.MEGAMENU_DATA.length){
+    const extracted = extractNewFacetsFromMenu(window.MEGAMENU_DATA);
+    if(extracted.length){
+      _megamenuNewFacets = extracted;
+      return _megamenuNewFacets;
+    }
+  }
+  return MEGAMENU_NEW_FACETS_FALLBACK.map(e => ({
+    field: e.field,
+    valueKey: normalizeFacetKey(e.value),
+    macroKey: normalizeFacetKey(e.macrofamilia),
+    familiaKey: normalizeFacetKey(e.familia)
+  }));
+}
+
+function isMegamenuNewFacet(field, value, selected){
+  const sel = selected || state.selected;
+  const valueKey = normalizeFacetKey(value);
+  const macroKey = normalizeFacetKey([...(sel.macrofamilia || [])][0]);
+  const familiaKey = normalizeFacetKey([...(sel.familia || [])][0]);
+  return getMegamenuNewFacets().some(entry => (
+    entry.field === field &&
+    entry.valueKey === valueKey &&
+    (!entry.macroKey || entry.macroKey === macroKey) &&
+    (!entry.familiaKey || entry.familiaKey === familiaKey)
+  ));
+}
+
+function nuevoBadgeHtml(field, value, selected){
+  if(!isMegamenuNewFacet(field, value, selected)) return "";
+  return `<span class="facet-nuevo" aria-label="Nuevo">Nuevo</span>`;
+}
+
 /* ---------------------------------------------------------
    OPTIMIZACIÓN DE IMÁGENES
    Todo lo que vive en el bucket s3.coresagroup.com se re-escribe para
@@ -754,6 +930,75 @@ function sortMacrofamiliaCounts(counts){
   });
 }
 
+/* Orden comercial de familias por macrofamilia. Las que no estén en la
+   lista quedan al final, alfabéticas. */
+const FAMILIA_ORDER_BY_MACRO = {
+  monaco: ["Armadas", "Despiece", "Tapas", "Luz Guía", "Tapa exterior"],
+  "tiras led": ["Tiras SMD", "Tiras COB", "Tiras Neón", "Perfiles de Aluminio", "Sensores", "Controladoras", "Accesorios"]
+};
+
+function normalizeFamiliaOrderKey(value){
+  let key = String(value || "").trim().toLocaleLowerCase("es")
+    .normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+  if(key === "despieces") key = "despiece";
+  return key;
+}
+
+function tirasLedFamiliaRank(value){
+  const key = normalizeFamiliaOrderKey(value);
+  const tiras = ["tiras smd", "tiras cob", "tiras neon"];
+  const tirasIndex = tiras.indexOf(key);
+  if(tirasIndex >= 0) return tirasIndex;
+  if(key.startsWith("tiras")) return 10;
+  if(key.includes("perfil")) return 20;
+  if(key.includes("sensor")) return 30;
+  if(key.includes("controlador")) return 40;
+  if(key.includes("accesor") || key.includes("conector")) return 60;
+  return 50;
+}
+
+function sortFamiliaCounts(counts, macro){
+  const macroKey = normalizeMacrofamiliaOrderKey(macro);
+  if(macroKey === "tiras led"){
+    return [...(counts || [])].sort((a, b) => {
+      const rankDiff = tirasLedFamiliaRank(a.value) - tirasLedFamiliaRank(b.value);
+      return rankDiff || String(a.value || "").localeCompare(String(b.value || ""), "es", { sensitivity: "base", numeric: true });
+    });
+  }
+  const order = FAMILIA_ORDER_BY_MACRO[macroKey];
+  if(!order) return sortFacetCounts(counts);
+  const index = new Map(order.map((value, i) => [normalizeFamiliaOrderKey(value), i]));
+  return [...(counts || [])].sort((a, b) => {
+    const aRank = index.has(normalizeFamiliaOrderKey(a.value))
+      ? index.get(normalizeFamiliaOrderKey(a.value))
+      : Number.MAX_SAFE_INTEGER;
+    const bRank = index.has(normalizeFamiliaOrderKey(b.value))
+      ? index.get(normalizeFamiliaOrderKey(b.value))
+      : Number.MAX_SAFE_INTEGER;
+    return aRank - bRank || String(a.value || "").localeCompare(String(b.value || ""), "es", { sensitivity: "base", numeric: true });
+  });
+}
+
+function panelesSubfamiliaRank(value){
+  const key = normalizeFamiliaOrderKey(value);
+  if(/6\s*a\s*24/.test(key)) return 0;
+  if(/6\s*a\s*36/.test(key) || (key.includes("36") && key.includes("cct"))) return 1;
+  if(key === "cob" || /(^|\s)cob(\s|$)/.test(key)) return 2;
+  if(key.includes("movil")) return 3;
+  if(key.includes("emergencia")) return 5;
+  if(key.includes("driver")) return 4;
+  if(key.includes("accesor")) return 80;
+  return 50;
+}
+
+function sortSubfamiliaCounts(counts, macro, familia){
+  if(normalizeFamiliaOrderKey(familia) !== "paneles") return sortFacetCounts(counts);
+  return [...(counts || [])].sort((a, b) => {
+    const rankDiff = panelesSubfamiliaRank(a.value) - panelesSubfamiliaRank(b.value);
+    return rankDiff || String(a.value || "").localeCompare(String(b.value || ""), "es", { sensitivity: "base", numeric: true });
+  });
+}
+
 /* Dimerizable: solo mostrar el filtro si hay alguna opción distinta de "No"
    (Sí, Con smartphone, etc.) en el contexto actual de facets. */
 function isDimerizableNoValue(value){
@@ -848,6 +1093,96 @@ async function buildAlphabeticalResults(firstPage, params, signal){
   return { ...firstPage, hits: allHits.slice(from, from + visiblePerPage), page: state.page };
 }
 
+function escapeHtml(value){
+  return String(value || "").replace(/[&<>"']/g, ch => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#39;"
+  }[ch]));
+}
+
+function normalizeSuggestKey(value){
+  return String(value || "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, " ")
+    .trim();
+}
+
+function parseSearchWatts(value){
+  const match = String(value || "").match(/(\d+(?:[.,]\d+)?)\s*w\b/i);
+  return match ? Number(String(match[1]).replace(",", ".")) : null;
+}
+
+function productSearchName(doc){
+  return String((doc && (doc.nombre_typesense || doc.nombre)) || "").trim();
+}
+
+function suggestNearSearch(query, hits){
+  const docs = (hits || []).map(hit => hit.document || hit).filter(Boolean);
+  if(!docs.length) return "";
+  const queryWatts = parseSearchWatts(query);
+  if(queryWatts != null){
+    let bestName = "";
+    let bestDiff = Infinity;
+    docs.forEach(doc => {
+      const watts = parseSearchWatts(productSearchName(doc)) ?? parseSearchWatts(doc.potencia);
+      if(watts == null) return;
+      const diff = Math.abs(watts - queryWatts);
+      if(diff < bestDiff){
+        bestDiff = diff;
+        bestName = productSearchName(doc);
+      }
+    });
+    if(bestName) return bestName;
+  }
+  const bases = Object.create(null);
+  docs.slice(0, 12).forEach(doc => {
+    const name = productSearchName(doc);
+    const base = name.replace(/\s*\d+(?:[.,]\d+)?\s*w\b/ig, "").replace(/\s{2,}/g, " ").trim();
+    const key = normalizeSuggestKey(base);
+    if(!key) return;
+    if(!bases[key]) bases[key] = { name: base, count: 0 };
+    bases[key].count += 1;
+  });
+  const top = Object.values(bases).sort((a, b) => b.count - a.count)[0];
+  return (top && top.name) || productSearchName(docs[0]);
+}
+
+async function countExactSearchHits(query, filterBy, signal){
+  const params = new URLSearchParams({
+    q: query,
+    query_by: "nombre_typesense,sku,descripcion",
+    per_page: "1",
+    page: "1",
+    num_typos: "0",
+    prefix: "false",
+    drop_tokens_threshold: "0",
+    typo_tokens_threshold: "100"
+  });
+  if(filterBy) params.set("filter_by", filterBy);
+  try{
+    const res = await typesenseDocumentsSearch(params, signal);
+    if(!res.ok) return null;
+    const data = await res.json();
+    return Number(data.found) || 0;
+  }catch(err){
+    if(err && err.name === "AbortError") throw err;
+    return null;
+  }
+}
+
+async function attachSearchNearMiss(data, exactFound){
+  if(!data || !state.query || !(Number(data.found) > 0) || exactFound !== 0) return data;
+  const suggestion = suggestNearSearch(state.query, data.hits);
+  if(!suggestion || normalizeSuggestKey(suggestion) === normalizeSuggestKey(state.query)) return data;
+  data.nearMiss = { query: state.query, suggestion };
+  return data;
+}
+
 async function searchTypesense(){
   // Si hay una búsqueda anterior todavía en vuelo, la cancelamos: su
   // respuesta ya no nos importa y evita que pise el estado más reciente
@@ -926,7 +1261,11 @@ async function searchTypesense(){
     per_page: String(getPerPage()),
     page: String(state.page)
   });
-  if(filterParts.length) params.set("filter_by", filterParts.join(" && "));
+  const filterBy = filterParts.join(" && ");
+  if(filterParts.length) params.set("filter_by", filterBy);
+  const exactHitsPromise = state.query
+    ? countExactSearchHits(state.query, filterBy, signal)
+    : Promise.resolve(null);
   const alphabetical = state.sortBy === "alpha:asc";
   if(alphabetical){
     params.set("per_page", "250");
@@ -951,7 +1290,8 @@ async function searchTypesense(){
         const retryRes = await typesenseDocumentsSearch(params, signal);
         if(retryRes.ok){
           const retryData = await retryRes.json();
-          return alphabetical ? await buildAlphabeticalResults(retryData, params, signal) : retryData;
+          const resolved = alphabetical ? await buildAlphabeticalResults(retryData, params, signal) : retryData;
+          return attachSearchNearMiss(resolved, await exactHitsPromise);
         }
       }
       const errText = await res.text();
@@ -990,7 +1330,8 @@ async function searchTypesense(){
       data.facet_counts = (data.facet_counts || []).filter(facet => !refreshedFields.has(facet.field_name));
       data.facet_counts.push(...disjunctiveFacets.filter(Boolean));
     }
-    return alphabetical ? await buildAlphabeticalResults(data, params, signal) : data;
+    const resolved = alphabetical ? await buildAlphabeticalResults(data, params, signal) : data;
+    return attachSearchNearMiss(resolved, await exactHitsPromise);
   }catch(err){
     // AbortError es esperado (cancelamos nosotros mismos la request vieja),
     // no es un error real ni hay que mostrar el mensaje de "no se pudo conectar"
@@ -1171,7 +1512,7 @@ function renderFacets(facetCounts){
         row.className = "facet-row familia-row";
         row.dataset.familia = c.value;
         row.innerHTML = `
-          <span>${c.value}</span>${c.count !== null && c.count !== undefined ? `<span class="count">${c.count}</span>` : ""}
+          <span>${c.value}${nuevoBadgeHtml(FAMILIA_FIELD, c.value)}</span>${c.count !== null && c.count !== undefined ? `<span class="count">${c.count}</span>` : ""}
         `;
         famBody.appendChild(row);
       });
@@ -1209,7 +1550,7 @@ function renderFacets(facetCounts){
             <input type="checkbox" data-field="${SUBFAMILIA_FIELD}" data-value="${c.value}" ${checked}>
             <span class="box">${ICON_CHECK}</span>
           </span>
-          <span>${c.value}</span>${c.count !== null && c.count !== undefined ? `<span class="count">${c.count}</span>` : ""}
+          <span>${c.value}${nuevoBadgeHtml(SUBFAMILIA_FIELD, c.value)}</span>${c.count !== null && c.count !== undefined ? `<span class="count">${c.count}</span>` : ""}
         `;
         subfamBody.appendChild(row);
       });
@@ -1245,7 +1586,7 @@ function renderFacets(facetCounts){
             <input type="checkbox" data-field="${field}" data-value="${c.value}" ${checked}>
             <span class="box">${ICON_CHECK}</span>
           </span>
-          <span>${c.value}</span><span class="count">${c.count}</span>
+          <span>${c.value}${nuevoBadgeHtml(field, c.value)}</span><span class="count">${c.count}</span>
         `;
         body.appendChild(row);
       });
@@ -1422,23 +1763,23 @@ function mergeFacetCounts(fresh, cached, selectedSet){
 function resolveFamiliaCounts(facetCounts, macro, selectedSet){
   const key = macro || "";
   const facetData = (facetCounts || []).find(f => f.field_name === FAMILIA_FIELD);
-  const fresh = sortFacetCounts(facetData ? facetData.counts : []);
+  const fresh = sortFamiliaCounts(facetData ? facetData.counts : [], macro);
   const cached = familiaOptionsCache[key];
   if(fresh.length && (!cached || fresh.length > cached.length)){
     familiaOptionsCache[key] = fresh;
   }
-  return mergeFacetCounts(fresh, familiaOptionsCache[key] || fresh, selectedSet);
+  return sortFamiliaCounts(mergeFacetCounts(fresh, familiaOptionsCache[key] || fresh, selectedSet), macro);
 }
 
 function resolveSubfamiliaCounts(facetCounts, macro, familia, selectedSet){
   const key = `${macro || ""}|${familia || ""}`;
   const facetData = (facetCounts || []).find(f => f.field_name === SUBFAMILIA_FIELD);
-  const fresh = sortFacetCounts(facetData ? facetData.counts : []);
+  const fresh = sortSubfamiliaCounts(facetData ? facetData.counts : [], macro, familia);
   const cached = subfamiliaOptionsCache[key];
   if(fresh.length && (!cached || fresh.length > cached.length)){
     subfamiliaOptionsCache[key] = fresh;
   }
-  return mergeFacetCounts(fresh, subfamiliaOptionsCache[key] || fresh, selectedSet);
+  return sortSubfamiliaCounts(mergeFacetCounts(fresh, subfamiliaOptionsCache[key] || fresh, selectedSet), macro, familia);
 }
 
 /* =========================================================
@@ -2181,7 +2522,7 @@ const COMPARE_PAGE_URL = (() => {
 function buildCompareUrl(){
   const macrofamiliaActual = [...state.selected.macrofamilia][0];
   const fromLabel = state.query
-    ? `Resultados para "${state.query}"`
+    ? `Resultados para: "${state.query}"`
     : (macrofamiliaActual || "productos");
   return `${COMPARE_PAGE_URL}?from=${encodeURIComponent(location.href)}&fromLabel=${encodeURIComponent(fromLabel)}`;
 }
@@ -2492,7 +2833,7 @@ function renderBreadcrumb(){
 
   if(state.query){
     addLink("Productos", productsUrl, clearToProductos);
-    addCurrent(`Resultados para "${state.query}"`);
+    addCurrent(`Resultados para: "${state.query}"`);
   }else if(!active){
     addCurrent("Productos");
   }else{
@@ -2550,25 +2891,67 @@ function renderBreadcrumb(){
 /* =========================================================
    RENDER: ENCABEZADO DE MACROFAMILIA / FAMILIA / BÚSQUEDA
    ========================================================= */
-function renderCategoryHeading(){
+function renderCategoryHeading(data){
   const holder = document.getElementById("categoryHeading");
   const active = [...state.selected.macrofamilia][0];
   const activeFamilia = [...state.selected.familia][0];
   const subfamilias = [...state.selected.subfamilia];
+  const nearMiss = data && data.nearMiss;
   let title = "Productos";
-  if(state.query) title = `Resultados para "${state.query}"`;
+  if(state.query) title = `Resultados para: "${state.query}"`;
   else if(subfamilias.length === 1) title = subfamilias[0];
   else if(subfamilias.length >= 2) title = active || activeFamilia || "Productos";
   else if(activeFamilia) title = activeFamilia;
   else if(active) title = active;
 
   holder.hidden = false;
+  holder.classList.toggle("is-near-miss", Boolean(nearMiss));
   let h1 = holder.querySelector("h1");
   if(!h1){
     h1 = document.createElement("h1");
     holder.prepend(h1);
   }
   h1.textContent = title;
+}
+
+function renderSearchNearMiss(data, countLabel){
+  let notice = document.getElementById("searchNearMiss");
+  if(!notice){
+    const gridShell = document.getElementById("gridShell");
+    notice = document.createElement("div");
+    notice.id = "searchNearMiss";
+    notice.className = "search-near-miss";
+    if(gridShell && gridShell.parentNode){
+      gridShell.parentNode.insertBefore(notice, gridShell);
+    }
+  }
+  const nearMiss = data && data.nearMiss;
+  if(nearMiss && nearMiss.suggestion){
+    const query = nearMiss.query || state.query;
+    const suggestion = nearMiss.suggestion;
+    notice.hidden = false;
+    notice.innerHTML = `
+      <div class="search-near-miss__box">
+        <p class="search-near-miss__lead"><span class="search-near-miss__icon" aria-hidden="true">!</span><span>No se encontraron resultados para: ${escapeHtml(query)}</span></p>
+        <p class="search-near-miss__indent">¿Quizás quisiste decir?</p>
+        <p class="search-near-miss__indent"><button type="button" class="search-suggest" data-suggest="${escapeHtml(suggestion)}">${escapeHtml(suggestion)}</button></p>
+      </div>
+      <hr class="search-near-miss__rule" aria-hidden="true">
+      <p class="search-near-miss__subtitle">Productos relacionados con tu búsqueda</p>
+      ${countLabel ? `<p class="search-near-miss__count">${escapeHtml(countLabel)}</p>` : ""}
+    `;
+    const suggestBtn = notice.querySelector(".search-suggest");
+    if(suggestBtn){
+      suggestBtn.addEventListener("click", () => {
+        applySearchQuery(suggestBtn.dataset.suggest || suggestion);
+        syncSearchInputFromState();
+        loadAndRender();
+      });
+    }
+  }else{
+    notice.hidden = true;
+    notice.innerHTML = "";
+  }
 }
 
 /* =========================================================
@@ -2629,20 +3012,30 @@ async function loadAndRender(){
     }
 
     window._lastHits = data.hits;
+    lastSearchNearMiss = data.nearMiss || null;
+    const perPage = getPerPage();
+    const from = data.hits.length ? (state.page - 1) * perPage + 1 : 0;
+    const to = (state.page - 1) * perPage + data.hits.length;
+    const countLabel = `${to} de ${data.found} productos`;
+
     renderFacets(data.facet_counts);
     renderMobileFilters(data.facet_counts);
     renderBreadcrumb();
-    renderCategoryHeading(data.found);
+    renderCategoryHeading(data);
+    renderSearchNearMiss(data, data.nearMiss ? countLabel : "");
     renderCategoryBanner();
     renderChips();
     renderCards(data.hits, data.found);
     renderPagination(data.found);
     renderCompareBar();
 
-    const perPage = getPerPage();
-    const from = data.hits.length ? (state.page - 1) * perPage + 1 : 0;
-    const to = (state.page - 1) * perPage + data.hits.length;
-    showingLabel.textContent = `${to} de ${data.found} productos`;
+    if(data.nearMiss){
+      showingLabel.hidden = true;
+      showingLabel.textContent = "";
+    }else{
+      showingLabel.hidden = false;
+      showingLabel.textContent = countLabel;
+    }
 
     const applyBtn = document.getElementById("filtersApply");
     if(applyBtn) applyBtn.textContent = `Ver ${data.found} resultado${data.found === 1 ? "" : "s"}`;
@@ -2931,6 +3324,7 @@ document.getElementById("fmnBack").addEventListener("click", goToListScreen);
    en state.pending / state.pendingSortBy y recién se aplica de verdad
    (loadAndRender) al tocar "Ver resultados" — nada filtra antes. ---- */
 let lastFacetCounts = [];
+let lastSearchNearMiss = null;
 const FMN_ORDER = ["macrofamilia", "familia", "subfamilia", "categoria", "variante_temperatura_filtro", "color", "potencia", "dimerizable"];
 const FMN_LABELS = {
   macrofamilia: "Macrofamilia",
@@ -3066,7 +3460,7 @@ function fmnCheckboxRowHtml(field, c){
   return `
     <div class="fmn-option-row${checked ? " active" : ""}${mutedOption ? " is-muted" : ""}${field === "color" && !c.count && !checked ? " is-empty" : ""}" data-value="${c.value}">
       <span class="fmn-checkbox">${checked ? ICON_CHECK : ""}</span>
-      ${tempDot}${colorDot}<span>${label}</span>
+      ${tempDot}${colorDot}<span>${label}${nuevoBadgeHtml(field, c.value, state.pending)}</span>
       ${c.count !== null && c.count !== undefined ? `<span class="fmn-count">${c.count}</span>` : ""}
     </div>
   `;
@@ -3245,7 +3639,7 @@ function openDetailScreen(field){
       return `
         <div class="fmn-option-row${checked ? " active" : ""}" data-value="${c.value}">
           <span class="fmn-radio"></span>
-          <span>${c.value}</span>
+          <span>${c.value}${nuevoBadgeHtml(FAMILIA_FIELD, c.value, state.pending)}</span>
           ${c.count !== null && c.count !== undefined ? `<span class="fmn-count">${c.count}</span>` : ""}
         </div>
       `;

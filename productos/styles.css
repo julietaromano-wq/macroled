@@ -80,6 +80,83 @@
     color:var(--ink-soft);
     line-height:1.4;
   }
+  .search-near-miss{
+    margin:0 0 20px;
+    padding:0;
+    border:0;
+    background:none;
+    font-size:15px;
+    font-weight:500;
+    color:var(--ink);
+    line-height:1.45;
+  }
+  .search-near-miss p{margin:0;}
+  .search-near-miss p + p{margin-top:8px;}
+  .search-near-miss__box{
+    padding:14px 16px;
+    border:1px solid #cfd6e0;
+    border-radius:10px;
+    background:#e4e9f0;
+  }
+  .search-near-miss__box p + p{margin-top:8px;}
+  .search-near-miss__lead{
+    display:flex;
+    align-items:flex-start;
+    gap:8px;
+    font-size:15px;
+    font-weight:700;
+    color:var(--dark-blue--700);
+  }
+  .search-near-miss__icon{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    flex:none;
+    width:18px;
+    height:18px;
+    margin-top:1px;
+    border-radius:50%;
+    background:var(--dark-blue--700);
+    color:#fff;
+    font-size:12px;
+    font-weight:800;
+    line-height:1;
+  }
+  .search-near-miss__indent{
+    padding-left:26px;
+  }
+  .search-near-miss__rule{
+    border:0;
+    border-top:1px solid var(--line);
+    margin:16px 0;
+  }
+  .search-near-miss__subtitle{
+    font-size:15px;
+    font-weight:700;
+    color:var(--dark-blue--700);
+  }
+  .search-near-miss__count{
+    margin-top:4px !important;
+    font-size:14px;
+    font-weight:400;
+    color:var(--ink-soft);
+  }
+  .search-near-miss[hidden]{display:none !important;}
+  .category-heading.is-near-miss .showing{display:none !important;}
+  .search-suggest{
+    display:inline;
+    margin:0;
+    padding:0;
+    border:0;
+    background:none;
+    font:inherit;
+    font-weight:700;
+    color:var(--tint-text);
+    text-decoration:underline;
+    text-underline-offset:2px;
+    cursor:pointer;
+  }
+  .search-suggest:hover{color:var(--brand-dark);}
   .category-heading .count{display:none !important;}
   .category-heading[hidden],
   .category-heading:empty{display:none !important;margin:0;}
@@ -267,6 +344,23 @@
   .facet-row.familia-row{
     font-weight:400;
     padding:7px 8px 7px 25px;
+  }
+  .facet-nuevo{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    flex:none;
+    margin-left:6px;
+    vertical-align:middle;
+    font-size:9px;
+    font-weight:700;
+    text-transform:uppercase;
+    letter-spacing:.04em;
+    line-height:1;
+    background:#ecd87f;
+    color:#16294f !important;
+    padding:3px 6px 2px;
+    border-radius:4px;
   }
 
   .facet-switch-group{padding:12px 0;}
@@ -1448,9 +1542,10 @@
       font-size:15px;color:var(--colortext);cursor:pointer;
       min-width:0;
     }
-    .fmn-option-row > span:not(.fmn-checkbox):not(.fmn-radio):not(.fmn-count):not(.dot){
+    .fmn-option-row > span:not(.fmn-checkbox):not(.fmn-radio):not(.fmn-count):not(.dot):not(.facet-nuevo){
       min-width:0;overflow-wrap:anywhere;
     }
+    .fmn-option-row .facet-nuevo{margin-left:8px;}
     .fmn-option-row.active{color:var(--ink);font-weight:600;}
     .fmn-option-row.is-empty{opacity:.55;}
     .fmn-option-row.disabled{opacity:.4;pointer-events:none;}
@@ -2327,6 +2422,49 @@ body.assistant-open > #aiLaunch.ai-launch{
   margin:8px 0 0 !important;
   font-size:14px !important;
   color:var(--ink-soft) !important;
+}
+#macroled-productos .category-heading.is-near-miss .showing{
+  display:none !important;
+}
+#macroled-productos .search-near-miss{
+  display:block !important;
+  margin:0 0 20px !important;
+  padding:0 !important;
+  border:0 !important;
+  background:none !important;
+  font-size:15px !important;
+  font-weight:500 !important;
+  color:var(--ink) !important;
+  line-height:1.45 !important;
+}
+#macroled-productos .search-near-miss__box{
+  padding:14px 16px !important;
+  border:1px solid #cfd6e0 !important;
+  border-radius:10px !important;
+  background:#e4e9f0 !important;
+}
+#macroled-productos .search-near-miss__lead{
+  display:flex !important;
+  align-items:flex-start !important;
+  gap:8px !important;
+  font-size:15px !important;
+  font-weight:700 !important;
+  letter-spacing:0 !important;
+  line-height:1.45 !important;
+  color:var(--dark-blue--700) !important;
+}
+#macroled-productos .search-near-miss[hidden]{display:none !important;}
+#macroled-productos .search-suggest{
+  display:inline !important;
+  margin:0 !important;
+  padding:0 !important;
+  border:0 !important;
+  background:none !important;
+  font:inherit !important;
+  font-weight:700 !important;
+  color:var(--tint-text) !important;
+  text-decoration:underline !important;
+  cursor:pointer !important;
 }
 #macroled-productos .category-heading .count{
   display:none !important;
