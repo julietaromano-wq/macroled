@@ -13,6 +13,10 @@ body.newsletter-open {
   --nl-placeholder: #9096a3;
   --nl-action: #0086b5;
   --nl-action-hover: #00688c;
+  --nl-tab-border: #e6e6e6;
+  --nl-tab-border-hover: #c7ccd4;
+  --nl-tab-active-border: #00bdff;
+  --nl-tab-active-bg: #e6f8ff;
   --nl-radius: 24px;
   --nl-ease: cubic-bezier(0.22, 0.61, 0.36, 1);
   box-sizing: border-box;
@@ -175,14 +179,17 @@ body.newsletter-open {
 .nl-interest-tab {
   appearance: none;
   margin: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
   padding: 10px 14px;
-  border: 1px solid var(--nl-line);
+  border: 1.5px solid var(--nl-tab-border);
   border-radius: 8px;
   background: #fff;
-  color: var(--nl-text);
+  color: var(--nl-muted);
   font-family: inherit;
-  font-size: 13px;
-  font-weight: 500;
+  font-size: 14px;
+  font-weight: 600;
   line-height: 1.2;
   cursor: pointer;
   transition:
@@ -191,10 +198,20 @@ body.newsletter-open {
     color 0.15s ease;
 }
 
+.nl-interest-tab::after {
+  content: "";
+  width: 12px;
+  height: 10px;
+  flex: none;
+  opacity: 0;
+  background-color: currentColor;
+  -webkit-mask: center/contain no-repeat url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 14 11'%3E%3Cpath d='M1.5 5.5 5.25 9 12.5 1.5' fill='none' stroke='black' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  mask: center/contain no-repeat url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 14 11'%3E%3Cpath d='M1.5 5.5 5.25 9 12.5 1.5' fill='none' stroke='black' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  transition: opacity 0.15s ease;
+}
+
 .nl-interest-tab:hover {
-  border-color: var(--nl-action);
-  background: #e6f8ff;
-  color: var(--nl-action);
+  border-color: var(--nl-tab-border-hover);
 }
 
 .nl-interest-tab:focus-visible {
@@ -204,9 +221,15 @@ body.newsletter-open {
 
 .nl-interest-tab.is-active,
 .nl-interest-tab[aria-pressed="true"] {
-  border-color: var(--nl-action);
-  background: #e6f8ff;
+  border-color: var(--nl-tab-active-border);
+  background: var(--nl-tab-active-bg);
   color: var(--nl-action);
+  font-weight: 700;
+}
+
+.nl-interest-tab.is-active::after,
+.nl-interest-tab[aria-pressed="true"]::after {
+  opacity: 1;
 }
 
 .nl-field:has(.nl-select-open) {

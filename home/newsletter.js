@@ -104,7 +104,7 @@
           if (backdrop) backdrop.classList.add("is-open");
         });
       });
-      const first = popup.querySelector("#nl-nombre");
+      const first = popup.querySelector("#nl-email");
       if (first) first.focus();
     };
 
@@ -160,11 +160,12 @@
         return;
       }
 
-      if (!consent || !consent.checked) {
-        showError("Tenés que aceptar recibir el newsletter para continuar.");
-        if (consent) consent.focus();
-        return;
-      }
+      // Checkbox de consentimiento deshabilitado (ver newsletter.html): se omite su validacion.
+      // if (!consent || !consent.checked) {
+      //   showError("Tenés que aceptar recibir el newsletter para continuar.");
+      //   if (consent) consent.focus();
+      //   return;
+      // }
 
       const endpoint =
         form.getAttribute("data-newsletter-endpoint") ||
