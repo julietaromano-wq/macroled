@@ -134,7 +134,7 @@ main{padding:calc(26px + clamp(12px,2vw,24px)) clamp(12px,2vw,24px) 0;}
 
 /* —— Crumb —— (mismo estilo que la página de productos: separador "›", 13px) */
 .crumb{
-  padding:clamp(12px,2vw,16px) 0 clamp(6px,1vw,8px);
+  padding:clamp(2px,1.5vw,15px) 0 clamp(6px,1vw,8px);
   font-size:13px;color:var(--ink-soft);
   display:flex;flex-wrap:wrap;gap:6px;align-items:center;
   line-height:1.5;
@@ -2116,6 +2116,7 @@ body.assistant-open .ai-launch{
     border-radius:8px;
   }
   .hero{gap:22px;padding:8px 0 28px;}
+  .hero .info{padding:0 var(--pad-x);}
   .detail{padding:0;}
 
   .gallery{
@@ -2269,8 +2270,8 @@ body.assistant-open .ai-launch{
   .compare-row{
     justify-content:flex-start;
     width:auto !important;
-    margin-left:-8px;
-    padding:8px 10px;
+    margin-left:calc(var(--pad-x) * -1);
+    padding:8px var(--pad-x);
     font-size:14px;
   }
   .cta-utility .btn-ai{
@@ -2321,7 +2322,7 @@ body.assistant-open .ai-launch{
   .spec-row{
     grid-template-columns:1fr;
     gap:4px;
-    padding:12px 14px;
+    padding:12px var(--pad-x);
     font-size:14px;
   }
   .spec-row .k,
@@ -2330,7 +2331,7 @@ body.assistant-open .ai-launch{
     font-size:14px;
   }
   .spec-row .v{text-align:left;font-weight:600;}
-  .spec-group-head{padding:12px 14px;}
+  .spec-group-head{padding:12px var(--pad-x);}
   .sg-title svg{width:16px;height:16px;}
 
   .compat-head{
