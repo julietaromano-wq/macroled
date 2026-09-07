@@ -1546,7 +1546,7 @@
       {
         key: "ficha",
         url: fichaUrl,
-        primaryLabel: "Descargar ficha técnica",
+        primaryLabel: "Ficha técnica",
         secondaryLabel: "Ficha técnica",
       },
       {

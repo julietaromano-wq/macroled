@@ -47,7 +47,7 @@
   --space-block:clamp(16px,2vw,22px);
   /* Proporcion de las columnas del hero. Subir --hero-gallery ensancha la card
      de la imagen; bajarla le pasa ancho a la columna de texto. */
-  --hero-gallery:1.28fr;
+  --hero-gallery:1.6fr;
   --hero-info:1fr;
   --gap-hero:clamp(28px,4.5vw,48px);
 }
@@ -86,7 +86,7 @@ img{max-width:100%;display:block;}
 .share-sheet :focus-visible{outline:none;box-shadow:var(--focus-ring);}
 
 /* Card blanca sobre fondo gris (cambio local). Padding fluido para mobile. */
-main{padding:calc(48px + clamp(12px,2vw,24px)) clamp(12px,2vw,24px) 0;}
+main{padding:calc(26px + clamp(12px,2vw,24px)) clamp(12px,2vw,24px) 0;}
 .wrap{
   max-width:var(--max);
   margin:0 auto 30px;
@@ -356,7 +356,7 @@ main{padding:calc(48px + clamp(12px,2vw,24px)) clamp(12px,2vw,24px) 0;}
 .share-sheet{display:none;}
 
 /* Info column — sin max-width fijo para aprovechar el ancho con galería más ancha */
-.hero .info{min-width:0;position:relative;z-index:1;}
+.hero .info{min-width:0;position:relative;z-index:1;padding:0 clamp(8px,1.5vw,20px);}
 .eyebrow{
   display:block;margin:0 0 clamp(8px,1.5vw,12px);
   font-size:var(--fs-xs);font-weight:600;letter-spacing:.12em;text-transform:uppercase;
@@ -695,15 +695,14 @@ main{padding:calc(48px + clamp(12px,2vw,24px)) clamp(12px,2vw,24px) 0;}
 .actions{display:flex;gap:8px;margin:0;}
 .btn{
   display:inline-flex;align-items:center;justify-content:center;gap:6px;
-  flex:1;min-width:0;
+  flex:0 0 calc(50% - 4px);min-width:0;
   min-height:44px;padding:12px 16px;border-radius:var(--radius-sm);
   font-family:var(--font);
-  font-size:var(--fs-sm);font-weight:600;letter-spacing:.02em;cursor:pointer;
+  font-size:var(--fs-base);font-weight:600;letter-spacing:.02em;cursor:pointer;
   border:1px solid transparent;
 }
 .btn-primary{
   background:var(--btn-blue);color:#fff;
-  flex:1.4; /* más ancho: es la acción principal */
 }
 .btn-primary:hover{
   background:var(--btn-blue-dark);
@@ -711,7 +710,6 @@ main{padding:calc(48px + clamp(12px,2vw,24px)) clamp(12px,2vw,24px) 0;}
 }
 .btn-ghost{
   background:var(--white);color:var(--ink);border-color:var(--line-strong);
-  flex:1;
 }
 .btn-ghost:hover{
   background:var(--bg-card);border-color:var(--line-hover);
@@ -813,7 +811,7 @@ main{padding:calc(48px + clamp(12px,2vw,24px)) clamp(12px,2vw,24px) 0;}
   border:none;
   border-radius:999px;
   background:transparent;
-  font-size:var(--fs-sm);font-weight:600;letter-spacing:.02em;
+  font-size:var(--fs-base);font-weight:600;letter-spacing:.02em;
   color:var(--ink);cursor:pointer;user-select:none;margin-bottom:0;
 }
 .compare-row:hover{
@@ -1468,6 +1466,7 @@ body.assistant-open .ai-launch{
   color:#fff;box-shadow:0 3px 10px rgba(0,144,199,.35);
   font-size:.68rem;font-weight:500;line-height:1;letter-spacing:.03em;white-space:nowrap;
 }
+.ml-product-smart-badge svg{flex:none;}
 .ml-product-nuevo-badge{
   display:inline-flex;align-items:center;
   padding:.45rem .7rem;
@@ -2081,7 +2080,6 @@ body.assistant-open .ai-launch{
   .zoom-pane{display:none !important;}
   .hero .info{
     max-width:none;
-    padding:0;
   }
   .mainnav{display:none;}
   .trust{grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:16px 14px;}
@@ -2111,10 +2109,10 @@ body.assistant-open .ai-launch{
 /* Mobile */
 @media (max-width:640px){
   :root{--pad-x:12px;}
-  main{padding:calc(6px + 8px) 8px 0;}
+  main{padding:calc(26px + 8px) 8px 0;}
   .wrap{
     padding:10px 12px;
-    margin-bottom:16px;
+    margin:0 6px 16px;
     border-radius:8px;
   }
   .hero{gap:22px;padding:8px 0 28px;}
