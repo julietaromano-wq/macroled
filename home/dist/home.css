@@ -1,4 +1,4 @@
-﻿html,
+html,
 body {
   width: 100%;
   min-height: 100%;
@@ -1139,10 +1139,11 @@ body {
   justify-items: start;
 }
 .ml-home .ml-foa__subtitle {
+  --ml-type-body-m-size: 1rem;
   max-width: 36rem;
   margin: 0;
   color: rgba(255, 255, 255, 0.82);
-  font-size: clamp(0.95rem, 1.2vw, 1.0625rem);
+  font-size: var(--ml-type-body-m-size);
   line-height: 1.55;
   text-wrap: pretty;
 }
@@ -5754,7 +5755,7 @@ a.ml-news-card:focus-visible .ml-news-card__arrow {
   --ml-type-h1-leading: 1.02;
   --ml-type-h1-tracking: -0.04em;
 
-  --ml-type-h2-size: clamp(2rem, calc(1.4rem + 1.6vw), 3.25rem);
+  --ml-type-h2-size: clamp(2rem, calc(1.4rem + 1.6vw), 3rem);
   --ml-type-h2-weight: 500;
   --ml-type-h2-leading: 1.15;
   --ml-type-h2-tracking: -0.04em;
@@ -5833,6 +5834,10 @@ a.ml-news-card:focus-visible .ml-news-card__arrow {
 }
 
 /* H5 — card titles (formerly heading-card-large and card variants) */
+.ml-home .ml-project-lines-concept__content {
+  --ml-type-h5-weight: 500;
+}
+
 .ml-home .ml-project-lines-concept__content,
 .ml-home .ml-project-line-card__title,
 .ml-home .ml-project-line-card__collapsed-title {
@@ -5996,26 +6001,42 @@ a.ml-news-card:focus-visible .ml-news-card__arrow {
     --ml-type-body-l-size: 1.125rem;
     --ml-type-body-m-size: 1.0625rem;
     --ml-type-body-s-size: 0.9375rem;
+    --ml-type-button-size: 0.875rem;
   }
 
-  .ml-home .ml-featured-products__tab {
-    font-size: 0.9375rem;
+  .ml-home .ml-featured__copy {
+    --ml-type-body-l-size: 0.875rem;
+  }
+
+  .ml-home .ml-featured-products__subtitle {
+    --ml-type-body-l-size: 1rem;
+  }
+
+  .ml-home .ml-project-lines-concept__content {
+    --ml-type-body-l-size: 0.9rem;
   }
 
   .ml-home .ml-button,
   .ml-home .ml-button--tertiary,
   .ml-home .ml-conversion__button,
-  .ml-home .ml-project-line-card__cta {
-    font-size: 1rem;
+  .ml-home .ml-featured-products__tab,
+  .ml-home .ml-project-line-card__cta,
+  .ml-home .ml-project-lines-concept__cta,
+  .ml-home .ml-solutions-banner .ml-solutions-banner__track .ml-category-card__cta,
+  .ml-home .ml-featured[data-content-mode="static"] .ml-line-subfamilies .ml-category-card__cta,
+  .ml-home .ml-category-card__cta,
+  .ml-home .ml-conversion__card--faq .ml-faq__trigger {
+    font-size: var(--ml-type-button-size);
   }
 
   .ml-home .ml-hero__subtitle {
     font-size: 1.125rem;
   }
 
-  .ml-home .ml-foa__subtitle,
+  .ml-home .ml-conversion__intro > p,
   .ml-home .ml-newsletter-banner__subtitle {
-    font-size: 1.0625rem;
+    --ml-type-body-l-size: 1rem;
+    font-size: var(--ml-type-body-l-size);
   }
 
   .ml-home .ml-highlight-badge {
@@ -6433,6 +6454,12 @@ a.ml-news-card:focus-visible .ml-news-card__arrow {
   text-wrap: pretty;
 }
 
+@media (min-width: 901px) {
+  .ml-home .ml-solutions-banner__subtitle {
+    max-width: 25rem;
+  }
+}
+
 .ml-home .ml-solutions-banner__media {
   position: relative;
   min-height: 100%;
@@ -6568,6 +6595,11 @@ a.ml-news-card:focus-visible .ml-news-card__arrow {
     padding-inline: 0;
   }
 
+  .ml-home .ml-solutions-banner__subtitle {
+    --ml-type-body-m-size: 1rem;
+    font-size: var(--ml-type-body-m-size);
+  }
+
   .ml-home .ml-solutions-banner__copy {
     padding: 1.5rem 0 0.75rem;
   }
@@ -6578,6 +6610,23 @@ a.ml-news-card:focus-visible .ml-news-card__arrow {
 
   .ml-home .ml-solutions-banner__categories {
     padding: 2rem 0 1rem;
+  }
+
+  .ml-home .ml-solutions-banner__categories .ml-categories-test__tabs {
+    display: grid;
+    grid-template-columns: minmax(0, 1.8fr) repeat(2, minmax(0, 1fr));
+    box-sizing: border-box;
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .ml-home .ml-solutions-banner__categories .ml-featured-products__tab {
+    min-width: 0;
+    padding-inline: 0.5rem;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    line-height: 1.2;
   }
 
   .ml-home .ml-solutions-banner__viewport {
@@ -7193,40 +7242,17 @@ a.ml-news-card:focus-visible .ml-news-card__arrow {
     max-height: none !important;
   }
 
-  .ml-home .ml-project-lines-concept__product {
-    bottom: -12% !important;
-    right: 0 !important;
-    width: auto !important;
-    height: 72% !important;
-    aspect-ratio: 1 / 1;
-    max-width: none !important;
-    object-fit: contain !important;
-    object-position: right bottom !important;
-  }
-
-  .ml-home [data-project-lines-concept-card="street"] .ml-project-lines-concept__product {
-    translate: 39% 0;
-  }
-
-  .ml-home [data-project-lines-concept-card="invictus"] .ml-project-lines-concept__product {
-    translate: 22% 0;
-    aspect-ratio: 1000 / 1349;
-  }
-
-  .ml-home [data-project-lines-concept-card="highbay"] .ml-project-lines-concept__product {
-    translate: 22% 0;
-  }
 }
 
-/* Reserve Webflow's fixed nav inside the full-height sheet animation. */
+/* Keep the sheet animation and nav spacing; let content determine its height. */
 .ml-home .ml-project-lines-concept {
   --ml-project-lines-nav-height: 69.8px;
   --ml-project-lines-content-offset: clamp(1.5rem, 4vw, 5rem);
   display: flex;
   box-sizing: border-box;
-  height: 100vh !important;
+  height: auto !important;
   min-height: 0 !important;
-  max-height: 100vh !important;
+  max-height: none !important;
   flex-direction: column;
   padding-top: calc(
     var(--ml-project-lines-nav-height) + var(--ml-project-lines-content-offset)
@@ -7237,19 +7263,12 @@ a.ml-news-card:focus-visible .ml-news-card__arrow {
   overflow: hidden;
 }
 
-@supports (height: 100dvh) {
-  .ml-home .ml-project-lines-concept {
-    height: 100dvh !important;
-    max-height: 100dvh !important;
-  }
-}
-
 .ml-home .ml-project-lines-concept__inner {
   --ml-project-lines-content-gap: clamp(2rem, 3vw, 4rem);
   display: flex;
-  height: 100% !important;
+  height: auto !important;
   min-height: 0 !important;
-  flex: 1 1 auto;
+  flex: 0 0 auto;
   flex-direction: column;
   gap: var(--ml-project-lines-content-gap);
 }
@@ -7263,13 +7282,16 @@ a.ml-news-card:focus-visible .ml-news-card__arrow {
   height: auto !important;
   min-height: 0 !important;
   max-height: none !important;
-  flex: 1 1 auto;
+  flex: 0 0 auto;
+  grid-template-rows: auto;
+  align-items: start;
 }
 
 .ml-home .ml-project-lines-concept__card {
-  height: 100% !important;
+  height: auto !important;
+  aspect-ratio: 4 / 5;
   min-height: 0 !important;
-  max-height: 100%;
+  max-height: none;
 }
 
 @media (max-width: 991px) {
@@ -7325,25 +7347,27 @@ a.ml-news-card:focus-visible .ml-news-card__arrow {
 
   .ml-home .ml-project-lines-concept__card {
     width: min(82vw, 20rem);
-    height: clamp(20rem, 100vw, 24rem) !important;
+    height: auto !important;
     flex: 0 0 min(82vw, 20rem);
     scroll-snap-align: start;
   }
 
-  .ml-home .ml-project-lines-concept__ambient {
-    opacity: 0.38;
-    transform: scale(1);
-  }
+}
 
-  .ml-home .ml-project-lines-concept__shade {
-    background: linear-gradient(
-      180deg,
-      rgba(0, 0, 0, 0.46) 0%,
-      rgba(0, 0, 0, 0.14) 48%,
-      rgba(0, 0, 0, 0.42) 100%
-    );
-    opacity: 1;
-  }
+/* Subtle contextual background behind products at every viewport width. */
+.ml-home .ml-project-lines-concept__ambient {
+  opacity: 0.38;
+  transform: scale(1);
+}
+
+.ml-home .ml-project-lines-concept__shade {
+  background: linear-gradient(
+    180deg,
+    rgba(0, 0, 0, 0.46) 0%,
+    rgba(0, 0, 0, 0.14) 48%,
+    rgba(0, 0, 0, 0.42) 100%
+  );
+  opacity: 1;
 }
 
 @media (max-width: 900px) {
@@ -7845,79 +7869,35 @@ body.assistant-open .ai-launch {
 }
 
 
-/* Product crop: 1920px reference, progressively reduced on smaller cards. */
-.ml-home [data-project-lines-concept-card="street"] .ml-project-lines-concept__product {
-  right: -24% !important;
+/* Preserve the 1920px product framing at every width: cards share a 4:5 ratio.
+   Percentages refer to the card, not the viewport. Keep transform free for hover. */
+.ml-home .ml-project-lines-concept__product {
+  right: var(--ml-project-product-right, -24%) !important;
+  bottom: var(--ml-project-product-bottom, -10%) !important;
+  width: var(--ml-project-product-width, 112%) !important;
+  height: var(--ml-project-product-height, 78%) !important;
+  max-width: none !important;
+  aspect-ratio: auto;
+  object-fit: contain !important;
+  object-position: right bottom !important;
   transform-origin: right bottom;
-  /* Same visual height as the other two products; the close-up comes from the crop. */
   scale: 1;
   translate: none !important;
 }
 
-.ml-home [data-project-lines-concept-card="invictus"] .ml-project-lines-concept__product {
-  right: -40% !important;
-  aspect-ratio: auto;
-  translate: none !important;
+.ml-home [data-project-lines-concept-card="invictus"] {
+  --ml-project-product-right: -40%;
+  --ml-project-product-bottom: -16%;
+  --ml-project-product-width: 140%;
+  --ml-project-product-height: 78%;
 }
 
-.ml-home [data-project-lines-concept-card="highbay"] .ml-project-lines-concept__product {
-  right: -35% !important;
-  translate: none !important;
+.ml-home [data-project-lines-concept-card="highbay"] {
+  --ml-project-product-right: -35%;
+  --ml-project-product-bottom: -20%;
+  --ml-project-product-width: 145%;
+  --ml-project-product-height: 82%;
 }
-
-@media (max-width: 1599px) {
-  .ml-home [data-project-lines-concept-card="street"] .ml-project-lines-concept__product { right: -20% !important; }
-  .ml-home [data-project-lines-concept-card="invictus"] .ml-project-lines-concept__product { right: -32% !important; }
-  .ml-home [data-project-lines-concept-card="highbay"] .ml-project-lines-concept__product { right: -28% !important; }
-}
-
-@media (min-width: 1600px) and (max-width: 1919px) {
-  .ml-home [data-project-lines-concept-card="street"] .ml-project-lines-concept__product { right: -22% !important; }
-  .ml-home [data-project-lines-concept-card="invictus"] .ml-project-lines-concept__product { right: -36% !important; }
-  .ml-home [data-project-lines-concept-card="highbay"] .ml-project-lines-concept__product { right: -32% !important; }
-}
-
-@media (max-width: 1199px) {
-  .ml-home [data-project-lines-concept-card="street"] .ml-project-lines-concept__product { right: -15% !important; }
-  .ml-home [data-project-lines-concept-card="invictus"] .ml-project-lines-concept__product { right: -24% !important; }
-  .ml-home [data-project-lines-concept-card="highbay"] .ml-project-lines-concept__product { right: -21% !important; }
-}
-
-@media (max-width: 900px) {
-  .ml-home [data-project-lines-concept-card="street"] .ml-project-lines-concept__product { right: -10% !important; }
-  .ml-home [data-project-lines-concept-card="invictus"] .ml-project-lines-concept__product { right: -16% !important; }
-  .ml-home [data-project-lines-concept-card="highbay"] .ml-project-lines-concept__product { right: -14% !important; }
-}
-
-/* Narrow desktop cards need a smaller product height as well as a softer crop. */
-@media (min-width: 1100px) and (max-width: 1199px) {
-  .ml-home .ml-project-lines-concept__product {
-    height: 58% !important;
-  }
-}
-
-@media (min-width: 991px) and (max-width: 1099px) {
-  .ml-home .ml-project-lines-concept__product {
-    height: 52% !important;
-  }
-
-  .ml-home [data-project-lines-concept-card="street"] .ml-project-lines-concept__product { right: -13% !important; }
-  .ml-home [data-project-lines-concept-card="invictus"] .ml-project-lines-concept__product { right: -20% !important; }
-  .ml-home [data-project-lines-concept-card="highbay"] .ml-project-lines-concept__product { right: -18% !important; }
-}
-
-@media (min-width: 901px) and (max-width: 990px) {
-  .ml-home .ml-project-lines-concept__product {
-    height: 56% !important;
-  }
-}
-
-@media (max-width: 900px) {
-  .ml-home .ml-project-lines-concept__product {
-    height: 68% !important;
-  }
-}
-
 
 /* ===== Newsletter popup (merged from css/newsletter.css) ===== */
 
@@ -8469,5 +8449,23 @@ body.newsletter-open {
   .nl-pill input[type="email"],
   .nl-select-trigger {
     font-size: 16px;
+  }
+}
+
+@media (max-width: 640px) {
+  .nl-popup {
+    --ml-type-button-size: 0.875rem;
+  }
+
+  .nl-popup .nl-interest-tab,
+  .nl-popup .nl-submit {
+    font-size: var(--ml-type-button-size);
+  }
+}
+@media (max-width: 640px) {
+  .ai-launch,
+  .ai-panel .ai-chip {
+    --ml-type-button-size: 0.875rem;
+    font-size: var(--ml-type-button-size);
   }
 }

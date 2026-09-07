@@ -548,3 +548,14 @@ body.newsletter-open {
     font-size: 16px;
   }
 }
+
+@media (max-width: 640px) {
+  .nl-popup {
+    --ml-type-button-size: 0.875rem;
+  }
+
+  .nl-popup .nl-interest-tab,
+  .nl-popup .nl-submit {
+    font-size: var(--ml-type-button-size);
+  }
+}

@@ -32,10 +32,10 @@
       { ...category("Lámparas", "lamparas"), href: "https://www.macroled.com.ar/productos?macrofamilia=L%C3%A1mparas", image: "https://d1zltvqju4u8ql.cloudfront.net/fit-in/250x250/filters:format(png)/MACROLED/1000/7428325565203a.png" }
     ],
     monaco: [
-      { ...category("Armadas", "monaco-armadas"), href: "https://www.macroled.com.ar/productos?macrofamilia=Interruptores+y+Tomas&familia=Monaco&subfamilia=Armadas", image: "https://s3.coresagroup.com/MACROLED/250/milan.png" },
-      { ...category("Despiece", "monaco-bastidor-modulos"), href: "https://www.macroled.com.ar/productos?macrofamilia=Interruptores+y+Tomas&familia=Monaco&subfamilia=Despiece", image: "https://s3.coresagroup.com/MACROLED/250/milan-bastidores.png" },
-      { ...category("Tapas", "monaco-tapas"), href: "https://www.macroled.com.ar/productos?macrofamilia=Interruptores+y+Tomas&familia=Monaco&subfamilia=Tapas", image: "https://s3.coresagroup.com/MACROLED/250/milan-tapas.png" },
-      { ...category("Luz guía", "monaco-luz-pasillo"), href: "https://www.macroled.com.ar/productos?macrofamilia=Interruptores+y+Tomas&familia=Monaco&subfamilia=Luz+gu%C3%ADa", image: "https://d1zltvqju4u8ql.cloudfront.net/fit-in/2000x2000/MACROLED/WEB/portada_luz_pasillo.webp" }
+      { ...category("Armadas", "monaco-armadas"), href: "https://www.macroled.com.ar/productos?macrofamilia=M%C3%B3naco&familia=Armadas", image: "https://s3.coresagroup.com/MACROLED/250/milan.png" },
+      { ...category("Despiece", "monaco-bastidor-modulos"), href: "https://www.macroled.com.ar/productos?macrofamilia=M%C3%B3naco&familia=Despiece", image: "https://s3.coresagroup.com/MACROLED/250/milan-bastidores.png" },
+      { ...category("Tapas", "monaco-tapas"), href: "https://www.macroled.com.ar/productos?macrofamilia=M%C3%B3naco&familia=Tapas", image: "https://s3.coresagroup.com/MACROLED/250/milan-tapas.png" },
+      { ...category("Luz guía", "monaco-luz-pasillo"), href: "https://www.macroled.com.ar/productos?macrofamilia=M%C3%B3naco&familia=Luz+Gu%C3%ADa", image: "https://d1zltvqju4u8ql.cloudfront.net/fit-in/2000x2000/MACROLED/WEB/portada_luz_pasillo.webp" }
     ],
     exterior: [
       { ...category("Reflectores", "reflectores"), href: "https://www.macroled.com.ar/productos?macrofamilia=Reflectores", image: "https://s3.coresagroup.com/MACROLED/250/reflectores-smart.png" },
@@ -77,7 +77,7 @@
             id: "monaco",
             image: "https://cdn.prod.website-files.com/65f1fdd7248b6709fdebe904/69a977bb0fe12ec5b81b7e9b_monaco-cover%20copia.webp",
             imageFit: "contain",
-            href: "https://www.macroled.com.ar/productos?macrofamilia=Interruptores+y+Tomas&familia=Monaco",
+            href: "https://www.macroled.com.ar/productos?macrofamilia=M%C3%B3naco",
             catalogHref: "https://s3.coresagroup.com/MACROLED/catalogos/Macroled_Monaco.pdf",
             titleEmphasis: "Mónaco",
             content: { mode: "static", categoryGroup: "monaco" }
