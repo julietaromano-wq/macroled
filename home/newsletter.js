@@ -127,7 +127,7 @@
     };
 
     document.addEventListener("click", event => {
-      const button = event.target.closest("[data-mlg-newsletter-open]");
+      const button = event.target.closest("[data-mlg-newsletter-open], [data-newsletter-open]");
       if (!button) return;
 
       event.preventDefault();
