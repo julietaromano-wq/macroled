@@ -480,34 +480,36 @@
     </aside>
     </div>
   </section>
+</main>
 
-  <section class="ml-related-products" id="productos-relacionados" data-reveal hidden>
-    <div class="wrap">
-      <div class="ml-related-products__head">
-        <h2 id="ml-related-products-title">También te puede interesar</h2>
-        <a class="link-more" href="index.html">Ver catálogo <span aria-hidden="true">→</span></a>
+<!-- Fuera de <main>: en Webflow este bloque va en un Embed aparte (ver html-webflow.html),
+     por eso no hereda el padding lateral de main y lo replica .ml-related-products en el CSS. -->
+<section class="ml-related-products" id="productos-relacionados" data-reveal hidden>
+  <div class="wrap">
+    <div class="ml-related-products__head">
+      <h2 id="ml-related-products-title">También te puede interesar</h2>
+      <a class="link-more" href="index.html">Ver catálogo <span aria-hidden="true">→</span></a>
+    </div>
+    <div class="ml-related-products__viewport" data-related-viewport>
+      <div class="ml-related-products__track" data-related-track aria-live="polite">
+        <div class="ml-related-products__state">Cargando productos relacionados…</div>
       </div>
-      <div class="ml-related-products__viewport" data-related-viewport>
-        <div class="ml-related-products__track" data-related-track aria-live="polite">
-          <div class="ml-related-products__state">Cargando productos relacionados…</div>
-        </div>
-        <div class="ml-related-products__arrows" hidden>
-          <button class="ml-related-products__nav" type="button" data-related-prev aria-label="Producto anterior">
-            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 12H5m6-6-6 6 6 6"/></svg>
-          </button>
-          <button class="ml-related-products__nav" type="button" data-related-next aria-label="Producto siguiente">
-            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6"/></svg>
-          </button>
-        </div>
-      </div>
-      <div class="ml-related-products__controls" hidden>
-        <div class="ml-related-products__progress" aria-hidden="true">
-          <span data-related-progress></span>
-        </div>
+      <div class="ml-related-products__arrows" hidden>
+        <button class="ml-related-products__nav" type="button" data-related-prev aria-label="Producto anterior">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 12H5m6-6-6 6 6 6"/></svg>
+        </button>
+        <button class="ml-related-products__nav" type="button" data-related-next aria-label="Producto siguiente">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6"/></svg>
+        </button>
       </div>
     </div>
-  </section>
-</main>
+    <div class="ml-related-products__controls" hidden>
+      <div class="ml-related-products__progress" aria-hidden="true">
+        <span data-related-progress></span>
+      </div>
+    </div>
+  </div>
+</section>
 
 <!-- Share toast -->
 <div class="share-toast" id="shareToast" role="status" aria-live="polite">Link copiado</div>

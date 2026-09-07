@@ -1212,7 +1212,10 @@ body.assistant-open .ai-launch{
   --ml-light-blue-500: #00bdff;
   --ml-light-blue-700: #0086b5;
   --ml-light-blue-800: #00688c;
-  padding: 0;
+  /* Este embed vive fuera de <main> en Webflow, así que no hereda su
+     padding lateral — lo replicamos acá para que el wrap quede alineado
+     con el card principal (mismo left/right que main{padding:...}). */
+  padding: 0 clamp(12px,2vw,24px);
   background: transparent;
   overflow: hidden;
 }
@@ -1672,6 +1675,7 @@ body.assistant-open .ai-launch{
   .ml-product-card__spec-value{font-size:14px;}
 }
 @media (max-width:640px){
+  .ml-related-products{padding:0 8px;}
   .ml-product-card .temp-dots{right:5px;bottom:5px;max-width:46%;padding:4px 6px;}
   .ml-product-card .temp-dots .luz-dot{width:8px;height:8px;}
   .ml-product-card .temp-dots-label{font-size:11px;}
