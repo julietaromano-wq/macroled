@@ -155,11 +155,12 @@ const MEGAMENU_DATA = [
         { name: "Highbay Classic", count: "4 Productos", img: `${CDN}/filters:format(webp)/MACROLED/250/galponeras-eco.webp`, href: "#" },
         { name: "Highbay Standard", count: "4 Productos", img: `${CDN}/filters:format(webp)/MACROLED/250/SHB-200W.png`, href: "#" },
       ]},
-      { group: "Gran Formato", href: "/productos?macrofamilia=Luminarias+de+Proyecto&familia=Gran+Formato", items: [
-        { name: "Downlight", count: "28 Productos", img: `${CDN}/500x500/filters:format(webp)/MACROLED/WEB/SDLR-36W-830-WW_FRONT.webp`, href: "/productos?macrofamilia=Luminarias+de+Proyecto&familia=Gran+Formato&subfamilia=Downlight", isNew: true },
-        { name: "Gran Formato Backlight", count: "28 Productos", img: `${CDN}/250x250/MACROLED/WEB/GRAN-FORMATO-P40.webp`, href: "/productos?macrofamilia=Luminarias+de+Proyecto&familia=Gran+Formato&subfamilia=Backlight", isNew: true },
-        { name: "Gran Formato 48W", count: "28 Productos", img: `${CDN}/250x250/MACROLED/WEB/GRAN-FORMATO-P40.webp`, href: "/productos?macrofamilia=Luminarias+de+Proyecto&familia=Gran+Formato&subfamilia=48W" },
-        { name: "Gran Formato 40W", count: "28 Productos", img: `${CDN}/250x250/MACROLED/WEB/GRAN-FORMATO-P40.webp`, href: "/productos?macrofamilia=Luminarias+de+Proyecto&familia=Gran+Formato&subfamilia=40W" },
+      { group: "Paneles", href: "/productos?macrofamilia=Luminarias+de+Proyecto&familia=Paneles", items: [
+        { name: "Downlight PRO", count: "2 Productos", img: `${CDN}/500x500/filters:format(webp)/MACROLED/WEB/SDLR-36W-830-WW_FRONT.webp`, href: "/productos?macrofamilia=Luminarias+de+Proyecto&familia=Paneles&subfamilia=Downlight&categoria=Downlight+PRO&categoria=Drivers", isNew: true },
+        { name: "Downlight Standard", count: "2 Productos", img: `${CDN}/500x500/filters:format(webp)/MACROLED/WEB/SDLR-36W-830-WW_FRONT.webp`, href: "/productos?macrofamilia=Luminarias+de+Proyecto&familia=Paneles&subfamilia=Downlight&categoria=Downlight+Standard&categoria=Drivers", isNew: true },
+        { name: "Gran Formato Backlight 36W", count: "2 Productos", img: `${CDN}/250x250/MACROLED/WEB/GRAN-FORMATO-P40.webp`, href: "/productos?macrofamilia=Luminarias+de+Proyecto&familia=Paneles&subfamilia=Backlight+36W", isNew: true },
+        { name: "Gran Formato 48W", count: "4 Productos", img: `${CDN}/250x250/MACROLED/WEB/GRAN-FORMATO-P40.webp`, href: "/productos?macrofamilia=Luminarias+de+Proyecto&familia=Paneles&subfamilia=Gran+Formato+48W" },
+        { name: "Gran Formato 40W", count: "4 Productos", img: `${CDN}/250x250/MACROLED/WEB/GRAN-FORMATO-P40.webp`, href: "/productos?macrofamilia=Luminarias+de+Proyecto&familia=Paneles&subfamilia=Gran+Formato+40W" },
       ]},
       { group: "Luz de Calle", items: [
         { name: "Standard", count: "28 Productos", img: `${CDN}/250x250/MACROLED/WEB/SLG2-100W-757-CW_FRONT.webp`, href: "#", isNew: true },
