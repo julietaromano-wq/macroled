@@ -201,7 +201,7 @@
             <h2 id="ml-newsletter-title">Nuevos productos <span class="ml-newsletter-banner__title-highlight">directo a tu mail</span></h2>
             <p class="ml-newsletter-banner__subtitle">Recibí novedades de productos, lanzamientos y soluciones para tus proyectos.</p>
           </div>
-          <button type="button" class="ml-button ml-button--primary ml-button--primary-light" data-newsletter-open>Recibir novedades</button>
+          <button type="button" class="ml-button ml-button--primary ml-button--primary-light" data-mlg-newsletter-open>Recibir novedades</button>
         </div>
       </section>
     </main>
@@ -246,50 +246,50 @@
 <!-- Popup de newsletter: solo para esta vista previa local. En Webflow vive en el
      componente/embed del footer (fuente unica: home/newsletter.html), no en la
      pagina Home, para que no quede duplicado. -->
-<div class="nl-backdrop" id="nlBackdrop" hidden></div>
-<div class="nl-popup" id="nlPopup" role="dialog" aria-modal="true" aria-labelledby="nlTitle" hidden>
-  <button type="button" class="nl-close" id="nlClose" aria-label="Cerrar">
+<div class="mlg-newsletter-backdrop" id="mlgNewsletterBackdrop" hidden></div>
+<div class="mlg-newsletter-popup" id="mlgNewsletterPopup" role="dialog" aria-modal="true" aria-labelledby="mlgNewsletterTitle" hidden>
+  <button type="button" class="mlg-newsletter-close" id="mlgNewsletterClose" aria-label="Cerrar">
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
   </button>
-  <div class="nl-popup__icon" aria-hidden="true">
+  <div class="mlg-newsletter-popup__icon" aria-hidden="true">
     <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
       <rect x="3" y="5" width="18" height="14" rx="2"/>
       <path d="M3 7l9 7 9-7"/>
     </svg>
   </div>
-  <h2 id="nlTitle">Sumate a nuestro<br>newsletter</h2>
-  <p class="nl-popup__sub">Completá tus datos para recibir novedades,<br>lanzamientos y contenido exclusivo.</p>
-  <form id="nlForm" class="nl-form" data-newsletter-endpoint="https://n8n.coresagroup.com/webhook/newsletter-macroled" novalidate>
-    <!-- <div class="nl-field">
-      <div class="nl-pill">
-        <label class="nl-border-label" for="nl-nombre">Nombre</label>
-        <input id="nl-nombre" type="text" name="nombre" placeholder="Tu nombre" required autocomplete="name">
+  <h2 id="mlgNewsletterTitle">Sumate a nuestro newsletter</h2>
+  <p class="mlg-newsletter-popup__sub">Completá tus datos para recibir contenido exclusivo y lanzamientos.</p>
+  <form id="mlgNewsletterForm" class="mlg-newsletter-form" data-newsletter-endpoint="https://n8n.coresagroup.com/webhook/newsletter-macroled" novalidate>
+    <!-- <div class="mlg-newsletter-field">
+      <div class="mlg-newsletter-pill">
+        <label class="mlg-newsletter-border-label" for="mlg-newsletter-nombre">Nombre</label>
+        <input id="mlg-newsletter-nombre" type="text" name="nombre" placeholder="Tu nombre" required autocomplete="name">
       </div>
     </div> -->
-    <div class="nl-field">
-      <div class="nl-pill">
-        <label class="nl-border-label" for="nl-email">Email</label>
-        <input id="nl-email" type="email" name="email" placeholder="tu@email.com" required autocomplete="email">
+    <div class="mlg-newsletter-field">
+      <div class="mlg-newsletter-pill">
+        <label class="mlg-newsletter-border-label" for="mlg-newsletter-email">Email</label>
+        <input id="mlg-newsletter-email" type="email" name="email" placeholder="tu@email.com" required autocomplete="email">
       </div>
     </div>
-    <div class="nl-field nl-field--interests">
-      <p class="nl-interests-label" id="nl-interes-label">Área de interés</p>
-      <div class="nl-interest-tabs" role="group" aria-labelledby="nl-interes-label" data-interest-tabs>
-        <button type="button" class="nl-interest-tab" data-interest="residencial" aria-pressed="false">Residencial</button>
-        <button type="button" class="nl-interest-tab" data-interest="proyectos" aria-pressed="false">Obras y proyectos</button>
-        <button type="button" class="nl-interest-tab" data-interest="arquitectura" aria-pressed="false">Arquitectura</button>
+    <div class="mlg-newsletter-field mlg-newsletter-field--interests">
+      <p class="mlg-newsletter-interests-label" id="mlg-newsletter-interes-label">Área de interés</p>
+      <div class="mlg-newsletter-interest-tabs" role="group" aria-labelledby="mlg-newsletter-interes-label" data-interest-tabs>
+        <button type="button" class="mlg-newsletter-interest-tab" data-interest="residencial" aria-pressed="false">Residencial</button>
+        <button type="button" class="mlg-newsletter-interest-tab" data-interest="proyectos" aria-pressed="false">Obras y proyectos</button>
+        <button type="button" class="mlg-newsletter-interest-tab" data-interest="arquitectura" aria-pressed="false">Arquitectura</button>
       </div>
     </div>
-    <!-- <div class="nl-consent">
-      <input type="checkbox" id="nl-acepta" name="acepta_newsletter" value="true" required>
-      <label for="nl-acepta">Acepto recibir el Newsletter Macroled. Puedo darme de baja cuando quiera.</label>
+    <!-- <div class="mlg-newsletter-consent">
+      <input type="checkbox" id="mlg-newsletter-acepta" name="acepta_newsletter" value="true" required>
+      <label for="mlg-newsletter-acepta">Acepto recibir el Newsletter Macroled. Puedo darme de baja cuando quiera.</label>
     </div> -->
-    <p class="nl-error" id="nlError" role="alert" hidden></p>
-    <button type="submit" class="nl-submit">Suscribirme</button>
-    <p class="nl-popup__note">Podés darte de baja cuando quieras.</p>
+    <p class="mlg-newsletter-error" id="mlgNewsletterError" role="alert" hidden></p>
+    <button type="submit" class="mlg-newsletter-submit">Suscribirme</button>
+    <p class="mlg-newsletter-popup__note">Podés darte de baja cuando quieras.</p>
   </form>
-  <div class="nl-success" id="nlSuccess" hidden>
-    <p class="nl-success__title">¡Listo, ya estás suscripto!</p>
+  <div class="mlg-newsletter-success" id="mlgNewsletterSuccess" hidden>
+    <p class="mlg-newsletter-success__title">¡Listo, ya estás suscripto!</p>
     <p>Te vamos a contar novedades, lanzamientos y contenido exclusivo.</p>
   </div>
 </div>
