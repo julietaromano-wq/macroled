@@ -2936,6 +2936,7 @@
   (function initSkuCopyBtn() {
     const btn = document.getElementById("sku-copy-btn");
     if (!btn) return;
+    const msg = document.getElementById("sku-copy-msg");
     let resetTimer = null;
     btn.addEventListener("click", () => {
       const sku = (document.getElementById("ficha-sku")?.textContent || "").trim();
@@ -2943,10 +2944,12 @@
       const markCopied = () => {
         btn.classList.add("copied");
         btn.setAttribute("aria-label", "SKU copiado");
+        msg?.classList.add("show");
         clearTimeout(resetTimer);
         resetTimer = setTimeout(() => {
           btn.classList.remove("copied");
           btn.setAttribute("aria-label", "Copiar SKU");
+          msg?.classList.remove("show");
         }, 1500);
       };
       if (navigator.clipboard?.writeText) {
