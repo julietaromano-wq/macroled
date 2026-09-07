@@ -4,7 +4,8 @@ import { build } from "./build.mjs";
 
 const homeDirectory = resolve(import.meta.dirname, "..");
 const htmlFile = resolve(homeDirectory, "webflow-embed.html");
-const watchedPaths = [htmlFile];
+const newsletterHtmlFile = resolve(homeDirectory, "newsletter.html");
+const watchedPaths = [htmlFile, newsletterHtmlFile];
 
 let building = false;
 let buildQueued = false;
@@ -50,7 +51,7 @@ const watcher = chokidar.watch(watchedPaths, {
 });
 
 watcher.on("all", (_event, changedPath) => {
-  if (changedPath !== htmlFile && !changedPath.endsWith(".css") && !changedPath.endsWith(".js")) return;
+  if (changedPath !== htmlFile && changedPath !== newsletterHtmlFile && !changedPath.endsWith(".css") && !changedPath.endsWith(".js")) return;
   console.log(`Cambio detectado: ${changedPath}`);
   void rebuild();
 });
@@ -59,4 +60,4 @@ watcher.on("error", (error) => {
   console.error("Error del watcher:", error);
 });
 
-console.log("Vigilando home/webflow-embed.html (Ctrl+C para salir). CSS y JS se editan directamente.");
+console.log("Vigilando home/webflow-embed.html y home/newsletter.html (Ctrl+C para salir). CSS y JS se editan directamente.");

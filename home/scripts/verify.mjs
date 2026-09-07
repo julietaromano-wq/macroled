@@ -14,7 +14,10 @@ assert.equal((newsletter.match(/function initNewsletter\(/g) || []).length, 1);
 
 const page = await read('index.html');
 const embed = await read('webflow-embed.html');
+const newsletterHtml = await read('newsletter.html');
 assert.ok(page.includes(embed.trim()), 'Run npm run build to update the preview');
+assert.ok(page.includes(newsletterHtml.trim()), 'Run npm run build to update the preview');
+assert.ok(!embed.includes('id="nlPopup"'), 'Newsletter popup duplicated in webflow-embed.html; keep it only in newsletter.html');
 for (const id of ['macroled-home', 'aiLaunch', 'aiPanel', 'nlPopup', 'nlForm']) {
   assert.equal((page.match(new RegExp(`id="${id}"`, 'g')) || []).length, 1, `Duplicate or missing ${id}`);
 }

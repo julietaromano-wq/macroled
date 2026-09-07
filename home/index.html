@@ -241,54 +241,53 @@
       </button>
     </form>
   </aside>
-
   <div class="nl-backdrop" id="nlBackdrop" hidden></div>
-  <div class="nl-popup" id="nlPopup" role="dialog" aria-modal="true" aria-labelledby="nlTitle" hidden>
-    <button type="button" class="nl-close" id="nlClose" aria-label="Cerrar">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
-    </button>
-    <div class="nl-popup__icon" aria-hidden="true">
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
-        <rect x="3" y="5" width="18" height="14" rx="2"/>
-        <path d="M3 7l9 7 9-7"/>
-      </svg>
-    </div>
-    <h2 id="nlTitle">Sumate a nuestro<br>newsletter</h2>
-    <p class="nl-popup__sub">Completá tus datos para recibir novedades,<br>lanzamientos y contenido exclusivo.</p>
-    <form id="nlForm" class="nl-form" data-newsletter-endpoint="https://n8n.coresagroup.com/webhook/newsletter-macroled" novalidate>
-      <div class="nl-field">
-        <div class="nl-pill">
-          <label class="nl-border-label" for="nl-nombre">Nombre</label>
-          <input id="nl-nombre" type="text" name="nombre" placeholder="Tu nombre" required autocomplete="name">
-        </div>
-      </div>
-      <div class="nl-field">
-        <div class="nl-pill">
-          <label class="nl-border-label" for="nl-email">Email</label>
-          <input id="nl-email" type="email" name="email" placeholder="tu@email.com" required autocomplete="email">
-        </div>
-      </div>
-      <div class="nl-field nl-field--interests">
-        <p class="nl-interests-label" id="nl-interes-label">Área de interés</p>
-        <div class="nl-interest-tabs" role="group" aria-labelledby="nl-interes-label" data-interest-tabs>
-          <button type="button" class="nl-interest-tab" data-interest="residencial" aria-pressed="false">Residencial</button>
-          <button type="button" class="nl-interest-tab" data-interest="proyectos" aria-pressed="false">Obras y proyectos</button>
-          <button type="button" class="nl-interest-tab" data-interest="arquitectura" aria-pressed="false">Arquitectura</button>
-        </div>
-      </div>
-      <div class="nl-consent">
-        <input type="checkbox" id="nl-acepta" name="acepta_newsletter" value="true" required>
-        <label for="nl-acepta">Acepto recibir el Newsletter Macroled. Puedo darme de baja cuando quiera.</label>
-      </div>
-      <p class="nl-error" id="nlError" role="alert" hidden></p>
-      <button type="submit" class="nl-submit">Suscribirme</button>
-      <p class="nl-popup__note">Podés darte de baja cuando quieras.</p>
-    </form>
-    <div class="nl-success" id="nlSuccess" hidden>
-      <p class="nl-success__title">¡Listo, ya estás suscripto!</p>
-      <p>Te vamos a contar novedades, lanzamientos y contenido exclusivo.</p>
-    </div>
+<div class="nl-popup" id="nlPopup" role="dialog" aria-modal="true" aria-labelledby="nlTitle" hidden>
+  <button type="button" class="nl-close" id="nlClose" aria-label="Cerrar">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+  </button>
+  <div class="nl-popup__icon" aria-hidden="true">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="3" y="5" width="18" height="14" rx="2"/>
+      <path d="M3 7l9 7 9-7"/>
+    </svg>
   </div>
+  <h2 id="nlTitle">Sumate a nuestro<br>newsletter</h2>
+  <p class="nl-popup__sub">Completá tus datos para recibir novedades,<br>lanzamientos y contenido exclusivo.</p>
+  <form id="nlForm" class="nl-form" data-newsletter-endpoint="https://n8n.coresagroup.com/webhook/newsletter-macroled" novalidate>
+    <div class="nl-field">
+      <div class="nl-pill">
+        <label class="nl-border-label" for="nl-nombre">Nombre</label>
+        <input id="nl-nombre" type="text" name="nombre" placeholder="Tu nombre" required autocomplete="name">
+      </div>
+    </div>
+    <div class="nl-field">
+      <div class="nl-pill">
+        <label class="nl-border-label" for="nl-email">Email</label>
+        <input id="nl-email" type="email" name="email" placeholder="tu@email.com" required autocomplete="email">
+      </div>
+    </div>
+    <div class="nl-field nl-field--interests">
+      <p class="nl-interests-label" id="nl-interes-label">Área de interés</p>
+      <div class="nl-interest-tabs" role="group" aria-labelledby="nl-interes-label" data-interest-tabs>
+        <button type="button" class="nl-interest-tab" data-interest="residencial" aria-pressed="false">Residencial</button>
+        <button type="button" class="nl-interest-tab" data-interest="proyectos" aria-pressed="false">Obras y proyectos</button>
+        <button type="button" class="nl-interest-tab" data-interest="arquitectura" aria-pressed="false">Arquitectura</button>
+      </div>
+    </div>
+    <div class="nl-consent">
+      <input type="checkbox" id="nl-acepta" name="acepta_newsletter" value="true" required>
+      <label for="nl-acepta">Acepto recibir el Newsletter Macroled. Puedo darme de baja cuando quiera.</label>
+    </div>
+    <p class="nl-error" id="nlError" role="alert" hidden></p>
+    <button type="submit" class="nl-submit">Suscribirme</button>
+    <p class="nl-popup__note">Podés darte de baja cuando quieras.</p>
+  </form>
+  <div class="nl-success" id="nlSuccess" hidden>
+    <p class="nl-success__title">¡Listo, ya estás suscripto!</p>
+    <p>Te vamos a contar novedades, lanzamientos y contenido exclusivo.</p>
+  </div>
+</div>
   <script src="home.js"></script>
   <script src="newsletter.js"></script>
   <script src="../global/floating-ui.js"></script>

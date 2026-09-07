@@ -23,8 +23,16 @@ Estructura de archivos de la Home de Macroled y cómo se relacionan con Webflow.
   `home.*` a propósito porque también se cargan desde **Global Settings** de Webflow
   (para que el popup aparezca en todas las páginas, no solo en la Home). Nunca deben
   copiarse dentro de `home.js`/`home.css`, o el popup queda duplicado.
-- **`webflow-embed.html`** — única fuente del HTML que se pega en el Designer de
-  Webflow para la Home.
+- **`newsletter.html`** — única fuente del HTML del popup de newsletter (el
+  backdrop y el diálogo con el formulario). Es el código que se pega en el
+  componente/símbolo del **footer** en Webflow (o cualquier embed global), para
+  que el popup exista una sola vez y aparezca en todas las páginas. Cuando se
+  cambie algo del formulario del newsletter (campos, textos, endpoint), se edita
+  acá y se vuelve a pegar ese mismo contenido en Webflow.
+- **`webflow-embed.html`** — única fuente del HTML propio de la Home (hero,
+  categorías, destacados, novedades, asistente). **No incluye** el popup de
+  newsletter: eso vive solo en `newsletter.html` para no duplicarlo, ya que el
+  footer global ya lo agrega a la Home también.
 - **`assets/`** — recursos locales que sí se sirven desde acá (hoy solo
   `images/editorial-placeholder.svg`, usado como fondo de contenido editorial sin
   imagen definitiva todavía). El resto de las imágenes/videos de la Home se sirven
@@ -34,8 +42,10 @@ Estructura de archivos de la Home de Macroled y cómo se relacionan con Webflow.
 
 `index.html` es una vista previa **generada**, no se edita a mano.
 
-- `npm run build` — regenera `index.html` a partir de `webflow-embed.html`.
-- `npm run watch` — regenera automáticamente al guardar `webflow-embed.html`.
+- `npm run build` — regenera `index.html` a partir de `webflow-embed.html` y
+  `newsletter.html`.
+- `npm run watch` — regenera automáticamente al guardar `webflow-embed.html` o
+  `newsletter.html`.
 - `npm run dev` — sirve la vista previa en `http://127.0.0.1:5501/home/index.html`.
 - `npm run check` — verifica sintaxis de `home.js`/`newsletter.js`, que el newsletter
   no esté duplicado, que la vista previa esté actualizada, que no haya IDs de widgets

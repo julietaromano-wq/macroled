@@ -6,6 +6,7 @@ const homeDirectory = resolve(import.meta.dirname, '..');
 // Only renders the local preview. dist stays frozen until Webflow migrates.
 export async function build() {
   const component = await readFile(resolve(homeDirectory, 'webflow-embed.html'), 'utf8');
+  const newsletterPopup = await readFile(resolve(homeDirectory, 'newsletter.html'), 'utf8');
   const page = `<!doctype html>
 <!-- Generated preview. Edit webflow-embed.html, then run npm run build. -->
 <html lang="es">
@@ -23,6 +24,7 @@ export async function build() {
 </head>
 <body>
 ${component.trim()}
+  ${newsletterPopup.trim()}
   <script src="home.js"></script>
   <script src="newsletter.js"></script>
   <script src="../global/floating-ui.js"></script>
