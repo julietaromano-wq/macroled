@@ -17,22 +17,25 @@ Estructura de archivos de la Home de Macroled y cómo se relacionan con Webflow.
   5. `home` — boot general de la página: arma las secciones, banners, categorías,
      fondos por línea y animaciones del hero.
   6. `asistente` — panel del asistente (abrir/cerrar, envío de mensajes).
-
-  No requiere build: se edita y se recarga directo en el navegador.
 - **`newsletter.css`** y **`newsletter.js`** — popup de newsletter. Van separados de
   `home.*` a propósito porque también se cargan desde **Global Settings** de Webflow
   (para que el popup aparezca en todas las páginas, no solo en la Home). Nunca deben
   copiarse dentro de `home.js`/`home.css`, o el popup queda duplicado.
 - **`newsletter.html`** — única fuente del HTML del popup de newsletter (el
   backdrop y el diálogo con el formulario). Es el código que se pega en el
-  componente/símbolo del **footer** en Webflow (o cualquier embed global), para
-  que el popup exista una sola vez y aparezca en todas las páginas. Cuando se
-  cambie algo del formulario del newsletter (campos, textos, endpoint), se edita
-  acá y se vuelve a pegar ese mismo contenido en Webflow.
-- **`webflow-embed.html`** — única fuente del HTML propio de la Home (hero,
-  categorías, destacados, novedades, asistente). **No incluye** el popup de
-  newsletter: eso vive solo en `newsletter.html` para no duplicarlo, ya que el
-  footer global ya lo agrega a la Home también.
+  componente/símbolo del **footer** en Webflow, para que el popup exista una sola
+  vez y aparezca en todas las páginas. Cuando cambie algo del formulario del
+  newsletter (campos, textos, endpoint), se edita acá y se vuelve a pegar ese mismo
+  contenido en Webflow. También hay que actualizar la copia idéntica que vive
+  dentro de `index.html` (ver abajo), y `npm run check` avisa si se olvida.
+- **`index.html`** — se edita directamente (no hay build). Cumple doble función:
+  1. Vista previa local, abierta con `npm run dev`.
+  2. Fuente del HTML de la página Home en Webflow: todo lo que está entre los
+     comentarios `<!-- EMBED WEBFLOW: HOME — inicio -->` y
+     `<!-- EMBED WEBFLOW: HOME — fin -->` es exactamente lo que se pega en el
+     embed del body de la página Home en el Designer. Lo que queda fuera de esos
+     comentarios (el popup de newsletter) es solo para esta vista previa; en
+     Webflow ese bloque no va en la Home sino en el footer (ver `newsletter.html`).
 - **`assets/`** — recursos locales que sí se sirven desde acá (hoy solo
   `images/editorial-placeholder.svg`, usado como fondo de contenido editorial sin
   imagen definitiva todavía). El resto de las imágenes/videos de la Home se sirven
@@ -40,28 +43,13 @@ Estructura de archivos de la Home de Macroled y cómo se relacionan con Webflow.
 
 ## Vista previa local
 
-`index.html` es una vista previa **generada**, no se edita a mano.
-
-- `npm run build` — regenera `index.html` a partir de `webflow-embed.html` y
-  `newsletter.html`.
-- `npm run watch` — regenera automáticamente al guardar `webflow-embed.html` o
-  `newsletter.html`.
-- `npm run dev` — sirve la vista previa en `http://127.0.0.1:5501/home/index.html`.
-- `npm run check` — verifica sintaxis de `home.js`/`newsletter.js`, que el newsletter
-  no esté duplicado, que la vista previa esté actualizada, que no haya IDs de widgets
-  repetidos y que las rutas locales (imágenes, CSS, JS) existan.
-
-Los cambios de CSS/JS se ven con solo guardar y recargar; el build solo hace falta
-si se edita `webflow-embed.html`.
-
-## dist/ (todavía en uso por Webflow)
-
-`dist/` guarda copia de los archivos que los CDN de Webflow consumen **hoy**
-(`home/dist/home.css`, `home/dist/home.bundle.js`, `home/dist/newsletter.css`,
-`home/dist/newsletter.js`). Se mantiene sin tocar mientras se migra Webflow a los
-archivos de arriba (`home.css`, `home.js`, `newsletter.css`, `newsletter.js`).
-Una vez que los CDN de la página y de Global Settings apunten a los archivos nuevos
-y se confirme que todo funciona en producción, `dist/` se puede eliminar.
+- `npm run dev` — sirve `index.html` en `http://127.0.0.1:5501/home/index.html`.
+  Guardar y recargar alcanza para ver cualquier cambio de CSS/JS/HTML.
+- `npm run check` — verifica sintaxis de `home.js`/`newsletter.js`, que el
+  newsletter no esté duplicado en `home.js`, que `index.html` tenga los
+  comentarios de embed y no le falte ni le sobre el popup de `newsletter.html`,
+  que no haya IDs de widgets repetidos y que las rutas locales (imágenes, CSS, JS)
+  existan.
 
 ## Otros componentes (fuera de esta carpeta)
 

@@ -1,6 +1,6 @@
 ---
 name: macroled-design-system
-description: Sistema de diseño de Macroled (marca, colores, tipografía, espaciado, radios, componentes reutilizables). Usar SIEMPRE que se cree, revise o refactorice HTML/CSS/JS dentro de home/, incluso para cambios chicos (ej. "cambiá el color de este botón"), para mantener consistencia visual y evitar que el agente invente valores o patrones nuevos sin justificación. Fuente de verdad: home/webflow-embed.html, home/home.css, home/home.js y DESIGN.md (Figma).
+description: Sistema de diseño de Macroled (marca, colores, tipografía, espaciado, radios, componentes reutilizables). Usar SIEMPRE que se cree, revise o refactorice HTML/CSS/JS dentro de home/, incluso para cambios chicos (ej. "cambiá el color de este botón"), para mantener consistencia visual y evitar que el agente invente valores o patrones nuevos sin justificación. Fuente de verdad: home/index.html, home/home.css, home/home.js y DESIGN.md (Figma).
 ---
 
 # Macroled Design System
@@ -79,7 +79,7 @@ componentes puntuales.
 
 Trabajar en este orden:
 
-1. Inspeccionar el componente existente en `home/webflow-embed.html`,
+1. Inspeccionar el componente existente en `home/index.html`,
    `home/home.css` y `home/home.js`.
 2. Respetar la implementación efectiva al final de la cascada, no una
    declaración anterior luego sobrescrita.

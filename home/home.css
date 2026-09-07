@@ -5259,6 +5259,11 @@ a.ml-news-card:focus-visible .ml-news-card__arrow {
     padding: 0;
   }
 
+  .ml-home .ml-conversion__intro p {
+    max-width: none;
+    width: 100%;
+  }
+
   .ml-home .ml-conversion__button {
     width: 100%;
   }

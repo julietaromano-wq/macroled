@@ -1,5 +1,4 @@
 <!doctype html>
-<!-- Generated preview. Edit webflow-embed.html, then run npm run build. -->
 <html lang="es">
 <head>
   <meta charset="utf-8">
@@ -14,6 +13,7 @@
   <link rel="stylesheet" href="newsletter.css">
 </head>
 <body>
+<!-- ===== EMBED WEBFLOW: HOME — inicio (pegar tal cual en el embed del body de la pagina Home) ===== -->
 <div id="macroled-home" class="ml-home">
     <div class="ml-hero-overlap">
       <div class="ml-hero" aria-labelledby="ml-hero-title" data-nav-theme="dark">
@@ -241,7 +241,12 @@
       </button>
     </form>
   </aside>
-  <div class="nl-backdrop" id="nlBackdrop" hidden></div>
+<!-- ===== EMBED WEBFLOW: HOME — fin ===== -->
+
+<!-- Popup de newsletter: solo para esta vista previa local. En Webflow vive en el
+     componente/embed del footer (fuente unica: home/newsletter.html), no en la
+     pagina Home, para que no quede duplicado. -->
+<div class="nl-backdrop" id="nlBackdrop" hidden></div>
 <div class="nl-popup" id="nlPopup" role="dialog" aria-modal="true" aria-labelledby="nlTitle" hidden>
   <button type="button" class="nl-close" id="nlClose" aria-label="Cerrar">
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>

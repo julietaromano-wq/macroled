@@ -13,11 +13,10 @@ assert.ok(!home.includes('__ML_NEWSLETTER_INIT__'), 'Newsletter duplicated in ho
 assert.equal((newsletter.match(/function initNewsletter\(/g) || []).length, 1);
 
 const page = await read('index.html');
-const embed = await read('webflow-embed.html');
 const newsletterHtml = await read('newsletter.html');
-assert.ok(page.includes(embed.trim()), 'Run npm run build to update the preview');
-assert.ok(page.includes(newsletterHtml.trim()), 'Run npm run build to update the preview');
-assert.ok(!embed.includes('id="nlPopup"'), 'Newsletter popup duplicated in webflow-embed.html; keep it only in newsletter.html');
+assert.ok(page.includes(newsletterHtml.trim()), 'newsletter.html cambio: actualiza el bloque del popup en index.html (y en el embed del footer de Webflow)');
+assert.equal((page.match(/EMBED WEBFLOW: HOME — inicio/g) || []).length, 1, 'Falta el comentario que marca el inicio del embed de Webflow en index.html');
+assert.equal((page.match(/EMBED WEBFLOW: HOME — fin/g) || []).length, 1, 'Falta el comentario que marca el fin del embed de Webflow en index.html');
 for (const id of ['macroled-home', 'aiLaunch', 'aiPanel', 'nlPopup', 'nlForm']) {
   assert.equal((page.match(new RegExp(`id="${id}"`, 'g')) || []).length, 1, `Duplicate or missing ${id}`);
 }
@@ -38,4 +37,4 @@ for (const file of ['home.css', 'newsletter.css']) {
   const css = await read(file);
   for (const match of css.matchAll(/url\(["']?([^"')]+)["']?\)/g)) await checkPath(file, match[1]);
 }
-console.log(`Checks passed: JavaScript syntax, separate newsletter, preview, widget IDs and ${checked} local resource paths.`);
+console.log(`Checks passed: JavaScript syntax, separate newsletter, embed markers, widget IDs and ${checked} local resource paths.`);
