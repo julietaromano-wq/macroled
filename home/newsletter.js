@@ -149,7 +149,7 @@
       clearError();
 
       const emailInput = form.querySelector("#mlg-newsletter-email");
-      // const consent = form.querySelector("#mlg-newsletter-acepta");
+      const consent = form.querySelector("#mlg-newsletter-acepta");
       const email = (emailInput && emailInput.value ? emailInput.value : "").trim();
       const intereses = getSelectedInterests();
 
@@ -179,8 +179,8 @@
 
       const payload = {
         email,
-        intereses
-        // acepta_newsletter: true
+        intereses,
+        acepta_newsletter: true
       };
 
       setSubmitting(true);

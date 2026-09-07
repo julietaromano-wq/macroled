@@ -538,6 +538,7 @@
   }
   .mc-conditional.mc-active{ display: block; }
 
+  /* Checkbox de newsletter deshabilitado temporalmente.
   .mc-checkbox-row{
     display:flex;
     align-items:flex-start;
@@ -562,6 +563,7 @@
     line-height: 1.45;
     cursor: pointer;
   }
+  */
 
   .mc-required-note{
     margin: -15px 0 2rem;
@@ -663,11 +665,13 @@
       font-size: 16px; /* evita zoom automático en iOS */
       padding: 13px 14px;
     }
+    /* Checkbox de newsletter deshabilitado temporalmente.
     .mc-checkbox-row input{
       width: 20px;
       height: 20px;
     }
     .mc-checkbox-row label{ padding: 2px 0; }
+    */
     .mc-upload{
       height: 58px;
       min-height: 58px;
@@ -723,11 +727,13 @@
       height: 38px;
     }
     .mc-upload-remove{ padding: 8px; }
+    /* Checkbox de newsletter deshabilitado temporalmente.
     .mc-checkbox-row{
       margin: 0 0 8px;
     }
     .mc-required-note{ margin: 0 0 2rem; }
     .mc-checkbox-row label{ font-size: 12px; }
+    */
     .mc-submit{
       padding: 15px 16px;
       font-size: 14px;
@@ -962,10 +968,12 @@
 
         <p class="mc-required-note">Los campos marcados con <span class="mc-req" aria-hidden="true">*</span> son obligatorios.</p>
 
+        <!-- Checkbox de newsletter deshabilitado temporalmente.
         <div class="mc-checkbox-row">
           <input type="checkbox" id="mc-acepta-newsletter" name="acepta_newsletter" value="true" checked />
           <label for="mc-acepta-newsletter">Acepto suscribirme al newsletter de Macroled</label>
         </div>
+        -->
 
         <button type="submit" class="mc-submit" id="mc-submit-btn">Enviar</button>
       </form>
@@ -1428,7 +1436,7 @@
     const mcForm = document.getElementById('mc-contact-form');
     const mcSubmitBtn = document.getElementById('mc-submit-btn');
     const mcFormError = document.getElementById('mc-form-error');
-    const newsletterConsent = document.getElementById('mc-acepta-newsletter');
+    // const newsletterConsent = document.getElementById('mc-acepta-newsletter');
 
     mcForm.addEventListener('submit', function(e){
       e.preventDefault();
@@ -1484,7 +1492,7 @@
 
           const data = config.buildData(fieldValues);
           data.origen = config.origen;
-          data.acepta_newsletter = newsletterConsent.checked;
+          // data.acepta_newsletter = newsletterConsent.checked;
 
           const body = {
             payload: {
