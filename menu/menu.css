@@ -316,6 +316,54 @@ html.mm-scroll-lock body {
     color: #8a8580;
     font-size: 13px;
   }
+  #mm-ts-search-results .ts-near-miss {
+    padding: 10px 12px 8px;
+    border-bottom: 1px solid #eee;
+  }
+  #mm-ts-search-results .ts-near-miss__box {
+    padding: 10px 12px;
+    border: 1px solid #cfd6e0;
+    border-radius: 10px;
+    background: #e4e9f0;
+  }
+  #mm-ts-search-results .ts-near-miss p { margin: 0; }
+  #mm-ts-search-results .ts-near-miss p + p { margin-top: 6px; }
+  #mm-ts-search-results .ts-near-miss__lead {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    font-size: 13px;
+    font-weight: 700;
+    color: #16294f;
+    line-height: 1.35;
+  }
+  #mm-ts-search-results .ts-near-miss__icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 16px;
+    height: 16px;
+    margin-top: 1px;
+    border-radius: 50%;
+    background: #16294f;
+    color: #fff;
+    font-size: 11px;
+    font-weight: 800;
+    line-height: 1;
+  }
+  #mm-ts-search-results .ts-near-miss__indent { padding-left: 24px; font-size: 13px; color: #5b6472; }
+  #mm-ts-search-results .ts-near-miss__suggest {
+    font-weight: 700;
+    color: rgb(0, 110, 165);
+    text-decoration: underline;
+  }
+  #mm-ts-search-results .ts-near-miss__subtitle {
+    margin: 10px 4px 2px !important;
+    font-size: 12px;
+    font-weight: 700;
+    color: #16294f;
+  }
 /* =========================================================
    MACROLED MEGAMENU — CSS
    Pegar en Webflow: Page Settings > Custom Code > Head
@@ -982,6 +1030,53 @@ a.mm-group-label:hover {
 #mm-mobile .search-overlay-body .ts-row-more { align-items: flex-start; }
 #mm-mobile .search-overlay-body .ts-row-more .ts-meta { color: #5b6472; font-weight: 500; }
 #mm-mobile .search-overlay-body .ts-row-footer { justify-content: center; }
+#mm-mobile .search-overlay-body .ts-near-miss {
+  padding: 12px 16px 8px;
+}
+#mm-mobile .search-overlay-body .ts-near-miss__box {
+  padding: 12px 14px;
+  border: 1px solid #cfd6e0;
+  border-radius: 10px;
+  background: #e4e9f0;
+}
+#mm-mobile .search-overlay-body .ts-near-miss p { margin: 0; }
+#mm-mobile .search-overlay-body .ts-near-miss p + p { margin-top: 6px; }
+#mm-mobile .search-overlay-body .ts-near-miss__lead {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 700;
+  color: #16294f;
+  line-height: 1.35;
+}
+#mm-mobile .search-overlay-body .ts-near-miss__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+  margin-top: 1px;
+  border-radius: 50%;
+  background: #16294f;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1;
+}
+#mm-mobile .search-overlay-body .ts-near-miss__indent { padding-left: 26px; font-size: 14px; color: #5b6472; }
+#mm-mobile .search-overlay-body .ts-near-miss__suggest {
+  font-weight: 700;
+  color: rgb(0, 110, 165);
+  text-decoration: underline;
+}
+#mm-mobile .search-overlay-body .ts-near-miss__subtitle {
+  margin: 12px 0 4px !important;
+  font-size: 13px;
+  font-weight: 700;
+  color: #16294f;
+}
 
 #mm-mobile .menu-overlay {
   position: fixed; inset: 0; top: var(--mm-mobile-nav-height);
