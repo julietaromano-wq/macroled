@@ -4,7 +4,7 @@ import { createReadStream } from "node:fs";
 import { extname, join, normalize, resolve, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 
-const root = resolve(fileURLToPath(new URL("..", import.meta.url)));
+const root = resolve(fileURLToPath(new URL("../..", import.meta.url)));
 const port = Number(process.env.PORT || 5501);
 
 const types = {
@@ -61,6 +61,6 @@ const server = http.createServer(async (req, res) => {
 });
 
 server.listen(port, "127.0.0.1", () => {
-  console.log(`Live: http://127.0.0.1:${port}/index.html`);
+  console.log(`Live: http://127.0.0.1:${port}/home/index.html`);
   console.log(`Root: ${root}`);
 });

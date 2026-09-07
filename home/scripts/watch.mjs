@@ -3,14 +3,8 @@ import { resolve } from "node:path";
 import { build } from "./build.mjs";
 
 const homeDirectory = resolve(import.meta.dirname, "..");
-const javascriptDirectory = resolve(homeDirectory, "js");
-const cssDirectory = resolve(homeDirectory, "css");
-const htmlFile = resolve(homeDirectory, "index.html");
-const watchedPaths = [
-  javascriptDirectory,
-  cssDirectory,
-  htmlFile,
-];
+const htmlFile = resolve(homeDirectory, "webflow-embed.html");
+const watchedPaths = [htmlFile];
 
 let building = false;
 let buildQueued = false;
@@ -35,7 +29,7 @@ async function rebuild() {
     buildQueued = false;
     try {
       await build();
-      console.log(`✓ Bundle actualizado - ${currentTime()}`);
+      console.log(`✓ Vista previa actualizada - ${currentTime()}`);
     } catch (error) {
       console.error(`✗ Error durante el build - ${currentTime()}`);
       console.error(error);
@@ -65,4 +59,4 @@ watcher.on("error", (error) => {
   console.error("Error del watcher:", error);
 });
 
-console.log("Vigilando home/index.html, home/js/*.js y home/css/*.css (Ctrl+C para salir)");
+console.log("Vigilando home/webflow-embed.html (Ctrl+C para salir). CSS y JS se editan directamente.");

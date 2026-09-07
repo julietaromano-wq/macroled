@@ -1,6 +1,6 @@
 ---
 name: macroled-design-system
-description: Sistema de diseño de Macroled (marca, colores, tipografía, espaciado, radios, componentes reutilizables). Usar SIEMPRE que se cree, revise o refactorice HTML/CSS/JS dentro de home/, incluso para cambios chicos (ej. "cambiá el color de este botón"), para mantener consistencia visual y evitar que el agente invente valores o patrones nuevos sin justificación. Fuente de verdad: home/index.html, home/css/home.css, home/js/ y DESIGN.md (Figma).
+description: Sistema de diseño de Macroled (marca, colores, tipografía, espaciado, radios, componentes reutilizables). Usar SIEMPRE que se cree, revise o refactorice HTML/CSS/JS dentro de home/, incluso para cambios chicos (ej. "cambiá el color de este botón"), para mantener consistencia visual y evitar que el agente invente valores o patrones nuevos sin justificación. Fuente de verdad: home/webflow-embed.html, home/home.css, home/home.js y DESIGN.md (Figma).
 ---
 
 # Macroled Design System
@@ -79,8 +79,8 @@ componentes puntuales.
 
 Trabajar en este orden:
 
-1. Inspeccionar el componente existente en `home/index.html`,
-   `home/css/home.css` y `home/js/`.
+1. Inspeccionar el componente existente en `home/webflow-embed.html`,
+   `home/home.css` y `home/home.js`.
 2. Respetar la implementación efectiva al final de la cascada, no una
    declaración anterior luego sobrescrita.
 3. Usar los tokens primitivos de este documento al crear o refactorizar
@@ -113,7 +113,7 @@ consultarlo antes.
 
 La paleta anterior es la referencia completa. La fuente de verdad ejecutable
 para los colores que ya consume la home está en el bloque `.ml-home` de
-`home/css/home.css`. Usar siempre estos nombres exactos desde los componentes:
+`home/home.css`. Usar siempre estos nombres exactos desde los componentes:
 
 ```css
 /* Neutros */
@@ -233,7 +233,7 @@ No reemplazar silenciosamente valores editoriales por el color primitivo
 verificarla visualmente.
 
 Las líneas editoriales configurables reciben `--line-bg` y `--line-color`
-desde `home/js/config.js`. Sus colores son contenido, no tokens globales.
+desde `home/home.js (bloque config)`. Sus colores son contenido, no tokens globales.
 El fondo del listado cambia con `--ml-panel-theme` mediante
 `IntersectionObserver`.
 
@@ -243,7 +243,7 @@ Usar `"Noto Sans", Arial, sans-serif`. La home carga Noto Sans en pesos
 300, 400, 500, 600, 700 y 800.
 
 La fuente de verdad ejecutable es la sección `Canonical typography scale`
-de `home/css/home.css`. Este documento registra el contrato del sistema;
+de `home/home.css`. Este documento registra el contrato del sistema;
 los componentes siempre deben consumir las variables `--ml-type-*` y no
 declarar escalas tipográficas paralelas.
 
@@ -576,8 +576,8 @@ sobrescritos: grilla 3.1fr/1fr, producto aislado sobre fondo negro, radio
 - Evitar sombras fuertes. La versión efectiva de las tarjetas de proyecto
   no usa sombra.
 - No agregar múltiples acciones de alto énfasis en el mismo bloque.
-- Mantener configuración editorial en `home/js/config.js` y datos
-  manuales de proyectos en `home/js/project-lines.js`.
+- Mantener configuración editorial en `home/home.js (bloque config)` y datos
+  manuales de proyectos en `home/home.js (bloque project-lines-concept)`.
 - Regenerar y verificar el bundle Webflow después de cambios en fuentes.
 - Probar al menos desktop, 900px y 640px; teclado; carga/error; y
   reduced motion.

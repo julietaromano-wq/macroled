@@ -1,78 +1,37 @@
-import { mkdir, readFile, writeFile } from "node:fs/promises";
-import { resolve } from "node:path";
-import { fileURLToPath } from "node:url";
+import { readFile, writeFile } from 'node:fs/promises';
+import { resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
+const homeDirectory = resolve(import.meta.dirname, '..');
 
-const homeDirectory = resolve(import.meta.dirname, "..");
-const distDirectory = resolve(homeDirectory, "dist");
-const javascriptFiles = [
-  "config.js",
-  "products.js",
-  "featured.js",
-  "project-lines-concept.js",
-  "home.js",
-  "asistente.js",
-];
-
+// Only renders the local preview. dist stays frozen until Webflow migrates.
 export async function build() {
-  await mkdir(distDirectory, { recursive: true });
-
-  const javascriptSources = await Promise.all(
-    javascriptFiles.map(async (fileName) => {
-      const source = await readFile(resolve(homeDirectory, "js", fileName), "utf8");
-      return `/* Source: home/js/${fileName} */\n${source.trimEnd()}`;
-    }),
-  );
-
-  const bundle = [
-    "/* Generated file. Edit the sources in home/js and run npm run build. */",
-    ...javascriptSources,
-    "",
-  ].join("\n\n");
-  await writeFile(resolve(distDirectory, "home.bundle.js"), bundle, "utf8");
-
-  const css = await readFile(resolve(homeDirectory, "css", "home.css"), "utf8");
-  await writeFile(resolve(distDirectory, "home.css"), css, "utf8");
-
-  // Keep standalone newsletter assets for older Webflow embeds; home.css/home.js already include them.
-  const newsletterCss = await readFile(
-    resolve(homeDirectory, "css", "newsletter.css"),
-    "utf8",
-  );
-  await writeFile(
-    resolve(distDirectory, "newsletter.css"),
-    newsletterCss,
-    "utf8",
-  );
-
-  const newsletterJavascript = await readFile(
-    resolve(homeDirectory, "js", "newsletter.js"),
-    "utf8",
-  );
-  await writeFile(
-    resolve(distDirectory, "newsletter.js"),
-    newsletterJavascript,
-    "utf8",
-  );
-
-  const page = await readFile(resolve(homeDirectory, "index.html"), "utf8");
-  const componentStart = page.indexOf('<div id="macroled-home"');
-  const scriptsStart = page.indexOf("<script src=", componentStart);
-
-  if (componentStart === -1 || scriptsStart === -1) {
-    throw new Error('No se pudo extraer el componente "#macroled-home" de home/index.html.');
-  }
-
-  const component = page.slice(componentStart, scriptsStart).trim();
-  const embed = [
-    "<!-- Generated file. Run npm run build after editing the Home. -->",
-    component,
-    "",
-  ].join("\n");
-
-  await writeFile(resolve(distDirectory, "webflow-embed.html"), embed, "utf8");
+  const component = await readFile(resolve(homeDirectory, 'webflow-embed.html'), 'utf8');
+  const page = `<!doctype html>
+<!-- Generated preview. Edit webflow-embed.html, then run npm run build. -->
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="Prototipo de la nueva home de Macroled.">
+  <title>Macroled — Iluminación que transforma</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="home.css">
+  <link rel="stylesheet" href="../global/floating-ui.css">
+  <link rel="stylesheet" href="newsletter.css">
+</head>
+<body>
+${component.trim()}
+  <script src="home.js"></script>
+  <script src="newsletter.js"></script>
+  <script src="../global/floating-ui.js"></script>
+</body>
+</html>
+`;
+  await writeFile(resolve(homeDirectory, 'index.html'), page, 'utf8');
 }
-
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
   await build();
-  console.log("Build completed: home bundle, CSS, newsletter assets and Webflow embed");
+  console.log('Local preview updated. Existing dist/CDN files preserved.');
 }
