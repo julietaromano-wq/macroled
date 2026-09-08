@@ -1,23 +1,24 @@
 <!--
-  HTML para pegar en el Embed de Webflow de /nuevo-contacto.
-  Generado a partir de home/contacto.html — SIN <!DOCTYPE>/<html>/<head>/<body>,
-  porque ese código va DENTRO del <body> real de la página de Webflow (que ya
-  trae navbar y footer). Pegar un documento completo ahí crea un <body> anidado
-  dentro de un <div>, que es HTML inválido y rompe el layout de forma errática.
+  ARCHIVO AUTOCONTENIDO PARA WEBFLOW.
 
-  También se aisló todo el CSS que antes apuntaba a `body` / `*` (afectaba a
-  TODA la página, navbar y footer incluidos) para que ahora solo afecte a
-  `.mc-contact-page` y sus descendientes. El bloque final de estilos del
-  footer SÍ usa `body:has(...)` a propósito — necesita ver el <body> real
-  de Webflow para scopear el footer global solo a esta página.
+  Este archivo conserva la versión original del Embed de la página de Contacto,
+  con su HTML, CSS y JavaScript inline.
 
-  =====================================================================
-  INTEGRACIÓN CON n8n (agregado):
-  El submit arma el mismo shape de payload que espera el flujo n8n
-  existente ({ payload: { submittedAt, data: { origen, ...campos } } })
-  y lo manda por fetch() directo al webhook, mapeando los campos según
-  el "origenValor" que corresponde a cada branch del Switch.
-  =====================================================================
+  Para realizar la prueba con archivos separados, usar:
+  - contacto/index.html
+  - contacto/contacto.css
+  - contacto/contacto.js
+
+  No incluye <!DOCTYPE>, <html>, <head> ni <body> porque debe pegarse dentro
+  de un Embed en el <body> de la página de Webflow, que ya proporciona la
+  estructura general, el navbar y el footer.
+
+  El CSS está encapsulado bajo `.mc-contact-page` para no afectar los estilos
+  globales de Webflow. Las reglas que usan `body:has(.mc-contact-page)` están
+  destinadas específicamente al footer global de la página.
+
+  El formulario envía a n8n un payload con la estructura:
+  { payload: { submittedAt, data: { origen, ...campos } } }
 -->
 <style>
   :root{
@@ -752,10 +753,9 @@
      esta página (--mc-bg) para que no se note el corte de color al
      llegar al footer, solo cuando esta página de contacto está
      presente, sin tocar el CSS compartido del sitio.
-     body:has(.mc-contact-page) nunca matchea en este archivo
-     standalone (no existe esa clase acá), así que es inerte aquí;
-     toma efecto al pegar el bloque en el Embed de Webflow de
-     /nuevo-contacto. */
+     En una vista local no existe `.footer-wrap`, por lo que estas reglas
+     quedan sin un elemento al cual aplicarse. En Webflow sí toman efecto al
+     existir el footer global alrededor del Embed de /nuevo-contacto. */
   body:has(.mc-contact-page) .footer-wrap{
     background-color: var(--mc-bg) !important;
   }

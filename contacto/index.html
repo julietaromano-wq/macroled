@@ -1,0 +1,253 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Contacto | Macroled</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./contacto.css">
+  <style>
+    /* Reset exclusivo de la vista local; Webflow ya lo aplica globalmente. */
+    html,
+    body {
+      margin: 0;
+    }
+  </style>
+</head>
+<body>
+  <!--
+    WEBFLOW EMBED: COPIAR DESDE EL MARCADOR "INICIO" HASTA EL MARCADOR "FIN".
+    El CSS y el JavaScript NO están incluidos en ese bloque. En Webflow deberán
+    enlazarse por separado después del commit y push.
+  -->
+  <!-- WEBFLOW EMBED — INICIO -->
+<div class="mc-contact-page">
+  <main class="mc-shell" aria-labelledby="mc-contact-title">
+
+    <!-- ================= HERO ================= -->
+    <div class="mc-hero">
+      <div class="mc-hero-top">
+        <h1 class="mc-hero-title" id="mc-contact-title">Tenés preguntas,<br/>tenemos respuestas</h1>
+        <p class="mc-hero-sub">
+          Asesoramiento técnico y comercial para tu proyecto de iluminación.
+          Contanos qué necesitás y te acompañamos en cada etapa.
+        </p>
+      </div>
+    </div>
+
+    <!-- ================= FORM ================= -->
+    <div class="mc-form-side">
+      <form id="mc-contact-form" novalidate>
+
+        <p class="mc-form-error" id="mc-form-error" role="alert">
+          Ocurrió un error al enviar el formulario. Probá de nuevo en unos minutos.
+        </p>
+
+        <div class="mc-field">
+          <div class="mc-pill">
+            <label class="mc-border-label" for="mc-nombre">Nombre completo <span class="mc-req" aria-hidden="true">*</span></label>
+            <input id="mc-nombre" type="text" name="nombre_completo" placeholder="Tu nombre completo" required />
+          </div>
+        </div>
+
+        <div class="mc-field">
+          <div class="mc-pill">
+            <label class="mc-border-label" for="mc-provincia">Provincia <span class="mc-req" aria-hidden="true">*</span></label>
+            <div class="mc-select-wrap">
+              <select id="mc-provincia" name="provincia" required>
+                <option value="" disabled selected>Seleccioná una provincia</option>
+                <option>Buenos Aires</option>
+                <option>Catamarca</option>
+                <option>Chaco</option>
+                <option>Chubut</option>
+                <option>Ciudad Autónoma de Buenos Aires (CABA)</option>
+                <option>Córdoba</option>
+                <option>Corrientes</option>
+                <option>Entre Ríos</option>
+                <option>Formosa</option>
+                <option>Jujuy</option>
+                <option>La Pampa</option>
+                <option>La Rioja</option>
+                <option>Mendoza</option>
+                <option>Misiones</option>
+                <option>Neuquén</option>
+                <option>Río Negro</option>
+                <option>Salta</option>
+                <option>San Juan</option>
+                <option>San Luis</option>
+                <option>Santa Cruz</option>
+                <option>Santa Fe</option>
+                <option>Santiago del Estero</option>
+                <option>Tierra del Fuego</option>
+                <option>Tucumán</option>
+              </select>
+            </div>
+          </div>
+          <p class="mc-field-error" id="mc-provincia-error" role="alert">Seleccioná tu provincia.</p>
+        </div>
+
+        <div class="mc-field">
+          <div class="mc-pill">
+            <label class="mc-border-label" for="mc-ciudad">Ciudad <span class="mc-req" aria-hidden="true">*</span></label>
+            <input id="mc-ciudad" type="text" name="ciudad" placeholder="Tu ciudad" required />
+          </div>
+        </div>
+
+        <div class="mc-row">
+          <div class="mc-field">
+            <div class="mc-pill">
+              <label class="mc-border-label" for="mc-email">Email <span class="mc-req" aria-hidden="true">*</span></label>
+              <input id="mc-email" type="email" name="email" placeholder="tu@email.com" required />
+            </div>
+          </div>
+          <div class="mc-field">
+            <div class="mc-pill">
+              <label class="mc-border-label" for="mc-telefono">Teléfono <span class="mc-req" aria-hidden="true">*</span></label>
+              <input id="mc-telefono" type="tel" name="telefono" placeholder="+54 11 0000-0000" required />
+            </div>
+          </div>
+        </div>
+
+        <div class="mc-field">
+          <div class="mc-pill">
+            <label class="mc-border-label" for="mc-tipo-consulta">Tipo de consulta <span class="mc-req" aria-hidden="true">*</span></label>
+            <div class="mc-select-wrap">
+              <select id="mc-tipo-consulta" name="tipo_consulta" required>
+                <option value="" disabled selected>Seleccioná una opción</option>
+                <option value="tecnica">Técnica</option>
+                <option value="comercial">Comercial</option>
+                <option value="garantia">Proceso de garantía</option>
+                <option value="asesoramiento">Asesoramiento lumínico</option>
+                <option value="trabaja-con-nosotros">Trabajá con nosotros</option>
+              </select>
+            </div>
+          </div>
+          <p class="mc-field-error" id="mc-tipo-consulta-error" role="alert">Elegí un tipo de consulta.</p>
+        </div>
+
+        <!-- ============ Condicional: Garantía ============ -->
+        <div class="mc-conditional" data-shows-for="garantia">
+          <div class="mc-field">
+            <div class="mc-pill">
+              <label class="mc-border-label" for="mc-comercio">Nombre del comercio</label>
+              <input id="mc-comercio" type="text" name="nombre_comercio" placeholder="Comercio donde adquirió el producto" />
+            </div>
+          </div>
+        </div>
+
+        <!-- ============ Condicional: Trabajá con nosotros ============ -->
+        <div class="mc-conditional" data-shows-for="trabaja-con-nosotros">
+          <div class="mc-field">
+            <div class="mc-pill">
+              <label class="mc-border-label" for="mc-area">Área a la que aplica</label>
+              <input id="mc-area" type="text" name="area_interes" placeholder="Ej: Ventas, Producción, Logística…" />
+            </div>
+          </div>
+        </div>
+
+        <!-- ======= Condicional: Asesoramiento lumínico ======= -->
+        <div class="mc-conditional" data-shows-for="asesoramiento">
+          <div class="mc-field">
+            <div class="mc-pill">
+              <label class="mc-border-label" for="mc-tipo-producto">Tipo de producto</label>
+              <div class="mc-select-wrap">
+                <select id="mc-tipo-producto" name="tipo_producto">
+                  <option value="" disabled selected>Seleccioná un producto</option>
+                  <option>Titán</option>
+                  <option>Focus</option>
+                  <option>Olimpus</option>
+                  <option>Industrial</option>
+                  <option>Farolas Pro</option>
+                  <option>Galponeras Pro</option>
+                  <option>Galponeras Eco</option>
+                  <option>Pública</option>
+                  <option>Solar</option>
+                  <option>Lumax</option>
+                  <option>Otra</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="mc-field">
+          <div class="mc-pill mc-pill-textarea">
+            <label class="mc-border-label" for="mc-comentarios">Comentarios</label>
+            <textarea id="mc-comentarios" name="comentarios" placeholder="Contanos más detalles…"></textarea>
+          </div>
+        </div>
+
+        <div class="mc-field mc-upload-field" id="mc-upload-field">
+          <div class="mc-upload-wrap">
+            <span class="mc-border-label" id="mc-upload-label">Ticket o factura</span>
+            <div class="mc-upload" data-upload id="mc-upload-zone">
+              <input type="file" name="archivo_adjunto" id="mc-archivo" accept="image/*,.pdf" />
+              <div class="mc-upload-empty">
+                <span class="mc-upload-btn-icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 16V4m0 0l-4 4m4-4l4 4"/>
+                    <path d="M4 17v2a2 2 0 002 2h12a2 2 0 002-2v-2"/>
+                  </svg>
+                </span>
+                <span class="mc-upload-btn-text">Seleccionar archivo</span>
+                <span class="mc-upload-formats-inline">Máx. 10 MB</span>
+              </div>
+              <div class="mc-upload-preview">
+                <img class="mc-upload-thumb" alt="" hidden />
+                <div class="mc-upload-file-icon" hidden>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
+                    <path d="M14 2v6h6"/>
+                  </svg>
+                </div>
+                <div class="mc-upload-meta">
+                  <p class="mc-upload-name"></p>
+                  <p class="mc-upload-size"></p>
+                </div>
+                <button type="button" class="mc-upload-remove" aria-label="Quitar archivo">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                    <path d="M18 6L6 18M6 6l12 12"/>
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <p class="mc-required-note">Los campos marcados con <span class="mc-req" aria-hidden="true">*</span> son obligatorios.</p>
+
+        <!-- Checkbox de newsletter deshabilitado temporalmente.
+        <div class="mc-checkbox-row">
+          <input type="checkbox" id="mc-acepta-newsletter" name="acepta_newsletter" value="true" checked />
+          <label for="mc-acepta-newsletter">Acepto suscribirme al newsletter de Macroled</label>
+        </div>
+        -->
+
+        <button type="submit" class="mc-submit" id="mc-submit-btn">Enviar</button>
+      </form>
+    </div>
+
+    <!-- ================= REDES / CONTACTO ================= -->
+    <div class="mc-hero-bottom">
+      <div>
+        <h4>Redes</h4>
+        <a href="http://instagram.com/macroled.ar" target="_blank" rel="noopener">Instagram</a>
+        <a href="https://www.youtube.com/@macroledoficial" target="_blank" rel="noopener">YouTube</a>
+        <a href="https://www.linkedin.com/company/coresa-group-s-r-l/posts/" target="_blank" rel="noopener">LinkedIn</a>
+      </div>
+
+      <div>
+        <h4>Contacto</h4>
+        <a href="mailto:info@macroled.com.ar">info@macroled.com.ar</a>
+      </div>
+    </div>
+
+  </main>
+</div>
+  <!-- WEBFLOW EMBED — FIN -->
+
+  <script src="./contacto.js"></script>
+</body>
+</html>

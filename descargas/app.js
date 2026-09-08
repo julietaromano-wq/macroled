@@ -39,7 +39,8 @@ const TIPO_DESCARGA_ORDER = ["Catálogo", "Ficha técnica", "Manual", "Garantía
 
 const ICON_CHECK = `<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`;
 const ICON_DOWNLOAD = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>`;
-const ICON_COPY = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>`;
+const ICON_COPY = `<svg class="copy-sku-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>`;
+const ICON_COPY_CHECK = `<svg class="copy-sku-check" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>`;
 const ICON_FILE = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>`;
 const ICON_GRID = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>`;
 const ICON_CHEVRON = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>`;
@@ -727,7 +728,7 @@ function cardTemplate(it, idx){
       <div class="card-body">
         <div class="card-info">
           <div class="card-title">${escAttr(it.nombre)}</div>
-          ${!esCatalogo && it.sku ? `<div class="card-sku-row"><span class="card-sku"><span class="card-sku-label">SKU:</span> <span class="card-sku-value">${escAttr(it.sku)}</span></span><button type="button" class="copy-sku" data-sku="${escAttr(it.sku)}" aria-label="Copiar SKU ${escAttr(it.sku)}" title="Copiar SKU">${ICON_COPY}</button></div>` : ""}
+          ${!esCatalogo && it.sku ? `<div class="card-sku-row"><span class="card-sku"><span class="card-sku-label">SKU:</span> <span class="card-sku-value">${escAttr(it.sku)}</span></span><button type="button" class="copy-sku" data-sku="${escAttr(it.sku)}" aria-label="Copiar SKU ${escAttr(it.sku)}" title="Copiar SKU">${ICON_COPY}${ICON_COPY_CHECK}<span class="copy-sku-msg" role="status" aria-live="polite">${ICON_COPY_CHECK}SKU copiado</span></button></div>` : ""}
           ${descHtml}
           ${seccionTipo}
         </div>
@@ -851,12 +852,13 @@ document.getElementById("grid").addEventListener("click", (e) => {
     copyPromise.then(() => {
       copyButton.classList.add("copied");
       copyButton.setAttribute("aria-label", `SKU ${sku} copiado`);
-      copyButton.title = "Copiado";
-      setTimeout(() => {
+      copyButton.title = "SKU copiado";
+      clearTimeout(copyButton._copyResetTimer);
+      copyButton._copyResetTimer = setTimeout(() => {
         copyButton.classList.remove("copied");
         copyButton.setAttribute("aria-label", `Copiar SKU ${sku}`);
         copyButton.title = "Copiar SKU";
-      }, 1400);
+      }, 1500);
     }).catch(() => {});
     return;
   }

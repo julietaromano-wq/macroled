@@ -25,10 +25,10 @@
    */
   const MANUAL_CATEGORIES = {
     interior: [
-      { ...category("Lineales PRO", "lineales-pro"), href: "https://www.macroled.com.ar/productos?macrofamilia=Lineales+PRO", image: "https://d1zltvqju4u8ql.cloudfront.net/fit-in/350x350/MACROLED/WEB/PORTADA-LINEALES-PRO.webp", badge: "Nuevo" },
+      { ...category("Lineales PRO", "lineales-pro"), href: "https://www.macroled.com.ar/productos?macrofamilia=Luminarias+de+Proyecto&familia=Lineales+PRO", image: "https://d1zltvqju4u8ql.cloudfront.net/fit-in/350x350/MACROLED/WEB/PORTADA-LINEALES-PRO.webp", badge: "Nuevo" },
       { ...category("Skyline", "luminarias-skyline"), href: "https://www.macroled.com.ar/productos?macrofamilia=Skyline&familia=Luminarias", image: "https://s3.coresagroup.com/MACROLED/250/skyline.png", badge: "Nuevo" },
       { ...category("Artefactos para lámparas", "artefactos-para-lamparas"), href: "https://www.macroled.com.ar/productos?macrofamilia=Artefactos+para+L%C3%A1mparas", image: "https://s3.coresagroup.com/MACROLED/250/policarbonato-embutir-ar111.png" },
-      { ...category("Paneles", "paneles"), href: "https://www.macroled.com.ar/productos?macrofamilia=Paneles", image: "https://d1zltvqju4u8ql.cloudfront.net/fit-in/250x250/MACROLED/WEB/GRAN-FORMATO-BACKLIGHT.webp" },
+      { ...category("Paneles", "paneles"), href: "https://www.macroled.com.ar/productos?macrofamilia=Luminarias+Interior&familia=Paneles", image: "https://d1zltvqju4u8ql.cloudfront.net/fit-in/250x250/MACROLED/WEB/GRAN-FORMATO-BACKLIGHT.webp" },
       { ...category("Tiras Led", "tiras-led"), href: "https://www.macroled.com.ar/productos?macrofamilia=Tiras+LED", image: "https://d1zltvqju4u8ql.cloudfront.net/fit-in/250x250/filters:format(png)/MACROLED/1000/0742832556316a.png" },
       { ...category("Lámparas", "lamparas"), href: "https://www.macroled.com.ar/productos?macrofamilia=L%C3%A1mparas", image: "https://d1zltvqju4u8ql.cloudfront.net/fit-in/250x250/filters:format(png)/MACROLED/1000/7428325565203a.png" }
     ],
@@ -39,9 +39,9 @@
       { ...category("Luz guía", "monaco-luz-pasillo"), href: "https://www.macroled.com.ar/productos?macrofamilia=M%C3%B3naco&familia=Luz+Gu%C3%ADa", image: "https://d1zltvqju4u8ql.cloudfront.net/fit-in/2000x2000/MACROLED/WEB/portada_luz_pasillo.webp" }
     ],
     exterior: [
-      { ...category("Reflectores", "reflectores"), href: "https://www.macroled.com.ar/productos?macrofamilia=Reflectores", image: "https://s3.coresagroup.com/MACROLED/250/reflectores-smart.png" },
-      { ...category("Tortugas", "tortugas"), href: "https://www.macroled.com.ar/productos?macrofamilia=Luminarias+Integradas+Exterior&familia=Tortugas", image: "https://s3.coresagroup.com/MACROLED/250/tortugas.png" },
-      { ...category("Estacas", "estacas"), href: "https://www.macroled.com.ar/productos?macrofamilia=Luminarias+Integradas+Exterior&familia=Estacas+M%C3%B3viles", image: "https://s3.coresagroup.com/MACROLED/250/estacas-led-integrado.png" },
+      { ...category("Reflectores", "reflectores"), href: "https://www.macroled.com.ar/productos?macrofamilia=Luminarias+Exterior&familia=Reflectores", image: "https://s3.coresagroup.com/MACROLED/250/reflectores-smart.png" },
+      { ...category("Tortugas", "tortugas"), href: "https://www.macroled.com.ar/productos?macrofamilia=Luminarias+Exterior&familia=Tortugas", image: "https://s3.coresagroup.com/MACROLED/250/tortugas.png" },
+      { ...category("Estacas", "estacas"), href: "https://www.macroled.com.ar/productos?macrofamilia=Luminarias+Exterior&familia=Estacas+M%C3%B3viles", image: "https://s3.coresagroup.com/MACROLED/250/estacas-led-integrado.png" },
       { ...category("Guirnaldas", "guirnaldas"), href: "https://www.macroled.com.ar/productos?macrofamilia=Artefactos+para+L%C3%A1mparas&familia=Guirnaldas", image: "https://d1zltvqju4u8ql.cloudfront.net/fit-in/250x250/filters:format(png)/MACROLED/1000/7428325574946a.png" }
     ],
     proyectos: [

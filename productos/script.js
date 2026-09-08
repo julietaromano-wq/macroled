@@ -345,6 +345,8 @@ const COMBO_BANNERS = [
 
 const BANNER_ICON_PAUSE = `<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg>`;
 const BANNER_ICON_PLAY = `<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>`;
+const BANNER_ICON_EXPAND = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 3H3v5M16 3h5v5M8 21H3v-5M16 21h5v-5"/></svg>`;
+const BANNER_ICON_COMPRESS = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 3v5H3M16 3v5h5M8 21v-5H3M16 21v-5h5"/></svg>`;
 let _activeBannerKey = "";
 const _bannerVideoPrefetch = Object.create(null);
 
@@ -445,6 +447,7 @@ function lookupBannerData(familia, macro, subfamilias){
 function wireBannerVideoControls(holder){
   const video = holder.querySelector(".category-banner__media");
   const playBtn = holder.querySelector(".category-banner__toggle");
+  const expandBtn = holder.querySelector(".category-banner__expand");
   if(!video || !(video instanceof HTMLVideoElement)) return;
 
   const syncPlayBtn = () => {
@@ -467,6 +470,36 @@ function wireBannerVideoControls(holder){
     if(video.paused) tryPlay();
     else video.pause();
   });
+  const isFullscreen = () => document.fullscreenElement === holder || document.webkitFullscreenElement === holder;
+  const syncExpandBtn = () => {
+    if(!expandBtn) return;
+    const expanded = isFullscreen();
+    expandBtn.setAttribute("aria-label", expanded ? "Salir de pantalla completa" : "Ver video en pantalla completa");
+    expandBtn.title = expanded ? "Salir de pantalla completa" : "Pantalla completa";
+    expandBtn.innerHTML = expanded ? BANNER_ICON_COMPRESS : BANNER_ICON_EXPAND;
+  };
+  expandBtn?.addEventListener("click", event => {
+    event.stopPropagation();
+    if(isFullscreen()){
+      const exit = document.exitFullscreen || document.webkitExitFullscreen;
+      if(exit) exit.call(document);
+      return;
+    }
+    const request = holder.requestFullscreen || holder.webkitRequestFullscreen;
+    if(request){
+      const result = request.call(holder);
+      if(result && typeof result.catch === "function") result.catch(() => {});
+    }else if(typeof video.webkitEnterFullscreen === "function"){
+      video.webkitEnterFullscreen();
+    }
+  });
+  document.addEventListener("fullscreenchange", syncExpandBtn);
+  document.addEventListener("webkitfullscreenchange", syncExpandBtn);
+  holder._bannerFullscreenCleanup = () => {
+    document.removeEventListener("fullscreenchange", syncExpandBtn);
+    document.removeEventListener("webkitfullscreenchange", syncExpandBtn);
+  };
+  syncExpandBtn();
   video.addEventListener("play", syncPlayBtn);
   video.addEventListener("pause", syncPlayBtn);
   syncPlayBtn();
@@ -496,6 +529,7 @@ function renderCategoryBanner(){
   });
 
   if(!data){
+    if(holder._bannerFullscreenCleanup) holder._bannerFullscreenCleanup();
     _activeBannerKey = "";
     holder.hidden = true;
     holder.innerHTML = "";
@@ -504,6 +538,7 @@ function renderCategoryBanner(){
   }
 
   if(bannerKey === _activeBannerKey && !holder.hidden) return;
+  if(holder._bannerFullscreenCleanup) holder._bannerFullscreenCleanup();
   _activeBannerKey = bannerKey;
 
   let mediaHtml = "";
@@ -513,9 +548,14 @@ function renderCategoryBanner(){
       <video class="category-banner__media" src="${data.video}" autoplay muted loop playsinline preload="auto"
         ${data.poster ? `poster="${data.poster}"` : ""}>
       </video>
-      <button type="button" class="category-banner__toggle" aria-label="Pausar video" title="Pausar">
-        ${BANNER_ICON_PAUSE}
-      </button>`;
+      <div class="category-banner__controls">
+        <button type="button" class="category-banner__toggle" aria-label="Pausar video" title="Pausar">
+          ${BANNER_ICON_PAUSE}
+        </button>
+        <button type="button" class="category-banner__expand" aria-label="Ver video en pantalla completa" title="Pantalla completa">
+          ${BANNER_ICON_EXPAND}
+        </button>
+      </div>`;
   } else if(data.poster){
     mediaHtml = `<img class="category-banner__media" src="${data.poster}" alt="">`;
   }
@@ -662,6 +702,7 @@ let smartSkuOptions = [];
 let smartSkuPromise = null;
 let smartProductContexts = [];
 let smartIndexLoaded = false;
+let smartAvailableInSearchResults = false;
 
 function parseWatts(str){
   if(str == null || str === "") return null;
@@ -704,10 +745,13 @@ function smartContextValues(value){
   return value == null || value === "" ? [] : [String(value).trim()];
 }
 
-/* En el catálogo general el switch siempre está disponible. Al navegar la
-   jerarquía, sólo se muestra si el contexto contiene algún producto Smart. */
+/* En el catálogo general el switch siempre está disponible. En una búsqueda
+   sólo se muestra si esa misma consulta contiene algún producto Smart. Al
+   navegar la jerarquía, depende del contexto seleccionado. */
 function hasSmartProductsInContext(selected, searching, smartEnabled){
-  if(smartEnabled || searching || !smartIndexLoaded) return true;
+  if(smartEnabled) return true;
+  if(searching) return smartAvailableInSearchResults;
+  if(!smartIndexLoaded) return true;
   const active = ["macrofamilia", "familia", "subfamilia", "categoria"]
     .map(field => [field, [...(selected[field] || [])]])
     .filter(([, values]) => values.length);
@@ -1175,6 +1219,25 @@ async function countExactSearchHits(query, filterBy, signal){
   }
 }
 
+async function countSearchHits(query, filterBy, signal){
+  const params = new URLSearchParams({
+    q: query,
+    query_by: "nombre_typesense,sku,descripcion",
+    per_page: "1",
+    page: "1"
+  });
+  if(filterBy) params.set("filter_by", filterBy);
+  try{
+    const res = await typesenseDocumentsSearch(params, signal);
+    if(!res.ok) return 0;
+    const data = await res.json();
+    return Number(data.found) || 0;
+  }catch(err){
+    if(err && err.name === "AbortError") throw err;
+    return 0;
+  }
+}
+
 async function attachSearchNearMiss(data, exactFound){
   if(!data || !state.query || !(Number(data.found) > 0) || exactFound !== 0) return data;
   const suggestion = suggestNearSearch(state.query, data.hits);
@@ -1192,7 +1255,7 @@ async function searchTypesense(){
   currentSearchController = new AbortController();
   const { signal } = currentSearchController;
 
-  if(state.smartOnly) await loadSmartSkuOptions();
+  if(state.smartOnly || state.query) await loadSmartSkuOptions();
 
   const activeMacro = [...state.selected.macrofamilia][0];
   const activeFamilia = state.selected.familia.size > 0;
@@ -1263,6 +1326,9 @@ async function searchTypesense(){
   });
   const filterBy = filterParts.join(" && ");
   if(filterParts.length) params.set("filter_by", filterBy);
+  const smartAvailabilityPromise = state.query && !state.smartOnly
+    ? countSearchHits(state.query, [...filterParts, smartFilterClause(true)].filter(Boolean).join(" && "), signal)
+    : Promise.resolve(state.smartOnly ? 1 : 0);
   const exactHitsPromise = state.query
     ? countExactSearchHits(state.query, filterBy, signal)
     : Promise.resolve(null);
@@ -1290,6 +1356,7 @@ async function searchTypesense(){
         const retryRes = await typesenseDocumentsSearch(params, signal);
         if(retryRes.ok){
           const retryData = await retryRes.json();
+          smartAvailableInSearchResults = (await smartAvailabilityPromise) > 0;
           const resolved = alphabetical ? await buildAlphabeticalResults(retryData, params, signal) : retryData;
           return attachSearchNearMiss(resolved, await exactHitsPromise);
         }
@@ -1298,6 +1365,7 @@ async function searchTypesense(){
       throw new Error(`Typesense ${res.status}: ${errText}`);
     }
     const data = await res.json();
+    smartAvailableInSearchResults = (await smartAvailabilityPromise) > 0;
     // Facets disyuntivos: cada grupo con checkbox calcula sus opciones sin
     // aplicarse a sí mismo, pero conserva todos los demás filtros activos.
     // Así las alternativas compatibles mantienen su conteo real y se pueden
