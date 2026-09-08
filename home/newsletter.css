@@ -557,6 +557,7 @@ body.mlg-newsletter-open {
     width: calc(100vw - 24px);
     min-height: 0;
     max-height: calc(100dvh - 24px);
+    padding-inline: 1rem;
     border-radius: 18px;
   }
 

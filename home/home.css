@@ -1911,7 +1911,7 @@ a.ml-news-card:focus-visible .ml-news-card__arrow {
 .ml-home .ml-hero__subtitle {
   max-width: 41rem;
   margin-bottom: 2rem;
-  font-size: clamp(1rem, 1.45vw, 1.25rem);
+  font-size: 16px;
   line-height: 1.5;
 }
 
@@ -2215,7 +2215,7 @@ a.ml-news-card:focus-visible .ml-news-card__arrow {
 }
 @media (max-width: 640px) {
   .ml-home .ml-hero__subtitle {
-    font-size: 1.125rem;
+    font-size: 16px;
   }
   .ml-featured-products {
     padding: 4rem 0 2rem;
@@ -2918,7 +2918,7 @@ a.ml-news-card:focus-visible .ml-news-card__arrow {
   }
 
   .ml-home .ml-hero__subtitle {
-    font-size: clamp(0.95rem, 1.25vw, 1.0625rem);
+    font-size: 16px;
   }
 }
 
@@ -2940,7 +2940,7 @@ a.ml-news-card:focus-visible .ml-news-card__arrow {
   }
 
   .ml-home .ml-hero__subtitle {
-    font-size: clamp(0.95rem, 2vw, 1.0625rem);
+    font-size: 16px;
   }
 }
 
@@ -2958,7 +2958,7 @@ a.ml-news-card:focus-visible .ml-news-card__arrow {
   }
 
   .ml-home .ml-hero__subtitle {
-    font-size: 1.125rem;
+    font-size: 16px;
   }
 
   .ml-home .ml-hero__metrics {
@@ -6035,7 +6035,7 @@ a.ml-news-card:focus-visible .ml-news-card__arrow {
   }
 
   .ml-home .ml-hero__subtitle {
-    font-size: 1.125rem;
+    font-size: 16px;
   }
 
   .ml-home .ml-conversion__intro > p,
@@ -7199,10 +7199,6 @@ a.ml-news-card:focus-visible .ml-news-card__arrow {
     font-size: clamp(2.15rem, 2.8vw, 2.55rem);
   }
 
-  .ml-home .ml-hero__copy {
-    padding-left: 1.35rem;
-  }
-
   .ml-home .ml-project-lines-concept__cards {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -7321,7 +7317,7 @@ a.ml-news-card:focus-visible .ml-news-card__arrow {
 
 @media (max-width: 1600px) {
   .ml-home .ml-project-lines-concept__inner.ml-shell {
-    width: min(100% - clamp(2rem, 8vw, 4rem), 1180px);
+    width: min(calc(100% - 96px), 1500px);
   }
 }
 
@@ -7397,8 +7393,8 @@ a.ml-news-card:focus-visible .ml-news-card__arrow {
   .ml-home .ml-project-lines-concept__explore {
     flex: 0 0 auto;
     margin-top: 2.5rem;
-    margin-bottom: 2.5rem;
-    padding-bottom: 0rem;
+    margin-bottom: 0;
+    padding-bottom: 16px;
   }
 }
 
