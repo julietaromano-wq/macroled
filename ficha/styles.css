@@ -52,6 +52,13 @@
   --gap-hero:clamp(28px,4.5vw,48px);
 }
 
+/* Achica la foto principal en desktop: le pasamos ancho de columna a
+   Info en vez de dejarlo como espacio muerto (mismo mecanismo fr de
+   siempre, solo que acá arrancamos de un --hero-gallery más chico). */
+@media (min-width:1101px){
+  :root{--hero-gallery:1.05fr;--gap-hero:clamp(40px,6vw,64px);}
+}
+
 *{box-sizing:border-box;}
 html{scroll-behavior:smooth;}
 body,button,input,select,textarea{
@@ -150,6 +157,9 @@ main{padding:calc(26px + clamp(12px,2vw,24px)) clamp(12px,2vw,24px) 0;}
   gap:var(--gap-hero);
   padding:var(--space-hero);
   align-items:start;
+}
+@media (min-width:1101px){
+  .hero{padding-bottom:clamp(56px,7vw,76px);}
 }
 
 /* Gallery — thumbs left, stage right, share under thumbs */
@@ -357,6 +367,9 @@ main{padding:calc(26px + clamp(12px,2vw,24px)) clamp(12px,2vw,24px) 0;}
 
 /* Info column — sin max-width fijo para aprovechar el ancho con galería más ancha */
 .hero .info{min-width:0;position:relative;z-index:1;padding:0 clamp(8px,1.5vw,20px);}
+@media (min-width:1101px){
+  .hero .info{padding:0 clamp(24px,3vw,44px);}
+}
 .eyebrow{
   display:block;margin:0 0 clamp(8px,1.5vw,12px);
   font-size:var(--fs-xs);font-weight:600;letter-spacing:.12em;text-transform:uppercase;
@@ -385,13 +398,13 @@ main{padding:calc(26px + clamp(12px,2vw,24px)) clamp(12px,2vw,24px) 0;}
 .sku-copy-btn{
   position:relative;
   display:inline-flex;align-items:center;justify-content:center;
-  margin-left:8px;padding:4px;border:0;background:#eef0f3;color:var(--muted);
+  margin-left:4px;padding:2px;border:0;background:transparent;color:#48525f;
   cursor:pointer;border-radius:6px;vertical-align:middle;line-height:0;
-  transition:color .15s ease,background-color .15s ease;
+  transition:color .15s ease;
 }
-.sku-copy-btn:hover{color:var(--ink);background:#e2e5ea;}
+.sku-copy-btn:hover{color:#141821;background:transparent;}
 .sku-copy-btn:focus-visible{outline:2px solid var(--ink);outline-offset:2px;}
-.sku-copy-btn.copied{color:#1a9c5b;}
+.sku-copy-btn.copied{color:#0086b5;}
 .sku-copy-btn .sku-copy-check{display:none;}
 .sku-copy-btn.copied .sku-copy-icon{display:none;}
 .sku-copy-btn.copied .sku-copy-check{display:inline-block;}
