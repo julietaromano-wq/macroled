@@ -1,8 +1,7 @@
 (function () {
   "use strict";
 
-  if (window.__ML_NEWSLETTER_INIT__) return;
-  window.__ML_NEWSLETTER_INIT__ = true;
+  if (window.__MLG_NEWSLETTER_INIT__) return;
 
   const DEFAULT_ENDPOINT = "https://n8n.coresagroup.com/webhook/newsletter-macroled";
 
@@ -13,16 +12,22 @@
   };
 
   function initNewsletter() {
-    const popup = document.getElementById("nlPopup");
-    const backdrop = document.getElementById("nlBackdrop");
-    const form = document.getElementById("nlForm");
-    const closeBtn = document.getElementById("nlClose");
-    const success = document.getElementById("nlSuccess");
-    const errorEl = document.getElementById("nlError");
-    const submitBtn = form ? form.querySelector(".nl-submit") : null;
+    const popup = document.getElementById("mlgNewsletterPopup");
+    const backdrop = document.getElementById("mlgNewsletterBackdrop");
+    const form = document.getElementById("mlgNewsletterForm");
+    const closeBtn = document.getElementById("mlgNewsletterClose");
+    const success = document.getElementById("mlgNewsletterSuccess");
+    const errorEl = document.getElementById("mlgNewsletterError");
+    const submitBtn = form ? form.querySelector(".mlg-newsletter-submit") : null;
     const interestTabs = form ? form.querySelector("[data-interest-tabs]") : null;
 
     if (!popup || !form) return;
+    if (window.__MLG_NEWSLETTER_INIT__) return;
+    window.__MLG_NEWSLETTER_INIT__ = true;
+
+    // Escape footer stacking contexts and page-specific ancestor styles.
+    if (backdrop) document.body.appendChild(backdrop);
+    document.body.appendChild(popup);
 
     let lastTrigger = null;
     let submitting = false;
@@ -30,13 +35,13 @@
     const getSelectedInterests = () => {
       if (!interestTabs) return [];
       return Array.prototype.map
-        .call(interestTabs.querySelectorAll('.nl-interest-tab[aria-pressed="true"]'), tab => INTEREST_HUBSPOT_MAP[tab.dataset.interest])
+        .call(interestTabs.querySelectorAll('.mlg-newsletter-interest-tab[aria-pressed="true"]'), tab => INTEREST_HUBSPOT_MAP[tab.dataset.interest])
         .filter(Boolean);
     };
 
     const clearInterestTabs = () => {
       if (!interestTabs) return;
-      interestTabs.querySelectorAll(".nl-interest-tab").forEach(tab => {
+      interestTabs.querySelectorAll(".mlg-newsletter-interest-tab").forEach(tab => {
         tab.setAttribute("aria-pressed", "false");
         tab.classList.remove("is-active");
       });
@@ -44,7 +49,7 @@
 
     if (interestTabs) {
       interestTabs.addEventListener("click", event => {
-        const tab = event.target.closest(".nl-interest-tab");
+        const tab = event.target.closest(".mlg-newsletter-interest-tab");
         if (!tab || !interestTabs.contains(tab)) return;
 
         const next = tab.getAttribute("aria-pressed") !== "true";
@@ -97,14 +102,14 @@
       }
       popup.hidden = false;
       popup.removeAttribute("hidden");
-      document.body.classList.add("newsletter-open");
+      document.body.classList.add("mlg-newsletter-open");
       requestAnimationFrame(() => {
         requestAnimationFrame(() => {
           popup.classList.add("is-open");
           if (backdrop) backdrop.classList.add("is-open");
         });
       });
-      const first = popup.querySelector("#nl-email");
+      const first = popup.querySelector("#mlg-newsletter-email");
       if (first) first.focus();
     };
 
@@ -112,7 +117,7 @@
       if (submitting) return;
       popup.classList.remove("is-open");
       if (backdrop) backdrop.classList.remove("is-open");
-      document.body.classList.remove("newsletter-open");
+      document.body.classList.remove("mlg-newsletter-open");
       const finish = () => {
         popup.hidden = true;
         if (backdrop) backdrop.hidden = true;
@@ -122,7 +127,7 @@
     };
 
     document.addEventListener("click", event => {
-      const button = event.target.closest("[data-newsletter-open]");
+      const button = event.target.closest("[data-mlg-newsletter-open], [data-newsletter-open]");
       if (!button) return;
 
       event.preventDefault();
@@ -143,8 +148,8 @@
 
       clearError();
 
-      const emailInput = form.querySelector("#nl-email");
-      const consent = form.querySelector("#nl-acepta");
+      const emailInput = form.querySelector("#mlg-newsletter-email");
+      const consent = form.querySelector("#mlg-newsletter-acepta");
       const email = (emailInput && emailInput.value ? emailInput.value : "").trim();
       const intereses = getSelectedInterests();
 
@@ -156,7 +161,7 @@
 
       if (!intereses.length) {
         showError("Seleccioná al menos un área de interés.");
-        interestTabs?.querySelector(".nl-interest-tab")?.focus();
+        interestTabs?.querySelector(".mlg-newsletter-interest-tab")?.focus();
         return;
       }
 

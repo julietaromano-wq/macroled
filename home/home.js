@@ -1423,7 +1423,6 @@
 
     if (solutionsSection) {
       const solutionsGrid = solutionsSection.querySelector("[data-categories-test-grid]");
-      let solutionsPending = false;
       solutionsSection.classList.add("ml-solutions-motion-ready");
       prepareCards(solutionsGrid, ".ml-category-card");
 
@@ -1444,25 +1443,11 @@
 
       const hideSolutions = () => {
         clearTimeout(solutionsSection._motionSettleTimer);
-        solutionsPending = false;
         solutionsSection.classList.remove("is-motion-visible", "is-motion-settled");
         solutionsGrid?.classList.remove("is-cards-refreshing", "is-cards-visible");
       };
 
-      const armSolutions = () => {
-        if (!solutionsPending) return;
-        solutionsPending = false;
-        showSolutions();
-      };
-
-      window.addEventListener("wheel", armSolutions, { passive: true });
-      window.addEventListener("touchmove", armSolutions, { passive: true });
-      window.addEventListener("keydown", event => {
-        if (["ArrowDown", "ArrowUp", "PageDown", "PageUp", "Home", "End", " "].includes(event.key)) {
-          armSolutions();
-        }
-      });
-
+      // Reveal on viewport entry, including when already visible on initial load.
       const observer = new IntersectionObserver(entries => {
         const entry = entries[0];
         if (!entry) return;
@@ -1470,9 +1455,8 @@
           hideSolutions();
           return;
         }
-        if (motionArmed) showSolutions();
-        else solutionsPending = true;
-      }, { threshold: 0.22, rootMargin: "0px 0px -10% 0px" });
+        showSolutions();
+      }, { threshold: 0, rootMargin: "0px" });
       observer.observe(solutionsSection);
 
       if (solutionsGrid) {
