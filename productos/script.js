@@ -1084,7 +1084,61 @@ async function loadMacrofamiliaOptions(){
    ========================================================= */
 const TS_FILTER_GET_MAX = 1800;
 
+// Same policy in both entry points: literal SKU prefixes, tolerant product text.
+function searchMatchOptions(isSku){
+  return {
+    query_by: isSku ? "sku" : "nombre_typesense,descripcion",
+    num_typos: isSku ? "0" : "2,1",
+    prefix: "true",
+    drop_tokens_threshold: isSku ? "0" : "1",
+    typo_tokens_threshold: "1",
+    drop_tokens_mode: "both_sides:3",
+    enable_typos_for_numerical_tokens: "false",
+    enable_typos_for_alpha_numerical_tokens: "false"
+  };
+}
+
+const catalogSearchProfiles = new Map();
+function resolveCatalogSearch(query){
+  query = String(query || "").trim();
+  if(!catalogSearchProfiles.has(query)){
+    const pending = (async () => {
+      let isSku = false;
+      // Verify against the SKU index, including alphabetic codes and prefixes.
+      if(query && !/\s/.test(query)){
+        const params = new URLSearchParams({
+          q: query, ...searchMatchOptions(true), filter_by: "tipo_registro:=producto",
+          per_page: "1", include_fields: "sku"
+        });
+        const res = await fetch(TS_HOST + "/collections/" + COLLECTION + "/documents/search?" + params, {
+          headers: { "X-TYPESENSE-API-KEY": TS_API_KEY }
+        });
+        if(!res.ok) throw new Error("Typesense " + res.status);
+        isSku = Number((await res.json()).found) > 0;
+      }
+      return { isSku, options: searchMatchOptions(isSku) };
+    })();
+    if(catalogSearchProfiles.size >= 50) catalogSearchProfiles.clear();
+    catalogSearchProfiles.set(query, pending);
+    pending.catch(() => { catalogSearchProfiles.delete(query); });
+  }
+  return catalogSearchProfiles.get(query);
+}
+
 async function typesenseDocumentsSearch(params, signal){
+  params = new URLSearchParams(params);
+  const query = params.get("q");
+  if(query && query !== "*"){
+    const profile = await resolveCatalogSearch(query);
+    Object.entries(profile.options).forEach(([key, value]) => params.set(key, String(value)));
+    if(profile.isSku){
+      params.set("filter_by", (params.get("filter_by") || BASE_FILTER)
+        .replace(/\s*&&\s*es_principal:true/g, ""));
+    }
+    if(params.get("sort_by") === "order:asc" && state.sortBy !== "alpha:asc"){
+      params.set("sort_by", "_text_match:desc,order:asc");
+    }
+  }
   const headers = { "X-TYPESENSE-API-KEY": TS_API_KEY };
   const filterBy = params.get("filter_by") || "";
   if(filterBy.length <= TS_FILTER_GET_MAX){
@@ -1147,78 +1201,6 @@ function escapeHtml(value){
   }[ch]));
 }
 
-function normalizeSuggestKey(value){
-  return String(value || "")
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, " ")
-    .trim();
-}
-
-function parseSearchWatts(value){
-  const match = String(value || "").match(/(\d+(?:[.,]\d+)?)\s*w\b/i);
-  return match ? Number(String(match[1]).replace(",", ".")) : null;
-}
-
-function productSearchName(doc){
-  return String((doc && (doc.nombre_typesense || doc.nombre)) || "").trim();
-}
-
-function suggestNearSearch(query, hits){
-  const docs = (hits || []).map(hit => hit.document || hit).filter(Boolean);
-  if(!docs.length) return "";
-  const queryWatts = parseSearchWatts(query);
-  if(queryWatts != null){
-    let bestName = "";
-    let bestDiff = Infinity;
-    docs.forEach(doc => {
-      const watts = parseSearchWatts(productSearchName(doc)) ?? parseSearchWatts(doc.potencia);
-      if(watts == null) return;
-      const diff = Math.abs(watts - queryWatts);
-      if(diff < bestDiff){
-        bestDiff = diff;
-        bestName = productSearchName(doc);
-      }
-    });
-    if(bestName) return bestName;
-  }
-  const bases = Object.create(null);
-  docs.slice(0, 12).forEach(doc => {
-    const name = productSearchName(doc);
-    const base = name.replace(/\s*\d+(?:[.,]\d+)?\s*w\b/ig, "").replace(/\s{2,}/g, " ").trim();
-    const key = normalizeSuggestKey(base);
-    if(!key) return;
-    if(!bases[key]) bases[key] = { name: base, count: 0 };
-    bases[key].count += 1;
-  });
-  const top = Object.values(bases).sort((a, b) => b.count - a.count)[0];
-  return (top && top.name) || productSearchName(docs[0]);
-}
-
-async function countExactSearchHits(query, filterBy, signal){
-  const params = new URLSearchParams({
-    q: query,
-    query_by: "nombre_typesense,sku,descripcion",
-    per_page: "1",
-    page: "1",
-    num_typos: "0",
-    prefix: "false",
-    drop_tokens_threshold: "0",
-    typo_tokens_threshold: "100"
-  });
-  if(filterBy) params.set("filter_by", filterBy);
-  try{
-    const res = await typesenseDocumentsSearch(params, signal);
-    if(!res.ok) return null;
-    const data = await res.json();
-    return Number(data.found) || 0;
-  }catch(err){
-    if(err && err.name === "AbortError") throw err;
-    return null;
-  }
-}
-
 async function countSearchHits(query, filterBy, signal){
   const params = new URLSearchParams({
     q: query,
@@ -1236,14 +1218,6 @@ async function countSearchHits(query, filterBy, signal){
     if(err && err.name === "AbortError") throw err;
     return 0;
   }
-}
-
-async function attachSearchNearMiss(data, exactFound){
-  if(!data || !state.query || !(Number(data.found) > 0) || exactFound !== 0) return data;
-  const suggestion = suggestNearSearch(state.query, data.hits);
-  if(!suggestion || normalizeSuggestKey(suggestion) === normalizeSuggestKey(state.query)) return data;
-  data.nearMiss = { query: state.query, suggestion };
-  return data;
 }
 
 async function searchTypesense(){
@@ -1329,9 +1303,6 @@ async function searchTypesense(){
   const smartAvailabilityPromise = state.query && !state.smartOnly
     ? countSearchHits(state.query, [...filterParts, smartFilterClause(true)].filter(Boolean).join(" && "), signal)
     : Promise.resolve(state.smartOnly ? 1 : 0);
-  const exactHitsPromise = state.query
-    ? countExactSearchHits(state.query, filterBy, signal)
-    : Promise.resolve(null);
   const alphabetical = state.sortBy === "alpha:asc";
   if(alphabetical){
     params.set("per_page", "250");
@@ -1358,7 +1329,7 @@ async function searchTypesense(){
           const retryData = await retryRes.json();
           smartAvailableInSearchResults = (await smartAvailabilityPromise) > 0;
           const resolved = alphabetical ? await buildAlphabeticalResults(retryData, params, signal) : retryData;
-          return attachSearchNearMiss(resolved, await exactHitsPromise);
+          return resolved;
         }
       }
       const errText = await res.text();
@@ -1399,7 +1370,7 @@ async function searchTypesense(){
       data.facet_counts.push(...disjunctiveFacets.filter(Boolean));
     }
     const resolved = alphabetical ? await buildAlphabeticalResults(data, params, signal) : data;
-    return attachSearchNearMiss(resolved, await exactHitsPromise);
+    return resolved;
   }catch(err){
     // AbortError es esperado (cancelamos nosotros mismos la request vieja),
     // no es un error real ni hay que mostrar el mensaje de "no se pudo conectar"
@@ -2631,11 +2602,117 @@ if("ResizeObserver" in window){
     compareBarObserver.observe(compareBar);
   }
 }
+let compareHelpCleanup = null;
+const COMPARE_HELP_SEEN_KEY = 'macroled_compare_help_acknowledged_v3';
+const COMPARE_HELP_RETURN_KEY = 'macroled_compare_help_from_ficha';
+let compareHelpSeen = false;
+try { compareHelpSeen = localStorage.getItem(COMPARE_HELP_SEEN_KEY) === '1'; } catch (_) {}
+
+function maybeShowCompareReturnHelp(){
+  if(compareHelpCleanup) return;
+  let returning = false;
+  try { returning = sessionStorage.getItem(COMPARE_HELP_RETURN_KEY) === '1'; } catch (_) {}
+  if(!returning) return;
+  const count = window.MacroledCompare.getCompareList().length;
+  if(compareHelpSeen || !count || count >= COMPARE_MAX){
+    try { sessionStorage.removeItem(COMPARE_HELP_RETURN_KEY); } catch (_) {}
+    return;
+  }
+  showCompareHelp(null);
+}
+window.addEventListener('pageshow', () => requestAnimationFrame(maybeShowCompareReturnHelp));
+let compareReturnHelpFrame = 0;
+window.addEventListener('scroll', () => {
+  if(compareHelpSeen || compareReturnHelpFrame) return;
+  compareReturnHelpFrame = requestAnimationFrame(() => {
+    compareReturnHelpFrame = 0;
+    maybeShowCompareReturnHelp();
+  });
+}, {passive:true});
+
+function closeCompareHelp(){
+  if(compareHelpCleanup) compareHelpCleanup();
+}
+
+function showCompareHelp(trigger){
+  if(compareHelpSeen) return;
+  closeCompareHelp();
+  const barTop = document.getElementById("compareBar").getBoundingClientRect().top;
+  const candidates = [...document.querySelectorAll('.compare-checkbox:not(:checked):not(:disabled)')]
+    .filter(cb => (cb.closest('.compare-action') || cb).getClientRects().length);
+  const visible = candidates.find(cb => {
+    const rect = (cb.closest('.compare-action') || cb).getBoundingClientRect();
+    return rect.top > 140 && rect.bottom < barTop && rect.left >= 0 && rect.right <= innerWidth;
+  });
+  const checkbox = visible || candidates[0];
+  if(!checkbox) return;
+  const anchor = checkbox.closest('.compare-action') || checkbox;
+  const bubble = document.createElement('div');
+  bubble.id = 'compareSelectionHelp';
+  bubble.className = 'compare-help-bubble';
+  bubble.setAttribute('role', 'dialog');
+  bubble.setAttribute('aria-label', 'Ayuda para comparar productos');
+  bubble.setAttribute('aria-describedby', 'compareHelpText');
+  bubble.innerHTML = '<p id="compareHelpText">Marcá “Comparar” para agregar otro producto.</p><button type="button">Entendido</button>';
+  document.body.appendChild(bubble);
+  const previousDescription = checkbox.getAttribute('aria-describedby');
+  checkbox.setAttribute('aria-describedby', [previousDescription, 'compareHelpText'].filter(Boolean).join(' '));
+  anchor.classList.add('compare-help-target');
+  let frame;
+  const position = () => {
+    if(!anchor.isConnected){ closeCompareHelp(); return; }
+    const rect = anchor.getBoundingClientRect();
+    const size = bubble.getBoundingClientRect();
+    const left = Math.max(12, Math.min(innerWidth - size.width - 12, rect.left + rect.width / 2 - size.width / 2));
+    const below = rect.top < size.height + 24;
+    const top = below ? rect.bottom + 12 : rect.top - size.height - 12;
+    bubble.style.left = left + 'px';
+    bubble.style.top = Math.max(12, Math.min(innerHeight - size.height - 12, top)) + 'px';
+    bubble.style.setProperty('--tip-arrow-x', Math.max(16, Math.min(size.width - 16, rect.left + rect.width / 2 - left)) + 'px');
+    bubble.classList.toggle('is-below', below);
+  };
+  const schedule = () => { cancelAnimationFrame(frame); frame = requestAnimationFrame(position); };
+  const dismiss = () => {
+    try { sessionStorage.removeItem(COMPARE_HELP_RETURN_KEY); } catch (_) {}
+    closeCompareHelp();
+  };
+  const outside = e => { if(!bubble.contains(e.target) && !trigger?.contains(e.target)) dismiss(); };
+  const escape = e => { if(e.key === 'Escape'){ dismiss(); checkbox.focus({preventScroll:true}); } };
+  compareHelpCleanup = () => {
+    compareHelpCleanup = null;
+    cancelAnimationFrame(frame);
+    bubble.remove();
+    anchor.classList.remove('compare-help-target');
+    if(previousDescription === null) checkbox.removeAttribute('aria-describedby');
+    else checkbox.setAttribute('aria-describedby', previousDescription);
+    window.removeEventListener('scroll', schedule, true);
+    window.removeEventListener('resize', schedule);
+    document.removeEventListener('pointerdown', outside);
+    document.removeEventListener('keydown', escape);
+  };
+  bubble.querySelector('button').onclick = () => {
+    compareHelpSeen = true;
+    try { localStorage.setItem(COMPARE_HELP_SEEN_KEY, '1'); } catch (_) {}
+    dismiss();
+    checkbox.focus({preventScroll:true});
+  };
+  window.addEventListener('scroll', schedule, true);
+  window.addEventListener('resize', schedule);
+  document.addEventListener('pointerdown', outside);
+  document.addEventListener('keydown', escape);
+  const rect = anchor.getBoundingClientRect();
+  if(rect.top < 140 || rect.bottom >= barTop) anchor.scrollIntoView({block:'center',behavior:'instant'});
+  position();
+  if(trigger) bubble.querySelector('button').focus({preventScroll:true});
+}
+
 function renderCompareBar(){
   const bar = document.getElementById("compareBar");
   const body = document.getElementById("compareBarBody");
   const countEl = document.getElementById("compareCount");
   const list = window.MacroledCompare.getCompareList();
+  if(list.length !== compareBarPrevCount) closeCompareHelp();
+  requestAnimationFrame(maybeShowCompareReturnHelp);
 
   if(!list.length){
     bar.style.display = "none";
@@ -2674,13 +2751,13 @@ function renderCompareBar(){
   }).join("");
 
   const emptySlots = Array.from({ length: Math.max(0, COMPARE_MAX - list.length) })
-    .map(() => `<div class="compare-slot-empty">+</div>`).join("");
+    .map(() => `<button type="button" class="compare-slot-empty compare-slot-help" data-compare-help aria-label="Cómo agregar otro producto a la comparación"></button>`).join("");
 
   const ctaDisabled = list.length < 2;
   body.innerHTML = `
-    <div class="compare-items">${chips}${emptySlots}</div>
+    <div class="compare-selection"><div class="compare-items">${chips}${emptySlots}</div></div>
     <div class="compare-actions">
-      <a href="${buildCompareUrl()}" class="compare-cta${ctaDisabled ? " disabled" : ""}"
+      <a ${ctaDisabled ? 'role="link" aria-disabled="true" tabindex="-1"' : `href="${buildCompareUrl()}"`} class="compare-cta${ctaDisabled ? " disabled" : ""}"
          title="${ctaDisabled ? "Agregá al menos 2 productos para comparar" : ""}">
         ${ICON_COMPARE} Comparar
       </a>
@@ -2691,6 +2768,9 @@ function renderCompareBar(){
     </div>
   `;
 
+  body.querySelectorAll("[data-compare-help]").forEach(btn => {
+    btn.addEventListener("click", () => showCompareHelp(btn));
+  });
   body.querySelectorAll("[data-remove]").forEach(btn => {
     btn.addEventListener("click", () => {
       window.MacroledCompare.removeFromCompare(btn.dataset.remove);
@@ -2800,6 +2880,8 @@ function prioritizeHighbayHits(hits){
 }
 
 function renderCards(hits, found){
+  closeCompareHelp();
+  requestAnimationFrame(maybeShowCompareReturnHelp);
   const grid = document.getElementById("grid");
   const orderedHits = prioritizeHighbayHits(hits);
   if(!orderedHits || !orderedHits.length){

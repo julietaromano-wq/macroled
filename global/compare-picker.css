@@ -1,0 +1,100 @@
+/* Estilos del selector reutilizado de comparar/styles.css. */
+.macroled-compare-picker {
+ --line:#e5e7eb;--line-strong:#d8dce1;--radius-sm:8px;--navy:#16294f;--ink:#202631;--ink-soft:#657084;
+ --bg-card:#f5f6f8;--fill-soft:#f5f6f8;--white:#fff;--btn-blue:#007eae;--btn-blue-dark:#006489;--brand:#00baf2;--tint:#eef9fd;
+ --fs-lg:18px;--fs-base:14px;--fs-sm:13px;--fs-xs:12px;--font:'Noto Sans',Arial,sans-serif;
+ --shadow-md:0 16px 48px #10182833;--focus-ring:0 0 0 3px #00baf233;--btn-dur:.15s;--ease:ease;
+ font-family:var(--font);line-height:1.4;color:var(--ink);
+}
+  .macroled-compare-picker{
+    position:fixed;inset:0;background:rgba(10,14,25,.5);display:none;align-items:center;justify-content:center;z-index:10080;padding:20px;
+  }
+  .macroled-compare-picker.open{display:flex;}
+  .macroled-compare-picker .modal-card{
+    background:#fff;border-radius:14px;width:100%;max-width:560px;max-height:82vh;display:flex;flex-direction:column;
+    box-shadow:var(--shadow-md);overflow:hidden;
+  }
+  .macroled-compare-picker .modal-head{display:flex;align-items:center;justify-content:space-between;padding:20px 22px;border-bottom:1px solid var(--line);}
+  .macroled-compare-picker .modal-head h3{margin:0;font-size:var(--fs-lg);font-weight:700;color:var(--navy);}
+  .macroled-compare-picker .modal-head .close{border:none;background:none;cursor:pointer;color:var(--ink-soft);width:30px;height:30px;display:flex;align-items:center;justify-content:center;border-radius:8px;}
+  .macroled-compare-picker .modal-head .close:hover{background:var(--bg-card);}
+  .macroled-compare-picker .modal-search{padding:16px 22px;border-bottom:1px solid var(--line);}
+  .macroled-compare-picker .modal-search input{
+    width:100%;border:1px solid var(--line);border-radius:var(--radius-sm);padding:10px 14px;font-size:var(--fs-base);
+    font-family:inherit;outline:none;transition:border-color .12s,box-shadow .12s;color:var(--ink);
+  }
+  .macroled-compare-picker .modal-search input:focus{border-color:var(--brand);box-shadow:var(--focus-ring);}
+  .macroled-compare-picker .modal-list{flex:1;overflow-y:auto;padding:6px 10px;}
+  .macroled-compare-picker .modal-item{
+    display:flex !important;
+    flex-direction:row !important;
+    align-items:center !important;
+    gap:14px;
+    padding:10px 12px;
+    border-radius:10px;
+    width:100%;
+    box-sizing:border-box;
+  }
+  .macroled-compare-picker .modal-item:hover{background:var(--fill-soft);}
+  .macroled-compare-picker .modal-item .mi-thumb{
+    width:44px;height:44px;border-radius:9px;
+    display:flex !important;align-items:center;justify-content:center;
+    overflow:hidden;flex:none !important;
+    background:var(--fill-soft);
+  }
+  .macroled-compare-picker .modal-item .mi-thumb img{width:100%;height:100%;object-fit:contain;padding:10%;box-sizing:border-box;}
+  .macroled-compare-picker .modal-item .mi-info{
+    flex:1 1 auto !important;
+    min-width:0 !important;
+    display:flex !important;
+    flex-direction:column !important;
+    align-items:flex-start !important;
+    justify-content:center !important;
+    gap:2px;
+    text-align:left;
+  }
+  .macroled-compare-picker .modal-item .mi-name{
+    display:block !important;
+    width:100%;
+    font-size:var(--fs-base);font-weight:600;color:var(--navy);
+    line-height:1.3;
+  }
+  .macroled-compare-picker .modal-item .mi-sku{
+    display:block !important;
+    width:100%;
+    font-size:var(--fs-xs);font-weight:500;color:#858484;
+    line-height:1.3;
+  }
+  .macroled-compare-picker .modal-item .add-btn{
+    flex:none !important;display:inline-flex !important;align-items:center;justify-content:center;
+    min-height:36px;border:1px solid var(--line-strong);background:var(--white);border-radius:var(--radius-sm);
+    padding:8px 14px;font-family:var(--font);font-size:var(--fs-sm);font-weight:600;color:var(--ink);cursor:pointer;
+    transition:border-color var(--btn-dur) var(--ease),color var(--btn-dur) var(--ease),background var(--btn-dur) var(--ease);
+    white-space:nowrap;
+  }
+  .macroled-compare-picker .modal-item .add-btn:hover{border-color:var(--btn-blue);color:var(--btn-blue);background:var(--tint);}
+  .macroled-compare-picker .modal-item .add-btn:disabled{opacity:.45;cursor:not-allowed;}
+  .macroled-compare-picker .modal-item .added{font-size:var(--fs-sm);color:var(--ink-soft);flex:none !important;white-space:nowrap;}
+  .macroled-compare-picker .modal-empty{padding:40px 20px;text-align:center;color:var(--ink-soft);font-size:var(--fs-base);}
+  .macroled-compare-picker .modal-foot{padding:14px 22px;border-top:1px solid var(--line);text-align:center;}
+  .macroled-compare-picker .modal-foot a{font-size:var(--fs-sm);font-weight:600;color:var(--btn-blue);cursor:pointer;}
+  .macroled-compare-picker .modal-foot a:hover{color:var(--btn-blue-dark);}
+
+body.compare-picker-open{overflow:hidden;}
+body > .macroled-compare-picker{z-index:100020 !important;}
+.macroled-compare-picker *{box-sizing:border-box;}
+.macroled-compare-picker button,.macroled-compare-picker input{font-family:inherit;}
+.macroled-compare-picker .modal-list{min-height:0;overscroll-behavior:contain;}
+.macroled-compare-picker .mi-name{overflow-wrap:anywhere;}
+.macroled-compare-picker .modal-foot button{border:0;background:none;font-size:13px;font-weight:600;color:#007eae;cursor:pointer;}
+.macroled-compare-picker :focus-visible{outline:2px solid #007eae;outline-offset:3px;}
+@media(max-width:640px){
+ body > .macroled-compare-picker{padding:0;align-items:flex-end;}
+ .macroled-compare-picker .modal-card{max-width:none;max-height:90dvh;border-radius:16px 16px 0 0;}
+ .macroled-compare-picker .modal-head,.macroled-compare-picker .modal-search{padding:16px;}
+ .macroled-compare-picker .modal-search input{font-size:16px;}
+ .macroled-compare-picker .modal-item{gap:10px;padding:12px 6px;}
+ .macroled-compare-picker .add-btn{min-height:44px;}
+ .macroled-compare-picker .modal-foot{padding-bottom:max(16px,env(safe-area-inset-bottom));}
+}
+@media print{.macroled-compare-picker{display:none !important;}}

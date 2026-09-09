@@ -151,14 +151,14 @@
     const emptySlots = Array.from({
       length: Math.max(0, COMPARE_MAX - list.length),
     })
-      .map(() => `<div class="compare-slot-empty">+</div>`)
+      .map(() => `<button type="button" class="compare-slot-empty compare-slot-action compare-slot-add" data-compare-add aria-label="Agregar producto a la comparación" title="Agregar producto"><span aria-hidden="true">+</span></button>`)
       .join("");
 
     const ctaDisabled = list.length < 2;
     body.innerHTML = `
       <div class="compare-items">${chips}${emptySlots}</div>
       <div class="compare-actions">
-        <a href="${buildCompareUrl()}" class="compare-cta${ctaDisabled ? " disabled" : ""}"
+        <a ${ctaDisabled ? 'role="link" aria-disabled="true" tabindex="-1"' : `href="${buildCompareUrl()}"`} class="compare-cta${ctaDisabled ? " disabled" : ""}"
            title="${ctaDisabled ? "Agregá al menos 2 productos para comparar" : ""}">
           ${ICON_COMPARE} Comparar
         </a>
@@ -168,6 +168,25 @@
         </button>
       </div>
     `;
+
+    body.querySelectorAll("[data-compare-add]").forEach(button => {
+      button.addEventListener("click", () => {
+        window.MacroledComparePicker.open({
+          search: query => window.MacroledComparePicker.search(query),
+          isSelected: sku => window.MacroledCompare.isInCompare(sku),
+          atLimit: () => window.MacroledCompare.getCompareList().length >= COMPARE_MAX,
+          add: doc => {
+            window.MacroledCompare.addToCompare({
+              sku: doc.sku || doc.id,
+              nombre: doc.nombre_typesense || "",
+              img: window.MacroledComparePicker.parseImages(doc)[0] || ""
+            });
+            renderCompareBar();
+            syncCompareCheckboxes();
+          }
+        });
+      });
+    });
 
     body.querySelectorAll("[data-remove]").forEach((btn) => {
       btn.addEventListener("click", () => {
@@ -249,6 +268,21 @@
   }
 
   function init() {
+    // Breadcrumb, enlaces al catálogo y Atrás (incluido bfcache).
+    const rememberCompareReturn = () => {
+      try {
+        const count = window.MacroledCompare.getCompareList().length;
+        if(count > 0 && count < COMPARE_MAX) sessionStorage.setItem('macroled_compare_help_from_ficha', '1');
+        else sessionStorage.removeItem('macroled_compare_help_from_ficha');
+      } catch (_) {}
+    };
+    window.addEventListener('pagehide', rememberCompareReturn);
+    document.addEventListener('click', event => {
+      const link = event.target.closest('a[href]');
+      if(!link) return;
+      const url = new URL(link.href, location.href);
+      if(url.origin === location.origin && /\/(?:nuevo-)?productos\/?$/.test(url.pathname)) rememberCompareReturn();
+    });
     bindCurrentProduct();
     renderCompareBar();
     syncCompareCheckboxes();

@@ -643,34 +643,9 @@ function escAttr(s){
 }
 
 async function searchTypesenseModal(query){
-  const params = new URLSearchParams({
-    q: query && query.trim() ? query.trim() : "*",
-    query_by: "nombre_typesense,sku,descripcion",
-    filter_by: BASE_FILTER,
-    include_fields: COMPARE_FIELDS,
-    per_page: "20",
-    page: "1"
+  return window.MacroledComparePicker.search(query, {
+    fields: COMPARE_FIELDS
   });
-
-  // si ya hay productos agregados, los de su misma macrofamilia se
-  // priorizan en el resultado (sin dejar de mostrar el resto: no es un
-  // filtro, solo reordena)
-  const boostFamilies = [...new Set(comparedProducts.map(p => p.macrofamilia).filter(Boolean))];
-  if(boostFamilies.length){
-    const escaped = boostFamilies.map(f => `\`${f}\``).join(",");
-    params.set("sort_by", `_eval(macrofamilia:=[${escaped}]):desc,_text_match:desc`);
-  }
-
-  const url = `${TS_HOST}/collections/${COLLECTION}/documents/search?${params.toString()}`;
-  try{
-    const res = await fetch(url, { headers: { "X-TYPESENSE-API-KEY": TS_API_KEY } });
-    if(!res.ok) throw new Error(`Typesense ${res.status}`);
-    const data = await res.json();
-    return (data.hits || []).map(h => h.document);
-  }catch(err){
-    console.error("Error buscando en Typesense:", err);
-    return null; // null = error de conexión, distinto de [] = sin resultados
-  }
 }
 
 const COMPARE_MAX = 3;
@@ -926,84 +901,22 @@ function render(){
 /* =========================================================
    MODAL "Buscar producto para comparar"
    ========================================================= */
-let modalSearchTimer = null;
-let modalCurrentDocs = [];
-
-async function renderModalList(query){
-  const list = document.getElementById("modalList");
-  list.innerHTML = `<div class="modal-empty">Buscando…</div>`;
-
-  const docs = await searchTypesenseModal(query);
-
-  if(docs === null){
-    list.innerHTML = `<div class="modal-empty">No se pudo conectar con Typesense. Revisá la consola para más detalle.</div>`;
-    return;
-  }
-  modalCurrentDocs = docs;
-
-  if(!docs.length){
-    list.innerHTML = `<div class="modal-empty">No encontramos productos con ese criterio.</div>`;
-    return;
-  }
-
-  list.innerHTML = docs.map(doc => {
-    const img = parseImages(doc)[0] || "";
-    const sku = doc.sku || doc.id || "";
-    const already = comparedProducts.some(cp => cp.principalSku === sku || cp.sku === sku);
-    const disabledAtLimit = !already && comparedProducts.length >= COMPARE_MAX;
-    const action = already
-      ? `<span class="added">Ya agregado</span>`
-      : `<button class="add-btn" data-sku="${escAttr(sku)}" ${disabledAtLimit ? "disabled" : ""}>+ Agregar</button>`;
-    return `
-      <div class="modal-item">
-        <div class="mi-thumb">${img ? `<img src="${escAttr(img)}" alt="" loading="lazy" onerror="this.remove()">` : ""}</div>
-        <div class="mi-info">
-          <div class="mi-name">${doc.nombre_typesense || "Producto sin nombre"}</div>
-          <div class="mi-sku">${sku}</div>
-        </div>
-        ${action}
-      </div>`;
-  }).join("");
-
-  list.querySelectorAll("[data-sku]").forEach(btn => {
-    btn.addEventListener("click", async () => {
-      if(comparedProducts.length >= COMPARE_MAX) return;
-      const doc = modalCurrentDocs.find(d => (d.sku || d.id) === btn.dataset.sku);
-      if(!doc) return;
+function openModal(){
+  window.MacroledComparePicker.open({
+    search: searchTypesenseModal,
+    isSelected: sku => comparedProducts.some(p => p.principalSku === sku || p.sku === sku),
+    atLimit: () => comparedProducts.length >= COMPARE_MAX,
+    add: async doc => {
       const sku = doc.sku || doc.id || "";
-      const imgs = parseImages(doc);
       const hydrated = await hydrateComparedProduct(doc, sku, { principalSku: sku });
+      if (comparedProducts.length >= COMPARE_MAX || comparedProducts.some(p => p.principalSku === sku || p.sku === sku)) return;
       comparedProducts.push(hydrated);
-      window.MacroledCompare.addToCompare({ sku, nombre: hydrated.name || "", img: hydrated.img || imgs[0] || "" });
-      closeModal();
+      window.MacroledCompare.addToCompare({ sku, nombre: hydrated.name || "", img: hydrated.img || parseImages(doc)[0] || "" });
       render();
-    });
+    }
   });
 }
-
-function openModal(){
-  document.getElementById("modalOverlay").classList.add("open");
-  document.getElementById("modalSearchInput").value = "";
-  renderModalList("");
-  document.getElementById("modalSearchInput").focus();
-}
-function closeModal(){
-  document.getElementById("modalOverlay").classList.remove("open");
-}
-
-document.getElementById("modalClose").addEventListener("click", closeModal);
-document.getElementById("modalOverlay").addEventListener("click", (e) => {
-  if(e.target.id === "modalOverlay") closeModal();
-});
-document.getElementById("modalSearchInput").addEventListener("input", (e) => {
-  clearTimeout(modalSearchTimer);
-  const val = e.target.value;
-  modalSearchTimer = setTimeout(() => renderModalList(val), 250);
-});
-document.getElementById("viewAllLink").addEventListener("click", () => {
-  document.getElementById("modalSearchInput").value = "";
-  renderModalList("");
-});
+function closeModal(){ window.MacroledComparePicker.close(); }
 
 /* =========================================================
    TOOLBAR — imprimir

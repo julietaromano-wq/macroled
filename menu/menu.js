@@ -980,102 +980,38 @@ if (typeof module !== "undefined") module.exports = MEGAMENU_DATA;
       .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
   }
 
-  // Búsqueda del menú: todos los productos (no solo es_principal / "producto final").
+  // Text searches show principal products; SKU searches include variants.
   var TS_FILTER = "tipo_registro:=producto";
-  var TS_QUERY_BY = "nombre_typesense,sku,descripcion";
-  var TS_SORT_BY = "order:asc";
   var CDN_HOST = "https://d1zltvqju4u8ql.cloudfront.net";
 
-  function normalizeSuggestKey(value) {
-    return String(value || "")
-      .normalize("NFD")
-      .replace(/[\u0300-\u036f]/g, "")
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, " ")
-      .trim();
-  }
-
-  function parseSearchWatts(value) {
-    var match = String(value || "").match(/(\d+(?:[.,]\d+)?)\s*w\b/i);
-    return match ? Number(String(match[1]).replace(",", ".")) : null;
-  }
-
-  function suggestNearSearch(query, hits) {
-    var docs = (hits || []).map(function (hit) { return hit.document || hit; }).filter(Boolean);
-    if (!docs.length) return "";
-    var queryWatts = parseSearchWatts(query);
-    if (queryWatts != null) {
-      var bestName = "";
-      var bestDiff = Infinity;
-      docs.forEach(function (doc) {
-        var watts = parseSearchWatts(productName(doc));
-        if (watts == null) watts = parseSearchWatts(doc.potencia);
-        if (watts == null) return;
-        var diff = Math.abs(watts - queryWatts);
-        if (diff < bestDiff) {
-          bestDiff = diff;
-          bestName = productName(doc);
-        }
-      });
-      if (bestName) return bestName;
-    }
-    var bases = {};
-    docs.slice(0, 12).forEach(function (doc) {
-      var name = productName(doc);
-      var base = name.replace(/\s*\d+(?:[.,]\d+)?\s*w\b/ig, "").replace(/\s{2,}/g, " ").trim();
-      var key = normalizeSuggestKey(base);
-      if (!key) return;
-      if (!bases[key]) bases[key] = { name: base, count: 0 };
-      bases[key].count += 1;
-    });
-    var top = Object.keys(bases).map(function (k) { return bases[k]; }).sort(function (a, b) { return b.count - a.count; })[0];
-    return (top && top.name) || productName(docs[0]);
-  }
-
-  function isNearMissSearch(query, exactFound, hits) {
-    if (exactFound !== 0 || !(hits && hits.length)) return false;
-    var suggestion = suggestNearSearch(query, hits);
-    return !!(suggestion && normalizeSuggestKey(suggestion) !== normalizeSuggestKey(query));
-  }
-
-  function searchExactCount(tsClient, query) {
-    return tsClient.collections("Macroled_Prueba").documents().search({
-      q: query,
-      query_by: TS_QUERY_BY,
-      filter_by: TS_FILTER,
-      per_page: 1,
-      num_typos: 0,
-      prefix: false,
-      drop_tokens_threshold: 0,
-      typo_tokens_threshold: 100,
-    }).then(function (result) {
-      return Number(result.found) || 0;
-    }).catch(function () {
-      return null;
-    });
+  // Same policy in both entry points: literal SKU prefixes, tolerant product text.
+  function searchMatchOptions(isSku){
+    return {
+      query_by: isSku ? "sku" : "nombre_typesense,descripcion",
+      num_typos: isSku ? "0" : "2,1",
+      prefix: "true",
+      drop_tokens_threshold: isSku ? "0" : "1",
+      typo_tokens_threshold: "1",
+      drop_tokens_mode: "both_sides:3",
+      enable_typos_for_numerical_tokens: "false",
+      enable_typos_for_alpha_numerical_tokens: "false"
+    };
   }
 
   function searchRelaxedHits(tsClient, query) {
-    return tsClient.collections("Macroled_Prueba").documents().search({
-      q: query,
-      query_by: TS_QUERY_BY,
-      filter_by: TS_FILTER,
-      sort_by: TS_SORT_BY,
-      per_page: 5,
+    var documents = tsClient.collections("Macroled_Prueba").documents();
+    var skuProbe = query && !/\s/.test(query)
+      ? documents.search(Object.assign({ q: query, filter_by: TS_FILTER, per_page: 1, include_fields: "sku" }, searchMatchOptions(true)))
+      : Promise.resolve({ found: 0 });
+    return skuProbe.then(function (probe) {
+      var isSku = Number(probe.found) > 0;
+      return documents.search(Object.assign({
+        q: query,
+        filter_by: TS_FILTER + (isSku ? "" : " && es_principal:true"),
+        sort_by: "_text_match:desc,order:asc",
+        per_page: 5
+      }, searchMatchOptions(isSku)));
     });
-  }
-
-  function nearMissBannerHtml(query, suggestion, suggestHref) {
-    return (
-      '<div class="ts-near-miss">' +
-        '<div class="ts-near-miss__box">' +
-          '<p class="ts-near-miss__lead"><span class="ts-near-miss__icon" aria-hidden="true">!</span><span>No se encontraron resultados para: ' + esc(query) + "</span></p>" +
-          '<p class="ts-near-miss__indent">¿Quizás quisiste decir?</p>' +
-          '<p class="ts-near-miss__indent"><a class="ts-near-miss__suggest" href="' + esc(suggestHref) + '">' + esc(suggestion) + "</a></p>" +
-        "</div>" +
-        '<p class="ts-near-miss__subtitle">Productos relacionados con tu búsqueda</p>' +
-      "</div>"
-    );
   }
 
   function productName(doc) {
@@ -1198,20 +1134,18 @@ if (typeof module !== "undefined") module.exports = MEGAMENU_DATA;
         showResults();
         return;
       }
-      Promise.all([
-        searchExactCount(tsClient, query),
-        searchRelaxedHits(tsClient, query),
-      ]).then(function (parts) {
-        var result = parts[1] || {};
-        renderResults(result.hits || [], result.found || 0, query, parts[0]);
+      searchRelaxedHits(tsClient, query).then(function (result) {
+        if (input.value.trim() !== query) return;
+        renderResults(result.hits || [], result.found || 0, query);
       }).catch(function (err) {
+        if (input.value.trim() !== query) return;
         console.error("Error buscando en Typesense:", err);
         resultsBox.innerHTML = '<div style="padding:12px 16px; font-size:13px; color:#8a8580;">Error al buscar</div>';
         showResults();
       });
     }
 
-    function renderResults(hits, found, query, exactFound) {
+    function renderResults(hits, found, query) {
       if (!isOpen()) return;
       if (hits.length === 0) {
         resultsBox.innerHTML =
@@ -1230,9 +1164,6 @@ if (typeof module !== "undefined") module.exports = MEGAMENU_DATA;
         showResults();
         return;
       }
-
-      var suggestion = suggestNearSearch(query, hits);
-      var nearMiss = isNearMissSearch(query, exactFound, hits);
       var rowsHtml = hits.map(function (hit) {
         var doc = hit.document;
         var href = esc(doc.link_ficha_web || "#");
@@ -1266,9 +1197,7 @@ if (typeof module !== "undefined") module.exports = MEGAMENU_DATA;
             '<circle cx="11" cy="11" r="7"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line>' +
           "</svg>" +
           '<span class="ts-meta">' +
-            (nearMiss
-              ? "Ver todos los relacionados (" + found + ")"
-              : 'Ver todos los resultados (' + found + ') para <strong>&quot;' + esc(query) + '&quot;</strong>') +
+            ('Ver todos los resultados (' + found + ') para <strong>&quot;' + esc(query) + '&quot;</strong>') +
           "</span>" +
           '<span class="ts-arrow">' +
             '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">' +
@@ -1277,9 +1206,7 @@ if (typeof module !== "undefined") module.exports = MEGAMENU_DATA;
           "</span>" +
         "</a>";
 
-      resultsBox.innerHTML = (nearMiss
-        ? nearMissBannerHtml(query, suggestion, searchResultsPageUrl(suggestion))
-        : "") + rowsHtml;
+      resultsBox.innerHTML = rowsHtml;
       showResults();
     }
 
@@ -1474,16 +1401,14 @@ if (typeof module !== "undefined") module.exports = MEGAMENU_DATA;
     searchTrigger.addEventListener("click", openSearch);
     searchBackBtn.addEventListener("click", closeSearch);
 
-    function moreResultsRow(query, found, nearMiss) {
+    function moreResultsRow(query, found) {
       return (
         '<a href="' + searchResultsPageUrl(query) + '" class="ts-row ts-row-more">' +
           '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">' +
             '<circle cx="11" cy="11" r="7"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line>' +
           "</svg>" +
           '<span class="ts-meta">' +
-            (nearMiss
-              ? "Ver todos los relacionados (" + found + ")"
-              : 'Ver todos los resultados (' + found + ') para <strong>&quot;' + esc(query) + '&quot;</strong>') +
+            ('Ver todos los resultados (' + found + ') para <strong>&quot;' + esc(query) + '&quot;</strong>') +
           "</span>" +
           '<span class="ts-arrow" aria-hidden="true">' +
             '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">' +
@@ -1499,14 +1424,10 @@ if (typeof module !== "undefined") module.exports = MEGAMENU_DATA;
         resultsBox.innerHTML = '<div class="ts-empty">Buscador no disponible</div>';
         return;
       }
-      Promise.all([
-        searchExactCount(tsClient, query),
-        searchRelaxedHits(tsClient, query),
-      ]).then(function (parts) {
-        var result = parts[1] || {};
+      searchRelaxedHits(tsClient, query).then(function (result) {
+        if (input.value.trim() !== query) return;
         var hits = result.hits || [];
         var found = result.found || 0;
-        var exactFound = parts[0];
         if (!hits.length) {
           resultsBox.innerHTML =
             '<div class="ts-empty">No se encontraron resultados para <strong>&quot;' + esc(query) + '&quot;</strong></div>' +
@@ -1515,8 +1436,6 @@ if (typeof module !== "undefined") module.exports = MEGAMENU_DATA;
             "</a>";
           return;
         }
-        var suggestion = suggestNearSearch(query, hits);
-        var nearMiss = isNearMissSearch(query, exactFound, hits);
         var rows = hits.map(function (hit) {
           var doc = hit.document;
           var href = doc.link_ficha_web || "";
@@ -1533,10 +1452,9 @@ if (typeof module !== "undefined") module.exports = MEGAMENU_DATA;
             '<span class="ts-arrow" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg></span>' +
             "</" + tag + ">";
         }).join("");
-        resultsBox.innerHTML = (nearMiss
-          ? nearMissBannerHtml(query, suggestion, searchResultsPageUrl(suggestion))
-          : "") + rows + moreResultsRow(query, found, nearMiss);
+        resultsBox.innerHTML = rows + moreResultsRow(query, found);
       }).catch(function () {
+        if (input.value.trim() !== query) return;
         resultsBox.innerHTML = '<div class="ts-empty">Error al buscar</div>';
       });
     }
