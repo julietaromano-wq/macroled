@@ -108,7 +108,7 @@
             image: "https://s3.coresagroup.com/MACROLED/250/skyline.png",
             imageFit: "contain-centered",
             visualTheme: "silver-dark",
-            href: "https://www.macroled.com.ar/productos?macrofamilia=Skyline&familia=Luminarias",
+            href: "https://www.macroled.com.ar/productos?macrofamilia=Skyline",
             catalogHref: "https://s3.coresagroup.com/MACROLED/catalogos/Macroled_Skyline.pdf",
             titleEmphasis: "Skyline",
             titleEmphasisWeight: 600,

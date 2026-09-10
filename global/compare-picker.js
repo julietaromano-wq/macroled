@@ -37,6 +37,27 @@ function parseImages(doc){
   return urls;
 }
 const referenceCache = new Map();
+const resultsCache = new Map();
+const RESULT_TTL = 60000;
+async function fetchJson(url) {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 8000);
+  try {
+    const response = await fetch(url, {
+      headers: { "X-TYPESENSE-API-KEY": TS_API_KEY }, signal: controller.signal
+    });
+    if (!response.ok) throw new Error(`Typesense ${response.status}`);
+    return await response.json();
+  } finally { clearTimeout(timeout); }
+}
+
+function rememberProducts(docs) {
+  for (const doc of docs || []) {
+    if (doc?.sku && doc.macrofamilia && doc.familia) {
+      referenceCache.set(doc.sku, Promise.resolve({sku:doc.sku, macrofamilia:doc.macrofamilia, familia:doc.familia}));
+    }
+  }
+}
 const filterValue = value => "`" + String(value).replace(/\\/g, "\\\\").replace(/`/g, "\\`") + "`";
 
 // La selección persistida guarda SKU, nombre e imagen. Resolvemos la taxonomía
@@ -51,11 +72,7 @@ async function getReference() {
         q: "*", query_by: "sku", filter_by: `sku:=${filterValue(sku)}`,
         include_fields: "sku,macrofamilia,familia", per_page: "1"
       });
-      const response = await fetch(`${TS_HOST}/collections/${COLLECTION}/documents/search?${params}`, {
-        headers: { "X-TYPESENSE-API-KEY": TS_API_KEY }
-      });
-      if (!response.ok) throw new Error(`Typesense ${response.status}`);
-      const data = await response.json();
+      const data = await fetchJson(`${TS_HOST}/collections/${COLLECTION}/documents/search?${params}`);
       return data.hits?.[0]?.document || null;
     })();
     referenceCache.set(sku, pending);
@@ -70,7 +87,7 @@ function catalogUrl(reference) {
   return "/productos" + (params.size ? "?" + params.toString() : "");
 }
 
-async function search(query, { fields = "nombre_typesense,sku,descripcion,macrofamilia,familia,multiimagen" } = {}){
+async function search(query, { fields = "nombre_typesense,sku,macrofamilia,familia,multiimagen" } = {}){
   const reference = await getReference();
   const params = new URLSearchParams({
     q: query && query.trim() ? query.trim() : "*",
@@ -95,14 +112,27 @@ async function search(query, { fields = "nombre_typesense,sku,descripcion,macrof
   }
 
   const url = `${TS_HOST}/collections/${COLLECTION}/documents/search?${params.toString()}`;
-  try{
-    const res = await fetch(url, { headers: { "X-TYPESENSE-API-KEY": TS_API_KEY } });
-    if(!res.ok) throw new Error(`Typesense ${res.status}`);
-    const data = await res.json();
-    return (data.hits || []).map(h => h.document);
-  }catch(err){
-    console.error("Error buscando en Typesense:", err);
-    return null; // null = error de conexión, distinto de [] = sin resultados
+  const cached = resultsCache.get(url);
+  if (cached && cached.expires > Date.now()) return cached.promise;
+  const entry = {expires:Date.now() + RESULT_TTL};
+  entry.promise = fetchJson(url).then(data => {
+    const docs = (data.hits || []).map(hit => hit.document);
+    rememberProducts(docs);
+    entry.expires = Date.now() + RESULT_TTL;
+    return docs;
+  }).catch(error => {
+    if (resultsCache.get(url) === entry) resultsCache.delete(url);
+    throw error;
+  });
+  resultsCache.set(url, entry);
+  if (resultsCache.size > 40) resultsCache.delete(resultsCache.keys().next().value);
+  return entry.promise;
+}
+
+function warmSelection() {
+  const count = window.MacroledCompare?.getCompareList().length || 0;
+  if (count > 0 && count < (window.MacroledCompare.MAX || 3)) {
+    search("").catch(() => { /* Un fallo de precarga se reintenta al abrir. */ });
   }
 }
 
@@ -182,7 +212,10 @@ async function search(query, { fields = "nombre_typesense,sku,descripcion,macrof
         } finally { busy = false; }
       }));
     } catch (_) {
-      if (id === request) list.innerHTML = '<div class="modal-empty">No pudimos cargar los productos. Volvé a intentar la búsqueda.</div>';
+      if (id === request) {
+        list.innerHTML = '<div class="modal-empty">No pudimos cargar los productos. <button type="button" class="add-btn">Reintentar</button></div>';
+        list.querySelector('button').onclick = renderResults;
+      }
     }
   }
 
@@ -213,5 +246,21 @@ async function search(query, { fields = "nombre_typesense,sku,descripcion,macrof
     const target = opener?.isConnected ? opener : document.querySelector("#compareBar [data-compare-add], #compareToggle, [data-open-modal]");
     target?.focus();
   }
-  window.MacroledComparePicker = { open, close, search, parseImages };
+  function openSelection(onChange) {
+    open({
+      search,
+      isSelected: sku => window.MacroledCompare.isInCompare(sku),
+      atLimit: () => window.MacroledCompare.getCompareList().length >= window.MacroledCompare.MAX,
+      add: doc => {
+        rememberProducts([doc]);
+        window.MacroledCompare.addToCompare({sku:doc.sku || doc.id, nombre:doc.nombre_typesense || "", img:parseImages(doc)[0] || ""});
+        onChange?.();
+      }
+    });
+  }
+  window.MacroledComparePicker = { open, openSelection, close, search, parseImages, rememberProducts };
+  window.addEventListener('macroled-compare-changed', warmSelection);
+  window.addEventListener('storage', event => { if(event.key === 'macroled_compare') warmSelection(); });
+  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', warmSelection, {once:true});
+  else warmSelection();
 })();

@@ -1133,140 +1133,8 @@
   .state-msg svg{color:#c3cad6;}
   .state-msg .state-title{font-size:15px;font-weight:700;color:var(--ink);}
 
-  /* Compare bar — misma que ficha; hueco a la derecha para el asistente */
-  .compare-bar{
-    position:fixed;left:20px;bottom:20px;transform:none;
-    width:calc(100% - 40px - 168px);z-index:10020;
-    transition:width .3s var(--ease),left .3s var(--ease);
-    touch-action:manipulation;
-    -webkit-text-size-adjust:100%;
-    text-size-adjust:100%;
-  }
-  .compare-bar-inner{
-    background:#fff;border-radius:14px;box-shadow:0 12px 32px rgba(10,14,25,.18);
-    padding:12px 16px;border:1px solid #eef0f3;
-  }
-  .compare-bar-header{display:flex;align-items:center;justify-content:space-between;cursor:pointer;}
-  .compare-bar-title{font-size:14px;font-weight:700;color:var(--ink);display:flex;align-items:center;gap:8px;}
-  .compare-count{
-    background:var(--brand);color:#fff;font-size:11px;font-weight:700;
-    width:20px;height:20px;border-radius:50%;flex:none;
-    display:inline-grid;place-items:center;place-content:center;
-    line-height:1;padding:0;margin:0;text-align:center;
-  }
-  .compare-toggle{
-    border:none;background:none;cursor:pointer;color:var(--ink-soft);
-    width:26px;height:26px;display:flex;align-items:center;justify-content:center;border-radius:6px;
-    transition:background .12s,transform .2s;flex:none;
-  }
-  .compare-toggle svg{transform:rotate(180deg);transition:transform .2s;}
-  .compare-toggle:hover{background:var(--bg-card);}
-  .compare-bar.collapsed .compare-bar-body{display:none;}
-  .compare-bar.collapsed .compare-toggle svg{transform:rotate(0deg);}
-  .compare-bar-body{
-    display:flex;
-    align-items:stretch;
-    gap:10px;
-    margin-top:14px;
-    flex-wrap:nowrap;
-    min-width:0;
-  }
-  .compare-items{
-    display:grid;
-    grid-template-columns:repeat(3, minmax(0, 1fr));
-    gap:8px;
-    flex:1 1 0;
-    width:0; /* reparte los 3 slots y evita que el CTA baje de fila */
-    min-width:0;
-  }
-  .compare-chip{
-    position:relative;
-    display:flex;align-items:center;gap:10px;background:#f5f6f7;border:1px solid #eceef1;
-    border-radius:10px;padding:9px 30px 9px 8px;
-    width:auto;min-width:0;max-width:none;flex:none;
-    box-sizing:border-box;overflow:hidden;
-  }
-  .compare-chip-remove{
-    position:absolute;top:6px;right:6px;
-    border:none;background:#fff;color:var(--ink-soft);width:18px;height:18px;border-radius:50%;
-    display:flex;align-items:center;justify-content:center;font-size:13px;line-height:1;
-    cursor:pointer;flex:none;box-shadow:0 1px 3px rgba(10,14,25,.15);transition:background .12s,color .12s;
-  }
-  .compare-chip-remove:hover{background:#fff;color:var(--ink);}
-  .compare-chip-thumb {
-    width: 46px;
-    height: 46px;
-    border-radius: 8px;
-    background: #ffffff;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex: none;
-    overflow: hidden;
-    padding: 4px;
-  }
-  .compare-chip-thumb img{width:100%;height:100%;object-fit:contain;}
-  .compare-chip-info{display:flex;flex-direction:column;align-items:flex-start;text-align:left;gap:2px;min-width:0;flex:1;overflow:hidden;}
-  .compare-chip-name{
-    font-size:14px;font-weight:700;color:var(--ink);line-height:1.25;
-    display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;
-    max-width:100%;
-  }
-  .compare-chip-sku{font-size:11px;color:#6a7687;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;}
-  .compare-slot-empty{
-    width:auto;min-width:0;min-height:64px;height:100%;border-radius:10px;border:1.5px dashed #d8dce1;
-    display:flex;align-items:center;justify-content:center;color:#c3c9d1;flex:none;font-size:16px;
-    box-sizing:border-box;background:#fafbfc;
-  }
-  .compare-cta{
-    margin-left:0;background:var(--btn-blue);color:#fff;border:none;border-radius:var(--radius-sm);
-    padding:9px 32px;font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;
-    white-space:nowrap;transition:background .15s;flex:0 0 auto;align-self:center;text-decoration:none;
-  }
-  .compare-cta svg{width:14px;height:14px;}
-  .compare-cta:hover{background:var(--btn-blue-dark);color:#fff;}
-  .compare-cta.disabled{background:#c3cad6;cursor:not-allowed;pointer-events:none;}
-  .compare-actions{
-    display:flex;flex-direction:column;align-items:stretch;justify-content:center;gap:5px;flex:0 0 auto;
-  }
-  .compare-clear{
-    border:0;background:transparent;color:var(--ink-soft);padding:3px 32px;
-    display:flex;align-items:center;justify-content:center;gap:5px;
-    font-size:13px;font-weight:600;line-height:1.2;cursor:pointer;border-radius:6px;
-    transition:color .15s,background .15s;
-  }
-  .compare-clear svg{width:14px;height:14px;flex:none;}
-  .compare-clear:hover{color:var(--ink);background:transparent;}
-
-  @media (min-width:901px){
-    .compare-bar-body{flex-wrap:nowrap !important;}
-    .compare-items{
-      grid-template-columns:repeat(3, minmax(0, 1fr)) !important;
-    }
-    .compare-slot-empty{display:flex !important;}
-  }
-
-  /* Desktop mediano: compacto, pero cards un poco más altas */
-  @media (min-width:901px) and (max-width:1400px){
-    .compare-bar-inner{padding:10px 14px;}
-    .compare-bar-title{font-size:13px;}
-    .compare-bar-body{gap:8px;margin-top:12px;}
-    .compare-items{gap:6px;}
-    .compare-chip{
-      gap:8px;
-      padding:8px 26px 8px 7px;
-      border-radius:9px;
-    }
-    .compare-chip-thumb{
-      width:40px;height:40px;padding:3px;border-radius:7px;
-    }
-    .compare-chip-name{font-size:14px;font-weight:700;}
-    .compare-chip-sku{font-size:11px;}
-    .compare-chip-remove{top:5px;right:5px;width:16px;height:16px;font-size:12px;}
-    .compare-slot-empty{min-height:56px;font-size:15px;border-radius:9px;}
-  }
   @media (max-width:900px){
-    .compare-cta,.compare-clear{padding-left:12px;padding-right:12px;}
+
     .layout{
       display:flex;
       flex-direction:column;
@@ -1630,53 +1498,8 @@
     .filters-apply{font-size:15px;padding:15px;}
     #macroled-productos .filters-mobile-footer .filters-clear{font-size:15px;}
 
-    /* Compare bar mobile — igual que ficha */
-    .compare-bar{
-      left:12px;
-      bottom:12px;
-      width:calc(100% - 84px);
-      max-width:none;
-    }
-    .compare-bar-inner{padding:14px 16px;}
-    .compare-bar-title{font-size:14px;}
-    .compare-bar button,
-    .compare-bar a,
-    .compare-cta{
-      font-size:14px;
-      font-weight:600;
-    }
-    .compare-chip-name{font-size:14px;font-weight:700;}
-    .compare-chip-sku{font-size:12px;}
-    .compare-chip-remove{font-size:16px;}
     .compare-checkbox{font-size:16px;}
     .compare-row{font-size:14px;}
-    .compare-bar-body{
-      flex-direction:column;
-      align-items:stretch;
-      gap:12px;
-      margin-top:12px;
-    }
-    .compare-items{
-      display:grid;
-      grid-template-columns:1fr;
-      gap:12px;
-      width:100%;
-      flex:none;
-    }
-    .compare-chip{
-      width:100%;
-      min-width:0;
-      max-width:none;
-      flex:none;
-    }
-    .compare-slot-empty{display:none;}
-    .compare-cta{
-      margin-left:0;
-      width:100%;
-      justify-content:center;
-    }
-    .compare-actions{width:100%;gap:8px;}
-    .compare-bar .compare-clear{width:100%;padding:7px 10px;font-size:14px;font-weight:600;}
   }
   @media (max-width:560px){
     .grid{grid-template-columns:repeat(2,minmax(0,1fr)) !important;gap:10px;}
@@ -1740,26 +1563,17 @@
    ============================================================ */
 
 body.assistant-open{overflow:hidden;}
-body.has-compare-bar .ai-launch{
-  bottom:max(20px,env(safe-area-inset-bottom,0px));
-}
+
 body.assistant-open .ai-launch{
   visibility:hidden;
   pointer-events:none;
 }
 @media (min-width:641px){
-  body.assistant-open .compare-bar{
-    width:calc(100% - 20px - 400px - 16px);
-    max-width:none;
-  }
+
 }
 @media (max-width:640px){
-  body.has-compare-bar .ai-launch{
-    bottom:max(12px,env(safe-area-inset-bottom,0px));
-  }
-  body.assistant-open .compare-bar{
-    display:none !important;
-  }
+
+
 }
 
 .ai-launch{
@@ -2176,7 +1990,7 @@ button.ai-launch svg .ai-icon-spark,
 }
 .ai-backdrop{z-index:10060 !important;}
 .ai-panel{z-index:10070 !important;}
-.compare-bar{z-index:899 !important;}
+
 .filters-backdrop{z-index:10040 !important;}
 aside.filters{z-index:10045;}
 aside.filters.open{z-index:10045 !important;}
@@ -2301,12 +2115,7 @@ body.filters-open button.ai-launch{
 }
 
 /* Comparador y asistente: anclados al viewport, también dentro de Webflow. */
-#macroled-productos .compare-bar{
-  position:fixed !important;
-  top:auto !important;
-  bottom:max(var(--compare-bar-gap,20px),env(safe-area-inset-bottom,0px)) !important;
-  transform:none !important;
-}
+
 
 body.assistant-open #macroled-productos .ai-launch{
   visibility:hidden !important;
@@ -2329,9 +2138,7 @@ body.assistant-open #macroled-productos .ai-launch{
 #macroled-productos .ai-panel{position:fixed !important;z-index:2147483647 !important;}
 
 @media (max-width:640px){
-  #macroled-productos .compare-bar{
-    width:calc(100% - 96px) !important;
-  }
+
   #macroled-productos .ai-launch{
     width:56px !important;
     height:56px !important;
@@ -2362,37 +2169,13 @@ body.assistant-open #macroled-productos .ai-launch{
 }
 
 /* Tipografía uniforme del comparador en desktop, tablet y mobile. */
-#macroled-productos .compare-chip-name{
-  font-size:14px !important;
-}
-#macroled-productos .compare-actions .compare-cta,
-#macroled-productos .compare-actions .compare-clear{
-  font-family:var(--font) !important;
-  font-size:14px !important;
-  font-weight:600 !important;
-  line-height:1.2 !important;
-}
+
+
 
 /* Flotantes portados a body: evita que el contenedor de Webflow capture fixed. */
-body > #compareBar.compare-bar{
-  --compare-bar-gap:20px;
-  position:fixed !important;
-  top:auto !important;
-  bottom:calc(max(var(--compare-bar-gap,20px),env(safe-area-inset-bottom,0px)) + var(--product-floating-lift,0px)) !important;
-  z-index:899 !important;
-  transform:none !important;
-}
-body > #compareBar .compare-chip-name,
-body > #compareBar .compare-cta,
-body > #compareBar .compare-clear{
-  font-family:var(--font) !important;
-  font-size:14px !important;
-}
-body > #compareBar .compare-cta,
-body > #compareBar .compare-clear{
-  font-weight:600 !important;
-  line-height:1.2 !important;
-}
+
+
+
 body > #aiLaunch.ai-launch{
   position:fixed !important;
   top:auto !important;
@@ -2413,11 +2196,7 @@ body.assistant-open > #aiLaunch.ai-launch{
   pointer-events:none !important;
 }
 @media (max-width:640px){
-  body > #compareBar.compare-bar{
-    --compare-bar-gap:12px;
-    left:12px !important;
-    width:calc(100% - 96px) !important;
-  }
+
   body > #aiLaunch.ai-launch{
     width:56px !important;
     height:56px !important;
@@ -3283,17 +3062,10 @@ body.assistant-open > #aiLaunch.ai-launch{
   }
 }
 
-/* El comparador pertenece al catálogo, no al body de Webflow.
-   El padding reserva lugar después de los resultados y el lift calculado por
-   JS lo ancla al final del componente antes de que comience el footer. */
 #macroled-productos{
   position:relative !important;
-  padding-bottom:var(--compare-bar-offset, 0px) !important;
 }
-#macroled-productos .compare-bar{
-  --compare-bar-gap:20px;
-  bottom:calc(var(--compare-bar-gap) + var(--compare-boundary-lift, 0px)) !important;
-}
+
 #macroled-productos .search-bar:focus-within{
   border-color:#0090c7 !important;
   box-shadow:none !important;
@@ -3302,9 +3074,7 @@ body.assistant-open > #aiLaunch.ai-launch{
   bottom:calc(max(20px,env(safe-area-inset-bottom,0px)) + var(--compare-boundary-lift, 0px)) !important;
 }
 @media (max-width:640px){
-  #macroled-productos .compare-bar{
-    --compare-bar-gap:12px;
-  }
+
   #macroled-productos .ai-launch{
     bottom:calc(max(12px,env(safe-area-inset-bottom,0px)) + var(--compare-boundary-lift, 0px)) !important;
   }
@@ -3312,9 +3082,7 @@ body.assistant-open > #aiLaunch.ai-launch{
 
 /* Comparador: nombre del producto en tablet y desktop. */
 @media (min-width:641px){
-  #macroled-productos .compare-chip-name{
-    font-size:14px !important;
-  }
+
 }
 
 /* Controles principales visibles durante el scroll. */
@@ -3730,16 +3498,12 @@ body.assistant-open > #aiLaunch.ai-launch{
 
 /* Comparador desktop: selector específico para prevalecer sobre Webflow. */
 @media (min-width:901px){
-  #macroled-productos .compare-cta{
-    padding:8px 32px;
-  }
+
 }
 
 /* Comparador: nombre del producto en tablet y desktop. */
 @media (min-width:641px){
-  #macroled-productos .compare-chip-name{
-    font-size:14px !important;
-  }
+
 }
 
 /* Controles principales visibles durante el scroll. */
@@ -4155,9 +3919,7 @@ body.assistant-open > #aiLaunch.ai-launch{
 
 /* Comparador desktop: selector específico para prevalecer sobre Webflow. */
 @media (min-width:901px){
-  #macroled-productos .compare-cta{
-    padding:8px 32px;
-  }
+
 }
 
 /* Catálogo híbrido: base 09f45eb + cabecera desktop aprobada. */
@@ -4337,9 +4099,7 @@ body.assistant-open > #aiLaunch.ai-launch{
 }
 
 /* Comparativa y asistente permanecen anclados al viewport. */
-#macroled-productos .compare-bar{
-  bottom:var(--compare-bar-gap,20px) !important;
-}
+
 
 #macroled-productos .sort-current,
 #macroled-productos .sort-trigger svg{
@@ -4573,18 +4333,8 @@ body.assistant-open > #aiLaunch.ai-launch{
      padding producía un hueco temporal y realimentaba el cálculo del footer. */
   transition:none !important;
 }
-body.has-compare-bar #macroled-productos .layout{
-  /* La reserva de la barra ya incorpora los 32px de separación. Evita sumar
-     también los 60/40/28px de padding inferior propios del catálogo. */
-  padding-bottom:0 !important;
-}
-#macroled-productos .compare-bar{
-  position:fixed !important;
-  top:auto !important;
-  bottom:max(var(--compare-bar-gap,20px),env(safe-area-inset-bottom,0px)) !important;
-  z-index:899 !important;
-  transform:none !important;
-}
+
+
 body.assistant-open #macroled-productos .ai-launch{
   visibility:hidden !important;
   pointer-events:none !important;

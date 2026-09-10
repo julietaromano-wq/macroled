@@ -1147,7 +1147,9 @@ body {
   line-height: 1.55;
   text-wrap: pretty;
 }
-.ml-news,
+.ml-news {
+  padding-bottom: clamp(2rem, 5vw, 6rem);
+}
 .ml-faq {
   padding-bottom: clamp(6rem, 11vw, 11rem);
 }
@@ -7328,20 +7330,26 @@ a.ml-news-card:focus-visible .ml-news-card__arrow {
     max-height: none !important;
   }
 
-  .ml-home .ml-project-lines-concept__inner {
+  .ml-home .ml-project-lines-concept__inner.ml-shell {
+    --ml-project-lines-side-padding: 40px;
+    box-sizing: border-box;
+    width: 100%;
+    max-width: none;
     height: auto !important;
+    padding-inline: var(--ml-project-lines-side-padding);
     flex: none;
   }
 
   .ml-home .ml-project-lines-concept__cards {
     display: flex;
-    width: calc(100% + 1rem);
+    /* Let cards pass through the right gutter up to the viewport edge. */
+    width: calc(100% + var(--ml-project-lines-side-padding));
     min-width: 0;
     flex: none;
     grid-template-columns: none;
     grid-template-rows: none;
     gap: 0.5rem;
-    padding-right: 1rem;
+    padding-right: var(--ml-project-lines-side-padding);
     overflow-x: auto;
     overflow-y: hidden;
     overscroll-behavior-inline: contain;
@@ -7363,6 +7371,31 @@ a.ml-news-card:focus-visible .ml-news-card__arrow {
 
 }
 
+@media (min-width: 641px) and (max-width: 990px) {
+  .ml-home .ml-project-lines-concept__header {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 1.5rem;
+  }
+
+  .ml-home .ml-project-lines-concept__explore {
+    width: auto;
+    margin: 0;
+  }
+}
+
+@media (max-width: 640px) {
+  .ml-home .ml-project-lines-concept {
+    padding-bottom: 60px !important;
+  }
+
+  .ml-home .ml-project-lines-concept__inner.ml-shell {
+    --ml-project-lines-side-padding: 20px;
+  }
+}
+
 /* Subtle contextual background behind products at every viewport width. */
 .ml-home .ml-project-lines-concept__ambient {
   opacity: 0.38;
@@ -7379,7 +7412,7 @@ a.ml-news-card:focus-visible .ml-news-card__arrow {
   opacity: 1;
 }
 
-@media (max-width: 900px) {
+@media (max-width: 640px) {
   .ml-home .ml-project-lines-concept__inner {
     gap: 0;
   }
@@ -7392,7 +7425,7 @@ a.ml-news-card:focus-visible .ml-news-card__arrow {
 
   .ml-home .ml-project-lines-concept__explore {
     flex: 0 0 auto;
-    margin-top: 2.5rem;
+    margin-top: 2rem;
     margin-bottom: 0;
     padding-bottom: 16px;
   }

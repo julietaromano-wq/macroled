@@ -2602,117 +2602,11 @@ if("ResizeObserver" in window){
     compareBarObserver.observe(compareBar);
   }
 }
-let compareHelpCleanup = null;
-const COMPARE_HELP_SEEN_KEY = 'macroled_compare_help_acknowledged_v3';
-const COMPARE_HELP_RETURN_KEY = 'macroled_compare_help_from_ficha';
-let compareHelpSeen = false;
-try { compareHelpSeen = localStorage.getItem(COMPARE_HELP_SEEN_KEY) === '1'; } catch (_) {}
-
-function maybeShowCompareReturnHelp(){
-  if(compareHelpCleanup) return;
-  let returning = false;
-  try { returning = sessionStorage.getItem(COMPARE_HELP_RETURN_KEY) === '1'; } catch (_) {}
-  if(!returning) return;
-  const count = window.MacroledCompare.getCompareList().length;
-  if(compareHelpSeen || !count || count >= COMPARE_MAX){
-    try { sessionStorage.removeItem(COMPARE_HELP_RETURN_KEY); } catch (_) {}
-    return;
-  }
-  showCompareHelp(null);
-}
-window.addEventListener('pageshow', () => requestAnimationFrame(maybeShowCompareReturnHelp));
-let compareReturnHelpFrame = 0;
-window.addEventListener('scroll', () => {
-  if(compareHelpSeen || compareReturnHelpFrame) return;
-  compareReturnHelpFrame = requestAnimationFrame(() => {
-    compareReturnHelpFrame = 0;
-    maybeShowCompareReturnHelp();
-  });
-}, {passive:true});
-
-function closeCompareHelp(){
-  if(compareHelpCleanup) compareHelpCleanup();
-}
-
-function showCompareHelp(trigger){
-  if(compareHelpSeen) return;
-  closeCompareHelp();
-  const barTop = document.getElementById("compareBar").getBoundingClientRect().top;
-  const candidates = [...document.querySelectorAll('.compare-checkbox:not(:checked):not(:disabled)')]
-    .filter(cb => (cb.closest('.compare-action') || cb).getClientRects().length);
-  const visible = candidates.find(cb => {
-    const rect = (cb.closest('.compare-action') || cb).getBoundingClientRect();
-    return rect.top > 140 && rect.bottom < barTop && rect.left >= 0 && rect.right <= innerWidth;
-  });
-  const checkbox = visible || candidates[0];
-  if(!checkbox) return;
-  const anchor = checkbox.closest('.compare-action') || checkbox;
-  const bubble = document.createElement('div');
-  bubble.id = 'compareSelectionHelp';
-  bubble.className = 'compare-help-bubble';
-  bubble.setAttribute('role', 'dialog');
-  bubble.setAttribute('aria-label', 'Ayuda para comparar productos');
-  bubble.setAttribute('aria-describedby', 'compareHelpText');
-  bubble.innerHTML = '<p id="compareHelpText">Marcá “Comparar” para agregar otro producto.</p><button type="button">Entendido</button>';
-  document.body.appendChild(bubble);
-  const previousDescription = checkbox.getAttribute('aria-describedby');
-  checkbox.setAttribute('aria-describedby', [previousDescription, 'compareHelpText'].filter(Boolean).join(' '));
-  anchor.classList.add('compare-help-target');
-  let frame;
-  const position = () => {
-    if(!anchor.isConnected){ closeCompareHelp(); return; }
-    const rect = anchor.getBoundingClientRect();
-    const size = bubble.getBoundingClientRect();
-    const left = Math.max(12, Math.min(innerWidth - size.width - 12, rect.left + rect.width / 2 - size.width / 2));
-    const below = rect.top < size.height + 24;
-    const top = below ? rect.bottom + 12 : rect.top - size.height - 12;
-    bubble.style.left = left + 'px';
-    bubble.style.top = Math.max(12, Math.min(innerHeight - size.height - 12, top)) + 'px';
-    bubble.style.setProperty('--tip-arrow-x', Math.max(16, Math.min(size.width - 16, rect.left + rect.width / 2 - left)) + 'px');
-    bubble.classList.toggle('is-below', below);
-  };
-  const schedule = () => { cancelAnimationFrame(frame); frame = requestAnimationFrame(position); };
-  const dismiss = () => {
-    try { sessionStorage.removeItem(COMPARE_HELP_RETURN_KEY); } catch (_) {}
-    closeCompareHelp();
-  };
-  const outside = e => { if(!bubble.contains(e.target) && !trigger?.contains(e.target)) dismiss(); };
-  const escape = e => { if(e.key === 'Escape'){ dismiss(); checkbox.focus({preventScroll:true}); } };
-  compareHelpCleanup = () => {
-    compareHelpCleanup = null;
-    cancelAnimationFrame(frame);
-    bubble.remove();
-    anchor.classList.remove('compare-help-target');
-    if(previousDescription === null) checkbox.removeAttribute('aria-describedby');
-    else checkbox.setAttribute('aria-describedby', previousDescription);
-    window.removeEventListener('scroll', schedule, true);
-    window.removeEventListener('resize', schedule);
-    document.removeEventListener('pointerdown', outside);
-    document.removeEventListener('keydown', escape);
-  };
-  bubble.querySelector('button').onclick = () => {
-    compareHelpSeen = true;
-    try { localStorage.setItem(COMPARE_HELP_SEEN_KEY, '1'); } catch (_) {}
-    dismiss();
-    checkbox.focus({preventScroll:true});
-  };
-  window.addEventListener('scroll', schedule, true);
-  window.addEventListener('resize', schedule);
-  document.addEventListener('pointerdown', outside);
-  document.addEventListener('keydown', escape);
-  const rect = anchor.getBoundingClientRect();
-  if(rect.top < 140 || rect.bottom >= barTop) anchor.scrollIntoView({block:'center',behavior:'instant'});
-  position();
-  if(trigger) bubble.querySelector('button').focus({preventScroll:true});
-}
-
 function renderCompareBar(){
   const bar = document.getElementById("compareBar");
   const body = document.getElementById("compareBarBody");
   const countEl = document.getElementById("compareCount");
   const list = window.MacroledCompare.getCompareList();
-  if(list.length !== compareBarPrevCount) closeCompareHelp();
-  requestAnimationFrame(maybeShowCompareReturnHelp);
 
   if(!list.length){
     bar.style.display = "none";
@@ -2751,7 +2645,7 @@ function renderCompareBar(){
   }).join("");
 
   const emptySlots = Array.from({ length: Math.max(0, COMPARE_MAX - list.length) })
-    .map(() => `<button type="button" class="compare-slot-empty compare-slot-help" data-compare-help aria-label="Cómo agregar otro producto a la comparación"></button>`).join("");
+    .map(() => `<button type="button" class="compare-slot-empty compare-slot-action compare-slot-add" data-compare-add aria-label="Agregar producto a la comparación" title="Agregar producto"><span aria-hidden="true">+</span></button>`).join("");
 
   const ctaDisabled = list.length < 2;
   body.innerHTML = `
@@ -2768,8 +2662,11 @@ function renderCompareBar(){
     </div>
   `;
 
-  body.querySelectorAll("[data-compare-help]").forEach(btn => {
-    btn.addEventListener("click", () => showCompareHelp(btn));
+  body.querySelectorAll("[data-compare-add]").forEach(btn => {
+    btn.addEventListener("click", () => window.MacroledComparePicker.openSelection(() => {
+      renderCompareBar();
+      syncCompareCheckboxes();
+    }));
   });
   body.querySelectorAll("[data-remove]").forEach(btn => {
     btn.addEventListener("click", () => {
@@ -2880,8 +2777,7 @@ function prioritizeHighbayHits(hits){
 }
 
 function renderCards(hits, found){
-  closeCompareHelp();
-  requestAnimationFrame(maybeShowCompareReturnHelp);
+  window.MacroledComparePicker?.rememberProducts((hits || []).map(hit => hit.document));
   const grid = document.getElementById("grid");
   const orderedHits = prioritizeHighbayHits(hits);
   if(!orderedHits || !orderedHits.length){
