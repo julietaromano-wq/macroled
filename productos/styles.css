@@ -1221,9 +1221,9 @@
   .compare-action:hover .cb-wrap .box{
     border-color:#606060;
   }
-  .compare-row:has(.compare-checkbox:checked) .compare-action{font-weight:500;color:#606060;}
+  .compare-row:has(.compare-checkbox:checked) .compare-action{font-weight:500;color:#0077a8;}
   .compare-row:has(.compare-checkbox:checked) .cb-wrap .box{
-    background:#606060;border-color:#606060;
+    background:#0077a8;border-color:#0077a8;
   }
   .compare-row.row-disabled .compare-action,
   .compare-action.is-disabled{opacity:.4;cursor:not-allowed;}
@@ -3095,8 +3095,12 @@ body.assistant-open > #aiLaunch.ai-launch{
   border-color:#606060 !important;
 }
 #macroled-productos .compare-row:has(.compare-checkbox:checked) .cb-wrap .box{
-  background:#606060 !important;
-  border-color:#606060 !important;
+  background:#0077a8 !important;
+  border-color:#0077a8 !important;
+}
+#macroled-productos .compare-row:has(.compare-checkbox:checked) .compare-action,
+#macroled-productos .compare-row:has(.compare-checkbox:checked) .compare-label{
+  color:#0077a8 !important;
 }
 
 @media (max-width:900px){
