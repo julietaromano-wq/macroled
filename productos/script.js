@@ -77,7 +77,7 @@ if(!window.MacroledCompare){
 const TS_HOST = "https://typesense.coresagroup.com";
 const TS_API_KEY = "g0oiNYY8THGuU9jnCsvqIH1X9HtvYRCR";
 const COLLECTION = "Macroled_Prueba";
-const BASE_FILTER = "tipo_registro:=producto && es_principal:true";
+const BASE_FILTER = "tipo_registro:=producto";
 const PER_PAGE = 18;
 const PER_PAGE_WIDE = 18;
 
@@ -600,6 +600,8 @@ const FACET_ICONS = {
   sort: `<svg ${ICON_SIZE}><path d="M8 6h12M8 12h9M8 18h6"/><path d="M4 4v16M2 18l2 2 2-2"/></svg>`
 };
 const ICON_CHECK = `<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`;
+const ICON_COPY = `<svg class="copy-sku-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>`;
+const ICON_COPY_CHECK = `<svg class="copy-sku-check" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>`;
 const ICON_COMPARE = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 3 21 3 21 7"/><line x1="21" y1="3" x2="10" y2="14"/><path d="M21 14v5a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h5"/></svg>`;
 const ICON_CHEVRON_LEFT = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>`;
 const ICON_CHEVRON_RIGHT = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>`;
@@ -1199,6 +1201,28 @@ function escapeHtml(value){
     '"': "&quot;",
     "'": "&#39;"
   }[ch]));
+}
+
+function highlightSearchMatch(value, query = state.query){
+  const text = String(value || "");
+  const terms = String(query || "").trim().split(/\s+/).filter(Boolean);
+  if(!text || !terms.length) return escapeHtml(text);
+
+  const escapedTerms = [...new Set(terms)]
+    .sort((a, b) => b.length - a.length)
+    .map(term => term.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"));
+  const matcher = new RegExp(`(?:${escapedTerms.join("|")})`, "gi");
+  let html = "";
+  let cursor = 0;
+
+  text.replace(matcher, (match, offset) => {
+    html += escapeHtml(text.slice(cursor, offset));
+    html += `<mark class="search-match">${escapeHtml(match)}</mark>`;
+    cursor = offset + match.length;
+    return match;
+  });
+
+  return html + escapeHtml(text.slice(cursor));
 }
 
 async function countSearchHits(query, filterBy, signal){
@@ -2026,6 +2050,7 @@ const TEMP_TONES = {
   calido:     { color: "#fff79b", label: "Cálido", order: 100 },
   neutro:     { color: "#d9d9d9", label: "Neutro", order: 200 },
   frio:       { color: "#bce4fa", label: "Frío", order: 300 },
+  dinamico:   { color: "conic-gradient(#bce4fa 0 33.33%,#d9d9d9 33.33% 66.66%,#fff79b 66.66% 100%)", label: "Blanco Dinámico", order: 350 },
   rgb:        { color: "linear-gradient(135deg,#e74c3c 0%,#f1c40f 33%,#2ecc71 66%,#3498db 100%)", label: "RGB", order: 400 },
   rgbw:       { color: "linear-gradient(135deg,#e74c3c 0%,#f1c40f 25%,#2ecc71 50%,#3498db 75%,#f5f5f5 100%)", label: "RGB+W", order: 410 },
   frio_ambar: { color: "linear-gradient(135deg,#bce4fa 50%,#ffbf00 50%)", label: "Frío + Ámbar", order: 420 },
@@ -2059,10 +2084,11 @@ function tempCategoryKey(value){
 
   if(/^rgb\s*\+\s*w$|^rgbw$/.test(norm)) return "rgbw";
   if(/^rgb$/.test(norm)) return "rgb";
-  if(/^frio\s*\+\s*ambar$/.test(norm)) return "frio_ambar";
-  if(/^calido$/.test(norm)) return "calido";
-  if(/^neutro$/.test(norm)) return "neutro";
-  if(/^frio$/.test(norm)) return "frio";
+  if(/^blanco dinamico$|^dinamico$/.test(norm)) return "dinamico";
+  if(/^(?:blanco\s+)?frio\s*\+\s*ambar$/.test(norm)) return "frio_ambar";
+  if(/^(?:(?:blanco|luz)\s+)?calid[oa]$/.test(norm)) return "calido";
+  if(/^(?:(?:blanco|luz)\s+)?neutr[oa]$/.test(norm)) return "neutro";
+  if(/^(?:(?:blanco|luz)\s+)?fri[oa]$/.test(norm)) return "frio";
   if(/^azul$/.test(norm)) return "azul";
   if(/^amarillo$/.test(norm)) return "amarillo";
   if(/^rojo$/.test(norm)) return "rojo";
@@ -2291,9 +2317,14 @@ function tempDotColor(value){
   return tempCategoryColor(value) || CCT_DOT[value] || "#ccc";
 }
 
-function getLuzToneSource(doc, fallbackValue){
-  const isVariantLuz = String(doc.nombre_attr_variantes || "").trim().toLowerCase() === "luz" && doc.attr_variantes;
-  return isVariantLuz ? doc.attr_variantes : fallbackValue;
+function temperatureSourceString(raw){
+  if(raw == null || raw === "") return "";
+  if(Array.isArray(raw)) return raw.map(value => String(value || "").trim()).filter(Boolean).join(";");
+  return String(raw);
+}
+
+function getLuzToneSource(doc){
+  return temperatureSourceString(doc?.variante_temperatura_filtro);
 }
 
 function buildLuzCategoryKeys(doc, fallbackValue){
@@ -2332,21 +2363,28 @@ function buildLuzDots(doc, fallbackValue){
   }).join("");
 }
 
-// Pill en la foto (abajo derecha): solo círculos; al hover se deslizan los nombres
+// Pill en la foto: usa variante_temperatura_filtro de Typesense.
 function buildLuzMediaDots(doc){
-  const temperatureVariants = Array.isArray(doc.variante_temperatura_filtro)
-    ? doc.variante_temperatura_filtro.join(";")
-    : doc.variante_temperatura_filtro;
-  const keys = buildLuzCategoryKeys({}, temperatureVariants);
-  if(!keys.length) return "";
+  const source = getLuzToneSource(doc);
+  if(!source) return "";
 
-  const collapsed = keys.length >= 2 ? " is-collapsed" : "";
-  const rows = keys.map(key => {
-    const { color, label } = TEMP_TONES[key];
-    return `<span class="temp-dots-row"><span class="temp-dots-label">${label}</span><span class="dot luz-dot" style="background:${color}" title="${label}" aria-label="${label}"></span></span>`;
+  const seen = new Set();
+  const rows = source.split(/[;|]/).map(value => value.trim()).filter(Boolean).map(label => {
+    const key = tempCategoryKey(label);
+    if(!key || seen.has(`${key}:${label}`)) return "";
+    seen.add(`${key}:${label}`);
+    const color = TEMP_TONES[key].color;
+    const safeLabel = escapeHtml(label);
+    return `<span class="temp-dots-row"><span class="dot luz-dot" style="background:${color}" title="${safeLabel}" aria-label="${safeLabel}"></span><span class="temp-dots-label">${safeLabel}</span></span>`;
   }).join("");
 
-  return `<span class="temp-dots${collapsed}" tabindex="0" aria-label="Temperatura de luz"><span class="temp-dots-icon" aria-hidden="true">${ICON_BULB}</span>${rows}</span>`;
+  return rows ? `<span class="temp-dots" aria-label="Temperatura de luz">${rows}</span>` : "";
+}
+
+function buildSkuRow(sku){
+  if(!sku) return "";
+  const safeSku = escapeHtml(sku);
+  return `<div class="card-sku-row"><span class="card-sku">${highlightSearchMatch(sku)}</span><button type="button" class="copy-sku" data-sku="${safeSku}" aria-label="Copiar SKU ${safeSku}" title="Copiar SKU">${ICON_COPY}${ICON_COPY_CHECK}<span class="copy-sku-msg" role="status" aria-live="polite">${ICON_COPY_CHECK}SKU copiado</span></button></div>`;
 }
 
 function isDimerizableProduct(doc){
@@ -2397,7 +2435,10 @@ function cardTemplate(doc){
       <div class="card-content">
         <div class="ml-card-body">
           ${metaInner ? `<div class="card-meta">${metaInner}</div>` : ""}
-          <div class="card-title">${doc.nombre_typesense || "Producto sin nombre"}</div>
+          <div class="card-heading">
+            <div class="card-title">${highlightSearchMatch(doc.nombre_typesense || "Producto sin nombre")}</div>
+            ${buildSkuRow(sku)}
+          </div>
           ${specsHtml ? `<div class="specs">${specsHtml}</div>` : ""}
         </div>
         <div class="compare-row">
@@ -2420,13 +2461,54 @@ function cardTemplate(doc){
 function wireCardLinks(){
   // La card es un <a href> real: click normal, click central y clic derecho > "abrir en pestaña nueva"
   // funcionan de forma nativa. Solo bloqueamos la navegación cuando el click cae en un control interno
-  // (Comparar, flechas de imagen, dots) para que ese control haga lo suyo en vez de abrir la ficha.
+  // (Comparar, flechas de imagen, dots, copiar SKU) para que ese control haga lo suyo en vez de abrir la ficha.
   document.querySelectorAll("a.card[data-href]").forEach(card => {
     card.addEventListener("click", (e) => {
-      if(e.target.closest(".compare-row, .nav-arrow, .temp-dots, button, input, label")){
+      if(e.target.closest(".compare-row, .nav-arrow, .temp-dots, .copy-sku, .card-sku-row, button, input, label")){
         e.preventDefault();
       }
     });
+  });
+}
+
+function copySkuToClipboard(sku, copyButton){
+  if(!sku || !copyButton) return;
+  const copyPromise = navigator.clipboard && window.isSecureContext
+    ? navigator.clipboard.writeText(sku)
+    : new Promise((resolve, reject) => {
+        const input = document.createElement("textarea");
+        input.value = sku;
+        input.setAttribute("readonly", "");
+        input.style.position = "fixed";
+        input.style.opacity = "0";
+        document.body.appendChild(input);
+        input.select();
+        try{ document.execCommand("copy") ? resolve() : reject(new Error("No se pudo copiar")); }
+        catch(err){ reject(err); }
+        finally{ input.remove(); }
+      });
+  copyPromise.then(() => {
+    copyButton.classList.add("copied");
+    copyButton.setAttribute("aria-label", `SKU ${sku} copiado`);
+    copyButton.title = "SKU copiado";
+    clearTimeout(copyButton._copyResetTimer);
+    copyButton._copyResetTimer = setTimeout(() => {
+      copyButton.classList.remove("copied");
+      copyButton.setAttribute("aria-label", `Copiar SKU ${sku}`);
+      copyButton.title = "Copiar SKU";
+    }, 1500);
+  }).catch(() => {});
+}
+
+const productsGrid = document.getElementById("grid");
+if(productsGrid && !productsGrid.dataset.copySkuBound){
+  productsGrid.dataset.copySkuBound = "1";
+  productsGrid.addEventListener("click", (e) => {
+    const copyButton = e.target.closest(".copy-sku");
+    if(!copyButton) return;
+    e.preventDefault();
+    e.stopPropagation();
+    copySkuToClipboard(copyButton.dataset.sku || "", copyButton);
   });
 }
 
