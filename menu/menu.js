@@ -725,8 +725,6 @@ if (typeof module !== "undefined") module.exports = MEGAMENU_DATA;
       title: String(promo.tagline || family.label).replace(/\.+$/, ""),
       subtitle: promo.subtitle || "Conocé cada solución y encontrá la que mejor se adapta a tu proyecto.",
       partner: promo.partner,
-      ctaLabel: "Ver línea completa",
-      href: family.viewAllHref || "#",
       catalogLabel: "Catálogo",
       catalogHref: ALL_PRODUCTS_URL,
     };
@@ -741,16 +739,13 @@ if (typeof module !== "undefined") module.exports = MEGAMENU_DATA;
           <div class="mm-promo-title">${escapeHtml(p.title)}</div>
           <p class="mm-promo-subtitle">${escapeHtml(p.subtitle)}</p>
         </div>
+        ${p.partner ? `
         <div class="mm-promo-bottom">
-          <div class="mm-promo-actions">
-            <a class="mm-promo-cta" href="${escapeHtml(p.href)}">${escapeHtml(p.ctaLabel)}</a>
-          </div>
-          ${p.partner ? `
           <div class="mm-promo-partner">
             <p>${escapeHtml(p.partner.text)}</p>
             <img src="${escapeHtml(p.partner.logo)}" alt="${escapeHtml(p.partner.alt || "")}" />
-          </div>` : ""}
-        </div>
+          </div>
+        </div>` : ""}
       </div>
     `;
   }
@@ -766,6 +761,7 @@ if (typeof module !== "undefined") module.exports = MEGAMENU_DATA;
           <div class="mm-content">
             <div class="mm-heading-row">
               <h3>${escapeHtml(family.label)}</h3>
+              <a class="mm-heading-viewall" href="${escapeHtml(family.viewAllHref || "#")}">Ver todo ${chevronRightSvg()}</a>
             </div>
             <div class="mm-groups">${groups.map(renderGroupSection).join("")}</div>
           </div>
