@@ -2951,16 +2951,15 @@ function glossaryCell(value){
 
 function glossaryRow(doc){
   const imgs = parseImages(doc);
-  const thumb = imgs[0] ? optimizeImg(imgs[0], "80x80") : "";
+  const thumb = imgs[0] ? optimizeImg(imgs[0], "160x160") : "";
   const title = doc.nombre_typesense || doc.nombre || "Producto sin nombre";
   const sku = (doc.sku || doc.id || "").toString();
   const productHref = doc.link_ficha_web || "";
   const values = glossaryValues(doc);
-  const safeSku = escapeHtml(sku);
-  const skuHtml = `<span class="glossary-sku-link">${highlightSearchMatch(sku)}</span><button type="button" class="copy-sku" data-sku="${safeSku}" aria-label="Copiar SKU ${safeSku}" title="Copiar SKU">${ICON_COPY}${ICON_COPY_CHECK}<span class="copy-sku-msg" role="status" aria-live="polite">${ICON_COPY_CHECK}SKU copiado</span></button>`;
-  const fileHtml = productHref
-    ? `<a class="glossary-file" href="${escAttr(productHref)}" title="Ver ficha" aria-label="Ver ficha de ${escAttr(sku)}">${ICON_GLOSSARY_LINK}</a>`
-    : `<span class="glossary-empty">—</span>`;
+  const fichaHtml = productHref
+    ? `<a class="glossary-sku-file" href="${escAttr(productHref)}" title="Ver ficha" aria-label="Ver ficha de ${escAttr(sku)}">${ICON_GLOSSARY_LINK}</a>`
+    : "";
+  const skuHtml = `<span class="glossary-sku-wrap"><span class="glossary-sku-link">${highlightSearchMatch(sku)}</span>${fichaHtml}</span>`;
 
   return `<tr>
     <td class="glossary-product">
@@ -2976,7 +2975,6 @@ function glossaryRow(doc){
       </div>
     </td>
     ${GLOSSARY_COLUMNS.map(column => glossaryCell(values[column.id])).join("")}
-    <td class="glossary-file-cell">${fileHtml}</td>
   </tr>`;
 }
 
@@ -2988,7 +2986,6 @@ function glossaryTable(hits){
       <tr>
         <th class="glossary-product" scope="col">SKU</th>
         ${head}
-        <th class="glossary-file-cell" scope="col">Ficha</th>
       </tr>
     </thead>
     <tbody>${rows}</tbody>

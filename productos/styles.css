@@ -4740,8 +4740,8 @@ body.assistant-open #macroled-productos .ai-launch{
   flex:none;
 }
 #macroled-productos .glossary .glossary-thumb{
-  width:28px;
-  height:40px;
+  width:48px;
+  height:68px;
   object-fit:contain;
   flex:none;
 }
@@ -4750,33 +4750,41 @@ body.assistant-open #macroled-productos .ai-launch{
   background:#f3f4f6;
   border-radius:4px;
 }
-#macroled-productos .glossary .glossary-sku-link{
+#macroled-productos .glossary .glossary-sku-wrap{
   display:inline-flex;
   align-items:center;
   gap:6px;
+  min-width:0;
+}
+#macroled-productos .glossary .glossary-sku-link{
+  display:inline-flex;
+  align-items:center;
   color:#16294f;
   font-weight:600;
   letter-spacing:.01em;
   text-decoration:none;
 }
-#macroled-productos .glossary a.glossary-sku-link:hover{color:var(--btn-blue);}
-#macroled-productos .glossary .glossary-sku-link svg{flex:none;color:#9aa1ab;}
-#macroled-productos .glossary .glossary-empty{color:#c5cad1;font-weight:500;}
-#macroled-productos .glossary .glossary-file-cell{text-align:center;width:72px;}
-#macroled-productos .glossary .glossary-file{
+#macroled-productos .glossary .glossary-sku-file{
   display:inline-flex;
   align-items:center;
   justify-content:center;
-  width:40px;
-  height:40px;
+  flex:none;
+  width:28px;
+  height:28px;
   color:var(--btn-blue);
-  border-radius:8px;
+  border-radius:6px;
+  text-decoration:none;
 }
-#macroled-productos .glossary .glossary-file svg{
-  width:22px;
-  height:22px;
+#macroled-productos .glossary .glossary-sku-file svg{
+  width:18px;
+  height:18px;
 }
-#macroled-productos .glossary .glossary-file:hover{color:var(--btn-blue-dark);background:#f3f8fb;}
+#macroled-productos .glossary .glossary-sku-file:hover{color:var(--btn-blue-dark);background:#f3f8fb;}
+#macroled-productos .glossary .glossary-sku-file:focus-visible{
+  outline:2px solid rgba(0,134,181,.35);
+  outline-offset:2px;
+}
+#macroled-productos .glossary .glossary-empty{color:#c5cad1;font-weight:500;}
 #macroled-productos .glossary .search-match{
   background:#fff3bf;
   color:inherit;
