@@ -24,7 +24,7 @@
     --shadow-sm:0 1px 2px rgba(20,24,33,.05);
     --shadow-md:0 16px 40px rgba(10,14,25,.14);
     --focus-ring:0 0 0 3px rgba(0,189,255,.35);
-    --section-bg:#e7f2f7;
+    --section-bg:#8ab4c5;
     --ease:cubic-bezier(.22,.61,.36,1);
     --btn-dur:.2s;
     --font:'Noto Sans',sans-serif;
@@ -272,12 +272,13 @@
   .header-label{align-items:flex-start;flex-direction:column;justify-content:end;gap:10px;padding:20px 16px;background:#fff;}
   .header-label .diff-toggle{display:flex;align-items:center;gap:9px;font-size:var(--fs-sm);color:var(--ink);font-weight:600;cursor:pointer;user-select:none;line-height:1.3;}
   .diff-toggle .dt-short{display:none;}
-  /* TÃ­tulos de grupo: misma tipografÃ­a que la ficha (.sg-title-text), sin uppercase */
+  /* Títulos de grupo: misma barra que .spec-group-head de la ficha */
   .cell.section{
-    grid-column:1/-1;background:var(--section-bg);color:var(--navy);
+    grid-column:1/-1;background:var(--section-bg);color:#fff;
     font-size:var(--fs-base);font-weight:600;letter-spacing:0;text-transform:none;
-    padding:clamp(12px,2vw,14px) clamp(12px,2vw,16px);
-    min-height:48px;overflow:hidden;
+    padding:10px 14px;
+    min-height:0;overflow:hidden;
+    border-bottom:none;
   }
   /* la columna de labels y el título de sección NO usan position:sticky:
      con muchas celdas sticky (una por fila) apiladas, el navegador las
@@ -294,14 +295,13 @@
   #compareShell.is-hscrolling .cell.section .section-title{
     will-change:transform;backface-visibility:hidden;-webkit-backface-visibility:hidden;
   }
-  .cell.section .section-title svg{
-    width:18px;height:18px;flex:none;color:var(--btn-blue);
-  }
+  .cell.section .section-title svg{display:none;}
   .cell.section .section-title-text{
-    min-width:0;font-size:var(--fs-base);font-weight:600;color:var(--navy);
+    min-width:0;font-size:var(--fs-base);font-weight:600;color:#fff;
     text-transform:none;letter-spacing:0;
   }
   .cell.value{font-size:var(--fs-sm);color:var(--ink);font-weight:500;justify-content:center;text-align:center;}
+  .cell.value .value-text{min-width:0;overflow-wrap:anywhere;line-height:1.35;text-align:center;}
   .cell.value .dash{color:#c3c9d1;font-weight:400;}
   /* lÃ­nea divisoria entre cada columna de producto */
   .cell.coldata{border-left:1px solid var(--line);}
@@ -370,12 +370,13 @@
   .cell.product-head .remove{
     position:absolute;top:10px;right:10px;width:26px;height:26px;border-radius:50%;border:1px solid var(--line);
     background:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--ink-soft);
+    z-index:2;
     transition:background var(--btn-dur) var(--ease),border-color var(--btn-dur) var(--ease),color var(--btn-dur) var(--ease);
   }
   .cell.product-head .remove:hover{background:var(--bg-card);border-color:var(--line-strong);color:var(--ink);}
   .cell.product-head .thumb{
     width:128px;height:128px;display:flex;align-items:center;justify-content:center;
-    overflow:hidden;border-radius:14px;background:#f0efef;position:relative;
+    overflow:hidden;border-radius:14px;background:transparent;position:relative;
   }
   .cell.product-head .thumb img{width:100%;height:100%;object-fit:contain;padding:8%;box-sizing:border-box;}
   .cell.product-head .thumb-ph{
@@ -389,10 +390,26 @@
     line-height:1.25;letter-spacing:-.02em;padding-top:14px;max-width:100%;
     overflow-wrap:break-word;word-break:break-word;
   }
-  .cell.product-head .psku{font-size:13px;font-weight:500;color:#7a8189;margin-top:4px;text-align:center;}
+  .cell.product-head .psku{font-size:13px;font-weight:500;color:var(--muted);margin-top:4px;text-align:center;}
+  .cell.product-head .phead-link{
+    display:flex;flex-direction:column;align-items:center;width:100%;min-width:0;
+    color:inherit;text-decoration:none;border-radius:12px;
+    cursor:pointer;
+  }
+  .cell.product-head .phead-link.is-static{cursor:default;}
+  .cell.product-head .phead-link:hover .pname,
+  .cell.product-head .phead-link:focus-visible .pname{color:var(--btn-blue);}
+  .cell.product-head .phead-hint{
+    display:inline-flex;align-items:center;gap:5px;
+    margin-top:8px;padding:4px 0;
+    font-size:12px;font-weight:600;color:var(--btn-blue);letter-spacing:.01em;
+  }
+  .cell.product-head .phead-hint svg{flex:none;width:12px;height:12px;}
+  .cell.product-head .phead-link:hover .phead-hint,
+  .cell.product-head .phead-link:focus-visible .phead-hint{text-decoration:underline;}
   .pvariant{
     display:flex;flex-direction:column;align-items:stretch;gap:6px;
-    width:100%;margin-top:14px;text-align:left;
+    width:100%;margin-top:14px;text-align:left;position:relative;z-index:1;
   }
   .pvariant-label{
     font-size:11px;font-weight:600;letter-spacing:0;text-transform:none;
@@ -407,26 +424,6 @@
   }
   .pvariant select:hover{border-color:var(--line-hover);}
   .pvariant select:focus{border-color:var(--btn-blue);box-shadow:var(--focus-ring);outline:none;}
-  .cell.product-head .phead-btns{display:flex;flex-direction:column;gap:8px;width:100%;margin-top:auto;padding-top:14px;}
-  .phead-btns .btn{
-    display:inline-flex;align-items:center;justify-content:center;gap:6px;width:100%;
-    min-height:42px;padding:10px 12px;border-radius:10px;
-    font-family:var(--font);font-size:var(--fs-sm);font-weight:600;letter-spacing:.02em;
-    cursor:pointer;border:1px solid transparent;
-    transition:background var(--btn-dur) var(--ease),border-color var(--btn-dur) var(--ease),box-shadow var(--btn-dur) var(--ease),transform var(--btn-dur) var(--ease);
-  }
-  .phead-btns .btn svg{flex:none;}
-  .phead-btns .btn-primary{
-    background:var(--btn-blue);color:#fff;
-  }
-  .phead-btns .btn-primary:hover{
-    background:var(--btn-blue-dark);
-    box-shadow:0 6px 16px rgba(0,119,168,.22);
-  }
-  .phead-btns .btn:active{transform:translateY(1px);}
-
-  /* celda de encabezado vacÃ­a con CTA "Agregar" â€” vive solo en la fila de
-     encabezado, para no pelear con el grid-column:1/-1 de las secciones */
   .cell.add-slot{align-items:stretch;padding:20px;background:#fff;}
   .add-slot .box{
     width:100%;min-height:200px;border:1.5px dashed #d3d9e0;border-radius:var(--radius-sm);
@@ -453,9 +450,10 @@
   .skel-pname{height:18px;width:78%;}
   .skel-sku{height:12px;width:42%;}
   .skel-select{height:40px;width:100%;border-radius:10px;margin-top:6px;}
-  .compare-skel-cell .skel-btn{height:42px;width:100%;border-radius:10px;}
+  .skel-hint{height:12px;width:72px;margin-top:8px;}
   .skel-toggle{height:16px;width:168px;}
-  .skel-section{height:16px;width:min(220px,70%);}
+  .skel-section{height:16px;width:min(220px,70%);background:rgba(255,255,255,.35);background-image:none;}
+  .cell.section.compare-skel-cell{background:var(--section-bg);}
   .skel-label{height:12px;width:72%;}
   .skel-value{height:12px;width:46%;margin:0 auto;}
   @keyframes skel-shimmer{
@@ -550,7 +548,12 @@
   html.is-printing-compare .nl-backdrop,
   html.is-printing-compare .nl-popup,
   html.is-printing-compare .compare-bar,
-  html.is-printing-compare .w-webflow-badge{
+  html.is-printing-compare .w-webflow-badge,
+  html.is-printing-compare .ai-launch,
+  html.is-printing-compare button.ai-launch,
+  html.is-printing-compare #aiLaunch,
+  html.is-printing-compare .ai-panel,
+  html.is-printing-compare .ai-backdrop{
     display:none !important;
     visibility:hidden !important;
   }
@@ -558,12 +561,13 @@
   /* ImpresiÃ³n: orientaciÃ³n vertical + look cercano al desktop */
   @media print{
     .back-link,
+    .page-head h1,
     .toolbar,
     .print-btn,
     .share-btn,
     .diff-bar,
     .cell.product-head .remove,
-    .cell.product-head .phead-btns,
+    .cell.product-head .phead-hint,
     .modal-overlay,
     .tip-bubble,
     .spec-tip__mark,
@@ -616,17 +620,7 @@
       padding:0 0 12px !important;
       border-bottom:1px solid #e6e6e6 !important;
     }
-    .page-head h1{
-      display:block !important;
-      margin:0 !important;
-      font-size:22px !important;
-      font-weight:800 !important;
-      letter-spacing:-.03em !important;
-      color:#00152B !important;
-      line-height:1.15 !important;
-      writing-mode:horizontal-tb !important;
-      transform:none !important;
-    }
+    .page-head h1{display:none !important;}
     .page-head .count{
       display:block !important;
       margin-top:6px !important;
@@ -731,13 +725,13 @@
 
     .cell.section{
       grid-column:1 / -1 !important;
-      background:#e7f2f7 !important;
-      color:#00152B !important;
+      background:#8ab4c5 !important;
+      color:#fff !important;
       font-size:12.5px !important;
       font-weight:600 !important;
       min-height:0 !important;
-      padding:12px 16px !important;
-      border-bottom:1px solid #edeff2 !important;
+      padding:10px 14px !important;
+      border-bottom:none !important;
       border-top:none !important;
       margin:0 !important;
       border-radius:0 !important;
@@ -747,19 +741,14 @@
       flex-direction:row !important;
       flex-wrap:nowrap !important;
       align-items:center !important;
-      gap:10px !important;
+      gap:0 !important;
       writing-mode:horizontal-tb !important;
       transform:none !important;
     }
-    .cell.section .section-title svg{
-      width:16px !important;height:16px !important;
-      color:#0077a8 !important;
-      flex:none !important;
-      transform:none !important;
-    }
+    .cell.section .section-title svg{display:none !important;}
     .cell.section .section-title-text{
       display:inline !important;
-      color:#00152B !important;
+      color:#fff !important;
       font-size:12.5px !important;
       font-weight:600 !important;
       text-transform:none !important;
@@ -804,7 +793,7 @@
     }
     .cell.product-head .thumb{
       width:88px !important;height:88px !important;
-      background:#efefef !important;
+      background:transparent !important;
       border-radius:10px !important;
       margin:0 0 4px !important;
     }
@@ -813,36 +802,22 @@
       object-fit:contain !important;
     }
     .cell.product-head .pname{
+      display:block !important;
       font-size:13px !important;
       font-weight:700 !important;
       color:#00152B !important;
       line-height:1.3 !important;
       text-align:center !important;
+      padding-top:6px !important;
       max-width:100% !important;
-      writing-mode:horizontal-tb !important;
-      transform:none !important;
     }
+    .cell.product-head .phead-hint,
+    .pvariant{display:none !important;}
     .cell.product-head .psku{
-      font-size:11px !important;
-      margin-top:4px !important;
-      color:#5b6472 !important;
+      font-size:12px !important;
+      margin-top:6px !important;
+      color:#4f5a68 !important;
       font-weight:500 !important;
-    }
-    .pvariant{margin-top:6px !important;}
-    .pvariant-label{text-align:center;}
-    .pvariant select{
-      appearance:none !important;
-      -webkit-appearance:none !important;
-      border:none !important;
-      background:none !important;
-      box-shadow:none !important;
-      padding:0 !important;
-      min-height:0 !important;
-      font-size:11px !important;
-      font-weight:700 !important;
-      text-align:center !important;
-      color:#00152B !important;
-      pointer-events:none !important;
     }
     .cell.product-head .family{display:none !important;}
 
@@ -979,12 +954,12 @@
     }
     .cell.value{font-size:14px;padding:12px;}
     .cell.section{
-      font-size:14px;
-      padding:10px 8px;
-      min-height:44px;
+      font-size:var(--fs-base);
+      padding:10px 14px;
+      min-height:0;
     }
-    .cell.section .section-title{gap:8px;}
-    .cell.section .section-title svg{width:15px;height:15px;}
+    .cell.section .section-title{gap:0;}
+    .cell.section .section-title svg{display:none;}
     /* el switch de "solo diferencias" que vive acá en desktop (adentro de
        .header-label) ya se muestra aparte en mobile (#diffBar /
        #miniDiffRow) — sin columna de label que ocupar, se saca del todo
@@ -998,11 +973,10 @@
     .cell.product-head .thumb-ph{width:42px;height:42px;}
     .cell.product-head .pname{font-size:14px;padding-top:8px;}
     .cell.product-head .psku{font-size:12px;}
-    .cell.product-head .phead-btns{margin-top:auto;padding-top:10px;gap:6px;}
+    .cell.product-head .phead-hint{font-size:11px;margin-top:6px;}
     .cell.product-head .remove{
       width:34px;height:34px;top:6px;right:6px;
     }
-    .phead-btns .btn{min-height:38px;padding:8px 10px;font-size:13px;}
     .add-slot .box{min-height:140px;}
     .add-slot .box .plus{width:32px;height:32px;font-size:18px;}
     .add-slot .box span.lbl{font-size:13px;}
@@ -1037,7 +1011,6 @@
       grid-template-columns: repeat(3, minmax(190px, 78vw));
     }
     .cell.product-head .thumb{width:72px;height:72px;}
-    .phead-btns .btn{font-size:12px;}
   }
 
   /* ---- Asistente (alineado con productos / descargas) ---- */
@@ -1385,4 +1358,15 @@ button.ai-launch svg .ai-icon-spark,
 .ai-panel{z-index:2147483647 !important;}
 @media screen and (max-width:480px){
   .page-head h1{font-size:28px !important;}
+}
+@media print{
+  button.ai-launch,
+  .ai-launch,
+  #aiLaunch,
+  .ai-panel,
+  .ai-backdrop,
+  .ai-launch *{
+    display:none !important;
+    visibility:hidden !important;
+  }
 }

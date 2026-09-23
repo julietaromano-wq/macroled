@@ -34,10 +34,11 @@ if(!window.MacroledCompare){
 }
 
 /* =========================================================
-   ESQUEMA DE SPECS PARA LA COMPARATIVA
-   Cada fila apunta a un campo real de Typesense (ver FIELD_MAP más abajo).
-   Si un producto no tiene dato en ese campo, la fila directamente no se
-   muestra (ver buildRows) — no hace falta borrar filas a mano.
+   TIPS DE SPECS
+   Las filas salen de especificaciones[] de la colección macroled (la misma
+   base que las fichas). Este esquema solo aporta el texto de ayuda cuando
+   el nombre de la spec coincide. Si un producto no tiene ese dato, la fila
+   no se muestra (ver buildRows).
    ========================================================= */
 const ICON_BOLT = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>';
 const ICON_SUN = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>';
@@ -94,8 +95,8 @@ const SPEC_SCHEMA = [
 let comparedProducts = [];
 
 const TS_HOST = "https://typesense.coresagroup.com";
-const TS_API_KEY = "g0oiNYY8THGuU9jnCsvqIH1X9HtvYRCR";
-const COLLECTION = "Macroled_Prueba";
+const TS_API_KEY = "wpbpJ1lMSHi0ZZlB9CHY1fktyn2LqzLJ";
+const COLLECTION = "macroled";
 
 // El documento real de Typesense tiene campos nombrados directo (no un array
 // `atributos`). Este mapa conecta cada key de SPEC_SCHEMA con el nombre real
@@ -137,15 +138,11 @@ const FIELD_MAP = {
   sku: "sku"
 };
 
-// Campos que Typesense necesita devolver en cada búsqueda/resolución (además
-// de query_by): tienen index:false en el schema, así que si no se piden a
-// mano en include_fields, Typesense no los trae aunque estén store:true.
-const COMPARE_FIELDS = "nombre_typesense,sku,descripcion,macrofamilia,familia,multiimagen,link_ficha_web,variantes_sku,nombre_attr_variantes,attr_variantes,es_principal,potencia,factor_potencia,corriente,tension,frecuencia,anti_high_volt,driver,conector,base_conector,conductores,conexion,conectividad,clase,panel_solar,autonomia,lumenes_w,flujo_luminoso,rango_temperatura,angulo_apertura,cri,tipo_led,eficiencia_energetica,cantidad_luces,dimerizable,color,material_cuerpo,material_lente,ip,ik,temperatura_operacion,compatibilidad,vida_util,garantia_tiempo";
-const BASE_FILTER = "tipo_registro:=producto && es_principal:true";
+const BASE_FILTER = "tipo_registro:=producto && es_principal:true && publicar:=true";
 
 function parseImages(doc){
   if(!doc) return [];
-  let raw = doc.multiimagen || doc.multiimage;
+  let raw = doc.multiimagen || doc.multimagen || doc.multiimage;
   for(let i = 0; i < 3 && typeof raw === "string"; i++){
     const t = raw.trim();
     if(!(t.startsWith("[") || t.startsWith("{") || t.startsWith('"'))) break;
@@ -157,6 +154,7 @@ function parseImages(doc){
   else if(typeof raw === "string" && raw.trim()){
     items = raw.split(/[;,|]/).map(s => s.trim()).filter(Boolean);
   }
+  if(!items.length && doc.imagen) items = [doc.imagen];
   const urls = [];
   items.forEach(item => {
     let u = item;
@@ -283,15 +281,30 @@ function parseWattsValue(str){
   return Number.isFinite(n) ? n : null;
 }
 
+function docText(doc, names){
+  if(!doc) return "";
+  for(let i = 0; i < names.length; i++){
+    const raw = doc[names[i]];
+    if(raw != null && String(raw).trim()) return String(raw).trim();
+  }
+  const rows = readEspecificaciones(doc);
+  for(let i = 0; i < names.length; i++){
+    const hit = rows.find(r => String(r && r.campo || "").trim() === names[i]);
+    if(hit && hit.valor != null && String(hit.valor).trim()) return String(hit.valor).trim();
+  }
+  return "";
+}
+
 function colorFromDoc(doc){
-  return normalizeColorKey(doc && doc.color);
+  return normalizeColorKey(docText(doc, ["color"]));
 }
 
 function potenciaFromDoc(doc){
   if(!doc) return null;
-  const fromField = parseWattsValue(doc.potencia);
+  const rawPotencia = docText(doc, ["potencia"]);
+  const fromField = parseWattsValue(rawPotencia);
   if(fromField != null){
-    const raw = String(doc.potencia).trim();
+    const raw = String(rawPotencia).trim();
     return { key: String(fromField), watts: fromField, label: /w/i.test(raw) ? raw.replace(/\s+/g, "") : `${fromField}W` };
   }
   const fromSku = parseWattsValue(doc.sku);
@@ -327,10 +340,11 @@ function skuTempSuffix(sku){
 
 function tempInfoFromDoc(doc){
   if(!doc) return { kelvin: null, tone: null };
+  const tempText = docText(doc, ["rango_temperatura", "temperatura_color", "temperatura_k"]);
   const suffixTone = skuTempSuffix(doc.sku);
   const declaredTone = tempCategoryKey(doc.attr_variantes);
-  const tone = suffixTone || declaredTone || tempCategoryKey(doc.rango_temperatura);
-  let kelvin = kelvinFromText(doc.rango_temperatura)
+  const tone = suffixTone || declaredTone || tempCategoryKey(tempText);
+  let kelvin = kelvinFromText(tempText)
     || kelvinFromText(doc.attr_variantes)
     || kelvinFromSku(doc.sku);
   if(tone && kelvin && tempCategoryKey(String(kelvin)) !== tone){
@@ -346,7 +360,7 @@ function tempFromDoc(doc){
 }
 
 function anguloFromDoc(doc){
-  const field = String(doc && doc.angulo_apertura || "").trim();
+  const field = docText(doc, ["angulo_apertura", "angulo_de_apertura", "angulo_grados"]);
   if(field){
     const n = parseInt(field.replace(",", "."), 10);
     if(Number.isFinite(n)) return `${n}°`;
@@ -378,10 +392,14 @@ function variantOptionLabel(doc){
   const declared = String(doc.attr_variantes || "").trim();
   if(declared) return declared;
   const name = foldText(doc.nombre_attr_variantes);
-  if(/luz|temp/.test(name) && doc.rango_temperatura) return String(doc.rango_temperatura).trim();
-  if(/angulo/.test(name) && doc.angulo_apertura) return String(doc.angulo_apertura).trim();
-  if(/color/.test(name) && doc.color) return String(doc.color).trim();
-  if(/potenc/.test(name) && doc.potencia) return String(doc.potencia).trim();
+  const tempText = docText(doc, ["rango_temperatura", "temperatura_color"]);
+  const anguloText = docText(doc, ["angulo_apertura", "angulo_de_apertura", "angulo_grados"]);
+  const colorText = docText(doc, ["color"]);
+  const potenciaText = docText(doc, ["potencia"]);
+  if(/luz|temp/.test(name) && tempText) return tempText;
+  if(/angulo/.test(name) && anguloText) return anguloText;
+  if(/color/.test(name) && colorText) return colorText;
+  if(/potenc/.test(name) && potenciaText) return potenciaText;
   const pot = potenciaFromDoc(doc);
   if(pot) return pot.label;
   return "";
@@ -515,10 +533,11 @@ function mapDocToCompared(doc, extras){
     sku: doc.sku,
     family: doc.familia || doc.macrofamilia || "",
     macrofamilia: doc.macrofamilia || "",
-    name: doc.nombre_typesense || extras.nombre || "Producto sin nombre",
+    name: doc.nombre || doc.nombre_typesense || extras.nombre || "Producto sin nombre",
     img,
     ficha: doc.link_ficha_web || "#",
     specs: mapAtributosToSpecs(doc),
+    specRows: specRowsFromDoc(doc),
     variants,
     axes
   };
@@ -584,10 +603,9 @@ async function fetchDocsBySkus(skus){
   const escaped = unique.map(s => `\`${s.replace(/`/g, "")}\``).join(",");
   const params = new URLSearchParams({
     q: "*",
-    query_by: "nombre_typesense,sku",
+    query_by: "sku",
     filter_by: `sku:=[${escaped}]`,
-    include_fields: COMPARE_FIELDS,
-    per_page: String(Math.min(Math.max(unique.length, 1), 50))
+    per_page: String(Math.min(Math.max(unique.length, 1), 250))
   });
   const res = await fetch(`${TS_HOST}/collections/${COLLECTION}/documents/search?${params.toString()}`, {
     headers: { "X-TYPESENSE-API-KEY": TS_API_KEY }
@@ -595,46 +613,144 @@ async function fetchDocsBySkus(skus){
   if(!res.ok) throw new Error(`Typesense ${res.status}`);
   const data = await res.json();
   const bySku = {};
-  (data.hits || []).forEach(h => { if(h.document && h.document.sku) bySku[h.document.sku] = h.document; });
-  return unique.map(s => bySku[s]).filter(Boolean);
+  (data.hits || []).forEach(h => {
+    const sku = h.document && h.document.sku;
+    if(sku) bySku[String(sku).toUpperCase()] = h.document;
+  });
+  return unique.map(s => bySku[s.toUpperCase()]).filter(Boolean);
+}
+
+function skuKey(value){
+  return String(value || "").trim().toUpperCase();
+}
+
+function readEspecificaciones(doc){
+  let rows = doc && doc.especificaciones;
+  if(typeof rows === "string"){
+    try { rows = JSON.parse(rows); } catch(_){ rows = []; }
+  }
+  return Array.isArray(rows) ? rows : [];
 }
 
 async function hydrateComparedProduct(doc, variantSku, extras){
   extras = extras || {};
-  const skuSet = new Set(parseSkuList(doc.variantes_sku));
-  skuSet.add(doc.sku);
+  const skuSet = new Set(parseSkuList(doc && doc.variantes_sku));
+  if(doc && doc.sku) skuSet.add(doc.sku);
   if(variantSku) skuSet.add(variantSku);
-  let sibs = [doc];
-  if(skuSet.size > 1){
-    try{
-      const fetched = await fetchDocsBySkus([...skuSet]);
-      const bySku = {};
-      fetched.forEach(d => { bySku[d.sku] = d; });
-      bySku[doc.sku] = bySku[doc.sku] || doc;
-      sibs = Object.values(bySku);
-    }catch(err){
-      console.warn("No se pudieron cargar las variantes:", err);
-    }
+  let sibs = doc ? [doc] : [];
+  try{
+    const fetched = await fetchDocsBySkus([...skuSet]);
+    const bySku = {};
+    fetched.forEach(d => { bySku[skuKey(d.sku)] = d; });
+    if(doc && doc.sku && !bySku[skuKey(doc.sku)]) bySku[skuKey(doc.sku)] = doc;
+    sibs = Object.values(bySku);
+  }catch(err){
+    console.warn("No se pudo cargar el producto completo:", err);
   }
   const variants = sibs.length > 1 ? buildVariantOptions(sibs) : [];
-  const active = (variantSku && sibs.find(d => d.sku === variantSku)) || doc;
+  const active = (variantSku && sibs.find(d => skuKey(d.sku) === skuKey(variantSku)))
+    || (doc && sibs.find(d => skuKey(d.sku) === skuKey(doc.sku)))
+    || sibs[0]
+    || doc;
   return mapDocToCompared(active, {
-    principalSku: extras.principalSku || doc.sku,
+    principalSku: extras.principalSku || (doc && doc.sku) || (active && active.sku),
     nombre: extras.nombre,
     img: extras.img,
     variants
   });
 }
 
+function hasSpecValue(v){
+  if(v == null) return false;
+  const s = String(v).trim();
+  if(!s) return false;
+  if(/^(-+|n\/?a|null|undefined|sin dato)$/i.test(s)) return false;
+  return true;
+}
+
+function foldSpecLabel(value){
+  return String(value || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/\s+/g, " ").trim();
+}
+
+const SPEC_TIPS = {};
+SPEC_SCHEMA.forEach(section => {
+  section.filas.forEach(f => {
+    SPEC_TIPS[f.key] = f.tip;
+    SPEC_TIPS[foldSpecLabel(f.label)] = f.tip;
+  });
+});
+
+function tipForSpec(key, label){
+  return SPEC_TIPS[key] || SPEC_TIPS[foldSpecLabel(label)] || "";
+}
+
+const GROUP_RULES = [
+  { test: /remoto/i, title: "Características del control remoto", icon: ICON_BOX },
+  { test: /controladora/i, title: "Características de la controladora", icon: ICON_BOX },
+  { test: /el[eé]ctric/i, title: "Características eléctricas", icon: ICON_BOLT },
+  { test: /lum[ií]nic/i, title: "Características lumínicas", icon: ICON_SUN },
+  { test: /material|construcci/i, title: "Características materiales", icon: ICON_BOX },
+  { test: /conect|funci/i, title: "Características de conectividad", icon: ICON_BOX },
+  { test: /comercial|log[ií]stic/i, title: "Características comerciales", icon: ICON_TAG }
+];
+
+function groupMeta(grupo){
+  const raw = String(grupo || "").trim();
+  const index = GROUP_RULES.findIndex(rule => rule.test.test(raw));
+  if(index >= 0) return { title: GROUP_RULES[index].title, icon: GROUP_RULES[index].icon, order: index };
+  return { title: raw || "Especificaciones", icon: ICON_BOX, order: GROUP_RULES.length };
+}
+
+function specRowsFromDoc(doc){
+  const rows = readEspecificaciones(doc);
+  const out = [];
+  const seen = new Set();
+  rows.forEach(row => {
+    const nombre = String((row && row.nombre) || "").trim();
+    const valor = row && row.valor != null ? String(row.valor).trim() : "";
+    if(!nombre || !hasSpecValue(valor)) return;
+    const key = String((row && row.campo) || "").trim() || foldSpecLabel(nombre);
+    if(seen.has(key)) return;
+    seen.add(key);
+    out.push({
+      key,
+      label: nombre,
+      group: String((row && row.grupo) || "").trim() || "Especificaciones"
+    });
+  });
+  if(!out.length){
+    SPEC_SCHEMA.forEach(section => {
+      section.filas.forEach(f => {
+        const raw = doc && doc[FIELD_MAP[f.key]];
+        if(!hasSpecValue(raw) || seen.has(f.key)) return;
+        seen.add(f.key);
+        out.push({ key: f.key, label: f.label, group: section.categoria });
+      });
+    });
+  }
+  if(doc && doc.sku && !seen.has("sku")){
+    out.push({ key: "sku", label: "SKU", group: "Comerciales y logística" });
+  }
+  return out;
+}
+
 function mapAtributosToSpecs(doc){
   const specs = {};
-  for(const key in FIELD_MAP){
-    const raw = doc[FIELD_MAP[key]];
-    if(raw !== undefined && raw !== null && raw !== ""){
-      specs[key] = raw.toString();
+  const rows = readEspecificaciones(doc);
+  rows.forEach(row => {
+    const nombre = String((row && row.nombre) || "").trim();
+    const valor = row && row.valor != null ? String(row.valor).trim() : "";
+    if(!nombre || !hasSpecValue(valor)) return;
+    const key = String((row && row.campo) || "").trim() || foldSpecLabel(nombre);
+    if(!hasSpecValue(specs[key])) specs[key] = valor;
+  });
+  if(!Object.keys(specs).length){
+    for(const key in FIELD_MAP){
+      const raw = doc[FIELD_MAP[key]];
+      if(hasSpecValue(raw)) specs[key] = String(raw).trim();
     }
   }
-  if(!specs.sku && doc.sku) specs.sku = doc.sku;
+  if(!specs.sku && doc && doc.sku) specs.sku = String(doc.sku);
   return specs;
 }
 
@@ -642,10 +758,41 @@ function escAttr(s){
   return (s || "").toString().replace(/"/g, "&quot;");
 }
 
+function escHtml(s){
+  return String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+}
+
+function tsFilterValue(value){
+  return "`" + String(value).replace(/\\/g, "\\\\").replace(/`/g, "\\`") + "`";
+}
+
 async function searchTypesenseModal(query){
-  return window.MacroledComparePicker.search(query, {
-    fields: COMPARE_FIELDS
+  const reference = comparedProducts[0];
+  const params = new URLSearchParams({
+    q: query && String(query).trim() ? String(query).trim() : "*",
+    query_by: "nombre,nombre_typesense,sku,descripcion",
+    filter_by: BASE_FILTER,
+    per_page: "20",
+    page: "1",
+    include_fields: "sku,nombre,nombre_typesense,descripcion,macrofamilia,familia,multiimage,imagen,link_ficha_web,variantes_sku,es_principal,especificaciones"
   });
+  const scores = [];
+  const macro = reference && reference.macrofamilia ? `macrofamilia:=${tsFilterValue(reference.macrofamilia)}` : "";
+  if(reference && reference.family){
+    const family = `familia:=${tsFilterValue(reference.family)}`;
+    scores.push(`(${macro ? macro + " && " : ""}${family}):3`);
+  }
+  if(macro) scores.push(`(${macro}):1`);
+  if(scores.length) params.set("sort_by", `_eval([${scores.join(",")}]):desc,_text_match:desc`);
+  const res = await fetch(`${TS_HOST}/collections/${COLLECTION}/documents/search?${params.toString()}`, {
+    headers: { "X-TYPESENSE-API-KEY": TS_API_KEY }
+  });
+  if(!res.ok) throw new Error(`Typesense ${res.status}`);
+  const data = await res.json();
+  return (data.hits || []).map(hit => hit.document).filter(Boolean).map(doc => ({
+    ...doc,
+    nombre_typesense: doc.nombre || doc.nombre_typesense || doc.sku
+  }));
 }
 
 const COMPARE_MAX = 3;
@@ -740,22 +887,30 @@ document.addEventListener("click", () => hideTip());
    RENDER
    ========================================================= */
 function buildRows(){
+  const catalog = new Map();
+  comparedProducts.forEach(p => {
+    (p.specRows || []).forEach(row => {
+      if(!catalog.has(row.key)) catalog.set(row.key, row);
+    });
+  });
+  const byGroup = new Map();
+  catalog.forEach(row => {
+    const meta = groupMeta(row.group);
+    if(!byGroup.has(meta.title)) byGroup.set(meta.title, { title: meta.title, icon: meta.icon, order: meta.order, filas: [] });
+    byGroup.get(meta.title).filas.push(row);
+  });
   const rows = [];
-  SPEC_SCHEMA.forEach(section => {
+  [...byGroup.values()].sort((a, b) => a.order - b.order || a.title.localeCompare(b.title, "es")).forEach(section => {
     const filas = section.filas.filter(f => {
-      // si ningún producto comparado tiene dato cargado en esta spec, la fila
-      // no aporta nada — se oculta siempre, sin importar el toggle de diffs
       const vals = comparedProducts.map(p => p.specs[f.key]);
-      const hasAnyValue = vals.some(v => v !== undefined && v !== null && v !== "");
-      if(!hasAnyValue) return false;
-
+      if(!vals.some(hasSpecValue)) return false;
       if(!showOnlyDiffs) return true;
-      const compareVals = comparedProducts.map(p => p.specs[f.key] ?? "—");
+      const compareVals = comparedProducts.map(p => hasSpecValue(p.specs[f.key]) ? String(p.specs[f.key]).trim() : "—");
       return !compareVals.every(v => v === compareVals[0]);
     });
-    if(!filas.length) return; // sin filas con dato → tampoco mostramos el título de la sección
-    rows.push({ type: "section", label: section.categoria, icon: section.icon || "" });
-    filas.forEach(f => rows.push({ type: "row", label: f.label, key: f.key, tip: f.tip }));
+    if(!filas.length) return;
+    rows.push({ type: "section", label: section.title, icon: section.icon || "" });
+    filas.forEach(f => rows.push({ type: "row", label: f.label, key: f.key, tip: tipForSpec(f.key, f.label) }));
   });
   return rows;
 }
@@ -789,18 +944,24 @@ function render(){
   for(let i = 0; i < COMPARE_MAX; i++){
     const p = comparedProducts[i];
     if(p){
+      const fichaHref = String(p.ficha || "").trim();
+      const canOpenFicha = fichaHref && fichaHref !== "#";
+      const linkOpen = canOpenFicha
+        ? `<a class="phead-link" href="${escAttr(fichaHref)}" aria-label="${escAttr("Ver ficha de " + p.name)}">`
+        : `<div class="phead-link is-static">`;
+      const linkClose = canOpenFicha ? "</a>" : "</div>";
       html += `
         <div class="cell product-head coldata">
           <button class="remove" data-remove="${p.id}" title="Quitar de la comparación">
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
           </button>
+          ${linkOpen}
           ${productThumbHtml(p)}
-          <div class="pname">${p.name}</div>
+          <div class="pname">${escHtml(p.name)}</div>
           <div class="psku">${escAttr(p.sku)}</div>
+          ${canOpenFicha ? `<span class="phead-hint">${ICON_LINK}<span>Ver ficha</span></span>` : ""}
+          ${linkClose}
           ${variantPickerHtml(p)}
-          <div class="phead-btns">
-            <a class="btn btn-primary" href="${p.ficha}">${ICON_LINK} Ver producto</a>
-          </div>
         </div>`;
     }else{
       html += `
@@ -818,7 +979,7 @@ function render(){
   // Filas de specs: misma lógica de 3 columnas fijas, celda vacía si no hay producto ahí
   rows.forEach(row => {
     if(row.type === "section"){
-      html += `<div class="cell section"><span class="section-title">${row.icon || ""}<span class="section-title-text">${row.label}</span></span></div>`;
+      html += `<div class="cell section"><span class="section-title">${row.icon || ""}<span class="section-title-text">${escHtml(row.label)}</span></span></div>`;
       return;
     }
     const labelCell = row.tip
@@ -838,7 +999,7 @@ function render(){
       const p = comparedProducts[i];
       if(p){
         const val = p.specs[row.key];
-        html += `<div class="cell value coldata">${val ? val : '<span class="dash">—</span>'}</div>`;
+        html += `<div class="cell value coldata">${hasSpecValue(val) ? `<span class="value-text">${escHtml(val)}</span>` : '<span class="dash">—</span>'}</div>`;
       }else{
         html += `<div class="cell value empty-col coldata"></div>`;
       }
@@ -928,7 +1089,11 @@ const PRINT_CHROME_SELECTORS = [
   ".nl-backdrop",
   ".nl-popup",
   ".compare-bar",
-  ".w-webflow-badge"
+  ".w-webflow-badge",
+  "#aiLaunch",
+  ".ai-launch",
+  "#aiPanel",
+  "#aiBackdrop"
 ];
 
 function setComparePrintChrome(hidden){
@@ -1300,30 +1465,30 @@ async function resolveProductsFromStorage(){
   try{
     const principalDocs = await fetchDocsBySkus(stored.map(p => p.sku));
     const bySku = {};
-    principalDocs.forEach(d => { bySku[d.sku] = d; });
+    principalDocs.forEach(d => { bySku[skuKey(d.sku)] = d; });
 
     const siblingSkus = [];
     stored.forEach(p => {
-      const doc = bySku[p.sku];
+      const doc = bySku[skuKey(p.sku)];
       if(doc) parseSkuList(doc.variantes_sku).forEach(s => siblingSkus.push(s));
       if(p.variantSku) siblingSkus.push(p.variantSku);
     });
     if(siblingSkus.length){
-      (await fetchDocsBySkus(siblingSkus)).forEach(d => { bySku[d.sku] = d; });
+      (await fetchDocsBySkus(siblingSkus)).forEach(d => { bySku[skuKey(d.sku)] = d; });
     }
 
     comparedProducts = stored.map(p => {
-      const principal = bySku[p.sku];
+      const principal = bySku[skuKey(p.sku)];
       if(!principal){
-        return { id: p.sku, principalSku: p.sku, sku: p.sku, family: "", name: p.nombre || p.sku, img: p.img || "", ficha: "#", specs: {}, variants: [] };
+        return { id: p.sku, principalSku: p.sku, sku: p.sku, family: "", name: p.nombre || p.sku, img: p.img || "", ficha: "#", specs: {}, specRows: [], variants: [] };
       }
       const skuSet = new Set(parseSkuList(principal.variantes_sku));
       skuSet.add(principal.sku);
-      const sibs = [...skuSet].map(s => bySku[s]).filter(Boolean);
-      if(!sibs.some(d => d.sku === principal.sku)) sibs.unshift(principal);
+      const sibs = [...skuSet].map(s => bySku[skuKey(s)]).filter(Boolean);
+      if(!sibs.some(d => skuKey(d.sku) === skuKey(principal.sku))) sibs.unshift(principal);
       const variants = sibs.length > 1 ? buildVariantOptions(sibs) : [];
-      const activeSku = (p.variantSku && bySku[p.variantSku]) ? p.variantSku : principal.sku;
-      return mapDocToCompared(bySku[activeSku] || principal, {
+      const activeSku = (p.variantSku && bySku[skuKey(p.variantSku)]) ? p.variantSku : principal.sku;
+      return mapDocToCompared(bySku[skuKey(activeSku)] || principal, {
         principalSku: p.sku,
         nombre: p.nombre,
         img: p.img,

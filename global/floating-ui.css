@@ -98,3 +98,15 @@ body > .ai-panel{
     box-shadow:none !important;
   }
 }
+
+@media print{
+  .ai-launch,
+  button.ai-launch,
+  #aiLaunch,
+  .ai-panel,
+  .ai-backdrop,
+  .ai-launch *{
+    display:none !important;
+    visibility:hidden !important;
+  }
+}
