@@ -37,6 +37,10 @@
     { key: "compatibles", role: "Compatible", roleClass: "is-compatible", attr: "data-compatibles" },
   ];
 
+  function productName(doc) {
+    return String((doc && (doc.nombre || doc.nombre_typesense)) || "").trim();
+  }
+
   const escapeHTML = (value) =>
     String(value ?? "").replace(
       /[&<>'"]/g,
@@ -283,7 +287,7 @@
     const image = firstImage(doc);
     const media = image
       ? `<img src="${escapeHTML(image)}" alt="${escapeHTML(
-          doc.nombre_typesense || doc.sku || ""
+          productName(doc) || doc.sku || ""
         )}" loading="lazy" width="300" height="300">`
       : '<span class="ml-product-card__note">Sin imagen</span>';
     const badgesLeft = `<span class="ml-product-role-badge ${group.roleClass}">${
@@ -297,7 +301,7 @@
     }<div class="card-overlays">${buildTempBadge(
       doc
     )}</div><div class="media-frame">${media}</div></div><div class="ml-product-card__title">${escapeHTML(
-      doc.nombre_typesense || doc.descripcion || "Producto sin nombre"
+      productName(doc) || doc.descripcion || "Producto sin nombre"
     )}</div><span class="ml-product-card__sku">${escapeHTML(
       doc.sku || ""
     )}</span></${tag}>`;

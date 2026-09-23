@@ -5,7 +5,7 @@
     host: "https://typesense.coresagroup.com",
     apiKey: "wpbpJ1lMSHi0ZZlB9CHY1fktyn2LqzLJ",
     collection: "macroled",
-    queryBy: "nombre_typesense,descripcion",
+    queryBy: "nombre,nombre_typesense,descripcion",
   };
   const RELATED_COUNT = 8;
   const RELATED_FALLBACK_POOL = 50;
@@ -48,6 +48,10 @@
       );
     }
     return targets;
+  }
+
+  function productName(doc) {
+    return String((doc && (doc.nombre || doc.nombre_typesense)) || "").trim();
   }
 
   const escapeHTML = (value) =>
@@ -276,7 +280,7 @@
       : '<span class="ml-product-card__note">Sin atributos cargados</span>';
     const image = imgs.length
       ? `<img src="${escapeHTML(imgs[0])}" alt="${escapeHTML(
-          doc.nombre_typesense || "Producto Macroled"
+          productName(doc) || "Producto Macroled"
         )}" loading="lazy" width="400" height="400">`
       : '<span class="ml-product-card__note">Sin imagen</span>';
     const badgesLeft = buildNuevoBadge(doc);
@@ -292,7 +296,7 @@
     }<div class="card-overlays">${buildTempBadge(
       doc
     )}</div><div class="media-frame">${image}</div></div><div class="ml-product-card__title">${escapeHTML(
-      doc.nombre_typesense || "Producto sin nombre"
+      productName(doc) || "Producto sin nombre"
     )}</div><div class="ml-product-card__specs">${specsHtml}</div></${tag}>`;
   }
 
@@ -486,9 +490,9 @@
 
   function sortByNameSimilarity(docs, currentName) {
     return docs.sort((a, b) => {
-      const score = nameSimilarity(currentName, b.nombre_typesense) - nameSimilarity(currentName, a.nombre_typesense);
+      const score = nameSimilarity(currentName, productName(b)) - nameSimilarity(currentName, productName(a));
       if (score) return score;
-      return String(a.nombre_typesense || "").localeCompare(String(b.nombre_typesense || ""), "es", {
+      return productName(a).localeCompare(productName(b), "es", {
         numeric: true,
         sensitivity: "base",
       });
