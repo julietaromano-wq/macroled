@@ -7,16 +7,18 @@ const COLLECTION = "Macroled_Prueba";
 const PER_PAGE = 18;
 const TYPESENSE_PAGE_SIZE = 250;
 const TYPESENSE_PAGE_CONCURRENCY = 4;
-const DOWNLOADS_CACHE_KEY = "macroled-descargas-v7";
+const DOWNLOADS_CACHE_KEY = "macroled-descargas-v8";
 const DOWNLOADS_CACHE_TTL_MS = 5 * 60 * 1000;
 
 // Qué campo del documento de producto corresponde a cada tipo de descarga.
 // Si en el futuro sumás páginas/MB por SKU, agregá esos campos acá.
 const PRODUCT_DOWNLOAD_FIELDS = [
-  { field: "ficha_tecnica", tipo_descarga: "Ficha técnica", tipo_archivo: "PDF" },
-  { field: "garantia_link", tipo_descarga: "Garantía",       tipo_archivo: "PDF" },
   { field: "manual",        tipo_descarga: "Manual",         tipo_archivo: "PDF", aliases: ["manual_link", "manuales"] },
   { field: "ies_link",      tipo_descarga: "IES",            tipo_archivo: "IES" },
+];
+const GENERATED_DOWNLOADS = [
+  { tipo_descarga: "Ficha técnica", tipo_archivo: "PDF", generar: "ficha" },
+  { tipo_descarga: "Garantía",       tipo_archivo: "PDF", generar: "garantia" },
 ];
 
 const TIPO_DESCARGA_CATALOGO = "Catálogo";
@@ -438,14 +440,16 @@ function buildTemperaturaMedia(temperaturas){
 // (no una card por tipo). "descargas" guarda solo los tipos que tienen URL cargada.
 function expandProductos(productos){
   const items = productos.map(doc => {
-    const descargas = PRODUCT_DOWNLOAD_FIELDS
+    const descargas = GENERATED_DOWNLOADS.concat(
+      PRODUCT_DOWNLOAD_FIELDS
       .map(({ field, aliases, tipo_descarga, tipo_archivo }) => {
         const raw = doc[field] || (aliases || []).map(a => doc[a]).find(Boolean) || "";
         const url = String(raw).trim();
         if(!url || url === "#" || url.toLowerCase() === "null") return null;
         return { tipo_descarga, tipo_archivo, url, paginas: null, mb: null };
       })
-      .filter(Boolean);
+      .filter(Boolean)
+    );
 
     const imgs = parseImages(doc);
 
@@ -732,7 +736,7 @@ function cardTemplate(it, idx){
           ${descHtml}
           ${seccionTipo}
         </div>
-        <a class="btn-download" href="${escAttr(activa.url)}" target="_blank" rel="noopener"><span class="btn-icon">${ICON_DOWNLOAD}</span> ${esCatalogo ? "Descargar" : `Descargar ${escAttr(activa.tipo_archivo)}`}</a>
+        <a class="btn-download" href="${activa.generar ? "#" : escAttr(activa.url)}" ${activa.generar ? `data-generar="${escAttr(activa.generar)}" data-sku="${escAttr(it.sku)}"` : 'target="_blank" rel="noopener"'}><span class="btn-icon">${ICON_DOWNLOAD}</span> ${esCatalogo ? "Descargar" : `Descargar ${escAttr(activa.tipo_archivo)}`}</a>
       </div>
     </div>
   `;
@@ -827,11 +831,74 @@ function updateCardActiveTab(cardEl, item){
   cardEl.querySelectorAll(".type-tab").forEach((btn, i) => btn.classList.toggle("active", i === activeIdx));
   const d = item.descargas[activeIdx];
   const btn = cardEl.querySelector(".btn-download");
-  btn.href = d.url;
-  btn.innerHTML = `<span class="btn-icon">${ICON_DOWNLOAD}</span> ${isCatalogoItem(item) ? "Descargar" : `Descargar ${d.tipo_archivo}`}`;
+  const label = isCatalogoItem(item) ? "Descargar" : `Descargar ${d.tipo_archivo}`;
+  btn.innerHTML = `<span class="btn-icon">${ICON_DOWNLOAD}</span> ${label}`;
+  if(d.generar){
+    btn.href = "#";
+    btn.removeAttribute("target");
+    btn.removeAttribute("rel");
+    btn.dataset.generar = d.generar;
+    btn.dataset.sku = item.sku || "";
+  }else{
+    btn.href = d.url;
+    btn.target = "_blank";
+    btn.rel = "noopener";
+    delete btn.dataset.generar;
+    delete btn.dataset.sku;
+  }
+}
+
+let sheetLibPromise = null;
+
+function sheetScriptUrl(){
+  const current = document.querySelector("script[src*='app.js']");
+  const base = current && current.src ? current.src : window.location.href;
+  return new URL("../ficha/script.js?v=pdf-gen", base).href;
+}
+
+function loadSheetLib(){
+  if(window.MacroledSheet && typeof window.MacroledSheet.download === "function"){
+    return Promise.resolve(window.MacroledSheet);
+  }
+  if(sheetLibPromise) return sheetLibPromise;
+  window.__mlSkipFichaBoot = true;
+  sheetLibPromise = new Promise((resolve, reject) => {
+    const script = document.createElement("script");
+    script.src = sheetScriptUrl();
+    script.onload = () => {
+      if(window.MacroledSheet && typeof window.MacroledSheet.download === "function") resolve(window.MacroledSheet);
+      else reject(new Error("generador"));
+    };
+    script.onerror = () => reject(new Error("generador"));
+    document.head.appendChild(script);
+  });
+  return sheetLibPromise;
+}
+
+async function generateSheetDownload(button){
+  if(button.getAttribute("aria-busy") === "true") return;
+  const sku = button.dataset.sku || "";
+  const kind = button.dataset.generar || "ficha";
+  const previous = button.innerHTML;
+  button.setAttribute("aria-busy", "true");
+  button.innerHTML = `<span class="btn-icon">${ICON_DOWNLOAD}</span> Generando…`;
+  try{
+    const lib = await loadSheetLib();
+    await lib.download(sku, kind);
+  }catch(err){
+    console.error("[descargas] no se pudo generar el PDF", err);
+    button.innerHTML = `<span class="btn-icon">${ICON_DOWNLOAD}</span> Reintentar`;
+    button.removeAttribute("aria-busy");
+  }
 }
 
 document.getElementById("grid").addEventListener("click", (e) => {
+  const generateButton = e.target.closest(".btn-download[data-generar]");
+  if(generateButton){
+    e.preventDefault();
+    generateSheetDownload(generateButton);
+    return;
+  }
   const copyButton = e.target.closest(".copy-sku");
   if(copyButton){
     const sku = copyButton.dataset.sku || "";

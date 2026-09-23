@@ -1,7 +1,8 @@
 <!--
-  HTML para pegar en Webflow (Embed / Custom Code del template de ficha).
-  Actualizado contra Macroled_ficha/index.html — CTA: comparar + preguntá en la misma fila (.cta-utility).
-  CMS, scripts y relacionados van aparte (como ya tenés).
+  HTML para pegar en el Embed de la plantilla de producto en Webflow.
+  Es la estructura vacía: no trae datos de ningún producto.
+  El script lee el SKU del Text Block #ml-cms-sku y completa nombre, specs, fotos y descargas.
+  Mientras carga, .wrap.is-hydrating tapa el contenido y muestra "Cargando producto…".
 -->
 <main>
   <div class="wrap is-hydrating">
@@ -11,8 +12,8 @@
     </div>
     <nav class="crumb" aria-label="Miga de pan">
       <a href="/productos">Productos</a><span class="sep">›</span>
-      <a id="crumb-family">Luminarias Inalámbricas</a><span class="sep">›</span>
-      <span class="here" id="crumb-name">Space Blanca</span>
+      <a id="crumb-family"></a><span class="sep">›</span>
+      <span class="here" id="crumb-name"></span>
     </nav>
 
     <section class="hero" aria-label="Producto">
@@ -24,7 +25,7 @@
               <span class="smart-badge" id="smart-badge" hidden aria-label="Producto con conectividad Smart">
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/></svg>SMART
               </span>
-              <img class="stage-img" id="stageImg" alt="Space Blanca" draggable="false" fetchpriority="high">
+              <img class="stage-img" id="stageImg" alt="" draggable="false" fetchpriority="high">
               <video class="stage-video" id="stageVideo" playsinline controls preload="metadata" hidden></video>
               <span class="stage-play" id="stagePlay" hidden aria-hidden="true">
                 <svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>
@@ -75,9 +76,9 @@
       </div>
 
       <div class="info">
-        <span class="eyebrow" id="ficha-eyebrow">Decorativas · Luminarias Inalámbricas</span>
-        <h1 id="ficha-name">Space Blanca</h1>
-        <p class="lead" id="ficha-lead">Velador a batería Space Macroled, dimerizable, color blanco, DC 5V, 2700K, IP44, 160lm, incluye cable USB-C</p>
+        <span class="eyebrow" id="ficha-eyebrow"></span>
+        <h1 id="ficha-name"></h1>
+        <p class="lead" id="ficha-lead"></p>
 
         <div class="meta">
           <div class="meta-ids">
@@ -95,7 +96,7 @@
           <div class="quick-specs" data-count="2" aria-label="Especificaciones destacadas">
             <div class="qspec" data-spec-key="Potencia">
               <span class="label">Potencia</span>
-              <span class="val" data-spec-val>1.6W</span>
+              <span class="val" data-spec-val></span>
             </div>
             <div class="qspec" data-spec-key="Temperatura del color" hidden>
               <span class="label">Luz</span>
@@ -103,18 +104,18 @@
             </div>
             <div class="qspec" data-spec-key="Flujo luminoso">
               <span class="label">Lúmenes</span>
-              <span class="val" data-spec-val>160lm</span>
+              <span class="val" data-spec-val></span>
             </div>
           </div>
         </div>
 
         <div class="cta-stack">
           <div class="actions">
-            <a class="btn btn-primary" id="btn-ficha" href="https://s3.coresagroup.com/MACROLED/DS/SPACE-B.pdf" target="_blank" rel="noopener">
+            <a class="btn btn-primary" id="btn-ficha" href="#" target="_blank" rel="noopener">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m7 11 5 5 5-5"/><path d="M5 21h14"/></svg>
               Descargar ficha técnica
             </a>
-            <a class="btn btn-ghost" id="btn-catalogo" href="descargar.html">
+            <a class="btn btn-ghost" id="btn-catalogo" href="#">
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/><path d="M8 7h8M8 11h6"/></svg>
               Catálogo
             </a>
@@ -141,7 +142,7 @@
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
             <span class="trust-lines">
               <span>Garantía oficial</span>
-              <span data-trust-garantia>1 año</span>
+              <span data-trust-garantia></span>
             </span>
           </div>
           <div class="trust-item" data-trust="certificado">
@@ -252,7 +253,7 @@
                     <svg class="spec-tip__mark" viewBox="0 0 16 16" fill="none" aria-hidden="true"><circle cx="8" cy="8" r="6.25" stroke="currentColor" stroke-width="1.4"/><path d="M8 7.2v4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><circle cx="8" cy="5.1" r="0.9" fill="currentColor"/></svg>
                   </button>
                 </span>
-                <span class="v" data-spec-val>Luminarias Inalámbricas</span>
+                <span class="v" data-spec-val></span>
               </div>
               <div class="spec-row" data-spec-key="Macrofamilia">
                 <span class="k">
@@ -261,7 +262,7 @@
                     <svg class="spec-tip__mark" viewBox="0 0 16 16" fill="none" aria-hidden="true"><circle cx="8" cy="8" r="6.25" stroke="currentColor" stroke-width="1.4"/><path d="M8 7.2v4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><circle cx="8" cy="5.1" r="0.9" fill="currentColor"/></svg>
                   </button>
                 </span>
-                <span class="v" data-spec-val>Decorativas</span>
+                <span class="v" data-spec-val></span>
               </div>
               <div class="spec-row" data-spec-key="SKU">
                 <span class="k">
@@ -270,7 +271,7 @@
                     <svg class="spec-tip__mark" viewBox="0 0 16 16" fill="none" aria-hidden="true"><circle cx="8" cy="8" r="6.25" stroke="currentColor" stroke-width="1.4"/><path d="M8 7.2v4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><circle cx="8" cy="5.1" r="0.9" fill="currentColor"/></svg>
                   </button>
                 </span>
-                <span class="v" id="spec-sku" data-spec-val>SPACE-B</span>
+                <span class="v" id="spec-sku" data-spec-val></span>
               </div>
               <div class="spec-row" data-spec-key="EAN13">
                 <span class="k">
@@ -279,7 +280,7 @@
                     <svg class="spec-tip__mark" viewBox="0 0 16 16" fill="none" aria-hidden="true"><circle cx="8" cy="8" r="6.25" stroke="currentColor" stroke-width="1.4"/><path d="M8 7.2v4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><circle cx="8" cy="5.1" r="0.9" fill="currentColor"/></svg>
                   </button>
                 </span>
-                <span class="v" id="spec-ean" data-spec-val>7428325595880</span>
+                <span class="v" id="spec-ean" data-spec-val></span>
               </div>
               <div class="spec-row" data-spec-key="Garantía">
                 <span class="k">
@@ -288,7 +289,7 @@
                     <svg class="spec-tip__mark" viewBox="0 0 16 16" fill="none" aria-hidden="true"><circle cx="8" cy="8" r="6.25" stroke="currentColor" stroke-width="1.4"/><path d="M8 7.2v4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><circle cx="8" cy="5.1" r="0.9" fill="currentColor"/></svg>
                   </button>
                 </span>
-                <span class="v" data-spec-val>1 año</span>
+                <span class="v" data-spec-val></span>
               </div>
             </div>
           </div>
@@ -297,7 +298,7 @@
 
       <div class="tab-panel" id="panel-files" role="tabpanel" hidden>
         <div class="dl-list" id="files-list">
-          <a class="dl-card" data-file="ficha" id="dl-ficha" href="https://s3.coresagroup.com/MACROLED/DS/SPACE-B.pdf" target="_blank" rel="noopener">
+          <a class="dl-card" data-file="ficha" id="dl-ficha" href="#" target="_blank" rel="noopener">
             <span class="dl-card__icon" aria-hidden="true">
               <svg viewBox="0 0 36 44" fill="none">
                 <path d="M4 0h20l12 12v28a4 4 0 0 1-4 4H4a4 4 0 0 1-4-4V4a4 4 0 0 1 4-4z" fill="currentColor"/>
@@ -308,20 +309,6 @@
             <span class="dl-card__body">
               <span class="dl-card__title">Ficha técnica</span>
               <span class="dl-card__meta">Resumen de características y especificaciones del producto</span>
-            </span>
-            <span class="dl-card__btn">Descargar</span>
-          </a>
-          <a class="dl-card" data-file="ficha-anterior" id="dl-ficha-anterior" href="#" target="_blank" rel="noopener" hidden>
-            <span class="dl-card__icon" aria-hidden="true">
-              <svg viewBox="0 0 36 44" fill="none">
-                <path d="M4 0h20l12 12v28a4 4 0 0 1-4 4H4a4 4 0 0 1-4-4V4a4 4 0 0 1 4-4z" fill="currentColor"/>
-                <path d="M24 0v8a4 4 0 0 0 4 4h8L24 0z" fill="#005f87" opacity=".45"/>
-                <text x="18" y="30" text-anchor="middle" fill="#fff" font-family="Noto Sans,sans-serif" font-size="9" font-weight="800">PDF</text>
-              </svg>
-            </span>
-            <span class="dl-card__body">
-              <span class="dl-card__title">Ficha técnica general</span>
-              <span class="dl-card__meta">Ficha técnica general cargada para este producto</span>
             </span>
             <span class="dl-card__btn">Descargar</span>
           </a>
@@ -339,7 +326,7 @@
             </span>
             <span class="dl-card__btn">Descargar</span>
           </a>
-          <a class="dl-card" data-file="garantia" id="dl-garantia" href="https://s3.coresagroup.com/MACROLED/Garantias/SPACE-B.pdf" target="_blank" rel="noopener">
+          <a class="dl-card" data-file="garantia" id="dl-garantia" href="#" target="_blank" rel="noopener">
             <span class="dl-card__icon" aria-hidden="true">
               <svg viewBox="0 0 36 44" fill="none">
                 <path d="M4 0h20l12 12v28a4 4 0 0 1-4 4H4a4 4 0 0 1-4-4V4a4 4 0 0 1 4-4z" fill="currentColor"/>
@@ -473,8 +460,34 @@
     </div>
   </section>
 
-  <!-- Relacionados: pegá el embed de relacionados en un Embed aparte (más fiable). -->
 </main>
+
+<section class="ml-related-products" id="productos-relacionados" data-reveal hidden>
+  <div class="wrap">
+    <div class="ml-related-products__head">
+      <h2 id="ml-related-products-title">También te puede interesar</h2>
+      <a class="link-more" href="/productos">Ver catálogo <span aria-hidden="true">→</span></a>
+    </div>
+    <div class="ml-related-products__viewport" data-related-viewport>
+      <div class="ml-related-products__track" data-related-track aria-live="polite">
+        <div class="ml-related-products__state">Cargando productos relacionados…</div>
+      </div>
+      <div class="ml-related-products__arrows" hidden>
+        <button class="ml-related-products__nav" type="button" data-related-prev aria-label="Producto anterior">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 12H5m6-6-6 6 6 6"/></svg>
+        </button>
+        <button class="ml-related-products__nav" type="button" data-related-next aria-label="Producto siguiente">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6"/></svg>
+        </button>
+      </div>
+    </div>
+    <div class="ml-related-products__controls" hidden>
+      <div class="ml-related-products__progress" aria-hidden="true">
+        <span data-related-progress></span>
+      </div>
+    </div>
+  </div>
+</section>
 
 <!-- Share toast -->
 <div class="share-toast" id="shareToast" role="status" aria-live="polite">Link copiado</div>
