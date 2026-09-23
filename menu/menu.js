@@ -442,9 +442,9 @@ if (typeof module !== "undefined") module.exports = MEGAMENU_DATA;
    ========================================================= */
 (function () {
   var TS_HOST = "https://typesense.coresagroup.com";
-  var TS_API_KEY = "g0oiNYY8THGuU9jnCsvqIH1X9HtvYRCR";
-  var COLLECTION = "Macroled_Prueba";
-  var BASE_FILTER = "tipo_registro:=producto && es_principal:true";
+  var TS_API_KEY = "wpbpJ1lMSHi0ZZlB9CHY1fktyn2LqzLJ";
+  var COLLECTION = "macroled";
+  var BASE_FILTER = "tipo_registro:=producto && es_principal:true && publicar:=true";
   var QUERY_BY = "nombre_typesense,sku,descripcion";
   var BATCH_SIZE = 40;
 
@@ -977,7 +977,8 @@ if (typeof module !== "undefined") module.exports = MEGAMENU_DATA;
   }
 
   // Text searches show principal products; SKU searches include variants.
-  var TS_FILTER = "tipo_registro:=producto";
+  var TS_COLLECTION = "macroled";
+  var TS_FILTER = "tipo_registro:=producto && publicar:=true";
   var CDN_HOST = "https://d1zltvqju4u8ql.cloudfront.net";
 
   // Same policy in both entry points: literal SKU prefixes, tolerant product text.
@@ -995,7 +996,7 @@ if (typeof module !== "undefined") module.exports = MEGAMENU_DATA;
   }
 
   function searchRelaxedHits(tsClient, query) {
-    var documents = tsClient.collections("Macroled_Prueba").documents();
+    var documents = tsClient.collections(TS_COLLECTION).documents();
     var skuProbe = query && !/\s/.test(query)
       ? documents.search(Object.assign({ q: query, filter_by: TS_FILTER, per_page: 1, include_fields: "sku" }, searchMatchOptions(true)))
       : Promise.resolve({ found: 0 });
@@ -1004,7 +1005,7 @@ if (typeof module !== "undefined") module.exports = MEGAMENU_DATA;
       return documents.search(Object.assign({
         q: query,
         filter_by: TS_FILTER + (isSku ? "" : " && es_principal:true"),
-        sort_by: "_text_match:desc,order:asc",
+        sort_by: "_text_match:desc,orden:asc",
         per_page: 5
       }, searchMatchOptions(isSku)));
     });
@@ -1012,6 +1013,13 @@ if (typeof module !== "undefined") module.exports = MEGAMENU_DATA;
 
   function productName(doc) {
     return String((doc && (doc.nombre_typesense || doc.nombre)) || "").trim();
+  }
+
+  function isNuevo(doc) {
+    var raw = doc && doc.nuevo;
+    if (raw === true || raw === 1) return true;
+    var value = String(raw == null ? "" : raw).trim().toLowerCase();
+    return value === "si" || value === "sí" || value === "true" || value === "1" || value === "yes";
   }
 
   function optimizeImg(url, size) {
@@ -1072,7 +1080,7 @@ if (typeof module !== "undefined") module.exports = MEGAMENU_DATA;
       if (typeof Typesense !== "undefined") {
         tsClient = new Typesense.Client({
           nodes: [{ host: "typesense.coresagroup.com", port: 443, protocol: "https" }],
-          apiKey: "g0oiNYY8THGuU9jnCsvqIH1X9HtvYRCR",
+          apiKey: "wpbpJ1lMSHi0ZZlB9CHY1fktyn2LqzLJ",
           connectionTimeoutSeconds: 3,
         });
       }
@@ -1166,7 +1174,7 @@ if (typeof module !== "undefined") module.exports = MEGAMENU_DATA;
         var imgSrc = esc(firstImage(doc));
         var nombre = esc(productName(doc));
         var sku = esc(doc.sku || "");
-        var nuevoPill = doc.nuevo
+        var nuevoPill = isNuevo(doc)
           ? '<span class="ts-nuevo">nuevo</span>'
           : "";
         return (
@@ -1364,7 +1372,7 @@ if (typeof module !== "undefined") module.exports = MEGAMENU_DATA;
       if (typeof Typesense !== "undefined") {
         tsClient = new Typesense.Client({
           nodes: [{ host: TYPESENSE_HOST, port: 443, protocol: "https" }],
-          apiKey: "g0oiNYY8THGuU9jnCsvqIH1X9HtvYRCR",
+          apiKey: "wpbpJ1lMSHi0ZZlB9CHY1fktyn2LqzLJ",
           connectionTimeoutSeconds: 3,
         });
       }
@@ -1438,7 +1446,7 @@ if (typeof module !== "undefined") module.exports = MEGAMENU_DATA;
           var tag = href ? "a" : "div";
           var hrefAttr = href ? ' href="' + esc(href) + '"' : "";
           var imgSrc = firstImage(doc);
-          var nuevo = doc.nuevo ? '<span class="ts-nuevo">nuevo</span>' : "";
+          var nuevo = isNuevo(doc) ? '<span class="ts-nuevo">nuevo</span>' : "";
           return "<" + tag + hrefAttr + ' class="ts-row">' +
             (imgSrc
               ? '<img src="' + esc(imgSrc) + '" alt="" />'
