@@ -2775,9 +2775,9 @@ function syncCompareCheckboxes(){
 }
 
 function wireCompareCheckboxes(){
-  document.querySelectorAll(".compare-row").forEach(row => {
+  document.querySelectorAll(".compare-row, .glossary-compare").forEach(row => {
     const cb = row.querySelector(".compare-checkbox");
-    const action = row.querySelector(".compare-action");
+    const action = row.classList.contains("glossary-compare") ? row : row.querySelector(".compare-action");
     if(!cb || cb.dataset.wired === "1") return;
     cb.dataset.wired = "1";
 
@@ -2831,6 +2831,182 @@ function isHighbayAccessory(doc){
   return false;
 }
 
+const GLOSSARY_COLUMNS = [
+  { id: "potencia", label: "Potencia" },
+  { id: "temp", label: "Temp." },
+  { id: "flujo", label: "Flujo lum." },
+  { id: "angulo", label: "Ángulo" },
+  { id: "eficiencia", label: "Eficiencia" },
+  { id: "ip", label: "IP" },
+  { id: "cri", label: "CRI" }
+];
+
+const ICON_GLOSSARY_LINK = `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 5h5v5"/><path d="M19 5 10 14"/><path d="M19 13v5a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1h5"/></svg>`;
+
+function glossarySpecKey(name){
+  return String(name || "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, " ")
+    .trim();
+}
+
+function glossarySpecIndex(doc){
+  const index = new Map();
+  const rows = Array.isArray(doc?.especificaciones) ? doc.especificaciones : [];
+  rows.forEach(row => {
+    const key = glossarySpecKey(row?.nombre);
+    const value = String(row?.valor ?? "").trim();
+    if(!key || !value || index.has(key)) return;
+    index.set(key, value);
+  });
+  return index;
+}
+
+function glossaryPick(index, names){
+  for(const name of names){
+    const value = index.get(glossarySpecKey(name));
+    if(value) return value;
+  }
+  return "";
+}
+
+function glossaryAttr(doc, pattern){
+  const pairs = [
+    [doc?.nombre_attr1, doc?.attr_1 != null && doc.attr_1 !== "" ? doc.attr_1 : doc?.attr1],
+    [doc?.nombre_attr2, doc?.attr_2 != null && doc.attr_2 !== "" ? doc.attr_2 : doc?.attr2]
+  ];
+  for(const [label, value] of pairs){
+    if(pattern.test(String(label || "")) && value != null && String(value).trim()) return String(value).trim();
+  }
+  return "";
+}
+
+function formatPotencia(raw, watts){
+  const text = String(raw || "").trim();
+  if(text){
+    const match = text.match(/^(\d+(?:[.,]\d+)?)\s*w$/i);
+    if(match) return `${match[1]} W`;
+    return text;
+  }
+  const n = Number(watts);
+  if(!Number.isFinite(n) || n <= 0) return "";
+  const label = Number.isInteger(n) ? String(n) : String(n).replace(".", ",");
+  return `${label} W`;
+}
+
+function formatFlujo(value){
+  const text = String(value || "").trim();
+  if(!text) return "";
+  return text.replace(/\s*lm\b/i, " lm").replace(/\s{2,}/g, " ").trim();
+}
+
+function formatEficiencia(value){
+  const text = String(value || "").trim();
+  if(!text) return "";
+  if(/lm\s*\/\s*w/i.test(text)) return text.replace(/\s*lm\s*\/\s*w/i, " lm/W").trim();
+  if(/^\d+(?:[.,]\d+)?$/.test(text)) return `${text} lm/W`;
+  return text;
+}
+
+function formatAngulo(value){
+  const text = String(value || "").trim();
+  if(!text) return "";
+  return text.replace(/º/g, "°").replace(/(\d)\s*°/g, "$1°");
+}
+
+function formatTemp(value){
+  const text = String(value || "").trim();
+  if(!text) return "";
+  return text.replace(/(\d)\s*k\b/i, "$1K");
+}
+
+function formatIp(value){
+  const text = String(value || "").trim();
+  if(!text) return "";
+  const match = text.match(/IP\s*\d{2}/i);
+  if(match) return match[0].replace(/\s+/g, "").toUpperCase();
+  if(/^\d{2}$/.test(text)) return `IP${text}`;
+  return text;
+}
+
+function glossaryValues(doc){
+  const specs = glossarySpecIndex(doc);
+  return {
+    potencia: formatPotencia(glossaryPick(specs, ["Potencia"]) || glossaryAttr(doc, /potencia/i), doc?.potencia_w),
+    temp: formatTemp(glossaryPick(specs, ["Temperatura Color", "Temperatura del color", "Temperatura de color"])),
+    flujo: formatFlujo(glossaryPick(specs, ["Flujo Luminoso", "Flujo luminoso nominal total", "Flujo luminoso inicial total", "Flujo luminoso estable total"])),
+    angulo: formatAngulo(glossaryPick(specs, ["Angulo de Apertura", "Ángulo de apertura", "Ángulo"]) || glossaryAttr(doc, /ngulo/i)),
+    eficiencia: formatEficiencia(glossaryPick(specs, ["Eficiencia (lm/W)", "Eficiencia", "Lúmenes/W", "Lumenes/W"])),
+    ip: formatIp(glossaryPick(specs, ["IP", "Protección IP", "Proteccion IP"])),
+    cri: glossaryPick(specs, ["CRI", "Cri"])
+  };
+}
+
+function glossaryCell(value){
+  if(!value) return `<td class="glossary-empty">—</td>`;
+  return `<td>${escapeHtml(value)}</td>`;
+}
+
+function glossaryRow(doc){
+  const imgs = parseImages(doc);
+  const thumb = imgs[0] ? optimizeImg(imgs[0], "80x80") : "";
+  const title = doc.nombre_typesense || doc.nombre || "Producto sin nombre";
+  const sku = (doc.sku || doc.id || "").toString();
+  const productHref = doc.link_ficha_web || "";
+  const values = glossaryValues(doc);
+  const safeSku = escapeHtml(sku);
+  const skuHtml = `<span class="glossary-sku-link">${highlightSearchMatch(sku)}</span><button type="button" class="copy-sku" data-sku="${safeSku}" aria-label="Copiar SKU ${safeSku}" title="Copiar SKU">${ICON_COPY}${ICON_COPY_CHECK}<span class="copy-sku-msg" role="status" aria-live="polite">${ICON_COPY_CHECK}SKU copiado</span></button>`;
+  const fileHtml = productHref
+    ? `<a class="glossary-file" href="${escAttr(productHref)}" title="Ver ficha" aria-label="Ver ficha de ${escAttr(sku)}">${ICON_GLOSSARY_LINK}</a>`
+    : `<span class="glossary-empty">—</span>`;
+
+  return `<tr>
+    <td class="glossary-product">
+      <div class="glossary-product-inner">
+      <label class="compare-action glossary-compare">
+        <span class="cb-wrap">
+          <input type="checkbox" class="compare-checkbox" data-sku="${escAttr(sku)}" data-nombre="${escAttr(title)}" data-img="${escAttr(imgs[0] || "")}" aria-label="Comparar ${escAttr(sku)}">
+          <span class="box">${ICON_CHECK}</span>
+        </span>
+      </label>
+      ${thumb ? `<img class="glossary-thumb" src="${escAttr(thumb)}" alt="" loading="lazy" data-orig="${escAttr(imgs[0] || "")}">` : `<span class="glossary-thumb glossary-thumb-empty" aria-hidden="true"></span>`}
+      ${skuHtml}
+      </div>
+    </td>
+    ${GLOSSARY_COLUMNS.map(column => glossaryCell(values[column.id])).join("")}
+    <td class="glossary-file-cell">${fileHtml}</td>
+  </tr>`;
+}
+
+function glossaryTable(hits){
+  const head = GLOSSARY_COLUMNS.map(column => `<th scope="col">${column.label}</th>`).join("");
+  const rows = hits.map(hit => glossaryRow(hit.document)).join("");
+  return `<table class="glossary">
+    <thead>
+      <tr>
+        <th class="glossary-product" scope="col">SKU</th>
+        ${head}
+        <th class="glossary-file-cell" scope="col">Ficha</th>
+      </tr>
+    </thead>
+    <tbody>${rows}</tbody>
+  </table>`;
+}
+
+function wireGlossaryThumbs(){
+  document.querySelectorAll(".glossary-thumb[data-orig]").forEach(img => {
+    if(img.dataset.fbBound) return;
+    img.dataset.fbBound = "1";
+    img.addEventListener("error", () => {
+      const orig = img.dataset.orig || "";
+      if(orig && img.src !== orig) img.src = orig;
+      else img.replaceWith(Object.assign(document.createElement("span"), { className: "glossary-thumb glossary-thumb-empty" }));
+    });
+  });
+}
+
 function prioritizeHighbayHits(hits){
   const fromSub = [...state.selected.subfamilia].some(isHighbayPro2026);
   const fromFam = [...state.selected.familia].some(isHighbayProFamilia);
@@ -2843,10 +3019,15 @@ function prioritizeHighbayHits(hits){
   });
 }
 
-function renderCards(hits, found){
-  window.MacroledComparePicker?.rememberProducts((hits || []).map(hit => hit.document));
+let lastRenderedHits = [];
+let catalogRendered = false;
+
+function renderCards(hits){
+  catalogRendered = true;
+  lastRenderedHits = hits || [];
+  window.MacroledComparePicker?.rememberProducts(lastRenderedHits.map(hit => hit.document));
   const grid = document.getElementById("grid");
-  const orderedHits = prioritizeHighbayHits(hits);
+  const orderedHits = prioritizeHighbayHits(lastRenderedHits);
   if(!orderedHits || !orderedHits.length){
     grid.innerHTML = `<div class="state-msg">
       <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
@@ -2856,10 +3037,13 @@ function renderCards(hits, found){
     grid.setAttribute("aria-busy", "false");
     return;
   }
-  grid.innerHTML = orderedHits.map(h => cardTemplate(h.document)).join("");
+  grid.innerHTML = state.view === "list"
+    ? glossaryTable(orderedHits)
+    : orderedHits.map(h => cardTemplate(h.document)).join("");
   grid.setAttribute("aria-busy", "false");
   wireCarousels();
   wireCardLinks();
+  wireGlossaryThumbs();
   wireCompareCheckboxes();
   syncCompareCheckboxes();
 }
@@ -3304,6 +3488,7 @@ function applyCatalogView(view){
   const btnList = document.getElementById("btnList");
   if(btnGrid) btnGrid.classList.toggle("active", next === "grid");
   if(btnList) btnList.classList.toggle("active", next === "list");
+  if(catalogRendered) renderCards(lastRenderedHits);
 }
 
 document.getElementById("btnGrid").addEventListener("click", () => applyCatalogView("grid"));
