@@ -405,6 +405,7 @@ html.mm-scroll-lock body {
   font-weight: 500;
   color: var(--mm-text);
   padding: 8px 2px;
+  text-decoration: none;
 }
 .mm-trigger svg {
   width: 14px;
@@ -605,15 +606,15 @@ html.mm-scroll-lock body {
   right: 0;
   bottom: 0;
   left: 0;
-  height: 68px;
+  height: 110px;
   pointer-events: none;
   opacity: 0;
   visibility: hidden;
   background: linear-gradient(
     to bottom,
     rgba(255, 255, 255, 0) 0%,
-    rgba(255, 255, 255, 0.38) 22%,
-    rgba(255, 255, 255, 0.90) 68%,
+    rgba(255, 255, 255, 0.72) 32%,
+    rgba(255, 255, 255, 0.96) 68%,
     #fff 100%
   );
   transition: opacity 180ms ease, visibility 180ms ease;
@@ -756,32 +757,6 @@ a.mm-group-label:hover {
 }
 .mm-group-viewall:hover {
   text-decoration: underline;
-}
-
-.mm-all-products-bar {
-  flex-shrink: 0;
-  background: #e8eef5;
-  border-top: 1px solid var(--mm-border);
-  padding: 16px var(--mm-side-pad);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-#macroled-menu .mm-all-products-bar a {
-  font-size: 14px;
-  font-weight: 700;
-  color: rgb(0, 110, 165) !important;
-  text-decoration: none;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-}
-#macroled-menu .mm-all-products-bar a:hover {
-  color: #005f87 !important;
-}
-.mm-all-products-bar a svg {
-  width: 15px;
-  height: 15px;
 }
 
 .mm-promo {

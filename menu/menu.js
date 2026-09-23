@@ -156,11 +156,11 @@ const MEGAMENU_DATA = [
         { name: "Highbay Standard", count: "4 Productos", img: `${CDN}/filters:format(webp)/MACROLED/250/SHB-200W.png`, href: "#" },
       ]},
       { group: "Paneles", href: "/productos?macrofamilia=Luminarias+de+Proyecto&familia=Paneles", items: [
-        { name: "Downlight PRO", count: "2 Productos", img: `${CDN}/500x500/filters:format(webp)/MACROLED/WEB/SDLR-36W-830-WW_FRONT.webp`, href: "/productos?macrofamilia=Luminarias+de+Proyecto&familia=Paneles&subfamilia=Downlight&categoria=Downlight+PRO&categoria=Drivers", isNew: true },
+        { name: "Downlight PRO", count: "2 Productos", img: `${CDN}/500x500/filters:format(webp)/MACROLED/WEB/PDLR-36W-830-WW_FRONT.webp`, href: "/productos?macrofamilia=Luminarias+de+Proyecto&familia=Paneles&subfamilia=Downlight&categoria=Downlight+PRO&categoria=Drivers", isNew: true },
         { name: "Downlight Standard", count: "2 Productos", img: `${CDN}/500x500/filters:format(webp)/MACROLED/WEB/SDLR-36W-830-WW_FRONT.webp`, href: "/productos?macrofamilia=Luminarias+de+Proyecto&familia=Paneles&subfamilia=Downlight&categoria=Downlight+Standard&categoria=Drivers", isNew: true },
         { name: "Gran Formato Backlight 36W", count: "2 Productos", img: `${CDN}/250x250/MACROLED/WEB/GRAN-FORMATO-P40.webp`, href: "/productos?macrofamilia=Luminarias+de+Proyecto&familia=Paneles&subfamilia=Backlight+36W", isNew: true },
-        { name: "Gran Formato 48W", count: "4 Productos", img: `${CDN}/250x250/MACROLED/WEB/GRAN-FORMATO-P40.webp`, href: "/productos?macrofamilia=Luminarias+de+Proyecto&familia=Paneles&subfamilia=Gran+Formato+48W" },
         { name: "Gran Formato 40W", count: "4 Productos", img: `${CDN}/250x250/MACROLED/WEB/GRAN-FORMATO-P40.webp`, href: "/productos?macrofamilia=Luminarias+de+Proyecto&familia=Paneles&subfamilia=Gran+Formato+40W" },
+        { name: "Gran Formato 48W", count: "4 Productos", img: `${CDN}/250x250/MACROLED/WEB/GRAN-FORMATO-P40.webp`, href: "/productos?macrofamilia=Luminarias+de+Proyecto&familia=Paneles&subfamilia=Gran+Formato+48W" },
       ]},
       { group: "Luz de Calle", items: [
         { name: "Standard", count: "28 Productos", img: `${CDN}/250x250/MACROLED/WEB/SLG2-100W-757-CW_FRONT.webp`, href: "#", isNew: true },
@@ -779,17 +779,14 @@ if (typeof module !== "undefined") module.exports = MEGAMENU_DATA;
 
     root.classList.add("mm-root");
     root.innerHTML = `
-      <button class="mm-trigger" type="button" aria-expanded="false">
+      <a class="mm-trigger" href="${ALL_PRODUCTS_URL}" aria-expanded="false">
         Productos ${arrowDownSvg()}
-      </button>
+      </a>
       <div class="mm-overlay"></div>
       <div class="mm-panel" role="menu">
         <div class="mm-body">
           <div class="mm-tabs"></div>
           <div class="mm-panel-body"></div>
-        </div>
-        <div class="mm-all-products-bar">
-          <a href="${ALL_PRODUCTS_URL}">Ver todos los productos Macroled ${chevronRightSvg()}</a>
         </div>
       </div>
     `;
@@ -904,7 +901,33 @@ if (typeof module !== "undefined") module.exports = MEGAMENU_DATA;
     document.addEventListener("touchmove", stopPageScroll, { passive: false, capture: true });
 
     trigger.addEventListener("click", () => {
-      root.classList.contains("is-open") ? close() : open();
+      cancelHoverOpen();
+    });
+    var hoverOpenTimer = null;
+    var hoverCloseTimer = null;
+    var hoverMedia = window.matchMedia("(hover: hover) and (pointer: fine)");
+    function cancelHoverOpen() {
+      if (!hoverOpenTimer) return;
+      clearTimeout(hoverOpenTimer);
+      hoverOpenTimer = null;
+    }
+    function cancelHoverClose() {
+      if (!hoverCloseTimer) return;
+      clearTimeout(hoverCloseTimer);
+      hoverCloseTimer = null;
+    }
+    root.addEventListener("mouseenter", () => {
+      if (!hoverMedia.matches) return;
+      cancelHoverClose();
+      if (root.classList.contains("is-open")) return;
+      cancelHoverOpen();
+      hoverOpenTimer = setTimeout(open, 80);
+    });
+    root.addEventListener("mouseleave", () => {
+      if (!hoverMedia.matches) return;
+      cancelHoverOpen();
+      cancelHoverClose();
+      hoverCloseTimer = setTimeout(close, 160);
     });
     overlay.addEventListener("click", close);
     document.addEventListener("keydown", (e) => {
