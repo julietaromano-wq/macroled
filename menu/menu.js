@@ -984,8 +984,9 @@ if (typeof module !== "undefined") module.exports = MEGAMENU_DATA;
   // Same policy in both entry points: literal SKU prefixes, tolerant product text.
   function searchMatchOptions(isSku){
     return {
-      query_by: isSku ? "sku" : "nombre_typesense,descripcion",
-      num_typos: isSku ? "0" : "2,1",
+      query_by: isSku ? "sku" : "nombre_typesense,descripcion,terminos_alt",
+      query_by_weights: isSku ? "1" : "4,2,1",
+      num_typos: isSku ? "0" : "2,1,2",
       prefix: "true",
       drop_tokens_threshold: isSku ? "0" : "1",
       typo_tokens_threshold: "1",
