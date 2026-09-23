@@ -174,26 +174,13 @@
   }
 
   /**
-   * Mantiene la columna vertical de miniaturas (desktop/tablet) siempre del
-   * mismo alto que la imagen principal — nunca se pasa hasta el botón
-   * Compartir, y nunca hace scroll interno: si no entran todas a tamaño
-   * completo, .thumb (flex:1 1 0) las achica para que las N entren justo.
-   * En mobile la galería cambia a fila horizontal (ver CSS ≤640px), así que
-   * ahí no tocamos el alto.
+   * La columna de miniaturas no pasa de alto de la foto principal.
+   * Si hay más de las que entran, se desplaza dentro de esa columna.
    */
   function syncThumbsHeight() {
     if (!thumbsEl || !stageEl) return;
-    if (window.matchMedia("(max-width:640px)").matches) {
-      thumbsEl.style.height = "";
-      return;
-    }
-    const h = stageEl.getBoundingClientRect().height;
-    /* Guarda defensiva: un stage real nunca mide menos que esto (aspect-ratio:1
-       sobre una columna angosta). Si por lo que sea llega una medición chica o
-       en 0 (layout todavía no asentado, elemento oculto, etc.), no la aplicamos
-       — mejor dejar el alto que ya había (o el fallback de .thumb) antes que
-       aplastar las miniaturas a una tira invisible. */
-    if (h >= 120) thumbsEl.style.height = `${h}px`;
+    const height = stageEl.offsetHeight;
+    thumbsEl.style.maxHeight = height ? height + "px" : "";
   }
 
   if (stageEl && thumbsEl) {
@@ -742,6 +729,7 @@
     "Proteccion IP": "Protección IP",
     "Protección IP": "Protección IP",
     IP: "Protección IP",
+    IK: "Protección IK",
     "Proteccion IK": "Protección IK",
     "Protección IK": "Protección IK",
     Garantia: "Garantía",
@@ -841,7 +829,23 @@
     UGR: "UGR",
     EMC: "EMC",
     THD: "THD",
+    "Eficiencia (lm/W)": "Lúmenes/W",
+    "Eficiencia (lm/w)": "Lúmenes/W",
+    "Material Lente": "Material del lente",
+    "Material lente": "Material del lente",
+    "Material del Lente": "Material del lente",
   };
+
+  const SPEC_ALIAS_NORM = Object.create(null);
+  Object.keys(SPEC_KEY_ALIASES).forEach((alias) => {
+    const folded = alias
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .toLowerCase()
+      .replace(/\s+/g, " ")
+      .trim();
+    if (!SPEC_ALIAS_NORM[folded]) SPEC_ALIAS_NORM[folded] = SPEC_KEY_ALIASES[alias];
+  });
 
   /**
    * Atributos sueltos del CMS Webflow → key canónica.
@@ -914,6 +918,13 @@
   function normalizeSpecKey(key) {
     if (!key) return "";
     if (SPEC_KEY_ALIASES[key]) return SPEC_KEY_ALIASES[key];
+    const folded = String(key)
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .toLowerCase()
+      .replace(/\s+/g, " ")
+      .trim();
+    if (SPEC_ALIAS_NORM[folded]) return SPEC_ALIAS_NORM[folded];
     return key;
   }
 
@@ -1108,13 +1119,70 @@
     });
   }
 
+  let dbSpecRows = [];
+
+  function specTipFor(key) {
+    for (let i = 0; i < SPEC_GROUPS.length; i++) {
+      const row = SPEC_GROUPS[i].rows.find((item) => item.key === key);
+      if (row) return row.tip || "";
+    }
+    return "";
+  }
+
+  /* Grupos que vienen en especificaciones[] de la base. Cada producto puede
+     traer specs que no están en SPEC_GROUPS: se muestran igual, en su grupo. */
+  function groupsFromDatabase() {
+    const order = [
+      { test: /remoto/i, title: "Características del control remoto", icon: ICON_REMOTE },
+      { test: /controladora/i, title: "Características de la controladora", icon: ICON_BOX },
+      { test: /el[eé]ctric/i, title: "Características eléctricas", icon: ICON_BOLT },
+      { test: /lum[ií]nic/i, title: "Características lumínicas", icon: ICON_SUN },
+      { test: /material|construcci/i, title: "Características materiales", icon: ICON_BOX },
+      { test: /conect|funci/i, title: "Características de conectividad", icon: ICON_WIFI },
+    ];
+    const commercialKeys = new Set(["SKU", "EAN13", "Familia", "Macrofamilia", "Subfamilia", "Garantía"]);
+    const byTitle = new Map();
+    const extras = [];
+
+    dbSpecRows.forEach((row) => {
+      const nombre = String((row && row.nombre) || "").trim();
+      const valor = String((row && row.valor) || "").trim();
+      if (!nombre || !hasSpecValue(valor)) return;
+      const key = normalizeSpecKey(nombre);
+      if (commercialKeys.has(key)) return;
+      const grupo = String((row && row.grupo) || "").trim();
+      const meta = order.find((rule) => rule.test.test(grupo));
+      const title = meta ? meta.title : grupo || "Especificaciones";
+      const icon = meta ? meta.icon : ICON_BOX;
+      if (!byTitle.has(title)) {
+        const bucket = { title: title, icon: icon, rows: [] };
+        byTitle.set(title, bucket);
+        if (!meta) extras.push(bucket);
+      }
+      const bucket = byTitle.get(title);
+      if (bucket.rows.some((item) => item.key === key)) return;
+      bucket.rows.push({ key: key, tip: specTipFor(key) });
+    });
+
+    const ordered = [];
+    order.forEach((rule) => {
+      const bucket = byTitle.get(rule.title);
+      if (bucket && bucket.rows.length) ordered.push(bucket);
+    });
+    extras.forEach((bucket) => {
+      if (bucket.rows.length) ordered.push(bucket);
+    });
+    return ordered;
+  }
+
   function renderSpecGroups(specs) {
     const root = document.getElementById("specGroups");
     if (!root) return;
     const map = specs || {};
+    const groups = dbSpecRows.length ? groupsFromDatabase() : SPEC_GROUPS;
     let html = "";
 
-    SPEC_GROUPS.forEach((group, gi) => {
+    groups.forEach((group, gi) => {
       const visibleRows = group.rows
         .map((row) => {
           const val = lookupSpec(map, row.key);
@@ -1308,17 +1376,15 @@
     "Garantía",
   ]);
 
-  /* Orden de preferencia cuando el CMS no declara "Nombre ATTR_Variantes". */
+  /* Ejes que pueden ser selector. Cuáles aparecen lo deciden las variantes
+     enlazadas (Variantes_Multireference / variantes_sku), no nombre_attr_variantes. */
   const DIM_AUTODETECT_PRIORITY = [
+    "Potencia",
     "Color del cuerpo",
     "Temperatura del color",
     "Tipo de luz",
     "Ángulo de apertura",
-    "Potencia",
-    "Conector",
-    "Conexión",
     "Protección IP",
-    "Dimensiones",
   ];
 
   const COLOR_SWATCH = {
@@ -1531,10 +1597,13 @@
 
   /**
    * Botones de descarga del hero (arriba de comparar):
-   * primario = ficha → si no hay, catálogo → si no hay, manual.
-   * secundario = el siguiente disponible de esa misma prioridad.
+   * primero la ficha técnica, después el catálogo.
+   * La ficha técnica siempre se genera al hacer click.
+   * El manual queda en la pestaña Descargas.
    */
   function syncActionDownloads(fichaUrl, catalogoUrl, manualUrl) {
+    void fichaUrl;
+    void manualUrl;
     const btnPrimary = document.getElementById("btn-ficha");
     const btnSecondary = document.getElementById("btn-catalogo");
     const actions = document.querySelector(".cta-stack .actions");
@@ -1542,26 +1611,21 @@
     const hasManualOverride = btnPrimary && btnPrimary.getAttribute("data-cta-mode") === "contact";
     const contactUrl = (btnPrimary && btnPrimary.getAttribute("data-contact-url")) || "https://www.electroestrada.com.ar/";
 
-    const docs = [
-      {
-        key: "ficha",
-        url: fichaUrl,
-        primaryLabel: "Ficha técnica",
-        secondaryLabel: "Ficha técnica",
-      },
-      {
-        key: "catalogo",
-        url: catalogoUrl,
-        primaryLabel: "Catálogo",
-        secondaryLabel: "Catálogo",
-      },
-      {
-        key: "manual",
-        url: manualUrl,
-        primaryLabel: "Descargar manual",
-        secondaryLabel: "Manual",
-      },
-    ].filter((d) => isValidFileUrl(d.url));
+    const fichaDoc = {
+      key: "ficha",
+      generate: true,
+      primaryLabel: "Descargar ficha técnica",
+      secondaryLabel: "Descargar ficha técnica",
+    };
+
+    const catalogDoc = isValidFileUrl(catalogoUrl)
+      ? {
+          key: "catalogo",
+          url: catalogoUrl,
+          primaryLabel: "Catálogo",
+          secondaryLabel: "Catálogo",
+        }
+      : null;
 
     const contactDoc = {
       key: "contacto",
@@ -1570,20 +1634,29 @@
       secondaryLabel: "Contacto comercial",
     };
 
-    const finalDocs = hasManualOverride ? [contactDoc, ...docs.filter((d) => d.key !== "ficha")] : docs;
+    const finalDocs = (hasManualOverride ? [contactDoc, catalogDoc] : [fichaDoc, catalogDoc]).filter(Boolean);
 
     const apply = (btn, doc, isPrimary) => {
       if (!btn) return;
       if (!doc) {
         btn.hidden = true;
         btn.removeAttribute("href");
+        delete btn.dataset.generatePdf;
         return;
       }
       btn.hidden = false;
+      setDownloadBtnLabel(btn, isPrimary ? doc.primaryLabel : doc.secondaryLabel);
+      if (doc.generate) {
+        btn.dataset.generatePdf = "1";
+        btn.href = "#";
+        btn.removeAttribute("target");
+        btn.removeAttribute("rel");
+        return;
+      }
+      delete btn.dataset.generatePdf;
       btn.href = doc.url;
       btn.target = "_blank";
       btn.rel = "noopener";
-      setDownloadBtnLabel(btn, isPrimary ? doc.primaryLabel : doc.secondaryLabel);
     };
 
     apply(btnPrimary, finalDocs[0] || null, true);
@@ -1591,9 +1664,27 @@
     if (actions) actions.hidden = finalDocs.length === 0;
   }
 
+  const DOWNLOAD_CARD_ORDER = ["ficha", "ficha-anterior", "catalogo", "garantia", "manual", "ies"];
+
+  function orderDownloadCards() {
+    const list = document.getElementById("files-list");
+    if (!list) return;
+    const cards = Array.from(list.querySelectorAll(".dl-card"));
+    const byKey = new Map(cards.map((card) => [card.getAttribute("data-file"), card]));
+    DOWNLOAD_CARD_ORDER.forEach((key) => {
+      const card = byKey.get(key);
+      if (card) list.appendChild(card);
+    });
+    cards.forEach((card) => {
+      if (!DOWNLOAD_CARD_ORDER.includes(card.getAttribute("data-file"))) list.appendChild(card);
+    });
+  }
+
   function syncFileCards(files) {
+    orderDownloadCards();
     const map = {
       ficha: files && files.ficha,
+      "ficha-anterior": files && files.fichaAnterior,
       garantia: files && files.garantia,
       manual: files && files.manual,
       catalogo: files && files.catalogo,
@@ -1602,6 +1693,18 @@
     let visibleCount = 0;
     document.querySelectorAll("#files-list .dl-card").forEach((card) => {
       const key = card.getAttribute("data-file");
+      /* La ficha y la garantía siempre se generan, aunque haya un link cargado. */
+      if (key === "ficha" || key === "garantia") {
+        card.href = "#";
+        card.hidden = false;
+        card.dataset.generatePdf = "1";
+        card.removeAttribute("target");
+        card.removeAttribute("rel");
+        const openLabel = card.querySelector(".dl-card__btn");
+        if (openLabel && openLabel.textContent.trim() !== "Generando…") openLabel.textContent = "Descargar";
+        visibleCount++;
+        return;
+      }
       const url = (map[key] || "").trim();
       if (url && url !== "#") {
         card.href = url;
@@ -1626,9 +1729,719 @@
     }
   }
 
+  /**
+   * PDF de ficha técnica: imagen principal + especificaciones + info comercial
+   * del producto que está en pantalla. Se arma en el navegador al hacer click.
+   */
+  function pdfFileName(sku, suffix) {
+    const base = String(sku || "producto").trim().replace(/[\\/:*?"<>|]+/g, "-") || "producto";
+    return base + "-" + suffix + ".pdf";
+  }
+
+  function deliverGeneratedPdf(blob, filename, preview) {
+    const viewUrl = URL.createObjectURL(blob);
+    const fileUrl = URL.createObjectURL(blob);
+    if (preview && !preview.closed) preview.location.replace(viewUrl);
+    else window.open(viewUrl, "_blank", "noopener");
+    const a = document.createElement("a");
+    a.href = fileUrl;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => {
+      URL.revokeObjectURL(viewUrl);
+      URL.revokeObjectURL(fileUrl);
+    }, 120000);
+  }
+
+  function pdfSafe(value) {
+    return String(value || "")
+      .normalize("NFC")
+      .replace(/\u00A0/g, " ")
+      .replace(/[\u2010-\u2015]/g, "-")
+      .replace(/[\u2018\u2019\u2032]/g, "'")
+      .replace(/[\u201C\u201D]/g, '"')
+      .replace(/\u2026/g, "...")
+      .replace(/\u2264/g, "<=")
+      .replace(/\u2265/g, ">=")
+      .replace(/[\u03A9\u2126]/g, "Ohm")
+      .replace(/[\u00B5\u03BC]/g, "u")
+      .replace(/\u00D7/g, "x")
+      .replace(/[^\u0000-\u00FF]/g, "");
+  }
+
+  function loadJsPdf() {
+    if (window.jspdf && window.jspdf.jsPDF) return Promise.resolve(window.jspdf.jsPDF);
+    return new Promise((resolve, reject) => {
+      const existing = document.querySelector("script[data-ml-jspdf]");
+      if (existing) {
+        existing.addEventListener("load", () => resolve(window.jspdf.jsPDF), { once: true });
+        existing.addEventListener("error", () => reject(new Error("jspdf")), { once: true });
+        return;
+      }
+      const s = document.createElement("script");
+      s.src = "https://cdn.jsdelivr.net/npm/jspdf@2.5.2/dist/jspdf.umd.min.js";
+      s.dataset.mlJspdf = "1";
+      s.onload = () => resolve(window.jspdf.jsPDF);
+      s.onerror = () => reject(new Error("jspdf"));
+      document.head.appendChild(s);
+    });
+  }
+
+  function currentSheetImageUrl() {
+    const current = GALLERY[activeIndex];
+    if (current && !isVideoType(current.type)) return current.full || current.display || "";
+    const photo = GALLERY.find((g) => g && !isVideoType(g.type));
+    if (photo) return photo.full || photo.display || "";
+    if (heroItem) return (heroItem.getAttribute("data-image") || "").trim();
+    return "";
+  }
+
+  function loadPdfImage(url) {
+    return new Promise((resolve) => {
+      if (!url) {
+        resolve(null);
+        return;
+      }
+      const img = new Image();
+      img.crossOrigin = "anonymous";
+      const timer = setTimeout(() => resolve(null), 8000);
+      img.onload = () => {
+        clearTimeout(timer);
+        try {
+          const max = 900;
+          const nw = img.naturalWidth || 1;
+          const nh = img.naturalHeight || 1;
+          const scale = Math.min(1, max / Math.max(nw, nh));
+          const canvas = document.createElement("canvas");
+          canvas.width = Math.max(1, Math.round(nw * scale));
+          canvas.height = Math.max(1, Math.round(nh * scale));
+          const ctx = canvas.getContext("2d");
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+          resolve({
+            data: canvas.toDataURL("image/png"),
+            format: "PNG",
+            w: canvas.width,
+            h: canvas.height,
+          });
+        } catch (e) {
+          resolve(null);
+        }
+      };
+      img.onerror = () => {
+        clearTimeout(timer);
+        resolve(null);
+      };
+      img.src = url;
+    });
+  }
+
+  function collectSheetData() {
+    const el = heroItem;
+    const specs = el ? parseSpecs(el) : {};
+    const ctx = window.__mlProductCtx || {};
+    const name = (document.getElementById("ficha-name")?.textContent || ctx.name || "").trim();
+    const sku = (document.getElementById("ficha-sku")?.textContent || ctx.sku || "").trim();
+    const ean = (document.getElementById("ficha-ean")?.textContent || ctx.ean13 || "").trim();
+    const lead = (document.getElementById("ficha-lead")?.textContent || ctx.description || "").trim();
+    const eyebrow = (document.getElementById("ficha-eyebrow")?.textContent || "").trim();
+    const family = (ctx.family || (el && el.getAttribute("data-family")) || "").trim();
+    const macro = (ctx.macro || (el && el.getAttribute("data-macrofamilia")) || "").trim();
+    const map = Object.assign({}, specs, {
+      SKU: sku,
+      EAN13: ean,
+      Familia: family,
+      Macrofamilia: macro,
+    });
+
+    const shown = readShownFicha();
+    const groups = shown.groups.length ? shown.groups : groupsFromSpecs(map);
+    const commercial = shown.commercial;
+    const highlights = shown.highlights;
+
+    const line = (el && el.getAttribute("data-linea") || "").trim();
+    const links = [];
+    const webUrl = sheetWebUrl(el);
+    const addSheetLink = (key, url) => {
+      const href = String(url || "").trim();
+      if (!key || !isValidFileUrl(href)) return;
+      if (links.some((item) => item.url === href)) return;
+      links.push({ key, val: href, url: href });
+    };
+    if (webUrl) addSheetLink("Ficha Web", webUrl);
+    [
+      ["Ficha técnica general", (el && el.getAttribute("data-ficha")) || (el && el.getAttribute("data-ficha-anterior"))],
+      ["Catálogo", el && el.getAttribute("data-catalogo")],
+      ["Manual de uso", el && el.getAttribute("data-manual")],
+      ["Archivo IES", el && el.getAttribute("data-ies")],
+    ].forEach(([key, url]) => addSheetLink(key, url));
+
+    return {
+      name,
+      sku,
+      ean,
+      lead,
+      eyebrow,
+      family,
+      line,
+      groups,
+      commercial,
+      links,
+      highlights,
+      webUrl,
+      imageUrl: currentSheetImageUrl(),
+    };
+  }
+
+  function sheetWebUrl(el) {
+    const href = String(window.location.href || "").split("#")[0];
+    if (/^https?:\/\//i.test(href)) return href;
+    const raw = (el && (el.getAttribute("data-product-url") || el.getAttribute("data-link")) || "").trim();
+    if (/^https?:\/\//i.test(raw)) return raw;
+    if (raw && raw !== "#") return "https://www.macroled.com.ar/" + raw.replace(/^\//, "");
+    return "https://www.macroled.com.ar/";
+  }
+
+  function cleanShownText(el) {
+    return String((el && el.textContent) || "")
+      .replace(/\s+/g, " ")
+      .trim();
+  }
+
+  /* Solo cuenta el hidden del propio dato. Las solapas (comercial, descargas)
+     están ocultas hasta que se abren, pero sus filas igual forman parte de la ficha. */
+  function isShown(el) {
+    return !!(el && !el.hidden);
+  }
+
+  function shownSpecRows(root) {
+    const rows = [];
+    if (!root) return rows;
+    root.querySelectorAll(".spec-row").forEach((row) => {
+      if (!isShown(row)) return;
+      const key = cleanShownText(row.querySelector(".spec-tip__label") || row.querySelector(".k"));
+      const val = cleanShownText(row.querySelector("[data-spec-val]"));
+      if (key && hasSpecValue(val)) rows.push({ key, val });
+    });
+    return rows;
+  }
+
+  /* Lo que el PDF imprime sale de lo que la ficha tiene visible.
+     Si este producto no muestra un dato, no entra. */
+  function readShownFicha() {
+    const groups = [];
+    document.querySelectorAll("#specGroups .spec-group").forEach((group) => {
+      if (!isShown(group)) return;
+      const title = cleanShownText(group.querySelector(".sg-title-text"));
+      const rows = shownSpecRows(group);
+      if (title && rows.length) groups.push({ title, rows });
+    });
+
+    const commercial = shownSpecRows(document.getElementById("commercialTable"));
+
+    const highlights = [];
+    document.querySelectorAll(".quick-specs .qspec").forEach((block) => {
+      if (!isShown(block)) return;
+      const key = cleanShownText(block.querySelector(".label"));
+      const val = cleanShownText(block.querySelector("[data-spec-val]"));
+      if (key && hasSpecValue(val)) highlights.push({ key, val });
+    });
+
+    return { groups, commercial, highlights };
+  }
+
+  function groupsFromSpecs(map) {
+    const groups = [];
+    SPEC_GROUPS.forEach((group) => {
+      const rows = [];
+      const seen = new Set();
+      group.rows.forEach((row) => {
+        if (seen.has(row.key)) return;
+        const val = lookupSpec(map, row.key);
+        if (!hasSpecValue(val)) return;
+        seen.add(row.key);
+        rows.push({ key: row.key, val: String(val).trim() });
+      });
+      if (rows.length) groups.push({ title: group.title, rows });
+    });
+    const electric = groups.find((g) => g.title === "Características eléctricas");
+    const luminic = groups.find((g) => g.title === "Características lumínicas");
+    if (electric && luminic && electric.rows.some((r) => r.key === "Dimerizable")) {
+      luminic.rows = luminic.rows.filter((r) => r.key !== "Dimerizable");
+      if (!luminic.rows.length) groups.splice(groups.indexOf(luminic), 1);
+    }
+    return groups;
+  }
+
+  function loadQrLib() {
+    if (typeof window.qrcode === "function") return Promise.resolve(window.qrcode);
+    return new Promise((resolve, reject) => {
+      const existing = document.querySelector("script[data-ml-qr]");
+      const done = () => resolve(window.qrcode);
+      if (existing) {
+        existing.addEventListener("load", done, { once: true });
+        existing.addEventListener("error", () => reject(new Error("qr")), { once: true });
+        return;
+      }
+      const s = document.createElement("script");
+      s.src = "https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.js";
+      s.dataset.mlQr = "1";
+      s.onload = done;
+      s.onerror = () => reject(new Error("qr"));
+      document.head.appendChild(s);
+    });
+  }
+
+  const PDF_CYAN = [0, 177, 235];
+  const PDF_GRAY = [124, 123, 123];
+  const CORESA_LOGO_URL = "https://cdn.prod.website-files.com/674eb5c4242fba76abefe2f3/69b9aefdcd76a4148f045172_coresa-negro.svg";
+  const CORESA_WEB_URL = "https://www.coresagroup.com/";
+  const PDF_CONTACTO_URL = "https://www.macroled.com.ar/contacto";
+
+  function loadSvgImage(url) {
+    return fetch(url)
+      .then((res) => {
+        if (!res.ok) throw new Error("logo");
+        return res.text();
+      })
+      .then(
+        (svg) =>
+          new Promise((resolve) => {
+            const img = new Image();
+            const blobUrl = URL.createObjectURL(new Blob([svg], { type: "image/svg+xml" }));
+            img.onload = () => {
+              const w = img.naturalWidth || 63;
+              const h = img.naturalHeight || 26;
+              const scale = 4;
+              const canvas = document.createElement("canvas");
+              canvas.width = Math.round(w * scale);
+              canvas.height = Math.round(h * scale);
+              const ctx = canvas.getContext("2d");
+              ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+              URL.revokeObjectURL(blobUrl);
+              resolve({ data: canvas.toDataURL("image/png"), w: canvas.width, h: canvas.height });
+            };
+            img.onerror = () => {
+              URL.revokeObjectURL(blobUrl);
+              resolve(null);
+            };
+            img.src = blobUrl;
+          })
+      )
+      .catch(() => null);
+  }
+
+  function placePdfImage(doc, image, x, y, maxW, maxH) {
+    if (!image) return 0;
+    const ratio = image.w / image.h || 1;
+    let iw = maxW;
+    let ih = maxW / ratio;
+    if (ih > maxH) {
+      ih = maxH;
+      iw = maxH * ratio;
+    }
+    try {
+      doc.addImage(image.data, image.format || "PNG", x + (maxW - iw) / 2, y + (maxH - ih) / 2, iw, ih);
+    } catch (e) {
+      return 0;
+    }
+    return ih;
+  }
+
+  function drawPdfQr(doc, url, x, y, size) {
+    if (typeof window.qrcode !== "function" || !url) return;
+    const qr = window.qrcode(0, "M");
+    qr.addData(url);
+    qr.make();
+    const n = qr.getModuleCount();
+    const cell = size / n;
+    doc.setFillColor(255, 255, 255);
+    doc.rect(x - 0.8, y - 0.8, size + 1.6, size + 1.6, "F");
+    doc.setFillColor(25, 25, 25);
+    for (let r = 0; r < n; r++) {
+      for (let c = 0; c < n; c++) {
+        if (qr.isDark(r, c)) doc.rect(x + c * cell, y + r * cell, cell + 0.08, cell + 0.08, "F");
+      }
+    }
+  }
+
+  async function downloadTechnicalSheet(preview) {
+    const data = collectSheetData();
+    const [JsPDF, image, coresaLogo] = await Promise.all([
+      loadJsPdf(),
+      loadPdfImage(data.imageUrl),
+      loadSvgImage(CORESA_LOGO_URL),
+      loadQrLib().catch(() => null),
+    ]);
+    const doc = new JsPDF({ unit: "mm", format: "a4" });
+    const pageW = doc.internal.pageSize.getWidth();
+    const pageH = doc.internal.pageSize.getHeight();
+    const margin = 14;
+    const contentW = pageW - margin * 2;
+    const footerTop = pageH - 30;
+    const state = { y: 32 };
+
+    function paintCover() {
+      doc.setFillColor(PDF_GRAY[0], PDF_GRAY[1], PDF_GRAY[2]);
+      doc.rect(0, 0, pageW, 214, "F");
+
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(32);
+      const logoTextW = doc.getTextWidth("MACROLED");
+      const logoBoxW = Math.min(124, logoTextW + 14);
+      const logoBoxY = 12;
+      const logoBoxH = 34;
+      doc.setFillColor(PDF_CYAN[0], PDF_CYAN[1], PDF_CYAN[2]);
+      doc.rect(0, logoBoxY, logoBoxW, logoBoxH, "F");
+      doc.setTextColor(255, 255, 255);
+      doc.text("MACROLED", logoBoxW / 2, logoBoxY + 23, { align: "center" });
+
+      const titleX = logoBoxW + 8;
+      const titleW = pageW - titleX - 12;
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(12);
+      const kicker = pdfSafe(data.family || data.eyebrow || "");
+      if (kicker) doc.text(doc.splitTextToSize(kicker, titleW).slice(0, 1), titleX, 26);
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(20);
+      const heroTitle = pdfSafe(data.line ? data.line.toUpperCase() : data.name || "Producto");
+      const heroLines = doc.splitTextToSize(heroTitle, titleW).slice(0, 2);
+      doc.text(heroLines, titleX, 36);
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(11);
+      if (data.sku) doc.text(pdfSafe(data.sku), titleX, 36 + heroLines.length * 8);
+
+      placePdfImage(doc, image, (pageW - 130) / 2, 62, 130, 142);
+
+      doc.setFillColor(255, 255, 255);
+      doc.rect(0, 214, pageW, pageH - 214 - 28, "F");
+      const perRow = 3;
+      const colW = 51;
+      data.highlights.forEach((item, i) => {
+        const row = Math.floor(i / perRow);
+        const rowStart = row * perRow;
+        const rowCount = Math.min(perRow, data.highlights.length - rowStart);
+        const x = (pageW - rowCount * colW) / 2 + (i - rowStart) * colW + colW / 2;
+        const y = 228 + row * 24;
+        doc.setFont("helvetica", "normal");
+        doc.setFontSize(9.9);
+        doc.setTextColor(110, 110, 110);
+        doc.text(pdfSafe(item.key), x, y, { align: "center" });
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(12.1);
+        doc.setTextColor(25, 25, 25);
+        doc.text(doc.splitTextToSize(pdfSafe(item.val), colW - 4).slice(0, 2), x, y + 6.6, { align: "center" });
+      });
+    }
+
+    function paintContentHeader() {
+      const headerTitle = pdfSafe([data.family, data.line].filter(Boolean).join(" ") || data.name || "Producto");
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(13);
+      doc.setTextColor(PDF_CYAN[0], PDF_CYAN[1], PDF_CYAN[2]);
+      const lines = doc.splitTextToSize(headerTitle, 112).slice(0, 2);
+      doc.text(lines, margin, 16);
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(11);
+      if (data.sku) doc.text(pdfSafe(data.sku), margin, 16 + lines.length * 5.4);
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(19.6);
+      doc.text("MACROLED", pageW - margin, 19, { align: "right" });
+      state.y = 30;
+    }
+
+    function ensure(h) {
+      if (state.y + h <= footerTop) return;
+      doc.addPage();
+      paintContentHeader();
+    }
+
+    function drawSpecTable(title, rows) {
+      const barH = 7;
+      ensure(barH + 8);
+      doc.setFillColor(PDF_CYAN[0], PDF_CYAN[1], PDF_CYAN[2]);
+      doc.rect(margin, state.y, contentW, barH, "F");
+      doc.setTextColor(255, 255, 255);
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(10);
+      doc.text(pdfSafe(title), margin + 2.2, state.y + 4.8);
+      state.y += barH;
+
+      rows.forEach((row) => {
+        doc.setFont("helvetica", "normal");
+        doc.setFontSize(9);
+        const label = pdfSafe(row.key);
+        const valueLines = doc.splitTextToSize(pdfSafe(row.val), contentW * 0.58);
+        const h = Math.max(6.5, valueLines.length * 4.15 + 2.3);
+        ensure(h);
+        doc.setFont("helvetica", "normal");
+        doc.setFontSize(9);
+        doc.setTextColor(PDF_CYAN[0], PDF_CYAN[1], PDF_CYAN[2]);
+        doc.text(label, margin + 2.2, state.y + 4.4);
+        const linkUrl = row.url || "";
+        doc.setTextColor(linkUrl ? PDF_CYAN[0] : 30, linkUrl ? PDF_CYAN[1] : 30, linkUrl ? PDF_CYAN[2] : 30);
+        doc.text(valueLines, margin + contentW - 2.2, state.y + 4.4, { align: "right" });
+        const labelW = doc.getTextWidth(label);
+        const valueW = Math.max.apply(null, valueLines.map((line) => doc.getTextWidth(line)).concat(0));
+        const x1 = margin + 2.2 + labelW + 1.6;
+        const x2 = margin + contentW - 2.2 - valueW - 1.6;
+        if (x2 > x1 + 3) {
+          doc.setDrawColor(186, 186, 186);
+          doc.setLineWidth(0.15);
+          doc.setLineDashPattern([0.25, 0.7], 0);
+          doc.line(x1, state.y + 4.7, x2, state.y + 4.7);
+          doc.setLineDashPattern([], 0);
+        }
+        if (linkUrl) {
+          doc.link(margin + contentW - 2.2 - valueW, state.y + 1.2, valueW, Math.max(4, h - 2), { url: linkUrl });
+        }
+        state.y += h;
+      });
+      state.y += 5;
+    }
+
+    function paintFooters() {
+      const pages = doc.internal.getNumberOfPages();
+      for (let i = 1; i <= pages; i++) {
+        doc.setPage(i);
+        const y = pageH - 24;
+        doc.setDrawColor(210, 210, 210);
+        doc.setLineWidth(0.25);
+        [72, 124, 170].forEach((x) => doc.line(x, y, x, y + 14));
+        doc.setFont("helvetica", "normal");
+        doc.setFontSize(7.5);
+        doc.setTextColor(110, 110, 110);
+        doc.text("Una marca de:", margin, y + 3.5);
+        if (coresaLogo) {
+          const logoW = 20;
+          const logoH = logoW * (coresaLogo.h / coresaLogo.w);
+          const logoX = margin;
+          const logoY = y + 5.2;
+          try {
+            doc.addImage(coresaLogo.data, "PNG", logoX, logoY, logoW, logoH);
+            doc.link(logoX, logoY, logoW, logoH, { url: CORESA_WEB_URL });
+          } catch (e) {
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(9);
+            doc.setTextColor(35, 35, 35);
+            doc.textWithLink("CORESA", margin, y + 10, { url: CORESA_WEB_URL });
+          }
+        } else {
+          doc.setFont("helvetica", "bold");
+          doc.setFontSize(9);
+          doc.setTextColor(35, 35, 35);
+          doc.textWithLink("CORESA", margin, y + 10, { url: CORESA_WEB_URL });
+        }
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(8);
+        doc.setTextColor(35, 35, 35);
+        doc.textWithLink("Contacto", 78, y + 5, { url: PDF_CONTACTO_URL });
+        doc.setFont("helvetica", "normal");
+        doc.setTextColor(110, 110, 110);
+        doc.textWithLink("macroled.com.ar/contacto", 78, y + 10, { url: PDF_CONTACTO_URL });
+        doc.setFont("helvetica", "bold");
+        doc.setTextColor(35, 35, 35);
+        doc.text("Web", 130, y + 5);
+        doc.setFont("helvetica", "normal");
+        doc.setTextColor(110, 110, 110);
+        doc.text("www.macroled.com.ar", 130, y + 10);
+        try {
+          drawPdfQr(doc, data.webUrl, pageW - margin - 16, y - 2, 16);
+        } catch (e) {
+          /* Sin QR la ficha igual se descarga. */
+        }
+      }
+    }
+
+    paintCover();
+    doc.addPage();
+    paintContentHeader();
+    if (image) {
+      placePdfImage(doc, image, (pageW - 78) / 2, state.y, 78, 62);
+      state.y += 68;
+    }
+    data.groups.forEach((group) => drawSpecTable(group.title, group.rows));
+    if (data.commercial.length) drawSpecTable("Información comercial", data.commercial);
+    if (data.links.length) drawSpecTable("Enlaces", data.links);
+    paintFooters();
+
+    const fileName = pdfFileName(data.sku, "ficha");
+    doc.setProperties({
+      title: fileName.replace(/\.pdf$/i, ""),
+      creator: "MACROLED",
+    });
+    deliverGeneratedPdf(doc.output("blob"), fileName, preview);
+  }
+
+  const WARRANTY_NUMBERS = ["", "Un", "Dos", "Tres", "Cuatro", "Cinco", "Seis", "Siete", "Ocho", "Nueve", "Diez", "Once", "Doce"];
+
+  function formatWarrantyTerm(raw) {
+    const value = String(raw || "").trim();
+    if (!value) return "";
+    const match = value.match(/(\d+)\s*(años|año|meses|mes)/i);
+    if (!match) return value.replace(/\s+a partir de la fecha de compra\.?$/i, "");
+    const count = parseInt(match[1], 10);
+    const word = WARRANTY_NUMBERS[count] || String(count);
+    const unit = /mes/i.test(match[2]) ? (count === 1 ? "mes" : "meses") : count === 1 ? "año" : "años";
+    return word + " (" + count + ") " + unit;
+  }
+
+  function currentWarrantyTerm() {
+    const row = document.querySelector('#commercialTable [data-spec-key="Garantía"]');
+    if (row && !row.hidden) {
+      const shown = (row.querySelector("[data-spec-val]")?.textContent || "").trim();
+      if (hasSpecValue(shown)) return shown;
+    }
+    const ctx = window.__mlProductCtx;
+    if (ctx && hasSpecValue(ctx.warranty)) return String(ctx.warranty).trim();
+    if (heroItem) {
+      const fromSpecs = parseSpecs(heroItem)["Garantía"];
+      if (hasSpecValue(fromSpecs)) return String(fromSpecs).trim();
+    }
+    return "";
+  }
+
+  function fichaAssetUrl(fileName) {
+    const scripts = document.querySelectorAll("script[src]");
+    for (let i = 0; i < scripts.length; i++) {
+      const src = scripts[i].src || "";
+      if (/(?:^|\/)script\.js(?:\?|$)/.test(src)) return new URL(fileName, src).href;
+    }
+    return new URL(fileName, window.location.href).href;
+  }
+
+  function loadScriptOnce(src, marker, ready) {
+    if (ready()) return Promise.resolve();
+    return new Promise((resolve, reject) => {
+      const existing = document.querySelector("script[data-ml-lib='" + marker + "']");
+      const done = () => (ready() ? resolve() : reject(new Error(marker)));
+      if (existing) {
+        existing.addEventListener("load", done, { once: true });
+        existing.addEventListener("error", () => reject(new Error(marker)), { once: true });
+        return;
+      }
+      const s = document.createElement("script");
+      s.src = src;
+      s.dataset.mlLib = marker;
+      s.onload = done;
+      s.onerror = () => reject(new Error(marker));
+      document.head.appendChild(s);
+    });
+  }
+
+  function loadPdfLib() {
+    return Promise.all([
+      loadScriptOnce(
+        "https://cdn.jsdelivr.net/npm/@pdf-lib/fontkit@1.1.1/dist/fontkit.umd.min.js",
+        "fontkit",
+        () => window.fontkit
+      ),
+      loadScriptOnce(
+        "https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js",
+        "pdflib",
+        () => window.PDFLib
+      ),
+    ]).then(() => window.PDFLib);
+  }
+
+  async function downloadWarrantySheet(preview) {
+    const sku = (document.getElementById("ficha-sku")?.textContent || (heroItem && heroItem.getAttribute("data-sku")) || "").trim();
+    const term = formatWarrantyTerm(currentWarrantyTerm());
+    const plazoRest = term
+      ? term + " a partir de la fecha de compra."
+      : "según las condiciones de la ficha del producto.";
+    const PDFLib = await loadPdfLib();
+    const [template, fontBytes] = await Promise.all([
+      fetch(fichaAssetUrl("garantia-base.pdf")).then((res) => {
+        if (!res.ok) throw new Error("garantia-base");
+        return res.arrayBuffer();
+      }),
+      fetch(fichaAssetUrl("OpenSans-Regular.ttf")).then((res) => {
+        if (!res.ok) throw new Error("opensans");
+        return res.arrayBuffer();
+      }),
+    ]);
+    const pdfDoc = await PDFLib.PDFDocument.load(template);
+    pdfDoc.registerFontkit(window.fontkit);
+    const page = pdfDoc.getPages()[0];
+    const font = await pdfDoc.embedFont(fontBytes);
+    const white = PDFLib.rgb(1, 1, 1);
+    const ink = PDFLib.rgb(0, 0, 0);
+    page.drawRectangle({ x: 129.2, y: 680.2, width: 360, height: 12, color: white });
+    page.drawText(pdfSafe(sku || "-"), { x: 130.15, y: 682.96, size: 10, font, color: ink });
+    page.drawRectangle({ x: 128.6, y: 606.2, width: 400, height: 13, color: white });
+    page.drawText(pdfSafe(plazoRest), { x: 129.5, y: 610.45, size: 9.5, font, color: ink });
+    const fileName = pdfFileName(sku, "garantia");
+    pdfDoc.setTitle(fileName.replace(/\.pdf$/i, ""));
+    const bytes = await pdfDoc.save();
+    deliverGeneratedPdf(new Blob([bytes], { type: "application/pdf" }), fileName, preview);
+  }
+
+  let pdfBusy = false;
+
+  function setPdfTriggerBusy(trigger, busy) {
+    if (!trigger) return;
+    if (busy) {
+      trigger.setAttribute("aria-busy", "true");
+      if (trigger.id === "dl-ficha" || trigger.id === "dl-garantia") {
+        const label = trigger.querySelector(".dl-card__btn");
+        if (label) {
+          label.dataset.prevLabel = label.textContent;
+          label.textContent = "Generando…";
+        }
+      } else {
+        setDownloadBtnLabel(trigger, "Generando…");
+      }
+      return;
+    }
+    trigger.removeAttribute("aria-busy");
+    if (trigger.id === "dl-ficha" || trigger.id === "dl-garantia") {
+      const label = trigger.querySelector(".dl-card__btn");
+      if (label) label.textContent = "Descargar";
+    } else if (trigger.dataset.generatePdf === "1") {
+      setDownloadBtnLabel(trigger, "Descargar ficha técnica");
+    }
+  }
+
+  document.addEventListener("click", (e) => {
+    const trigger = e.target.closest("#btn-ficha[data-generate-pdf], #dl-ficha, #dl-garantia");
+    if (!trigger || trigger.hidden) return;
+    e.preventDefault();
+    if (pdfBusy) return;
+    pdfBusy = true;
+    const preview = window.open("", "_blank");
+    if (preview) {
+      try {
+        const openingWarranty = trigger.id === "dl-garantia";
+        preview.document.write(
+          "<!DOCTYPE html><title>" +
+            (openingWarranty ? "Garantía" : "Ficha técnica") +
+            "</title><p style=\"font-family:sans-serif;padding:24px;color:#141821\">Generando " +
+            (openingWarranty ? "garantía" : "ficha") +
+            "…</p>"
+        );
+        preview.document.close();
+      } catch (err) {}
+    }
+    setPdfTriggerBusy(trigger, true);
+    const job = trigger.id === "dl-garantia" ? downloadWarrantySheet(preview) : downloadTechnicalSheet(preview);
+    job
+      .catch((err) => {
+        console.error("[ficha-pdf]", err);
+        if (preview && !preview.closed) preview.close();
+      })
+      .finally(() => {
+        pdfBusy = false;
+        setPdfTriggerBusy(trigger, false);
+      });
+  });
+
   let heroItem = null;
   let siblings = [];
   let dimensionKeys = [];
+  let dimensionLabels = {};
   /* Video "de familia": la mayoría de las variantes (color/tamaño) no cargan
      su propio campo Video en el CMS — solo el SKU elegido como hero lo tiene.
      Se guarda acá para no perder el video al cambiar de variante. */
@@ -1652,12 +2465,18 @@
 
     /* El héroe primero: si el multi-reference se incluye a sí mismo, gana el embed
        del héroe, que es el que trae la ficha completa. */
+    const dbMode = current.getAttribute("data-source") === "typesense";
+    const accept = (el) => !dbMode || el.getAttribute("data-source") === "typesense";
+
     push(current);
-    document.querySelectorAll(".cms-product-item[data-variant-item]").forEach(push);
+    document.querySelectorAll(".cms-product-item[data-variant-item]").forEach((el) => {
+      if (accept(el)) push(el);
+    });
 
     if (bySku.size <= 1) {
       const wanted = new Set(parseList(current.getAttribute("data-variantes-sku")));
       document.querySelectorAll(".cms-product-item").forEach((el) => {
+        if (!accept(el)) return;
         const sku = (el.getAttribute("data-sku") || "").trim();
         if (wanted.has(sku) || parseList(el.getAttribute("data-variantes-sku")).indexOf(currentSku) !== -1) {
           push(el);
@@ -1700,68 +2519,36 @@
 
   function resolveDimensions(current, sibs) {
     const differs = (key) => !NON_DIM_KEYS.has(key) && specValues(sibs, key).size > 1;
-
-    /* Campo nuevo: lista de atributos separados por ; o , — soporta varios ejes
-       de variación a la vez (ej. "Ángulo de apertura;Potencia"). Prioridad sobre
-       el campo viejo de un solo atributo. */
-    const multiRaw = (current.getAttribute("data-attr-variantes") || "").trim();
-    if (multiRaw) {
-      const terms = multiRaw.split(/[;,]/).map((t) => t.trim()).filter(Boolean);
-      const resolved = [];
-      const seen = new Set();
-      terms.forEach((term) => {
-        const hit = resolveOneDeclared(term, sibs, differs);
-        if (hit && !seen.has(normKey(hit))) {
-          seen.add(normKey(hit));
-          resolved.push(hit);
-        } else if (!hit) {
-          console.warn(
-            `[variantes] "${term}" (declarado en Atributos Variantes) no matchea ningún spec que difiera entre hermanas.`
-          );
-        }
-      });
-      if (resolved.length) return resolved;
-      console.warn(
-        `[variantes] "${multiRaw}" no resolvió ningún atributo válido. Autodetectando…`
-      );
-    }
-
-    /* Campo viejo (legacy, un solo atributo): se mantiene para productos que
-       todavía no migraron al campo nuevo. */
-    const declaredRaw = (current.getAttribute("data-nombre-attr-variantes") || "").trim();
-    if (declaredRaw) {
-      const hit = resolveOneDeclared(declaredRaw, sibs, differs);
-      if (hit) return [hit];
-      console.warn(
-        `[variantes] el CMS declara "${declaredRaw}" pero ningún campo con ese valor difiere entre las variantes. Autodetectando…`
-      );
-    }
-
-    /* Autodetección: ahora junta TODOS los atributos que difieran (no solo el
-       primero), respetando el orden de prioridad y agregando al final cualquier
-       otro spec fuera de esa lista que también difiera. */
+    dimensionLabels = {};
     const seen = new Set();
     const auto = [];
     DIM_AUTODETECT_PRIORITY.forEach((key) => {
-      if (differs(key) && !seen.has(normKey(key))) {
-        seen.add(normKey(key));
-        auto.push(key);
-      }
-    });
-    allSpecKeys(sibs).forEach((key) => {
-      if (differs(key) && !seen.has(normKey(key))) {
-        seen.add(normKey(key));
-        auto.push(key);
-      }
+      if (!differs(key) || seen.has(normKey(key))) return;
+      if (valueIsDeterminedBy(key, auto, sibs)) return;
+      seen.add(normKey(key));
+      auto.push(key);
     });
     return auto;
+  }
+
+  function valueIsDeterminedBy(key, priorKeys, sibs) {
+    if (!priorKeys.length) return false;
+    const groups = new Map();
+    sibs.forEach((el) => {
+      const specs = parseSpecs(el);
+      const sig = priorKeys.map((k) => (specs[k] || "").trim()).join("\u0001");
+      const value = (specs[key] || "").trim();
+      if (!groups.has(sig)) groups.set(sig, new Set());
+      groups.get(sig).add(value);
+    });
+    return [...groups.values()].every((set) => set.size <= 1);
   }
 
   const CHIP_LABELS = {
     "Color del cuerpo": "Color",
     "Temperatura del color": "Temperatura",
     "Ángulo de apertura": "Ángulo",
-    "Protección IP": "Protección",
+    "Protección IP": "IP",
   };
 
   function renderChipGroup(label, groupName, entries, activeValue) {
@@ -1822,14 +2609,10 @@
   }
 
   /**
-   * Disponibilidad en cascada: un valor de `key` se tacha solo si no hay ninguna
-   * hermana que lo tenga Y coincida con la selección actual en las dimensiones QUE
-   * VIENEN ANTES en dimensionKeys (nunca contra las que vienen después).
-   *
-   * Esto evita el candado cruzado: si Potencia es la primera dimensión declarada,
-   * sus chips nunca se tachan por culpa de un Ángulo ya elegido (100W existe, solo
-   * que con otro ángulo). El Ángulo sí se filtra por la Potencia/Temperatura ya
-   * elegidas, porque es la dimensión más específica y depende de las anteriores.
+   * Disponibilidad en cascada: Potencia va primera y no se tacha. Un valor de un
+   * eje posterior (ángulo, color, temperatura) se tacha si ninguna hermana lo
+   * combina con la potencia y los ejes anteriores ya elegidos. Ejemplo: en 200W
+   * el ángulo 60° queda tachado porque esa potencia no lo tiene.
    */
   function isCombinationAvailable(currentSpecs, key, value) {
     const idx = dimensionKeys.indexOf(key);
@@ -1859,7 +2642,7 @@
           return "";
         };
         html += renderChipGroup(
-          CHIP_LABELS[key] || key,
+          dimensionLabels[normKey(key)] || CHIP_LABELS[key] || key,
           "variant-" + slugify(key),
           values.map((value) => ({
             value,
@@ -1868,7 +2651,8 @@
             unavailable:
               dimensionKeys.length > 1 && !isCombinationAvailable(currentSpecs, key, value),
           })),
-          (currentSpecs[key] || "").trim()
+          (currentSpecs[key] || "").trim(),
+          key
         );
       });
     } else if (siblings.length > 1) {
@@ -1926,8 +2710,8 @@
      taxonomías distintas. Linkear con el valor del CMS deja el filtro sin
      resultados. Se resuelve el valor real contra Typesense por SKU. */
   const TS_HOST = "https://typesense.coresagroup.com";
-  const TS_API_KEY = "g0oiNYY8THGuU9jnCsvqIH1X9HtvYRCR";
-  const TS_COLLECTION = "Macroled_Prueba";
+  const TS_API_KEY = "wpbpJ1lMSHi0ZZlB9CHY1fktyn2LqzLJ";
+  const TS_COLLECTION = "macroled";
   const familiaCache = Object.create(null);
 
   async function fetchLiveFamilia(sku) {
@@ -1985,6 +2769,7 @@
 
   function applyProduct(el, opts) {
     opts = opts || {};
+    dbSpecRows = readDbSpecRows(el);
     const specs = parseSpecs(el);
     const sku = (el.getAttribute("data-sku") || "").trim();
     const name = (el.getAttribute("data-name") || "").trim();
@@ -2006,6 +2791,7 @@
     const family = (el.getAttribute("data-family") || "").trim();
     const macro = (el.getAttribute("data-macrofamilia") || "").trim();
     const fichaUrl = (el.getAttribute("data-ficha") || "").trim();
+    const fichaAnteriorUrl = (el.getAttribute("data-ficha-anterior") || "").trim();
     const garantiaUrl = (el.getAttribute("data-garantia") || "").trim();
     const catalogoUrl = (el.getAttribute("data-catalogo") || "").trim();
     const manualUrl = (el.getAttribute("data-manual") || "").trim();
@@ -2063,6 +2849,7 @@
     syncActionDownloads(fichaUrl, catalogoUrl, manualUrl);
     syncFileCards({
       ficha: fichaUrl,
+      fichaAnterior: fichaUrl || fichaAnteriorUrl,
       garantia: garantiaUrl,
       manual: manualUrl,
       catalogo: catalogoUrl,
@@ -2188,7 +2975,8 @@
    * cualquier orden, así que no alcanza con tomar el primero del DOM.
    */
   function pickHeroItem() {
-    const all = Array.prototype.slice.call(document.querySelectorAll(".cms-product-item"));
+    const fromDb = document.querySelectorAll(".cms-product-item[data-source='typesense']");
+    const all = Array.prototype.slice.call(fromDb.length ? fromDb : document.querySelectorAll(".cms-product-item"));
     if (!all.length) return null;
 
     const explicit = all.find((el) => el.hasAttribute("data-hero"));
@@ -2878,11 +3666,15 @@
    * así que seguimos mirando si aparecen más .cms-product-item.
    */
   function watchForLateVariants() {
-    let lastCount = document.querySelectorAll(".cms-product-item").length;
+    const itemCount = () => {
+      const db = document.querySelectorAll(".cms-product-item[data-source='typesense']");
+      return (db.length ? db : document.querySelectorAll(".cms-product-item")).length;
+    };
+    let lastCount = itemCount();
     let checks = 0;
     const tick = () => {
       if (userPickedVariant) return;
-      const count = document.querySelectorAll(".cms-product-item").length;
+      const count = itemCount();
       if (count !== lastCount) {
         lastCount = count;
         initVariants();
@@ -2913,23 +3705,274 @@
     revealFicha();
   }
 
-  function waitForCmsAndBoot() {
-    let tries = 0;
-    const maxTries = 40; /* ~4s */
-    const tick = () => {
-      const hasCms = !!document.querySelector(".cms-product-item");
-      if (hasCms || tries >= maxTries) {
-        bootFicha();
+  function readDbSpecRows(el) {
+    if (!el) return [];
+    try {
+      const raw = el.getAttribute("data-spec-groups");
+      const parsed = raw ? JSON.parse(raw) : [];
+      return Array.isArray(parsed) ? parsed : [];
+    } catch (e) {
+      return [];
+    }
+  }
+
+  function showFichaError(message) {
+    const loader = document.getElementById("fichaLoader");
+    if (!loader) return;
+    loader.classList.add("is-error");
+    const text = loader.querySelector(".ficha-loader__text");
+    if (text) text.textContent = message;
+    const spin = loader.querySelector(".ficha-loader__spin");
+    if (spin) spin.hidden = true;
+  }
+
+  function readInitialSku() {
+    const params = new URLSearchParams(window.location.search);
+    const fromQuery = (params.get("sku") || "").trim();
+    if (fromQuery) return fromQuery;
+    /* Text Block oculto de la plantilla CMS. El id tiene que ser ml-cms-sku:
+       #ficha-sku vive dentro del embed y el script lo pisa al pintar el producto. */
+    const fromCms = (document.getElementById("ml-cms-sku")?.textContent || "").trim();
+    if (fromCms && !/^sku$/i.test(fromCms)) return fromCms;
+    const fromText = (document.getElementById("ficha-sku")?.textContent || "").trim();
+    if (fromText && !/^sku$/i.test(fromText)) return fromText;
+    const hero =
+      document.querySelector(".cms-product-item[data-hero][data-sku]") ||
+      document.querySelector(".cms-product-item[data-sku]");
+    return (hero && hero.getAttribute("data-sku") || "").trim();
+  }
+
+  function listField(value) {
+    if (Array.isArray(value)) return value.map((item) => String(item).trim()).filter(Boolean);
+    return parseList(value);
+  }
+
+  function joinList(values) {
+    return values.filter(Boolean).join(" ; ");
+  }
+
+  function firstText(doc, names) {
+    for (let i = 0; i < names.length; i++) {
+      const value = doc[names[i]];
+      if (value == null) continue;
+      const text = Array.isArray(value) ? joinList(listField(value)) : String(value).trim();
+      if (text) return text;
+    }
+    return "";
+  }
+
+  function docFileValue(doc, names) {
+    const wanted = new Set(names.map((name) => name.toLowerCase().replace(/[\s-]+/g, "_")));
+    for (const key of Object.keys(doc || {})) {
+      if (!wanted.has(key.toLowerCase().replace(/[\s-]+/g, "_"))) continue;
+      const text = firstText({ value: doc[key] }, ["value"]);
+      if (text) return text;
+    }
+    return "";
+  }
+
+  function productPath(doc) {
+    const raw = String(doc.link_ficha_web || "").trim();
+    if (raw) {
+      try {
+        const url = new URL(raw, "https://www.macroled.com.ar");
+        if (url.pathname && url.pathname !== "/") return url.pathname;
+      } catch (e) {}
+    }
+    const slug = String(doc.slug || "").trim();
+    const cat = String(doc.categoria_slug || "").trim();
+    if (cat && slug) return "/" + cat + "/" + slug;
+    if (slug) return "/" + slug;
+    return "";
+  }
+
+  function galleryImages(doc) {
+    const raw = doc.multimagen != null ? doc.multimagen : doc.multiimage;
+    const urls = [];
+    listField(raw).forEach((url) => {
+      if (url && urls.indexOf(url) === -1) urls.push(url);
+    });
+    return urls;
+  }
+
+  function specPayload(doc) {
+    const rows = Array.isArray(doc.especificaciones) ? doc.especificaciones : [];
+    const flat = {};
+    const groups = [];
+    rows.forEach((row) => {
+      const nombre = String((row && row.nombre) || "").trim();
+      const valor = row && row.valor != null ? String(row.valor).trim() : "";
+      if (!nombre || !hasSpecValue(valor)) return;
+      const key = normalizeSpecKey(nombre);
+      if (!hasSpecValue(flat[key])) flat[key] = valor;
+      groups.push({
+        grupo: String((row && row.grupo) || "Especificaciones").trim() || "Especificaciones",
+        nombre: nombre,
+        valor: valor,
+      });
+    });
+    return { flat: flat, groups: groups };
+  }
+
+  function setAttr(el, name, value) {
+    const text = value == null ? "" : String(value).trim();
+    if (text) el.setAttribute(name, text);
+  }
+
+  function docToItem(doc, isHero) {
+    const el = document.createElement("div");
+    el.className = "cms-product-item";
+    el.setAttribute("data-source", "typesense");
+    if (isHero) el.setAttribute("data-hero", "");
+    else el.setAttribute("data-variant-item", "");
+
+    const specs = specPayload(doc);
+    const images = galleryImages(doc);
+    const path = productPath(doc);
+    const variantSkus = listField(doc.variantes_sku);
+
+    setAttr(el, "data-sku", doc.sku);
+    setAttr(el, "data-name", doc.nombre || doc.nombre_typesense);
+    setAttr(el, "data-image", images[0] || doc.imagen);
+    setAttr(el, "data-multiimage", joinList(images));
+    setAttr(el, "data-video", firstText(doc, ["video", "videos"]));
+    setAttr(el, "data-family", doc.familia);
+    setAttr(el, "data-macrofamilia", doc.macrofamilia);
+    setAttr(el, "data-subfamilia", doc.subfamilia);
+    setAttr(el, "data-linea", doc.linea);
+    setAttr(el, "data-nuevo", doc.nuevo === true || /^(true|1|si|sí|yes)$/i.test(String(doc.nuevo || "")) ? "true" : "");
+    setAttr(el, "data-link", path);
+    setAttr(el, "data-product-url", path);
+    setAttr(el, "data-descripcion", doc.descripcion);
+    setAttr(el, "data-ean13", doc.ean13);
+    setAttr(el, "data-smart", doc.smart);
+    setAttr(el, "data-variantes-sku", joinList(variantSkus));
+    setAttr(el, "data-nombre-attr-variantes", doc.nombre_attr_variantes);
+    setAttr(el, "data-attr-variantes", firstText(doc, ["atributos_variantes", "atributos_de_variantes"]));
+    setAttr(el, "data-catalogo", firstText(doc, ["catalogo_link", "catalogo"]));
+    setAttr(el, "data-manual", firstText(doc, ["manual", "manuales", "manual_link"]));
+    setAttr(el, "data-ies", firstText(doc, ["ies", "ies_link"]));
+    setAttr(el, "data-ficha", firstText(doc, ["ficha_tecnica"]));
+    setAttr(el, "data-ficha-anterior", docFileValue(doc, ["ficha_tecnica_anterior", "ficha tecnica_anterior"]));
+    setAttr(el, "data-garantia", firstText(doc, ["garantia_link"]));
+    setAttr(el, "data-relacionados-armados", firstText(doc, ["productos_relacionados_armados", "relacionados_armados", "armados"]));
+    setAttr(el, "data-relacionados-despiece", firstText(doc, ["productos_relacionados_despiece", "relacionados_despiece", "despiece"]));
+    setAttr(el, "data-compatibles", firstText(doc, ["productos_compatibles", "compatibles"]));
+    if (Object.keys(specs.flat).length) el.setAttribute("data-specs", JSON.stringify(specs.flat));
+    if (specs.groups.length) el.setAttribute("data-spec-groups", JSON.stringify(specs.groups));
+    return el;
+  }
+
+  async function fetchDocsBySku(skus) {
+    const unique = [];
+    skus.forEach((sku) => {
+      const value = String(sku || "").trim();
+      if (!value || unique.some((item) => item.toUpperCase() === value.toUpperCase())) return;
+      unique.push(value);
+    });
+    if (!unique.length) return [];
+    const inList = unique.map((sku) => `"${sku.replace(/"/g, '\\"')}"`).join(",");
+    const params = new URLSearchParams({
+      q: "*",
+      query_by: "sku",
+      filter_by: `sku:=[${inList}]`,
+      per_page: String(Math.min(unique.length, 250)),
+    });
+    const res = await fetch(
+      `${TS_HOST}/collections/${encodeURIComponent(TS_COLLECTION)}/documents/search?${params}`,
+      { headers: { "X-TYPESENSE-API-KEY": TS_API_KEY } }
+    );
+    if (!res.ok) throw new Error("Typesense " + res.status);
+    const data = await res.json();
+    const docs = (data.hits || []).map((hit) => hit.document).filter(Boolean);
+    docs.sort((a, b) => {
+      const ai = unique.findIndex((sku) => sku.toUpperCase() === String(a.sku || "").toUpperCase());
+      const bi = unique.findIndex((sku) => sku.toUpperCase() === String(b.sku || "").toUpperCase());
+      return ai - bi;
+    });
+    return docs;
+  }
+
+  async function fetchDocsReferencingSku(sku) {
+    const value = String(sku || "").trim();
+    if (!value) return [];
+    const params = new URLSearchParams({
+      q: "*",
+      query_by: "sku",
+      filter_by: `variantes_sku:=${JSON.stringify(value)}`,
+      per_page: "250",
+    });
+    const res = await fetch(
+      `${TS_HOST}/collections/${encodeURIComponent(TS_COLLECTION)}/documents/search?${params}`,
+      { headers: { "X-TYPESENSE-API-KEY": TS_API_KEY } }
+    );
+    if (!res.ok) throw new Error("Typesense " + res.status);
+    const data = await res.json();
+    return (data.hits || []).map((hit) => hit.document).filter(Boolean);
+  }
+
+  function mountProductItems(hero, variants) {
+    document.querySelectorAll(".cms-product-item").forEach((el) => el.remove());
+    let root = document.getElementById("cmsProductSource");
+    if (!root) {
+      root = document.createElement("div");
+      root.id = "cmsProductSource";
+      root.className = "cms-product-source";
+      root.setAttribute("aria-hidden", "true");
+      document.body.appendChild(root);
+    }
+    root.appendChild(docToItem(hero, true));
+    variants.forEach((doc) => {
+      if (!doc || !doc.sku) return;
+      if (String(doc.sku).toUpperCase() === String(hero.sku).toUpperCase()) return;
+      root.appendChild(docToItem(doc, false));
+    });
+  }
+
+  async function loadFichaFromDb() {
+    const sku = readInitialSku();
+    if (!sku) {
+      showFichaError("Esta ficha no tiene SKU.");
+      return;
+    }
+    try {
+      let docs = await fetchDocsBySku([sku]);
+      if (!docs.length && sku !== sku.toUpperCase()) docs = await fetchDocsBySku([sku.toUpperCase()]);
+      const hero = docs[0];
+      if (!hero) {
+        showFichaError("No encontramos el producto " + sku + ".");
         return;
       }
-      tries += 1;
-      setTimeout(tick, 100);
-    };
+      const variantSkus = listField(hero.variantes_sku).filter(
+        (item) => item.toUpperCase() !== String(hero.sku || "").toUpperCase()
+      );
+      const [listed, referring] = await Promise.all([
+        variantSkus.length ? fetchDocsBySku(variantSkus) : Promise.resolve([]),
+        fetchDocsReferencingSku(hero.sku),
+      ]);
+      const seen = new Set([String(hero.sku || "").toUpperCase()]);
+      const variants = [];
+      listed.concat(referring).forEach((doc) => {
+        const skuKey = String(doc && doc.sku || "").toUpperCase();
+        if (!skuKey || seen.has(skuKey)) return;
+        seen.add(skuKey);
+        variants.push(doc);
+      });
+      mountProductItems(hero, variants);
+      lastVariantSignature = "";
+      userPickedVariant = false;
+      bootFicha();
+    } catch (err) {
+      console.error("[ficha] no se pudo leer la base", err);
+      showFichaError("No pudimos cargar el producto. Reintentá en unos segundos.");
+    }
+  }
 
+  function waitForCmsAndBoot() {
     if (document.readyState === "loading") {
-      document.addEventListener("DOMContentLoaded", tick);
+      document.addEventListener("DOMContentLoaded", loadFichaFromDb);
     } else {
-      tick();
+      loadFichaFromDb();
     }
   }
 
@@ -2968,8 +4011,4 @@
   })();
 
   waitForCmsAndBoot();
-  /* Red de seguridad: si por lo que sea bootFicha tarda de más, no dejamos
-     la ficha oculta más de 1.2s (peor caso normal: el embed CMS ya está en
-     el DOM y esto ni se nota, revealFicha ya corrió antes). */
-  setTimeout(revealFicha, 1200);
 })();

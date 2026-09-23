@@ -277,6 +277,9 @@
       renderCompareBar();
       syncCompareCheckboxes();
     });
+    window.addEventListener("ml-product-changed", () => {
+      bindCurrentProduct();
+    });
     // El motor del asistente (copiado de productos/script.js) ya no manda
     // el evento "macroled-assistant-toggle" — observamos directamente la
     // clase "is-open" del panel para recalcular el padding igual que antes.

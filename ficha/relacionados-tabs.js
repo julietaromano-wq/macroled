@@ -26,8 +26,8 @@
 
   const TYPESENSE = {
     host: "https://typesense.coresagroup.com",
-    apiKey: "g0oiNYY8THGuU9jnCsvqIH1X9HtvYRCR",
-    collection: "Macroled_Prueba",
+    apiKey: "wpbpJ1lMSHi0ZZlB9CHY1fktyn2LqzLJ",
+    collection: "macroled",
     queryBy: "descripcion",
   };
 

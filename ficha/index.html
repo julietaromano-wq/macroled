@@ -29,6 +29,10 @@
 
 <main>
   <div class="wrap is-hydrating">
+    <div class="ficha-loader" id="fichaLoader" role="status" aria-live="polite">
+      <span class="ficha-loader__spin" aria-hidden="true"></span>
+      <span class="ficha-loader__text">Cargando producto…</span>
+    </div>
     <nav class="crumb" aria-label="Miga de pan">
       <a href="/productos">Productos</a><span class="sep">›</span>
       <a id="crumb-family">Luminarias Inalámbricas</a><span class="sep">›</span>
@@ -52,8 +56,7 @@
               <div class="zoom-lens" id="zoomLens" aria-hidden="true"></div>
               <div class="stage-actions">
                 <button type="button" class="zoom-btn" id="openLightboxBtn" aria-label="Ampliar imagen">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
-                  <span class="zoom-btn__label">Ampliar</span>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>
                 </button>
                 <button type="button" class="zoom-btn zoom-btn--share-mobile" id="mobileShareBtn" aria-label="Compartir" aria-haspopup="true" aria-expanded="false">
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4"/></svg>
@@ -101,16 +104,18 @@
         <p class="lead" id="ficha-lead">Reflector Roma Smart Macroled, control por app, Wi-Fi, 30W, 3000K, IP65, 2700lm, compatible con Alexa y Google Home</p>
 
         <div class="meta">
-          <span>SKU <b id="ficha-sku">ROMA-S-30W</b><button type="button" id="sku-copy-btn" class="sku-copy-btn" aria-label="Copiar SKU" title="Copiar SKU"><svg class="sku-copy-icon" viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg><svg class="sku-copy-check" viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" hidden><polyline points="20 6 9 17 4 12"></polyline></svg><span class="sku-copy-msg" id="sku-copy-msg" role="status" aria-live="polite"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"></polyline></svg>SKU copiado</span></button></span>
-          <span class="dot" aria-hidden="true"></span>
-          <span>EAN <b id="ficha-ean">7428325600001</b></span>
+          <div class="meta-ids">
+            <span>SKU <b id="ficha-sku">m-bast-t-mg</b><button type="button" id="sku-copy-btn" class="sku-copy-btn" aria-label="Copiar SKU" title="Copiar SKU"><svg class="sku-copy-icon" viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg><svg class="sku-copy-check" viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" hidden><polyline points="20 6 9 17 4 12"></polyline></svg><span class="sku-copy-msg" id="sku-copy-msg" role="status" aria-live="polite"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"></polyline></svg>SKU copiado</span></button></span>
+            <span class="dot" aria-hidden="true"></span>
+            <span>EAN <b id="ficha-ean">7428325600001</b></span>
+          </div>
         </div>
 
         <div id="product-variants" class="container_variants" hidden aria-live="polite"></div>
 
         <div class="chars-block">
-          <span class="chars-label">Características</span>
-          <div class="quick-specs" data-count="2" aria-label="Características destacadas">
+          <span class="chars-label">Especificaciones</span>
+          <div class="quick-specs" data-count="2" aria-label="Especificaciones destacadas">
             <div class="qspec" data-spec-key="Potencia">
               <span class="label">Potencia</span>
               <span class="val" data-spec-val>30W</span>
@@ -126,16 +131,11 @@
           </div>
         </div>
 
-        <!--
-          CTA STACK — jerarquía nueva:
-          1) Fila principal: Ficha técnica + Catálogo (50/50)
-          2) Fila utilitaria: Agregar a comparación (pill)
-        -->
         <div class="cta-stack">
           <div class="actions">
             <a class="btn btn-primary" id="btn-ficha" href="https://s3.coresagroup.com/MACROLED/DS/ROMA-S-30W.pdf" target="_blank" rel="noopener">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/></svg>
-              Ficha técnica
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m7 11 5 5 5-5"/><path d="M5 21h14"/></svg>
+              Descargar ficha técnica
             </a>
             <a class="btn btn-ghost" id="btn-catalogo" href="descargar.html">
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/><path d="M8 7h8M8 11h6"/></svg>
@@ -334,6 +334,34 @@
             </span>
             <span class="dl-card__btn">Descargar</span>
           </a>
+          <a class="dl-card" data-file="ficha-anterior" id="dl-ficha-anterior" href="#" target="_blank" rel="noopener" hidden>
+            <span class="dl-card__icon" aria-hidden="true">
+              <svg viewBox="0 0 36 44" fill="none">
+                <path d="M4 0h20l12 12v28a4 4 0 0 1-4 4H4a4 4 0 0 1-4-4V4a4 4 0 0 1 4-4z" fill="currentColor"/>
+                <path d="M24 0v8a4 4 0 0 0 4 4h8L24 0z" fill="#005f87" opacity=".45"/>
+                <text x="18" y="30" text-anchor="middle" fill="#fff" font-family="Noto Sans,sans-serif" font-size="9" font-weight="800">PDF</text>
+              </svg>
+            </span>
+            <span class="dl-card__body">
+              <span class="dl-card__title">Ficha técnica general</span>
+              <span class="dl-card__meta">Ficha técnica general cargada para este producto</span>
+            </span>
+            <span class="dl-card__btn">Descargar</span>
+          </a>
+          <a class="dl-card" data-file="catalogo" id="dl-catalogo" href="#" target="_blank" rel="noopener" hidden>
+            <span class="dl-card__icon" aria-hidden="true">
+              <svg viewBox="0 0 36 44" fill="none">
+                <path d="M4 0h20l12 12v28a4 4 0 0 1-4 4H4a4 4 0 0 1-4-4V4a4 4 0 0 1 4-4z" fill="currentColor"/>
+                <path d="M24 0v8a4 4 0 0 0 4 4h8L24 0z" fill="#005f87" opacity=".45"/>
+                <text x="18" y="30" text-anchor="middle" fill="#fff" font-family="Noto Sans,sans-serif" font-size="9" font-weight="800">PDF</text>
+              </svg>
+            </span>
+            <span class="dl-card__body">
+              <span class="dl-card__title">Catálogo</span>
+              <span class="dl-card__meta">Catálogo comercial del producto o línea</span>
+            </span>
+            <span class="dl-card__btn">Descargar</span>
+          </a>
           <a class="dl-card" data-file="garantia" id="dl-garantia" href="https://s3.coresagroup.com/MACROLED/Garantias/SPACE-B.pdf" target="_blank" rel="noopener">
             <span class="dl-card__icon" aria-hidden="true">
               <svg viewBox="0 0 36 44" fill="none">
@@ -359,20 +387,6 @@
             <span class="dl-card__body">
               <span class="dl-card__title">Manual de uso</span>
               <span class="dl-card__meta">Guía de instalación, montaje y uso</span>
-            </span>
-            <span class="dl-card__btn">Descargar</span>
-          </a>
-          <a class="dl-card" data-file="catalogo" id="dl-catalogo" href="#" target="_blank" rel="noopener" hidden>
-            <span class="dl-card__icon" aria-hidden="true">
-              <svg viewBox="0 0 36 44" fill="none">
-                <path d="M4 0h20l12 12v28a4 4 0 0 1-4 4H4a4 4 0 0 1-4-4V4a4 4 0 0 1 4-4z" fill="currentColor"/>
-                <path d="M24 0v8a4 4 0 0 0 4 4h8L24 0z" fill="#005f87" opacity=".45"/>
-                <text x="18" y="30" text-anchor="middle" fill="#fff" font-family="Noto Sans,sans-serif" font-size="9" font-weight="800">PDF</text>
-              </svg>
-            </span>
-            <span class="dl-card__body">
-              <span class="dl-card__title">Catálogo</span>
-              <span class="dl-card__meta">Catálogo comercial del producto o línea</span>
             </span>
             <span class="dl-card__btn">Descargar</span>
           </a>
@@ -575,7 +589,6 @@
 <!-- CMS siblings mock: campos sueltos como en Webflow (vacío = no se muestra en características) -->
 <div class="cms-product-source" id="cmsProductSource" aria-hidden="true">
   <div class="cms-product-item"
-       data-hero
        data-sku="ROMA-S-30W"
        data-name="Roma Smart 30W"
        data-image="https://d1zltvqju4u8ql.cloudfront.net/fit-in/1000x1000/filters:format(webp)/MACROLED/250/roma.png"
@@ -584,7 +597,7 @@
        data-nuevo="true"
        data-link="roma-smart-30w"
        data-ficha="https://s3.coresagroup.com/MACROLED/DS/ROMA-S-30W.pdf"
-       data-catalogo=""
+       data-catalogo="descargar.html"
        data-manual=""
        data-ies=""
        data-garantia="https://s3.coresagroup.com/MACROLED/Garantias/ROMA-S-30W.pdf"
@@ -626,6 +639,7 @@
        data-control-remoto=""
        data-dimerizable="Si"></div>
   <div class="cms-product-item"
+       data-hero
        data-sku="SPACE-B"
        data-name="Space Blanca"
        data-image="https://d1zltvqju4u8ql.cloudfront.net/fit-in/2000x2000/filters:format(webp)/MACROLED/2000/7428325595880a.png"
@@ -884,8 +898,8 @@
 <script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0/dist/fancybox/fancybox.umd.js"></script>
 <script src="comparar.js"></script>
 <script src="../global/compare-picker.js"></script>
-<script src="script.js?v=sku-toast2"></script>
-<script src="destacados.js?v=20260827-1"></script>
+<script src="script.js?v=eje-ip"></script>
+<script src="destacados.js?v=attr-specs"></script>
 <script src="relacionados-tabs.js?v=1"></script>
 <script src="comparar-ficha.js"></script>
 <script src="../global/compare-bar.js"></script>

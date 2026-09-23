@@ -3,8 +3,8 @@
 
   const TYPESENSE = {
     host: "https://typesense.coresagroup.com",
-    apiKey: "g0oiNYY8THGuU9jnCsvqIH1X9HtvYRCR",
-    collection: "Macroled_Prueba",
+    apiKey: "wpbpJ1lMSHi0ZZlB9CHY1fktyn2LqzLJ",
+    collection: "macroled",
     queryBy: "nombre_typesense,descripcion",
   };
   const RELATED_COUNT = 8;
@@ -128,30 +128,27 @@
   const isSmartSpec = (spec) =>
     /^smart$/i.test(String(spec.value || "").trim()) ||
     /\bsmart\b/i.test(String(spec.label || ""));
-  const normalizedLabel = (value) =>
-    String(value || "")
-      .trim()
-      .toLocaleLowerCase("es");
-
   function variantSpec(doc) {
     const label = String(doc.nombre_attr_variantes || "").trim();
     const value = String(doc.attr_variantes || "").trim();
     return label && value ? { label, value } : null;
   }
 
+  function cmsAttrValue(doc, index) {
+    const underscored = doc[`attr_${index}`];
+    const plain = doc[`attr${index}`];
+    const value = underscored != null && String(underscored).trim() ? underscored : plain;
+    return String(value ?? "").trim();
+  }
+
+  /* Specs de la card: Nombre ATTR1 + ATTR 1, y Nombre ATTR2 + ATTR 2. */
   function buildSpecs(doc) {
-    const variant = variantSpec(doc);
-    const variantLabel = normalizedLabel(variant?.label);
-    const specs = rawSpecs(doc).filter(
-      (spec) =>
-        normalizedLabel(spec.label) !== variantLabel &&
-        !isTemperatureSpec(spec) &&
-        !isSmartSpec(spec)
-    );
-    if (variant && !isTemperatureSpec(variant) && !isSmartSpec(variant)) {
-      specs.unshift(variant);
-    }
-    return specs.slice(0, 2);
+    return [1, 2]
+      .map((index) => ({
+        label: String(doc[`nombre_attr${index}`] || "").trim(),
+        value: cmsAttrValue(doc, index),
+      }))
+      .filter((spec) => spec.label && spec.value);
   }
 
   const ICON_BULB =
@@ -661,9 +658,13 @@
   let loadToken = 0;
   let reloadTimer = 0;
   let isLoading = false;
+  let reloadQueued = false;
 
   function scheduleReload(reason) {
-    if (isLoading) return;
+    if (isLoading) {
+      reloadQueued = true;
+      return;
+    }
     window.clearTimeout(reloadTimer);
     reloadTimer = window.setTimeout(() => {
       loadRelatedProducts();
@@ -775,6 +776,11 @@
         resolveRelatedTargets().forEach(({ track }) =>
           track.setAttribute("aria-busy", "false")
         );
+        if (reloadQueued) {
+          reloadQueued = false;
+          paintedOk = false;
+          scheduleReload("pendiente");
+        }
       }
     }
   }
