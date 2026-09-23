@@ -5,8 +5,8 @@
   const esc = value => String(value ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 
   const TS_HOST = "https://typesense.coresagroup.com";
-const TS_API_KEY = "g0oiNYY8THGuU9jnCsvqIH1X9HtvYRCR";
-const COLLECTION = "Macroled_Prueba";
+const TS_API_KEY = "wpbpJ1lMSHi0ZZlB9CHY1fktyn2LqzLJ";
+const COLLECTION = "macroled";
 function parseImages(doc){
   if(!doc) return [];
   let raw = doc.multiimagen || doc.multiimage;
@@ -34,6 +34,10 @@ function parseImages(doc){
     if(cdn) u = `https://s3.coresagroup.com/${cdn[1]}`;
     if(!urls.includes(u)) urls.push(u);
   });
+  if(!urls.length && doc.imagen){
+    const u = String(doc.imagen).trim();
+    if(/^https?:\/\//i.test(u)) urls.push(u);
+  }
   return urls;
 }
 const referenceCache = new Map();
@@ -87,12 +91,12 @@ function catalogUrl(reference) {
   return "/productos" + (params.size ? "?" + params.toString() : "");
 }
 
-async function search(query, { fields = "nombre_typesense,sku,macrofamilia,familia,multiimagen" } = {}){
+async function search(query, { fields = "nombre_typesense,nombre,sku,macrofamilia,familia,multiimage,imagen" } = {}){
   const reference = await getReference();
   const params = new URLSearchParams({
     q: query && query.trim() ? query.trim() : "*",
     query_by: "nombre_typesense,sku,descripcion",
-    filter_by: "tipo_registro:=producto && es_principal:true",
+    filter_by: "tipo_registro:=producto && es_principal:true && publicar:=true",
     include_fields: fields,
     per_page: "20",
     page: "1"
@@ -194,7 +198,8 @@ function warmSelection() {
       list.innerHTML = docs.map((doc, index) => {
         const sku = doc.sku || doc.id || "";
         const img = parseImages(doc)[0];
-        return `<div class="modal-item"><div class="mi-thumb">${img ? `<img src="${esc(img)}" alt="" loading="lazy">` : ""}</div><div class="mi-info"><div class="mi-name">${esc(doc.nombre_typesense || "Producto sin nombre")}</div><div class="mi-sku">${esc(sku)}</div></div>${current.isSelected(sku) ? '<span class="added">Ya agregado</span>' : `<button type="button" class="add-btn" data-index="${index}" ${current.atLimit() || !sku ? "disabled" : ""}>+ Agregar</button>`}</div>`;
+        const name = doc.nombre_typesense || doc.nombre || "Producto sin nombre";
+        return `<div class="modal-item"><div class="mi-thumb">${img ? `<img src="${esc(img)}" alt="" loading="lazy">` : ""}</div><div class="mi-info"><div class="mi-name">${esc(name)}</div><div class="mi-sku">${esc(sku)}</div></div>${current.isSelected(sku) ? '<span class="added">Ya agregado</span>' : `<button type="button" class="add-btn" data-index="${index}" ${current.atLimit() || !sku ? "disabled" : ""}>+ Agregar</button>`}</div>`;
       }).join("");
       list.querySelectorAll("img").forEach(img => img.addEventListener("error", () => img.remove()));
       list.querySelectorAll("[data-index]").forEach(button => button.addEventListener("click", async () => {
@@ -253,7 +258,7 @@ function warmSelection() {
       atLimit: () => window.MacroledCompare.getCompareList().length >= window.MacroledCompare.MAX,
       add: doc => {
         rememberProducts([doc]);
-        window.MacroledCompare.addToCompare({sku:doc.sku || doc.id, nombre:doc.nombre_typesense || "", img:parseImages(doc)[0] || ""});
+        window.MacroledCompare.addToCompare({sku:doc.sku || doc.id, nombre:doc.nombre_typesense || doc.nombre || "", img:parseImages(doc)[0] || ""});
         onChange?.();
       }
     });
