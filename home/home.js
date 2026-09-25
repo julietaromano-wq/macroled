@@ -800,9 +800,9 @@
 
   function placeFeaturedProducts() {
     const featuredProducts = root.querySelector("#productos-destacados");
-    const foa = root.querySelector("[data-foa]");
-    if (!featuredProducts || !foa) return;
-    foa.insertAdjacentElement("beforebegin", featuredProducts);
+    const solutions = root.querySelector("[data-solutions-banner]");
+    if (!featuredProducts || !solutions) return;
+    solutions.insertAdjacentElement("beforebegin", featuredProducts);
   }
 
   function initExpandBanners() {
