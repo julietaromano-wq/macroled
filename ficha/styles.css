@@ -2027,18 +2027,21 @@ body.assistant-open .ai-launch{
 
   .gallery{
     display:grid;
-    grid-template-columns:auto minmax(0,1fr);
+    grid-template-columns:minmax(0,1fr);
     grid-template-areas:
-      "thumbs main"
-      ". share";
+      "main"
+      "thumbs";
     gap:10px;
     max-width:none;
   }
   .thumbs{
-    flex-direction:column;max-height:none;
-    overflow-x:hidden;overflow-y:auto;
+    flex-direction:row;
+    max-height:none !important;
+    overflow-x:auto;
+    overflow-y:hidden;
     gap:8px;
     padding-bottom:0;
+    width:100%;
   }
   .thumb{
     width:64px;height:64px;flex:none;
