@@ -74,17 +74,7 @@
         categories: MANUAL_CATEGORIES.interior,
         featuredLines: [
           {
-            ...line("Línea Mónaco", "Módulos y tomas diseñados con un enfoque en estética, funcionalidad y seguridad. Una propuesta versátil con armadas, conexiones y componentes pensados para adaptarse a instalaciones eléctricas contemporáneas.", "#e9ecef", "#101820", "image-left"),
-            id: "monaco",
-            image: "https://cdn.prod.website-files.com/65f1fdd7248b6709fdebe904/69a977bb0fe12ec5b81b7e9b_monaco-cover%20copia.webp",
-            imageFit: "contain",
-            href: "https://www.macroled.com.ar/productos?macrofamilia=M%C3%B3naco",
-            catalogHref: "https://s3.coresagroup.com/MACROLED/catalogos/Macroled_Monaco.pdf",
-            titleEmphasis: "Mónaco",
-            content: { mode: "static", categoryGroup: "monaco" }
-          },
-          {
-            ...line("Reflectores PRO", "La combinación ideal entre rendimiento y practicidad. Reflectores para exterior pensados para iluminar accesos, fachadas, patios y áreas abiertas con una instalación versátil y una luz confiable.", "#16283a", "#e4ebf0", "image-right"),
+            ...line("Reflectores PRO", "La combinación ideal entre rendimiento y practicidad. Reflectores para exterior pensados para iluminar accesos, fachadas, patios y áreas abiertas con una instalación versátil y una luz confiable.", "#e9ecef", "#101820", "image-left"),
             image: "https://cdn.prod.website-files.com/65f1fdd7248b6709fdebe904/699cb28af6cdd53e774759f0_FAMILIA%20REFLECTORES%20PRO.webp",
             imageFit: "contain-right",
             href: "https://www.macroled.com.ar/productos?macrofamilia=Luminarias+Exterior&familia=Reflectores&subfamilia=Reflectores+PRO+2026",
@@ -104,10 +94,9 @@
             }
           },
           {
-            ...line("Luminarias Skyline", "Iluminación arquitectónica con rieles magnéticos de 48V que combinan seguridad, versatilidad y estética premium. Luminarias con opciones Smart de blancos dinámicos y automatización.", "#07090c", "#e4ebf0", "image-left"),
-            image: "https://s3.coresagroup.com/MACROLED/250/skyline.png",
-            imageFit: "contain-centered",
-            visualTheme: "silver-dark",
+            ...line("Luminarias Skyline", "Iluminación arquitectónica con rieles magnéticos de 48V que combinan seguridad, versatilidad y estética premium. Luminarias con opciones Smart de blancos dinámicos y automatización.", "#2E2F30", "#ffffff", "image-right"),
+            id: "skyline",
+            media: "skyline-layers",
             href: "https://www.macroled.com.ar/productos?macrofamilia=Skyline",
             catalogHref: "https://s3.coresagroup.com/MACROLED/catalogos/Macroled_Skyline.pdf",
             titleEmphasis: "Skyline",
@@ -124,6 +113,16 @@
                 randomizeBy: "nombre_typesense"
               }
             }
+          },
+          {
+            ...line("Línea Mónaco", "Módulos y tomas diseñados con un enfoque en estética, funcionalidad y seguridad. Una propuesta versátil con armadas, conexiones y componentes pensados para adaptarse a instalaciones eléctricas contemporáneas.", "#e9ecef", "#101820", "image-left"),
+            id: "monaco",
+            image: "https://cdn.prod.website-files.com/65f1fdd7248b6709fdebe904/69a977bb0fe12ec5b81b7e9b_monaco-cover%20copia.webp",
+            imageFit: "contain",
+            href: "https://www.macroled.com.ar/productos?macrofamilia=M%C3%B3naco",
+            catalogHref: "https://s3.coresagroup.com/MACROLED/catalogos/Macroled_Monaco.pdf",
+            titleEmphasis: "Mónaco",
+            content: { mode: "static", categoryGroup: "monaco" }
           }
         ]
       }
@@ -773,13 +772,80 @@
     return `<div class="ml-products-block"><div class="ml-product-grid" data-products-field="${esc(query.typesenseField)}" data-products-value="${esc(query.typesenseValue)}" data-products-filters="${esc(filters)}" data-products-count="${Number(query.productCount || 4)}" data-products-fetch-count="${Number(query.fetchCount || query.productCount || 4)}" data-products-randomize-by="${esc(query.randomizeBy || "")}">${skeletons}</div>${productControlsTemplate()}</div>`;
   }
 
+  function skylineLayersMarkup() {
+    const src = (file) => `https://s3.coresagroup.com/MACROLED/WEB/HOME/${file}`;
+    return `<div class="ml-sk" data-skyline-layers>
+      <img class="ml-sk__bg" src="${src("skyline-fondo.webp")}" alt="Luminarias Skyline sobre rieles magnéticos de 48V" width="2000" height="1414">
+      <img class="ml-sk__fx ml-sk__grilla" src="${src("skyline-1-grilla.webp")}" alt="">
+      <img class="ml-sk__fx ml-sk__tubo" src="${src("skyline-2-tubo.webp")}" alt="">
+      <img class="ml-sk__fx ml-sk__esfera" src="${src("skyline-3-esfera.webp")}" alt="">
+      <img class="ml-sk__fx ml-sk__flexible" src="${src("skyline-4-flexible.webp")}" alt="">
+      <img class="ml-sk__fx ml-sk__spots" src="${src("skyline-5-spots.webp")}" alt="">
+      <div aria-hidden="true">
+        <span class="ml-sk__glow ml-sk__glow--1" style="left:23.7%;top:73.6%;width:24cqw"></span>
+        <span class="ml-sk__glow ml-sk__glow--2" style="left:40.5%;top:77.4%;width:24cqw"></span>
+        <span class="ml-sk__glow ml-sk__glow--3" style="left:41.7%;top:55.2%;width:24cqw"></span>
+        <span class="ml-sk__glow ml-sk__glow--4" style="left:66.6%;top:70.3%;width:44cqw"></span>
+        <span class="ml-sk__glow ml-sk__glow--5" style="left:81.1%;top:58.4%;width:26cqw"></span>
+      </div>
+    </div>`;
+  }
+
+  function lineMediaTemplate(item) {
+    if (item.media === "skyline-layers") return `<div class="ml-featured__media">${skylineLayersMarkup()}</div>`;
+    return `<div class="ml-featured__media"><img src="${esc(item.image)}" alt="" loading="lazy" width="1600" height="1000"></div>`;
+  }
+
   function lineTemplate(item) {
     const mode = item.content?.mode || "typesense";
     const lineId = item.id ? ` data-line="${esc(item.id)}"` : "";
     const catalogLink = item.catalogHref
       ? `<a class="ml-button--tertiary ml-featured__resource-link" href="${esc(item.catalogHref)}" target="_blank" rel="noopener noreferrer">Ver catálogo <span aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 12h14m-6-6 6 6-6 6"/></svg></span></a>`
       : "";
-    return `<article class="ml-featured ml-shell"${lineId} data-theme="${esc(item.theme)}" data-visual-theme="${esc(item.visualTheme || "solid")}" data-layout="${esc(item.layout)}" data-image-fit="${esc(item.imageFit || "cover")}" data-description-lines="${Number(item.descriptionLines || 0)}" data-button-tone="${buttonTone(item.textColor)}" data-content-mode="${esc(mode)}" style="--line-bg:${esc(item.theme)};--line-color:${esc(item.textColor)};--title-emphasis-weight:${Number(item.titleEmphasisWeight || 600)}"><div class="ml-featured__story"><div class="ml-featured__media"><img src="${esc(item.image)}" alt="" loading="lazy" width="1600" height="1000"></div><div class="ml-featured__copy"><h3>${emphasize(item.title, item.titleEmphasis)}</h3><p>${emphasize(item.description, item.descriptionEmphasis)}</p><div class="ml-featured__actions"><a class="ml-button ml-button--primary" href="${esc(item.href)}">Ver productos</a>${catalogLink}</div></div></div>${lineContentTemplate(item)}</article>`;
+    return `<article class="ml-featured ml-shell"${lineId} data-theme="${esc(item.theme)}" data-visual-theme="${esc(item.visualTheme || "solid")}" data-layout="${esc(item.layout)}" data-image-fit="${esc(item.imageFit || "cover")}" data-media="${esc(item.media || "image")}" data-description-lines="${Number(item.descriptionLines || 0)}" data-button-tone="${buttonTone(item.textColor)}" data-content-mode="${esc(mode)}" style="--line-bg:${esc(item.theme)};--line-color:${esc(item.textColor)};--title-emphasis-weight:${Number(item.titleEmphasisWeight || 600)}"><div class="ml-featured__story">${lineMediaTemplate(item)}<div class="ml-featured__copy"><h3>${emphasize(item.title, item.titleEmphasis)}</h3><p>${emphasize(item.description, item.descriptionEmphasis)}</p><div class="ml-featured__actions"><a class="ml-button ml-button--primary" href="${esc(item.href)}">Ver productos</a>${catalogLink}</div></div></div>${lineContentTemplate(item)}</article>`;
+  }
+
+  function initSkylineLayers() {
+    root.querySelectorAll("[data-skyline-layers]").forEach((el) => {
+      if (el.dataset.skyReady) return;
+      el.dataset.skyReady = "true";
+
+      if (matchMedia("(prefers-reduced-motion: reduce)").matches) {
+        el.classList.add("is-playing");
+        const line = el.closest(".ml-featured");
+        if (line) line.classList.add("is-sky-in");
+        return;
+      }
+
+      const trigger = el.closest(".ml-featured") || el;
+      let inView = false;
+
+      const restart = (next) => {
+        el.classList.remove("is-playing", "is-leaving");
+        trigger.classList.toggle("is-sky-in", next === "is-playing");
+        void el.offsetWidth;
+        el.classList.add(next);
+      };
+
+      const playIn = () => restart("is-playing");
+      const playOut = () => restart("is-leaving");
+
+      if (!("IntersectionObserver" in window)) {
+        playIn();
+        return;
+      }
+
+      const io = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          const visible = entry.isIntersecting && entry.intersectionRatio >= 0.28;
+          if (visible === inView) return;
+          inView = visible;
+          if (visible) playIn();
+          else playOut();
+        });
+      }, { threshold: [0, 0.28, 0.45], rootMargin: "0px 0px -8% 0px" });
+      io.observe(trigger);
+    });
   }
 
   function renderSections() {
@@ -1853,6 +1919,7 @@
   initCategoryCarousels();
   initLineBackgrounds();
   initSolutionsBanner();
+  initSkylineLayers();
   renderCommon();
   window.MacroledProducts.init(root);
   window.MacroledFeatured.init(root);
