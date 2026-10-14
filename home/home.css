@@ -429,7 +429,7 @@ body {
   position: relative;
   overflow: visible;
   margin-bottom: clamp(2.5rem, 5vw, 4.5rem);
-  grid-template-columns: 1.22fr 0.78fr;
+  grid-template-columns: 0.92fr 1.08fr;
 }
 .ml-featured[data-line="skyline"] .ml-featured__media {
   display: block;
@@ -440,7 +440,7 @@ body {
 }
 .ml-featured[data-line="skyline"] .ml-featured__copy {
   z-index: 2;
-  max-width: none;
+  max-width: 32rem;
   padding-left: 0;
   padding-right: 1.25rem;
 }
