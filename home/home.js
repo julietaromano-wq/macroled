@@ -773,7 +773,7 @@
   }
 
   function skylineLayersMarkup() {
-    const src = (file) => `https://s3.coresagroup.com/MACROLED/WEB/HOME/${file}`;
+    const src = (file) => `https://s3.coresagroup.com/MACROLED/WEB/HOME/${file}?v=20261015`;
     return `<div class="ml-sk" data-skyline-layers>
       <img class="ml-sk__bg" src="${src("skyline-fondo.webp")}" alt="Luminarias Skyline sobre rieles magnéticos de 48V" width="2000" height="1414">
       <img class="ml-sk__fx ml-sk__grilla" src="${src("skyline-1-grilla.webp")}" alt="">
