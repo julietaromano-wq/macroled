@@ -775,12 +775,12 @@
   function skylineLayersMarkup() {
     const src = (file) => `https://s3.coresagroup.com/MACROLED/WEB/HOME/${file}?v=20261015`;
     return `<div class="ml-sk" data-skyline-layers>
-      <img class="ml-sk__bg" src="${src("skyline-fondo.webp")}" alt="Luminarias Skyline sobre rieles magnéticos de 48V" width="2000" height="1414">
-      <img class="ml-sk__fx ml-sk__grilla" src="${src("skyline-1-grilla.webp")}" alt="">
-      <img class="ml-sk__fx ml-sk__tubo" src="${src("skyline-2-tubo.webp")}" alt="">
-      <img class="ml-sk__fx ml-sk__esfera" src="${src("skyline-3-esfera.webp")}" alt="">
-      <img class="ml-sk__fx ml-sk__flexible" src="${src("skyline-4-flexible.webp")}" alt="">
-      <img class="ml-sk__fx ml-sk__spots" src="${src("skyline-5-spots.webp")}" alt="">
+      <img class="ml-sk__bg" src="${src("skyline-fondo-1.webp")}" alt="Luminarias Skyline sobre rieles magnéticos de 48V" width="2000" height="1414">
+      <img class="ml-sk__fx ml-sk__grilla" src="${src("skyline-1-grilla-1.webp")}" alt="">
+      <img class="ml-sk__fx ml-sk__tubo" src="${src("skyline-2-tubo-1.webp")}" alt="">
+      <img class="ml-sk__fx ml-sk__esfera" src="${src("skyline-3-esfera-1.webp")}" alt="">
+      <img class="ml-sk__fx ml-sk__flexible" src="${src("skyline-4-flexible-1.png")}" alt="">
+      <img class="ml-sk__fx ml-sk__spots" src="${src("skyline-5-spots-1.webp")}" alt="">
       <div aria-hidden="true">
         <span class="ml-sk__glow ml-sk__glow--1" style="left:23.7%;top:73.6%;width:24cqw"></span>
         <span class="ml-sk__glow ml-sk__glow--2" style="left:40.5%;top:77.4%;width:24cqw"></span>
