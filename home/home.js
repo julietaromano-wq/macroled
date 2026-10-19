@@ -153,6 +153,13 @@
     },
     news: [
       {
+        title: "Casa FOA 2026, Edición Palacio Molina",
+        description: "Por tercera vez acompañamos a Casa FOA como sponsor oficial de iluminación, en la edición del Palacio Molina.",
+        href: "/novedades/casa-foa-2026-palacio",
+        image: "https://cdn.prod.website-files.com/66298c6904f627b9b69307c7/6ad6111b3b96ba358fb4314d_casafoa-2026-1.jpeg",
+        hoverImage: "https://cdn.prod.website-files.com/66298c6904f627b9b69307c7/6ad6111b3b96ba358fb43155_casafoa-2026-2.jpeg"
+      },
+      {
         title: "Casa FOA 2026, Edición Pocito",
         description: "Formamos parte de uno de los eventos de diseño más reconocidos del país, aportando luminarias LED que realzan texturas, colores y ambientes en proyectos de alto nivel estético.",
         href: "/novedades/casa-foa-2026-pocito",
@@ -166,13 +173,6 @@
         image: "https://s3.coresagroup.com/MACROLED/WEB/HOME/expo_hover.jpg",
         hoverImage: "https://s3.coresagroup.com/MACROLED/WEB/HOME/expo.jpg",
         zoomDefaultImage: true
-      },
-      {
-        title: "Biel Light 2025",
-        description: "Durante cuatro días presentamos nuevas tecnologías, lanzamientos y demostraciones técnicas, con asesoramiento personalizado para distribuidores, instaladores y profesionales del sector.",
-        href: "/novedades/biel-light-2025",
-        image: "https://cdn.prod.website-files.com/690a24d6bf8e2592b2f29d1f/69bc53bc8148c948726225fa_691b4529bb6b28848a915f53_015.coresa-p-2600-p-2000.webp",
-        hoverImage: "https://s3.coresagroup.com/MACROLED/WEB/HOME/biel_hover.jpg"
       }
     ],
     faq: [
@@ -1946,6 +1946,103 @@
     observer.disconnect();
   }, { once: true });
 })(window);
+
+/* ===== aviso Casa FOA 2026 ===== */
+(function () {
+  "use strict";
+
+  const STORAGE_KEY = "ml-casa-foa-2026-modal";
+  const root = document.querySelector("[data-foa-modal]");
+  if (!root) return;
+
+  const dialog = root.querySelector(".ml-foa-modal__dialog");
+
+  function wasDismissed() {
+    try {
+      return sessionStorage.getItem(STORAGE_KEY) === "1";
+    } catch (_) {
+      return false;
+    }
+  }
+
+  function markDismissed() {
+    try {
+      sessionStorage.setItem(STORAGE_KEY, "1");
+    } catch (_) {}
+  }
+
+  let lastFocus = null;
+  let closeTimer = 0;
+
+  function focusable() {
+    if (!dialog) return [];
+    return Array.from(dialog.querySelectorAll('a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])')).filter((el) => !el.hasAttribute("hidden"));
+  }
+
+  function openModal() {
+    if (wasDismissed() || root.classList.contains("is-open")) return;
+    lastFocus = document.activeElement;
+    window.clearTimeout(closeTimer);
+    root.hidden = false;
+    document.body.classList.add("ml-foa-modal-open");
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        root.classList.add("is-open");
+        const closeBtn = root.querySelector(".ml-foa-modal__close");
+        if (closeBtn) closeBtn.focus();
+      });
+    });
+  }
+
+  function closeModal() {
+    if (!root.classList.contains("is-open") && root.hidden) return;
+    markDismissed();
+    root.classList.remove("is-open");
+    document.body.classList.remove("ml-foa-modal-open");
+    closeTimer = window.setTimeout(() => {
+      root.hidden = true;
+      if (lastFocus && typeof lastFocus.focus === "function") lastFocus.focus();
+    }, 320);
+  }
+
+  root.addEventListener("click", (event) => {
+    if (event.target.closest("[data-foa-modal-close]")) closeModal();
+  });
+
+  const cta = root.querySelector(".ml-foa-modal__cta");
+  if (cta) cta.addEventListener("click", markDismissed);
+
+  document.addEventListener("keydown", (event) => {
+    if (root.hidden || !root.classList.contains("is-open")) return;
+    if (event.key === "Escape") {
+      event.preventDefault();
+      closeModal();
+      return;
+    }
+    if (event.key !== "Tab") return;
+    const items = focusable();
+    if (!items.length) return;
+    const first = items[0];
+    const last = items[items.length - 1];
+    if (event.shiftKey && document.activeElement === first) {
+      event.preventDefault();
+      last.focus();
+    } else if (!event.shiftKey && document.activeElement === last) {
+      event.preventDefault();
+      first.focus();
+    } else if (!dialog.contains(document.activeElement)) {
+      event.preventDefault();
+      first.focus();
+    }
+  });
+
+  const start = () => window.setTimeout(openModal, 450);
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", start, { once: true });
+  } else {
+    start();
+  }
+})();
 
 /* ===== asistente ===== */
 (function (window) {
