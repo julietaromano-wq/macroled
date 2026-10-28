@@ -66,13 +66,13 @@ html.mm-scroll-lock body {
 #macroled-menu.is-on-dark:not(.mm-mega-open) .mm-contact,
 #macroled-menu.nav-dark:not(.mm-mega-open) .mm-contact {
   color: #fff;
-  border-color: #fff;
+  border-color: #686565;
   background: transparent;
 }
 #macroled-menu.is-on-dark:not(.mm-mega-open) .mm-contact:hover,
 #macroled-menu.nav-dark:not(.mm-mega-open) .mm-contact:hover {
   color: #fff;
-  border-color: #fff;
+  border-color: #686565;
   background: rgba(255, 255, 255, 0.16);
 }
 
