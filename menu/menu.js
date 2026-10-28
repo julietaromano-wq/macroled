@@ -321,6 +321,7 @@ if (typeof module !== "undefined") module.exports = MEGAMENU_DATA;
         || host === (window.location.hostname || "").replace(/^www\./, "").toLowerCase();
       if (!ours) return href;
       var slug = url.pathname.replace(/^\/+|\/+$/g, "");
+      if (slug === "arq") return "http://macroled.com.ar/arq";
       if (slug === "nuevo-productos") {
         url.pathname = "/productos";
       } else if (slug === "nuevo-home-final" || slug === "nuevo-home") {
@@ -851,6 +852,9 @@ if (typeof module !== "undefined") module.exports = MEGAMENU_DATA;
 
     function open() {
       if (root.classList.contains("is-open")) return;
+      if (window.MACROLED_MENU && typeof window.MACROLED_MENU.closeSearch === "function") {
+        window.MACROLED_MENU.closeSearch();
+      }
       setActive("lamparas");
       if (tabsEl) tabsEl.scrollTop = 0;
       root.classList.add("is-open");
@@ -900,34 +904,15 @@ if (typeof module !== "undefined") module.exports = MEGAMENU_DATA;
     document.addEventListener("wheel", stopPageScroll, { passive: false, capture: true });
     document.addEventListener("touchmove", stopPageScroll, { passive: false, capture: true });
 
-    trigger.addEventListener("click", () => {
-      cancelHoverOpen();
+    trigger.addEventListener("click", (e) => {
+      e.preventDefault();
+      if (root.classList.contains("is-open")) close();
+      else open();
     });
-    var hoverOpenTimer = null;
-    var hoverCloseTimer = null;
-    var hoverMedia = window.matchMedia("(hover: hover) and (pointer: fine)");
-    function cancelHoverOpen() {
-      if (!hoverOpenTimer) return;
-      clearTimeout(hoverOpenTimer);
-      hoverOpenTimer = null;
-    }
-    function cancelHoverClose() {
-      if (!hoverCloseTimer) return;
-      clearTimeout(hoverCloseTimer);
-      hoverCloseTimer = null;
-    }
-    root.addEventListener("mouseenter", () => {
-      if (!hoverMedia.matches) return;
-      cancelHoverClose();
-      if (root.classList.contains("is-open")) return;
-      cancelHoverOpen();
-      hoverOpenTimer = setTimeout(open, 80);
-    });
-    root.addEventListener("mouseleave", () => {
-      if (!hoverMedia.matches) return;
-      cancelHoverOpen();
-      cancelHoverClose();
-      hoverCloseTimer = setTimeout(close, 160);
+    document.addEventListener("click", (e) => {
+      if (!root.classList.contains("is-open")) return;
+      if (root.contains(e.target)) return;
+      close();
     });
     overlay.addEventListener("click", close);
     document.addEventListener("keydown", (e) => {
@@ -1090,14 +1075,16 @@ if (typeof module !== "undefined") module.exports = MEGAMENU_DATA;
     return "";
   }
 
-  /* ---- Desktop Typesense (lupa que se desliza al abrir) ---- */
+  /* ---- Desktop Typesense (panel que baja desde el header) ---- */
   (function () {
+    var menu = document.getElementById("macroled-menu");
     var wrapper = document.getElementById("mm-ts-search-wrapper");
     var input = document.getElementById("mm-ts-search-input");
     var btn = document.getElementById("mm-ts-search-btn");
+    var closeBtn = document.getElementById("mm-ts-search-close");
+    var backdrop = document.getElementById("mm-search-backdrop");
     var resultsBox = document.getElementById("mm-ts-search-results");
     if (!wrapper || !input || !btn || !resultsBox) return;
-    var searchBox = wrapper.closest(".mm-nav-search");
 
     var tsClient = null;
     try {
@@ -1126,23 +1113,30 @@ if (typeof module !== "undefined") module.exports = MEGAMENU_DATA;
         window.MACROLED_MENU.closeMegamenu();
       }
       wrapper.classList.add("is-open");
-      if (searchBox) searchBox.classList.add("is-open");
-      input.setAttribute("aria-expanded", "true");
+      wrapper.setAttribute("aria-hidden", "false");
+      if (menu) menu.classList.add("mm-search-open");
+      if (backdrop) backdrop.hidden = false;
+      btn.setAttribute("aria-expanded", "true");
       btn.setAttribute("aria-label", "Cerrar búsqueda");
-      setTimeout(function () { input.focus(); }, 220);
+      setTimeout(function () { input.focus(); }, 280);
     }
 
     function closeSearch() {
       wrapper.classList.remove("is-open");
       wrapper.classList.remove("has-results");
-      if (searchBox) searchBox.classList.remove("is-open");
-      input.setAttribute("aria-expanded", "false");
-      btn.setAttribute("aria-label", "Abrir búsqueda");
+      wrapper.setAttribute("aria-hidden", "true");
+      if (menu) menu.classList.remove("mm-search-open");
+      if (backdrop) backdrop.hidden = true;
+      btn.setAttribute("aria-expanded", "false");
+      btn.setAttribute("aria-label", "Buscar");
       input.value = "";
       resultsBox.style.display = "none";
       resultsBox.innerHTML = "";
       input.blur();
     }
+
+    window.MACROLED_MENU = window.MACROLED_MENU || {};
+    window.MACROLED_MENU.closeSearch = closeSearch;
 
     function hideResults() {
       resultsBox.style.display = "none";
@@ -1261,10 +1255,21 @@ if (typeof module !== "undefined") module.exports = MEGAMENU_DATA;
       else openSearch();
     });
 
+    if (closeBtn) {
+      closeBtn.addEventListener("click", function (e) {
+        e.preventDefault();
+        closeSearch();
+      });
+    }
+
+    if (backdrop) {
+      backdrop.addEventListener("click", closeSearch);
+    }
+
     document.addEventListener("click", function (e) {
-      if (wrapper.contains(e.target)) return;
-      resultsBox.style.display = "none";
-      if (isOpen() && !input.value.trim()) closeSearch();
+      if (!isOpen()) return;
+      if (wrapper.contains(e.target) || btn.contains(e.target)) return;
+      closeSearch();
     });
 
     document.addEventListener("keydown", function (e) {
@@ -1323,17 +1328,18 @@ if (typeof module !== "undefined") module.exports = MEGAMENU_DATA;
 
   function desktopNavLinks() {
     var links = [];
-    document.querySelectorAll("#macroled-menu .mm-links > a").forEach(function (a) {
+    document.querySelectorAll("#macroled-menu .mm-links > a, #macroled-menu .mm-contact").forEach(function (a) {
       var label = (a.textContent || "").trim();
       var href = a.getAttribute("href") || "#";
-      if (label) links.push({ label: label, href: href });
+      if (label) links.push({ label: label, href: href, isContact: a.classList.contains("mm-contact") });
     });
     if (links.length) return links;
     return [
+      { label: "Macroled ARQ", href: "http://macroled.com.ar/arq" },
       { label: "Proyectos Lumínicos", href: "https://macroled.webflow.io/proyectos" },
       { label: "Novedades", href: "https://macroled.webflow.io/nuevo-novedades" },
       { label: "Descargas", href: "https://macroled.webflow.io/nuevo-descargas" },
-      { label: "Contacto", href: "https://macroled.webflow.io/nuevo-contacto" },
+      { label: "Contacto", href: "https://macroled.webflow.io/nuevo-contacto", isContact: true },
     ];
   }
 
@@ -1537,6 +1543,9 @@ if (typeof module !== "undefined") module.exports = MEGAMENU_DATA;
             return '<li class="mm-mobile-group-label">' + esc(item.label) + "</li>";
           }
           var label = '<span class="item-label">' + esc(item.label) + badgesHtml(item) + "</span>";
+          if (item.isContact) {
+            return '<li class="mm-mobile-contact"><a class="mm-contact" href="' + esc(item.href || "#") + '">' + esc(item.label) + "</a></li>";
+          }
           if (item.children) {
             return "<li><button type=\"button\" data-action=\"forward\" data-idx=\"" + i + "\">" + label + '<span class="chevron"></span></button></li>';
           }
