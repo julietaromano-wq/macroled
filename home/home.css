@@ -7238,6 +7238,12 @@ a.ml-news-card:focus-visible .ml-news-card__arrow {
   font-size: clamp(2.3rem, calc(1.4rem + 2.4vw), 5.25rem);
   line-height: 1.14;
 }
+@media (min-width: 1921px) {
+  .ml-home .ml-hero h1,
+  .ml-home #ml-hero-title {
+    font-size: 4rem;
+  }
+}
 @media (max-width: 640px) {
   .ml-home .ml-hero__slide .ml-hero__content {
     bottom: clamp(1.5rem, 5vh, 3rem);
