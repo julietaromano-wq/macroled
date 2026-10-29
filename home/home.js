@@ -1240,42 +1240,25 @@
     });
   }
 
-  function handleVideo() {
-    const video = root.querySelector(".ml-hero__video");
+  function bindHeroVideo(video) {
     const revealHome = () => root.classList.remove("is-video-loading");
     if (!video) {
       revealHome();
-      return;
+      return { activate() {}, deactivate() {} };
     }
-    video.poster = matchMedia("(max-width: 640px)").matches
+
+    const poster = matchMedia("(max-width: 640px)").matches
       ? video.dataset.posterMobile
       : video.dataset.posterDesktop;
+    if (poster) video.poster = poster;
+
     const reducedMotion = matchMedia("(prefers-reduced-motion: reduce)");
-
-    if (reducedMotion.matches) {
-      video.pause();
-      video.hidden = true;
-      revealHome();
-      return;
-    }
-
-    const revealVideo = () => {
-      video.removeEventListener("canplay", revealVideo);
-      video.removeEventListener("error", revealVideo);
-      revealHome();
-    };
-
-    video.addEventListener("canplay", revealVideo, { once: true });
-    video.addEventListener("error", revealVideo, { once: true });
-
-    if (video.readyState >= HTMLMediaElement.HAVE_FUTURE_DATA) revealVideo();
-    video.play().catch(revealVideo);
-
     const restMs = 10000;
     const reverseSpeed = 8;
     let reverseFrame = 0;
     let restTimer = 0;
     let lastTick = 0;
+    let active = false;
 
     const stopReverse = () => {
       cancelAnimationFrame(reverseFrame);
@@ -1283,15 +1266,19 @@
     };
 
     const playForward = () => {
+      if (!active || reducedMotion.matches) return;
       stopReverse();
+      video.hidden = false;
       video.currentTime = 0;
       video.play().catch(() => {});
     };
 
     const playReverse = () => {
+      if (!active) return;
       video.pause();
       lastTick = performance.now();
       const step = now => {
+        if (!active) return;
         const elapsed = ((now - lastTick) / 1000) * reverseSpeed;
         lastTick = now;
         const nextTime = video.currentTime - elapsed;
@@ -1307,7 +1294,14 @@
       reverseFrame = requestAnimationFrame(step);
     };
 
+    const revealVideo = () => {
+      video.removeEventListener("canplay", revealVideo);
+      video.removeEventListener("error", revealVideo);
+      revealHome();
+    };
+
     video.addEventListener("ended", () => {
+      if (!active) return;
       restTimer = window.setTimeout(playReverse, restMs);
     });
 
@@ -1318,53 +1312,163 @@
       video.pause();
       video.hidden = true;
     });
+
+    return {
+      activate() {
+        active = true;
+        if (reducedMotion.matches) {
+          video.pause();
+          video.hidden = true;
+          revealHome();
+          return;
+        }
+        video.hidden = false;
+        video.addEventListener("canplay", revealVideo, { once: true });
+        video.addEventListener("error", revealVideo, { once: true });
+        if (video.readyState >= HTMLMediaElement.HAVE_FUTURE_DATA) revealVideo();
+        playForward();
+      },
+      deactivate() {
+        active = false;
+        window.clearTimeout(restTimer);
+        stopReverse();
+        video.pause();
+      }
+    };
+  }
+
+  function initHeroSlider() {
+    const hero = root.querySelector("[data-hero-slider]");
+    const revealHome = () => root.classList.remove("is-video-loading");
+    if (!hero) {
+      revealHome();
+      return;
+    }
+
+    const slides = [...hero.querySelectorAll("[data-hero-slide]")];
+    if (!slides.length) {
+      revealHome();
+      return;
+    }
+
+    const players = slides.map(slide => bindHeroVideo(slide.querySelector(".ml-hero__video")));
+    const controls = hero.querySelector("[data-hero-controls]");
+    const dots = hero.querySelector("[data-hero-dots]");
+    let index = slides.findIndex(slide => slide.classList.contains("is-active"));
+    if (index < 0) index = 0;
+
+    const show = next => {
+      index = (next + slides.length) % slides.length;
+      slides.forEach((slide, slideIndex) => {
+        const on = slideIndex === index;
+        slide.classList.toggle("is-active", on);
+        slide.setAttribute("aria-hidden", on ? "false" : "true");
+        if (on) players[slideIndex].activate();
+        else players[slideIndex].deactivate();
+        if (on) replayHeroTitle(slide.querySelector("h1"));
+      });
+      if (slides.length > 1) queueAuto();
+    };
+
+    let autoTimer = 0;
+    const reducedMotion = matchMedia("(prefers-reduced-motion: reduce)");
+    const queueAuto = () => {
+      window.clearTimeout(autoTimer);
+      if (reducedMotion.matches || slides.length < 2) return;
+      autoTimer = window.setTimeout(() => show(index + 1), 7000);
+    };
+
+    if (slides.length < 2) {
+      if (controls) controls.hidden = true;
+      show(index);
+      return;
+    }
+
+    hero.classList.add("has-multiple-slides");
+    if (controls) controls.hidden = false;
+    if (dots) dots.hidden = true;
+
+    hero.querySelector("[data-hero-prev]")?.addEventListener("click", () => show(index - 1));
+    hero.querySelector("[data-hero-next]")?.addEventListener("click", () => show(index + 1));
+
+    let touchStartX = 0;
+    let touchStartY = 0;
+    hero.addEventListener("touchstart", event => {
+      touchStartX = event.touches[0]?.clientX || 0;
+      touchStartY = event.touches[0]?.clientY || 0;
+    }, { passive: true });
+    hero.addEventListener("touchend", event => {
+      const touch = event.changedTouches[0];
+      if (!touch) return;
+      const deltaX = touch.clientX - touchStartX;
+      const deltaY = touch.clientY - touchStartY;
+      if (Math.abs(deltaX) < 48 || Math.abs(deltaX) < Math.abs(deltaY)) return;
+      show(index + (deltaX < 0 ? 1 : -1));
+    }, { passive: true });
+
+    show(index);
+  }
+
+  function replayHeroTitle(title) {
+    if (!title || !title.querySelector(".ml-hero__letter")) return;
+    if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    title.classList.remove("is-illuminating");
+    void title.offsetWidth;
+    title.classList.add("is-illuminating");
   }
 
   function animateHeroTitle() {
-    const title = root.querySelector("#ml-hero-title");
-    if (!title || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    const ariaText = title.innerText.replace(/\s+/g, " ").trim();
-    title.setAttribute("aria-label", ariaText);
+    const titles = [...root.querySelectorAll(".ml-hero h1")];
+    if (!titles.length || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
-    const chunks = [...title.childNodes].flatMap(node => {
-      if (node.nodeName === "BR") {
-        return [{ type: "br", className: node.className }];
-      }
-      const text = node.textContent;
-      return text ? [{ type: "text", value: text }] : [];
-    });
+    titles.forEach(title => {
+      if (title.querySelector(".ml-hero__letter")) return;
+      const ariaText = title.innerText.replace(/\s+/g, " ").trim();
+      title.setAttribute("aria-label", ariaText);
 
-    title.textContent = "";
-    let letterIndex = 0;
-    chunks.forEach(chunk => {
-      if (chunk.type === "br") {
-        const br = document.createElement("br");
-        if (chunk.className) br.className = chunk.className;
-        title.appendChild(br);
-        return;
-      }
+      const chunks = [...title.childNodes].flatMap(node => {
+        if (node.nodeName === "BR") {
+          return [{ type: "br", className: node.className }];
+        }
+        const text = node.textContent;
+        return text ? [{ type: "text", value: text }] : [];
+      });
 
-      chunk.value.split(/(\s+)/).forEach(part => {
-        if (/^\s+$/.test(part)) {
-          title.appendChild(document.createTextNode(" "));
+      title.textContent = "";
+      let letterIndex = 0;
+      chunks.forEach(chunk => {
+        if (chunk.type === "br") {
+          const br = document.createElement("br");
+          if (chunk.className) br.className = chunk.className;
+          title.appendChild(br);
           return;
         }
 
-        const word = document.createElement("span");
-        word.className = "ml-hero__word";
-        word.setAttribute("aria-hidden", "true");
-        [...part].forEach(character => {
-          const letter = document.createElement("span");
-          letter.className = "ml-hero__letter";
-          letter.style.setProperty("--letter-delay", `${letterIndex * 52}ms`);
-          letter.textContent = character;
-          word.appendChild(letter);
-          letterIndex += 1;
+        chunk.value.split(/(\s+)/).forEach(part => {
+          if (/^\s+$/.test(part)) {
+            title.appendChild(document.createTextNode(" "));
+            return;
+          }
+
+          const word = document.createElement("span");
+          word.className = "ml-hero__word";
+          word.setAttribute("aria-hidden", "true");
+          [...part].forEach(character => {
+            const letter = document.createElement("span");
+            letter.className = "ml-hero__letter";
+            letter.style.setProperty("--letter-delay", `${letterIndex * 42}ms`);
+            letter.textContent = character;
+            word.appendChild(letter);
+            letterIndex += 1;
+          });
+          title.appendChild(word);
         });
-        title.appendChild(word);
       });
+
+      if (title.closest(".ml-hero__slide")?.classList.contains("is-active")) {
+        requestAnimationFrame(() => title.classList.add("is-illuminating"));
+      }
     });
-    requestAnimationFrame(() => title.classList.add("is-illuminating"));
   }
 
   function animateCategoriesTitle() {
@@ -1924,7 +2028,7 @@
   window.MacroledProducts.init(root);
   window.MacroledFeatured.init(root);
   window.MacroledProjectLinesConcept.init(root);
-  handleVideo();
+  initHeroSlider();
   animateHeroTitle();
   animateCategoriesTitle();
   initHeroLuminariasRise();

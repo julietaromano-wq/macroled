@@ -1779,8 +1779,19 @@ a.ml-news-card:focus-visible .ml-news-card__arrow {
   transform: scale(0.97);
   transform-origin: left bottom;
 }
-.ml-home .ml-hero__copy:has(#ml-hero-title.is-illuminating) {
-  animation: ml-hero-copy-zoom 7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+.ml-home .ml-hero__slide.is-active .ml-hero__copy {
+  animation: ml-hero-copy-zoom 1.15s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+.ml-home .ml-hero__subtitle,
+.ml-home .ml-hero__copy .ml-button {
+  opacity: 0;
+  transform: translateY(18px);
+}
+.ml-home .ml-hero__slide.is-active .ml-hero__subtitle {
+  animation: ml-hero-text-in 0.75s cubic-bezier(0.22, 0.7, 0.25, 1) 0.28s forwards;
+}
+.ml-home .ml-hero__slide.is-active .ml-hero__copy .ml-button {
+  animation: ml-hero-text-in 0.75s cubic-bezier(0.22, 0.7, 0.25, 1) 0.48s forwards;
 }
 @keyframes ml-hero-copy-zoom {
   from {
@@ -1790,13 +1801,26 @@ a.ml-news-card:focus-visible .ml-news-card__arrow {
     transform: scale(1);
   }
 }
+@keyframes ml-hero-text-in {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
 @media (prefers-reduced-motion: reduce) {
   .ml-home .ml-hero__letter {
     color: #fff;
     opacity: 1;
   }
-  .ml-home .ml-hero__copy {
+  .ml-home .ml-hero__copy,
+  .ml-home .ml-hero__subtitle,
+  .ml-home .ml-hero__copy .ml-button {
     transform: none;
+    opacity: 1;
     animation: none;
   }
 }
@@ -7175,6 +7199,128 @@ a.ml-news-card:focus-visible .ml-news-card__arrow {
   z-index: 0;
   height: 100vh;
   height: 100svh;
+}
+
+.ml-home .ml-hero__slides,
+.ml-home .ml-hero__slide {
+  position: absolute;
+  inset: 0;
+}
+.ml-home .ml-hero__slide {
+  opacity: 0;
+  visibility: hidden;
+  overflow: hidden;
+  isolation: isolate;
+  pointer-events: none;
+  transition: opacity 0.55s ease, visibility 0.55s ease;
+}
+.ml-home .ml-hero__slide.is-active {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  z-index: 1;
+}
+.ml-home .ml-hero__slide .ml-hero__fallback {
+  z-index: 0;
+}
+.ml-home .ml-hero__slide .ml-hero__video {
+  z-index: 1;
+}
+.ml-home .ml-hero__slide .ml-hero__overlay {
+  z-index: 2;
+}
+.ml-home .ml-hero__slide .ml-hero__content {
+  z-index: 3;
+  bottom: clamp(3.25rem, 8vh, 5.5rem);
+}
+.ml-home .ml-hero h1,
+.ml-home #ml-hero-title {
+  font-size: clamp(2.3rem, calc(1.4rem + 2.4vw), 5.25rem);
+  line-height: 1.14;
+}
+@media (max-width: 640px) {
+  .ml-home .ml-hero__slide .ml-hero__content {
+    bottom: clamp(1.5rem, 5vh, 3rem);
+  }
+  .ml-home .ml-hero h1,
+  .ml-home #ml-hero-title {
+    font-size: clamp(2.45rem, 10vw, 3rem);
+    line-height: 1.12;
+  }
+}
+.ml-home .ml-hero__controls {
+  position: absolute;
+  z-index: 3;
+  inset: 0;
+  pointer-events: none;
+}
+.ml-home .ml-hero__controls[hidden] {
+  display: none;
+}
+.ml-home .ml-hero__arrow {
+  position: absolute;
+  top: 50%;
+  width: 36px;
+  height: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.42);
+  cursor: pointer;
+  pointer-events: auto;
+  transform: translateY(-50%);
+  opacity: 1;
+}
+.ml-home .ml-hero__arrow--prev {
+  left: clamp(1rem, 3vw, 2.5rem);
+}
+.ml-home .ml-hero__arrow--next {
+  right: clamp(1rem, 3vw, 2.5rem);
+}
+.ml-home .ml-hero__arrow svg {
+  width: 28px;
+  height: 28px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.ml-home .ml-hero__arrow:hover {
+  background: transparent;
+  color: rgba(255, 255, 255, 0.9);
+}
+.ml-home .ml-hero__dots {
+  position: absolute;
+  left: 50%;
+  bottom: 1.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  pointer-events: auto;
+  transform: translateX(-50%);
+}
+.ml-home .ml-hero__dot {
+  width: 7px;
+  height: 7px;
+  padding: 0;
+  border: 0;
+  border-radius: 99px;
+  background: rgba(255, 255, 255, 0.45);
+  cursor: pointer;
+}
+.ml-home .ml-hero__dot.is-active {
+  width: 18px;
+  background: #fff;
+}
+@media (prefers-reduced-motion: reduce) {
+  .ml-home .ml-hero__slide {
+    transition: none;
+  }
 }
 
 .ml-hero-overlap .ml-project-lines-concept {

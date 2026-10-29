@@ -16,22 +16,49 @@
 <!-- ===== EMBED WEBFLOW: HOME — inicio (pegar tal cual en el embed del body de la pagina Home) ===== -->
 <div id="macroled-home" class="ml-home">
     <div class="ml-hero-overlap">
-      <div class="ml-hero" aria-labelledby="ml-hero-title" data-nav-theme="dark">
-        <video class="ml-hero__video" autoplay muted playsinline preload="auto" aria-hidden="true"
-          poster="https://s3.coresagroup.com/MACROLED/video/HOMEDESKTOP-poster.webp"
-          data-poster-desktop="https://s3.coresagroup.com/MACROLED/video/HOMEDESKTOP-poster.webp"
-          data-poster-mobile="https://s3.coresagroup.com/MACROLED/video/HOMEMOBILE-poster.webp">
-          <source src="https://s3.coresagroup.com/MACROLED/video/HOMEMOBILE-faststart.mp4" type="video/mp4" media="(max-width: 640px)">
-          <source src="https://s3.coresagroup.com/MACROLED/video/HOMEDESKTOP-faststart.mp4" type="video/mp4" media="(min-width: 641px)">
-        </video>
-        <div class="ml-hero__fallback" aria-hidden="true"></div>
-        <div class="ml-hero__overlay"></div>
-        <div class="ml-hero__content">
-          <div class="ml-hero__copy">
-            <h1 id="ml-hero-title">La iluminación<br class="ml-hero__title-break">alcanza otro nivel</h1>
-            <p class="ml-hero__subtitle">Tecnología lumínica con la <span class="ml-hero__phrase">precisión técnica</span><br class="ml-hero__subtitle-break">que exige cada proyecto.</p>
-            <a class="ml-button ml-button--primary" href="https://www.macroled.com.ar/productos">Explorá nuestros productos</a>
-          </div>
+      <div class="ml-hero" data-hero-slider aria-roledescription="carrusel" aria-labelledby="ml-hero-title" data-nav-theme="dark">
+        <div class="ml-hero__slides">
+          <article class="ml-hero__slide is-active" data-hero-slide aria-hidden="false">
+            <video class="ml-hero__video" autoplay muted loop playsinline preload="auto" aria-hidden="true">
+              <source src="https://s3.coresagroup.com/MACROLED/WEB/HOME/arq_video.mp4" type="video/mp4">
+            </video>
+            <div class="ml-hero__fallback" aria-hidden="true"></div>
+            <div class="ml-hero__overlay"></div>
+            <div class="ml-hero__content">
+              <div class="ml-hero__copy">
+                <h1 id="ml-hero-title">Luz que transforma<br class="ml-hero__title-break">espacios</h1>
+                <p class="ml-hero__subtitle">Soluciones de iluminación que inspiran y dan vida a cada proyecto.</p>
+                <a class="ml-button ml-button--primary" href="http://macroled.com.ar/arq">Conocer Macroled ARQ</a>
+              </div>
+            </div>
+          </article>
+          <article class="ml-hero__slide" data-hero-slide aria-hidden="true">
+            <video class="ml-hero__video" muted playsinline preload="metadata" aria-hidden="true"
+              poster="https://s3.coresagroup.com/MACROLED/video/HOMEDESKTOP-poster.webp"
+              data-poster-desktop="https://s3.coresagroup.com/MACROLED/video/HOMEDESKTOP-poster.webp"
+              data-poster-mobile="https://s3.coresagroup.com/MACROLED/video/HOMEMOBILE-poster.webp">
+              <source src="https://s3.coresagroup.com/MACROLED/video/HOMEMOBILE-faststart.mp4" type="video/mp4" media="(max-width: 640px)">
+              <source src="https://s3.coresagroup.com/MACROLED/video/HOMEDESKTOP-faststart.mp4" type="video/mp4" media="(min-width: 641px)">
+            </video>
+            <div class="ml-hero__fallback" aria-hidden="true"></div>
+            <div class="ml-hero__overlay"></div>
+            <div class="ml-hero__content">
+              <div class="ml-hero__copy">
+                <h1>La iluminación<br class="ml-hero__title-break">alcanza otro nivel</h1>
+                <p class="ml-hero__subtitle">Tecnología lumínica con la <span class="ml-hero__phrase">precisión técnica</span><br class="ml-hero__subtitle-break">que exige cada proyecto.</p>
+                <a class="ml-button ml-button--primary" href="https://www.macroled.com.ar/productos">Explorá nuestros productos</a>
+              </div>
+            </div>
+          </article>
+        </div>
+        <div class="ml-hero__controls" data-hero-controls hidden>
+          <button type="button" class="ml-hero__arrow ml-hero__arrow--prev" data-hero-prev aria-label="Video anterior">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 18 9 12l6-6"/></svg>
+          </button>
+          <div class="ml-hero__dots" data-hero-dots role="tablist" aria-label="Videos de portada"></div>
+          <button type="button" class="ml-hero__arrow ml-hero__arrow--next" data-hero-next aria-label="Video siguiente">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
+          </button>
         </div>
       </div>
 
