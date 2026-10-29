@@ -7245,6 +7245,9 @@ a.ml-news-card:focus-visible .ml-news-card__arrow {
   }
 }
 @media (max-width: 640px) {
+  .ml-home .ml-hero__slide .ml-hero__video {
+    object-position: 68% center;
+  }
   .ml-home .ml-hero__slide .ml-hero__content {
     bottom: clamp(1.5rem, 5vh, 3rem);
   }
