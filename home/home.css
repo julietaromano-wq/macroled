@@ -6127,7 +6127,7 @@ a.ml-news-card:focus-visible .ml-news-card__arrow {
   }
 }
 
-/* —— Solutions banner (after project lines) —— */
+/* —— Solutions banner (after Reflectores PRO, Skyline and Mónaco) —— */
 .ml-home .ml-solutions-banner {
   --ml-monaco-tone: #e9ecef;
   --ml-solutions-fade: #ffffff;
@@ -6139,11 +6139,11 @@ a.ml-news-card:focus-visible .ml-news-card__arrow {
   padding-bottom: clamp(1.25rem, 2.5vw, 2rem);
   background: linear-gradient(
     180deg,
-    #ffffff 0%,
-    #ffffff 32%,
-    #f7f7f7 55%,
-    color-mix(in srgb, #f4f4f4 28%, var(--ml-monaco-tone)) 78%,
-    var(--ml-monaco-tone) 100%
+    var(--ml-monaco-tone) 0%,
+    color-mix(in srgb, #f4f4f4 28%, var(--ml-monaco-tone)) 22%,
+    #f7f7f7 45%,
+    #ffffff 68%,
+    #ffffff 100%
   );
   color: var(--ml-dark-blue-700, #00152b);
 }
@@ -7660,7 +7660,7 @@ body.assistant-open .ai-launch {
   right: max(16px, env(safe-area-inset-right, 0px));
   left: auto;
   bottom: max(20px, env(safe-area-inset-bottom, 0px));
-  z-index: 2147483645 !important;
+  z-index: 99990 !important;
   display: inline-flex;
   align-items: center;
   justify-content: center;

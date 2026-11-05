@@ -413,6 +413,8 @@
   }
 
   function setupTrackControls(root, track, options = {}) {
+    root._featuredAutoplayCleanup?.();
+    root._featuredAutoplayCleanup = null;
     const controls = root.querySelector(".ml-featured-products__controls");
     const progressBar = root.querySelector(".ml-featured-products__progress");
     const progress = root.querySelector("[data-featured-progress]");
@@ -578,6 +580,42 @@
       dragged = false;
     };
 
+    if (options.autoplayMs) {
+      const reducedMotion = matchMedia("(prefers-reduced-motion: reduce)");
+      let timer = 0;
+      const tick = () => {
+        if (document.hidden || reducedMotion.matches || track.classList.contains("is-dragging")) return;
+        const max = track.scrollWidth - track.clientWidth;
+        if (max <= 4) return;
+        if (track.scrollLeft >= max - 4) {
+          track.scrollTo({ left: 0, behavior: "smooth" });
+          return;
+        }
+        moveToCard(1);
+      };
+      const start = () => {
+        clearInterval(timer);
+        if (reducedMotion.matches) return;
+        timer = window.setInterval(tick, options.autoplayMs);
+      };
+      const onVisibility = () => {
+        if (document.hidden) clearInterval(timer);
+        else start();
+      };
+      const manual = direction => {
+        moveToCard(direction);
+        start();
+      };
+      prev.onclick = () => manual(-1);
+      next.onclick = () => manual(1);
+      document.addEventListener("visibilitychange", onVisibility);
+      start();
+      root._featuredAutoplayCleanup = () => {
+        clearInterval(timer);
+        document.removeEventListener("visibilitychange", onVisibility);
+      };
+    }
+
     track._featuredResizeObserver?.disconnect();
     track._featuredResizeObserver = new ResizeObserver(update);
     track._featuredResizeObserver.observe(track);
@@ -593,6 +631,7 @@
   async function render(root, space) {
     if (isFetching) return;
     isFetching = true;
+    root._featuredAutoplayCleanup?.();
     const track = root.querySelector("[data-featured-track]");
     track.setAttribute("aria-busy", "true");
     track.innerHTML = window.MacroledProducts.loadingSkeletons(5);
@@ -606,7 +645,7 @@
       track.innerHTML = orderFeatured(data.hits).map(hit => window.MacroledProducts.cardTemplate(hit.document)).join("");
       window.MacroledProducts.wireCarousels(track);
       track.scrollLeft = 0;
-      setupTrackControls(root, track);
+      setupTrackControls(root, track, { autoplayMs: 4000 });
     } catch (error) {
       const filter = `${FEATURED_FIELD} en ${FEATURED_GROUPS.join(", ")}`;
       console.error(`Macroled Home · Error consultando Typesense (${filter})`, error);
@@ -866,9 +905,11 @@
 
   function placeFeaturedProducts() {
     const featuredProducts = root.querySelector("#productos-destacados");
+    const explore = root.querySelector("#ml-explore");
     const solutions = root.querySelector("[data-solutions-banner]");
-    if (!featuredProducts || !solutions) return;
-    solutions.insertAdjacentElement("beforebegin", featuredProducts);
+    const anchor = explore || solutions;
+    if (!featuredProducts || !anchor) return;
+    anchor.insertAdjacentElement("beforebegin", featuredProducts);
   }
 
   function initExpandBanners() {
@@ -1048,8 +1089,9 @@
         section?.style.setProperty("--ml-section-theme", theme);
         section?.style.setProperty("--ml-section-background", background);
       };
-      /* Start with Monaco's theme so the categories gradient and the first
-         editorial line meet on the exact same surface color. */
+      /* Reflectores PRO abre con el mismo gris que el fondo de la sección,
+         y Mónaco cierra en ese tono para encontrarse con el degradado de
+         “Soluciones que se adaptan”. */
       setBackground(lines[0]);
 
       if (!("IntersectionObserver" in window)) return;
