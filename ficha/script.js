@@ -1731,7 +1731,16 @@
     if (actions) actions.hidden = finalDocs.length === 0;
   }
 
-  const DOWNLOAD_CARD_ORDER = ["ficha", "catalogo", "garantia", "manual", "ies"];
+  const DOWNLOAD_CARD_ORDER = ["ficha", "catalogo", "garantia", "manual", "ies", "imagenes"];
+
+  function galleryImageUrls() {
+    const urls = [];
+    GALLERY.forEach((item) => {
+      if (!item || item.type !== "image" || !item.full) return;
+      if (urls.indexOf(item.full) === -1) urls.push(item.full);
+    });
+    return urls;
+  }
 
   function orderDownloadCards() {
     const list = document.getElementById("files-list");
@@ -1762,6 +1771,14 @@
       if (key === "ficha-anterior") {
         card.hidden = true;
         card.removeAttribute("href");
+        return;
+      }
+      if (key === "imagenes") {
+        const count = galleryImageUrls().length;
+        card.hidden = count === 0;
+        if (count) visibleCount++;
+        const openLabel = card.querySelector(".dl-card__btn");
+        if (openLabel && card.getAttribute("aria-busy") !== "true") openLabel.textContent = "Descargar";
         return;
       }
       /* La ficha y la garantía siempre se generan, aunque haya un link cargado. */
@@ -2579,6 +2596,115 @@
       .finally(() => {
         pdfBusy = false;
         setPdfTriggerBusy(trigger, false);
+      });
+  });
+
+  function fetchableImageUrl(url) {
+    try {
+      const parsed = new URL(url, window.location.href);
+      const host = parsed.hostname.replace(/^www\./, "").toLowerCase();
+      if (host === "s3.coresagroup.com") {
+        return "https://d1zltvqju4u8ql.cloudfront.net" + parsed.pathname + parsed.search;
+      }
+      return parsed.href;
+    } catch (err) {
+      return url;
+    }
+  }
+
+  function imageZipName(url, index) {
+    let base = "";
+    try {
+      base = decodeURIComponent(new URL(url, window.location.href).pathname.split("/").pop() || "");
+    } catch (err) {}
+    base = base.replace(/[\\/:*?"<>|]+/g, "-").trim();
+    if (!base || !/\.[a-z0-9]{2,5}$/i.test(base)) base = "imagen-" + (index + 1) + ".jpg";
+    return base;
+  }
+
+  function uniqueZipName(name, used) {
+    const dot = name.lastIndexOf(".");
+    const stem = dot > 0 ? name.slice(0, dot) : name;
+    const ext = dot > 0 ? name.slice(dot) : "";
+    let next = name;
+    let n = 2;
+    while (used.has(next.toLowerCase())) {
+      next = stem + "-" + n + ext;
+      n += 1;
+    }
+    used.add(next.toLowerCase());
+    return next;
+  }
+
+  let imagesBusy = false;
+
+  async function downloadGalleryImages(trigger) {
+    const urls = galleryImageUrls();
+    if (!urls.length) return;
+    const label = trigger.querySelector(".dl-card__btn");
+    trigger.setAttribute("aria-busy", "true");
+    if (label) label.textContent = "Preparando…";
+    try {
+      await loadScriptOnce(
+        "https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js",
+        "jszip",
+        () => window.JSZip
+      );
+      const zip = new window.JSZip();
+      const sku = (document.getElementById("ficha-sku")?.textContent || "producto").trim() || "producto";
+      const folderName = sku.replace(/[\\/:*?"<>|]+/g, "-") || "imagenes";
+      const folder = zip.folder(folderName);
+      const used = new Set();
+      const planned = urls.map((url, index) => ({
+        url: url,
+        name: uniqueZipName(imageZipName(url, index), used),
+      }));
+      const settled = await Promise.all(planned.map(async (item) => {
+        try {
+          const res = await fetch(fetchableImageUrl(item.url));
+          if (!res.ok) return null;
+          const blob = await res.blob();
+          if (!blob.size) return null;
+          return { blob: blob, name: item.name };
+        } catch (err) {
+          return null;
+        }
+      }));
+      const files = settled.filter(Boolean);
+      if (!files.length) throw new Error("sin imagenes");
+      files.forEach((file) => {
+        folder.file(file.name, file.blob, { compression: "STORE" });
+      });
+      const out = await zip.generateAsync({ type: "blob" });
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(out);
+      a.download = folderName + "-imagenes.zip";
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(() => URL.revokeObjectURL(a.href), 60000);
+      if (label) label.textContent = "Descargar";
+    } catch (err) {
+      if (label) label.textContent = "Reintentar";
+      throw err;
+    } finally {
+      trigger.removeAttribute("aria-busy");
+    }
+  }
+
+  document.addEventListener("click", (e) => {
+    const trigger = e.target.closest("#dl-imagenes");
+    if (!trigger || trigger.hidden || imagesBusy) return;
+    e.preventDefault();
+    imagesBusy = true;
+    downloadGalleryImages(trigger)
+      .catch((err) => {
+        console.error("[imagenes]", err);
+        const label = trigger.querySelector(".dl-card__btn");
+        if (label) label.textContent = "Reintentar";
+      })
+      .finally(() => {
+        imagesBusy = false;
       });
   });
 

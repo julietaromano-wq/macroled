@@ -1075,6 +1075,15 @@ body.assistant-open .ai-launch{
   box-shadow:0 8px 20px rgba(0,21,43,.06);
 }
 .dl-card[hidden]{display:none !important;}
+button.dl-card{
+  width:100%;
+  margin:0;
+  font:inherit;
+  color:inherit;
+  text-align:left;
+  cursor:pointer;
+  appearance:none;
+}
 .dl-card__icon{
   flex:none;width:40px;height:48px;
   display:grid;place-items:center;
