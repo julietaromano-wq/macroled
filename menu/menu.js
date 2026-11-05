@@ -322,6 +322,7 @@ if (typeof module !== "undefined") module.exports = MEGAMENU_DATA;
       if (!ours) return href;
       var slug = url.pathname.replace(/^\/+|\/+$/g, "");
       if (slug === "arq") return "http://macroled.com.ar/arq";
+      if (slug === "casafoa") return "https://www.macroled.com.ar/casafoa";
       if (slug === "nuevo-productos") {
         url.pathname = "/productos";
       } else if (slug === "nuevo-home-final" || slug === "nuevo-home") {
@@ -855,6 +856,9 @@ if (typeof module !== "undefined") module.exports = MEGAMENU_DATA;
       if (window.MACROLED_MENU && typeof window.MACROLED_MENU.closeSearch === "function") {
         window.MACROLED_MENU.closeSearch();
       }
+      if (window.MACROLED_MENU && typeof window.MACROLED_MENU.closeDropdowns === "function") {
+        window.MACROLED_MENU.closeDropdowns();
+      }
       setActive("lamparas");
       if (tabsEl) tabsEl.scrollTop = 0;
       root.classList.add("is-open");
@@ -973,6 +977,81 @@ if (typeof module !== "undefined") module.exports = MEGAMENU_DATA;
   }
   window.Webflow = window.Webflow || [];
   window.Webflow.push(init);
+})();
+
+(function () {
+  if (window.__macroledDropInit) return;
+  window.__macroledDropInit = true;
+
+  function closeAll(except) {
+    document.querySelectorAll("#macroled-menu [data-mm-drop].is-open").forEach(function (drop) {
+      if (except && drop === except) return;
+      drop.classList.remove("is-open");
+      var trigger = drop.querySelector(".mm-drop-trigger");
+      if (trigger) trigger.setAttribute("aria-expanded", "false");
+    });
+  }
+
+  function setOpen(drop, open) {
+    drop.classList.toggle("is-open", open);
+    var trigger = drop.querySelector(".mm-drop-trigger");
+    if (trigger) trigger.setAttribute("aria-expanded", open ? "true" : "false");
+  }
+
+  function openDrop(drop) {
+    if (window.MACROLED_MENU && typeof window.MACROLED_MENU.closeMegamenu === "function") {
+      window.MACROLED_MENU.closeMegamenu();
+    }
+    if (window.MACROLED_MENU && typeof window.MACROLED_MENU.closeSearch === "function") {
+      window.MACROLED_MENU.closeSearch();
+    }
+    closeAll(drop);
+    setOpen(drop, true);
+  }
+
+  window.MACROLED_MENU = window.MACROLED_MENU || {};
+  window.MACROLED_MENU.closeDropdowns = function () { closeAll(null); };
+
+  function bindDrops() {
+  document.querySelectorAll("#macroled-menu [data-mm-drop]").forEach(function (drop) {
+    if (drop.getAttribute("data-mm-drop-bound") === "1") return;
+    drop.setAttribute("data-mm-drop-bound", "1");
+    var trigger = drop.querySelector(".mm-drop-trigger");
+    var panel = drop.querySelector(".mm-drop-panel");
+    if (!trigger || !panel) return;
+
+    trigger.addEventListener("click", function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+      if (drop.classList.contains("is-open")) setOpen(drop, false);
+      else openDrop(drop);
+    });
+
+    drop.addEventListener("focusout", function (e) {
+      if (drop.contains(e.relatedTarget)) return;
+      setOpen(drop, false);
+    });
+    trigger.addEventListener("keydown", function (e) {
+      if (e.key !== "ArrowDown") return;
+      e.preventDefault();
+      openDrop(drop);
+      var first = panel.querySelector("a");
+      if (first) first.focus();
+    });
+  });
+  }
+
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", bindDrops);
+  else bindDrops();
+
+  document.addEventListener("click", function (e) {
+    var open = document.querySelector("#macroled-menu [data-mm-drop].is-open");
+    if (!open || open.contains(e.target)) return;
+    closeAll(null);
+  });
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "Escape") closeAll(null);
+  });
 })();
 
 (function () {
@@ -1111,6 +1190,9 @@ if (typeof module !== "undefined") module.exports = MEGAMENU_DATA;
     function openSearch() {
       if (window.MACROLED_MENU && typeof window.MACROLED_MENU.closeMegamenu === "function") {
         window.MACROLED_MENU.closeMegamenu();
+      }
+      if (window.MACROLED_MENU && typeof window.MACROLED_MENU.closeDropdowns === "function") {
+        window.MACROLED_MENU.closeDropdowns();
       }
       wrapper.classList.add("is-open");
       wrapper.setAttribute("aria-hidden", "false");
@@ -1328,16 +1410,43 @@ if (typeof module !== "undefined") module.exports = MEGAMENU_DATA;
 
   function desktopNavLinks() {
     var links = [];
-    document.querySelectorAll("#macroled-menu .mm-links > a, #macroled-menu .mm-contact").forEach(function (a) {
-      var label = (a.textContent || "").trim();
-      var href = a.getAttribute("href") || "#";
-      if (label) links.push({ label: label, href: href, isContact: a.classList.contains("mm-contact") });
+    document.querySelectorAll("#macroled-menu .mm-links > a, #macroled-menu .mm-links > .mm-drop, #macroled-menu .mm-contact").forEach(function (el) {
+      if (el.classList.contains("mm-drop")) {
+        var trigger = el.querySelector(".mm-drop-trigger");
+        var label = trigger ? (trigger.textContent || "").replace(/\s+/g, " ").trim() : "";
+        var items = [];
+        el.querySelectorAll(".mm-drop-panel a").forEach(function (a) {
+          var childLabel = (a.textContent || "").trim();
+          if (!childLabel) return;
+          items.push({
+            label: childLabel,
+            href: a.getAttribute("href") || "#",
+            targetBlank: (a.getAttribute("target") || "").toLowerCase() === "_blank",
+          });
+        });
+        if (label && items.length) {
+          links.push({ label: label, children: { title: label, items: items } });
+        }
+        return;
+      }
+      var label = (el.textContent || "").trim();
+      var href = el.getAttribute("href") || "#";
+      if (label) links.push({ label: label, href: href, isContact: el.classList.contains("mm-contact") });
     });
     if (links.length) return links;
     return [
       { label: "Macroled ARQ", href: "http://macroled.com.ar/arq" },
       { label: "Proyectos Lumínicos", href: "https://macroled.webflow.io/proyectos" },
-      { label: "Novedades", href: "https://macroled.webflow.io/nuevo-novedades" },
+      {
+        label: "Novedades",
+        children: {
+          title: "Novedades",
+          items: [
+            { label: "Noticias", href: "https://macroled.webflow.io/nuevo-novedades" },
+            { label: "Casa FOA", href: "https://www.macroled.com.ar/casafoa", targetBlank: true },
+          ],
+        },
+      },
       { label: "Descargas", href: "https://macroled.webflow.io/nuevo-descargas" },
       { label: "Contacto", href: "https://macroled.webflow.io/nuevo-contacto", isContact: true },
     ];
@@ -1531,7 +1640,9 @@ if (typeof module !== "undefined") module.exports = MEGAMENU_DATA;
             '<svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>' +
             '<span class="screen-title">' + esc(node.title) + "</span>" +
           "</button>" +
-          '<a href="' + esc(node.viewAllHref || ALL_PRODUCTS_URL) + '" class="view-all-inline">' + esc(node.viewAllLabel || "Ver todo") + "</a>" +
+          (node.viewAllHref
+            ? '<a href="' + esc(node.viewAllHref) + '" class="view-all-inline">' + esc(node.viewAllLabel || "Ver todo") + "</a>"
+            : "") +
         "</div>"
       )) +
       '<div class="screen-body"><ul class="menu-list">' +
@@ -1549,7 +1660,8 @@ if (typeof module !== "undefined") module.exports = MEGAMENU_DATA;
           if (item.children) {
             return "<li><button type=\"button\" data-action=\"forward\" data-idx=\"" + i + "\">" + label + '<span class="chevron"></span></button></li>';
           }
-          return "<li><a href=\"" + esc(item.href || "#") + "\">" + label + "</a></li>";
+          var blank = item.targetBlank ? ' target="_blank" rel="noopener noreferrer"' : "";
+          return "<li><a href=\"" + esc(item.href || "#") + "\"" + blank + ">" + label + "</a></li>";
         }).join("") +
       "</ul></div>";
 

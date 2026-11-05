@@ -40,7 +40,16 @@
         <span data-megamenu-root></span>
         <a href="http://macroled.com.ar/arq">Macroled ARQ</a>
         <a href="https://macroled.webflow.io/proyectos">Proyectos Lumínicos</a>
-        <a href="https://macroled.webflow.io/nuevo-novedades">Novedades</a>
+        <div class="mm-drop" data-mm-drop>
+          <button type="button" class="mm-drop-trigger" aria-expanded="false" aria-haspopup="menu" aria-controls="mm-novedades-panel">
+            Novedades
+            <svg xmlns="http://www.w3.org/2000/svg" height="10" viewBox="0 -960 960 960" width="14" fill="currentColor" aria-hidden="true"><path d="m321-80-71-71 329-329-329-329 71-71 400 400L321-80Z"/></svg>
+          </button>
+          <div class="mm-drop-panel" id="mm-novedades-panel" role="menu">
+            <a role="menuitem" href="https://macroled.webflow.io/nuevo-novedades">Noticias</a>
+            <a role="menuitem" href="https://www.macroled.com.ar/casafoa" target="_blank" rel="noopener noreferrer">Casa FOA</a>
+          </div>
+        </div>
         <a href="https://macroled.webflow.io/nuevo-descargas">Descargas</a>
       </nav>
       <div class="mm-nav-actions">
