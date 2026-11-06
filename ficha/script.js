@@ -1681,8 +1681,8 @@
     const fichaDoc = {
       key: "ficha",
       generate: true,
-      primaryLabel: "Descargar ficha técnica",
-      secondaryLabel: "Descargar ficha técnica",
+      primaryLabel: "Generar ficha técnica",
+      secondaryLabel: "Generar ficha técnica",
     };
 
     const catalogDoc = isValidFileUrl(catalogoUrl)
@@ -1714,10 +1714,17 @@
       btn.hidden = false;
       setDownloadBtnLabel(btn, isPrimary ? doc.primaryLabel : doc.secondaryLabel);
       if (doc.generate) {
-        btn.dataset.generatePdf = "1";
-        btn.href = "#";
-        btn.removeAttribute("target");
-        btn.removeAttribute("rel");
+        const sku = (document.getElementById("ficha-sku")?.textContent || "").trim();
+        const pageUrl = datasheetPageUrl(sku, window.location.origin);
+        delete btn.dataset.generatePdf;
+        btn.href = pageUrl || "#";
+        if (pageUrl) {
+          btn.target = "_blank";
+          btn.rel = "noopener";
+        } else {
+          btn.removeAttribute("target");
+          btn.removeAttribute("rel");
+        }
         return;
       }
       delete btn.dataset.generatePdf;
@@ -1740,6 +1747,14 @@
       if (urls.indexOf(item.full) === -1) urls.push(item.full);
     });
     return urls;
+  }
+
+  const DL_ACTION_ICON = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12"/><path d="m7 11 5 5 5-5"/><path d="M5 21h14"/></svg>';
+
+  function setCardDownloadIcon(el) {
+    if (!el) return;
+    el.innerHTML = DL_ACTION_ICON;
+    el.setAttribute("aria-label", "Descargar");
   }
 
   function orderDownloadCards() {
@@ -1778,18 +1793,30 @@
         card.hidden = count === 0;
         if (count) visibleCount++;
         const openLabel = card.querySelector(".dl-card__btn");
-        if (openLabel && card.getAttribute("aria-busy") !== "true") openLabel.textContent = "Descargar";
+        if (openLabel && card.getAttribute("aria-busy") !== "true") setCardDownloadIcon(openLabel);
         return;
       }
       /* La ficha y la garantía siempre se generan, aunque haya un link cargado. */
       if (key === "ficha" || key === "garantia") {
-        card.href = "#";
         card.hidden = false;
-        card.dataset.generatePdf = "1";
-        card.removeAttribute("target");
-        card.removeAttribute("rel");
         const openLabel = card.querySelector(".dl-card__btn");
-        if (openLabel && openLabel.textContent.trim() !== "Generando…") openLabel.textContent = "Descargar";
+        if (key === "ficha") {
+          const sku = (document.getElementById("ficha-sku")?.textContent || "").trim();
+          const pageUrl = datasheetPageUrl(sku, window.location.origin);
+          delete card.dataset.generatePdf;
+          card.href = pageUrl || "#";
+          if (pageUrl) {
+            card.target = "_blank";
+            card.rel = "noopener";
+          }
+          if (openLabel && openLabel.textContent.trim() !== "Generando…") setCardDownloadIcon(openLabel);
+        } else {
+          card.href = "#";
+          card.dataset.generatePdf = "1";
+          card.removeAttribute("target");
+          card.removeAttribute("rel");
+          if (openLabel && openLabel.textContent.trim() !== "Generando…") setCardDownloadIcon(openLabel);
+        }
         visibleCount++;
         return;
       }
@@ -1827,20 +1854,10 @@
   }
 
   function deliverGeneratedPdf(blob, filename, preview) {
-    const viewUrl = URL.createObjectURL(blob);
-    const fileUrl = URL.createObjectURL(blob);
+    const file = new File([blob], filename, { type: blob.type || "application/pdf" });
+    const viewUrl = URL.createObjectURL(file);
     if (preview && !preview.closed) preview.location.replace(viewUrl);
     else window.open(viewUrl, "_blank", "noopener");
-    const a = document.createElement("a");
-    a.href = fileUrl;
-    a.download = filename;
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    setTimeout(() => {
-      URL.revokeObjectURL(viewUrl);
-      URL.revokeObjectURL(fileUrl);
-    }, 120000);
   }
 
   function pdfSafe(value) {
@@ -1951,14 +1968,15 @@
 
     const line = (el && el.getAttribute("data-linea") || "").trim();
     const links = [];
-    const webUrl = sheetWebUrl(el);
-    const addSheetLink = (key, url) => {
+    const sheetUrl = datasheetUrl(sku);
+    const webUrl = sheetUrl || sheetWebUrl(el);
+    const addSheetLink = (key, url, label) => {
       const href = String(url || "").trim();
       if (!key || !isValidFileUrl(href)) return;
       if (links.some((item) => item.url === href)) return;
-      links.push({ key, val: href, url: href });
+      links.push({ key, val: label || href, url: href });
     };
-    if (webUrl) addSheetLink("Ficha Web", webUrl);
+    if (webUrl) addSheetLink("Ficha Web", webUrl, sheetUrl ? datasheetLabel(sku) : webUrl);
     [
       ["Ficha técnica general", (el && el.getAttribute("data-ficha")) || (el && el.getAttribute("data-ficha-anterior"))],
       ["Catálogo", el && el.getAttribute("data-catalogo")],
@@ -1984,6 +2002,25 @@
   }
 
   let forcedSheetUrl = "";
+
+  function datasheetPageUrl(sku, origin) {
+    const code = String(sku || "").trim();
+    if (!code) return "";
+    const base = origin || "https://www.macroled.com.ar";
+    const url = new URL("/datasheet/", base.endsWith("/") ? base : base + "/");
+    url.searchParams.set("sku", code);
+    return url.href;
+  }
+
+  function datasheetUrl(sku) {
+    return datasheetPageUrl(sku, "https://www.macroled.com.ar");
+  }
+
+  function datasheetLabel(sku) {
+    const code = String(sku || "").trim();
+    if (!code) return "";
+    return "datasheet/" + code;
+  }
 
   function sheetWebUrl(el) {
     if (forcedSheetUrl) return forcedSheetUrl;
@@ -2208,7 +2245,7 @@
     }
   }
 
-  async function downloadTechnicalSheet(preview) {
+  async function buildTechnicalSheet() {
     const data = collectSheetData();
     const [JsPDF, image, coresaLogo, macroledLogoWhite, macroledLogoCyan] = await Promise.all([
       loadJsPdf(),
@@ -2433,7 +2470,12 @@
       title: fileName.replace(/\.pdf$/i, ""),
       creator: "MACROLED",
     });
-    deliverGeneratedPdf(doc.output("blob"), fileName, preview);
+    return { blob: doc.output("blob"), fileName: fileName };
+  }
+
+  async function downloadTechnicalSheet(preview) {
+    const built = await buildTechnicalSheet();
+    deliverGeneratedPdf(built.blob, built.fileName, preview);
   }
 
   const WARRANTY_NUMBERS = ["", "Un", "Dos", "Tres", "Cuatro", "Cinco", "Seis", "Siete", "Ocho", "Nueve", "Diez", "Once", "Doce"];
@@ -2560,14 +2602,14 @@
     trigger.removeAttribute("aria-busy");
     if (trigger.id === "dl-ficha" || trigger.id === "dl-garantia") {
       const label = trigger.querySelector(".dl-card__btn");
-      if (label) label.textContent = "Descargar";
+      if (label) setCardDownloadIcon(label);
     } else if (trigger.dataset.generatePdf === "1") {
       setDownloadBtnLabel(trigger, "Descargar ficha técnica");
     }
   }
 
   document.addEventListener("click", (e) => {
-    const trigger = e.target.closest("#btn-ficha[data-generate-pdf], #dl-ficha, #dl-garantia");
+    const trigger = e.target.closest("#btn-ficha[data-generate-pdf], #dl-ficha[data-generate-pdf], #dl-garantia");
     if (!trigger || trigger.hidden) return;
     e.preventDefault();
     if (pdfBusy) return;
@@ -2683,7 +2725,7 @@
       a.click();
       a.remove();
       setTimeout(() => URL.revokeObjectURL(a.href), 60000);
-      if (label) label.textContent = "Descargar";
+      if (label) setCardDownloadIcon(label);
     } catch (err) {
       if (label) label.textContent = "Reintentar";
       throw err;
@@ -4403,19 +4445,37 @@
     });
   }
 
-  async function downloadGeneratedSheet(sku, kind) {
+  async function loadSheetDoc(sku) {
     const wanted = String(sku || "").trim();
     if (!wanted) throw new Error("sin sku");
     let docs = await fetchDocsBySku([wanted]);
     if (!docs.length && wanted !== wanted.toUpperCase()) docs = await fetchDocsBySku([wanted.toUpperCase()]);
     const doc = docs[0];
     if (!doc) throw new Error("sin producto");
-    prepareSheetFromDoc(doc);
-    if (kind === "garantia") await downloadWarrantySheet(null);
-    else await downloadTechnicalSheet(null);
+    return doc;
   }
 
-  window.MacroledSheet = { download: downloadGeneratedSheet };
+  async function downloadGeneratedSheet(sku, kind) {
+    if (kind !== "garantia") {
+      const url = datasheetPageUrl(sku, window.location.origin);
+      if (!url) throw new Error("sin sku");
+      window.open(url, "_blank", "noopener");
+      return;
+    }
+    const doc = await loadSheetDoc(sku);
+    prepareSheetFromDoc(doc);
+    await downloadWarrantySheet(null);
+  }
+
+  async function viewGeneratedSheet(sku) {
+    const doc = await loadSheetDoc(sku);
+    prepareSheetFromDoc(doc);
+    const built = await buildTechnicalSheet();
+    const file = new File([built.blob], built.fileName, { type: "application/pdf" });
+    return URL.createObjectURL(file);
+  }
+
+  window.MacroledSheet = { download: downloadGeneratedSheet, view: viewGeneratedSheet };
 
   if (!skipFichaBoot) waitForCmsAndBoot();
 })();

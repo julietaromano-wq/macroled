@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ficha técnica — MACROLED</title>
+<style>
+  html, body { margin: 0; height: 100%; background: #525659; }
+  body { color: #fff; font-family: "Segoe UI", sans-serif; }
+  .status { margin: 0; padding: 28px 24px; font-size: 16px; }
+  iframe { border: 0; display: block; width: 100%; height: 100%; background: #525659; }
+</style>
+</head>
+<body>
+<p class="status" id="status">Generando ficha…</p>
+<script>window.__mlSkipFichaBoot = true;</script>
+<script src="../ficha/script.js"></script>
+<script>
+(function () {
+  function skuFromLocation() {
+    const fromQuery = (new URLSearchParams(location.search).get("sku") || "").trim();
+    if (fromQuery) return fromQuery;
+    const parts = location.pathname.split("/").filter(Boolean);
+    const at = parts.lastIndexOf("datasheet");
+    const next = at >= 0 ? parts[at + 1] : "";
+    if (next && next.toLowerCase() !== "index.html") {
+      try { return decodeURIComponent(next); } catch (err) { return next; }
+    }
+    return "";
+  }
+
+  const status = document.getElementById("status");
+  const sku = skuFromLocation();
+  if (!sku) {
+    status.textContent = "Falta el SKU de la ficha.";
+    return;
+  }
+  document.title = sku + " — Ficha técnica";
+  const open = window.MacroledSheet && window.MacroledSheet.view;
+  if (typeof open !== "function") {
+    status.textContent = "No pudimos cargar el generador de la ficha.";
+    return;
+  }
+  open(sku).then((url) => {
+    status.remove();
+    const frame = document.createElement("iframe");
+    frame.title = "Ficha técnica " + sku;
+    frame.src = url;
+    document.body.appendChild(frame);
+  }).catch(() => {
+    status.textContent = "No pudimos armar la ficha de " + sku + ".";
+  });
+})();
+</script>
+</body>
+</html>

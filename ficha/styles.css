@@ -1049,11 +1049,8 @@ body.assistant-open .ai-launch{
 
 .dl-list{
   display:grid;
-  grid-template-columns:repeat(3,minmax(0,1fr));
+  grid-template-columns:1fr;
   gap:12px;
-}
-@media (max-width:640px){
-  .dl-list{grid-template-columns:1fr;}
 }
 .dl-card{
   display:flex;align-items:center;gap:clamp(12px,2vw,16px);
@@ -1104,14 +1101,14 @@ button.dl-card{
 .dl-card__btn{
   flex:none;
   display:inline-flex;align-items:center;justify-content:center;
-  min-height:40px;padding:10px 18px;
+  width:40px;height:40px;padding:0;
   border-radius:10px;
-  background:var(--bg-card);
-  color:var(--ink);
+  background:transparent;
+  color:var(--ink-soft);
   font-size:var(--fs-sm);font-weight:700;
   transition:background .15s,color .15s;
 }
-.dl-card:hover .dl-card__btn{background:#e4e6ea;}
+.dl-card:hover .dl-card__btn{background:transparent;color:var(--ink);}
 
 /* Compatible / Related products (home cards + slider) */
 .ml-related-products {

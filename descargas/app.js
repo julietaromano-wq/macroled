@@ -736,7 +736,7 @@ function cardTemplate(it, idx){
           ${descHtml}
           ${seccionTipo}
         </div>
-        <a class="btn-download" href="${activa.generar ? "#" : escAttr(activa.url)}" ${activa.generar ? `data-generar="${escAttr(activa.generar)}" data-sku="${escAttr(it.sku)}"` : 'target="_blank" rel="noopener"'}><span class="btn-icon">${ICON_DOWNLOAD}</span> ${esCatalogo ? "Descargar" : `Descargar ${escAttr(activa.tipo_archivo)}`}</a>
+        <a class="btn-download" href="${activa.generar === "ficha" ? escAttr(datasheetPageUrl(it.sku) || "#") : (activa.generar ? "#" : escAttr(activa.url))}" ${activa.generar === "ficha" ? 'target="_blank" rel="noopener"' : (activa.generar ? `data-generar="${escAttr(activa.generar)}" data-sku="${escAttr(it.sku)}"` : 'target="_blank" rel="noopener"')}><span class="btn-icon">${ICON_DOWNLOAD}</span> ${esCatalogo ? "Descargar" : (activa.generar === "ficha" ? "Ver ficha" : `Descargar ${escAttr(activa.tipo_archivo)}`)}</a>
       </div>
     </div>
   `;
@@ -826,14 +826,29 @@ function bindImgFallback(img){
   if(img.complete && img.naturalWidth === 0 && img.getAttribute("src")) fail();
 }
 
+function datasheetPageUrl(sku){
+  const code = String(sku || "").trim();
+  if(!code) return "";
+  const url = new URL("/datasheet/", location.origin + "/");
+  url.searchParams.set("sku", code);
+  return url.href;
+}
+
 function updateCardActiveTab(cardEl, item){
   const activeIdx = item._active || 0;
   cardEl.querySelectorAll(".type-tab").forEach((btn, i) => btn.classList.toggle("active", i === activeIdx));
   const d = item.descargas[activeIdx];
   const btn = cardEl.querySelector(".btn-download");
-  const label = isCatalogoItem(item) ? "Descargar" : `Descargar ${d.tipo_archivo}`;
+  const verFicha = d.generar === "ficha";
+  const label = isCatalogoItem(item) ? "Descargar" : (verFicha ? "Ver ficha" : `Descargar ${d.tipo_archivo}`);
   btn.innerHTML = `<span class="btn-icon">${ICON_DOWNLOAD}</span> ${label}`;
-  if(d.generar){
+  if(verFicha){
+    btn.href = datasheetPageUrl(item.sku) || "#";
+    btn.target = "_blank";
+    btn.rel = "noopener";
+    delete btn.dataset.generar;
+    delete btn.dataset.sku;
+  }else if(d.generar){
     btn.href = "#";
     btn.removeAttribute("target");
     btn.removeAttribute("rel");
