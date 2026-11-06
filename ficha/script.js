@@ -1824,6 +1824,7 @@
       if (url && url !== "#") {
         card.href = url;
         card.hidden = false;
+        setCardDownloadIcon(card.querySelector(".dl-card__btn"));
         visibleCount++;
       } else {
         card.removeAttribute("href");
