@@ -13,9 +13,9 @@
   "use strict";
 
   var CRITICAL_CSS =
-    "html.ml-loading,html.ml-loading body{background:#f5f5f5!important}" +
-    "html.ml-loading body{overflow:hidden}" +
-    "html.ml-loading body>*:not(#ml-preload){opacity:0!important;pointer-events:none!important}" +
+    "html:not(.ml-ready),html:not(.ml-ready) body{background:#f5f5f5!important}" +
+    "html:not(.ml-ready) body{overflow:hidden}" +
+    "html:not(.ml-ready) body>*:not(#ml-preload){opacity:0!important;pointer-events:none!important}" +
     "#ml-preload{position:fixed;inset:0;z-index:99999;display:flex;align-items:center;justify-content:center;background:#f5f5f5;transition:opacity .4s ease,visibility .4s ease}" +
     "#ml-preload.is-done{opacity:0;visibility:hidden;pointer-events:none}" +
     ".ml-preload__inner{display:flex;flex-direction:column;align-items:center;padding:24px;width:min(280px,78vw);box-sizing:border-box}" +

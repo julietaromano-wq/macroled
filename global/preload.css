@@ -1,14 +1,17 @@
-/* Preload Macroled — overlay hasta que Typesense / la página esté lista */
-html.ml-loading,
-html.ml-loading body {
-  background: #f5f5f5;
+/* Preload Macroled — overlay hasta que Typesense / la página esté lista.
+   Se oculta desde que llega este CSS (está en el head), no cuando corre el
+   script del final. Si no, la página se pinta, después aparece el loader
+   y recién ahí vuelve a verse bien. */
+html:not(.ml-ready),
+html:not(.ml-ready) body {
+  background: #f5f5f5 !important;
 }
 
-html.ml-loading body {
+html:not(.ml-ready) body {
   overflow: hidden;
 }
 
-html.ml-loading body > *:not(#ml-preload) {
+html:not(.ml-ready) body > *:not(#ml-preload) {
   opacity: 0 !important;
   pointer-events: none !important;
 }
